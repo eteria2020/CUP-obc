@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent"
+	android:layout_height="match_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/LedsLL"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@+id/rl6"
+        android:layout_toRightOf="@+id/LedsLL"
+        android:background="@drawable/border1"
+        android:orientation="vertical"
+        android:id="@+id/CellsLL"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvCellsInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="-"
+            android:textSize="26sp" />
+    </LinearLayout>
+
+    <RelativeLayout android:id="@+id/rl0" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:layout_marginLeft="2dp" android:layout_marginRight="2dp" android:layout_marginTop="2dp">
+        <LinearLayout android:id="@+id/linearLayout6" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignBottom="@+id/linearLayout7" android:layout_alignTop="@+id/linearLayout7" android:background="@drawable/border1" android:orientation="vertical">
+            <TextView android:id="@+id/textView4" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="3dp" android:text="OBC App" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="@color/white"/>
+            <TextView android:id="@+id/tvVer" android:layout_width="100dp" android:layout_height="wrap_content" android:gravity="center_horizontal" android:text="v. ---"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/linearLayout7" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toRightOf="@+id/linearLayout6" android:background="@drawable/border1">
+            <TextView android:id="@+id/textView5" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:layout_marginLeft="3dp" android:text="Car plate:" android:textAppearance="?android:attr/textAppearanceLarge"/>
+            <EditText android:id="@+id/etPlate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp" android:layout_marginTop="3dp" android:layout_weight="1" android:ems="10" android:enabled="false"/>
+            <Button android:id="@+id/btnSet" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:padding="15dp" android:text="Set"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/linerarLayout8" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignBottom="@+id/linearLayout7" android:layout_alignParentRight="true" android:layout_alignTop="@+id/linearLayout7" android:layout_toRightOf="@+id/linearLayout7" android:background="@drawable/border1" android:orientation="horizontal" android:paddingTop="2dp">
+            <Button android:id="@+id/btnGo" android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_marginLeft="10dp" android:drawableTop="@drawable/back32" android:text="App"/>
+            <Button android:id="@+id/btnSettings" android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_marginLeft="10dp" android:drawableTop="@drawable/settings32" android:text="Config"/>
+            <Button android:id="@+id/btnLcd" android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_marginLeft="10dp"  android:text="LCD"/>
+            <Button android:id="@+id/btnRadio" android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_marginLeft="10dp"  android:text="Home"/>
+        </LinearLayout>
+    </RelativeLayout>
+    
+        <LinearLayout android:id="@+id/LedsLL" android:layout_width="240dp" android:layout_height="wrap_content" android:layout_below="@+id/rl0" android:layout_marginLeft="10dp" android:layout_marginTop="15dp" android:background="@drawable/border1" android:orientation="vertical">
+            <TextView android:id="@+id/tvBtnFrequency" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_horizontal" android:text="Leds" android:textAppearance="?android:attr/textAppearanceLarge"/>
+        <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_vertical|center_horizontal">
+            <ToggleButton android:id="@+id/tbLed1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="false" android:text="Led 1" android:textAlignment="center" android:textColor="#0F0"/>
+            <ToggleButton android:id="@+id/tbLed2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toRightOf="@+id/tbLed1" android:text="ToggleButton" android:textColor="#00F"/>
+            <ToggleButton android:id="@+id/tbLed3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toRightOf="@+id/tbLed2" android:text="ToggleButton" android:textColor="#FF0"/>
+            <ToggleButton android:id="@+id/tbLed4" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toRightOf="@+id/tbLed3" android:text="ToggleButton" android:textColor="#F00"/>
+        </RelativeLayout>
+    </LinearLayout>
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignTop="@+id/LedsLL" android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:layout_toLeftOf="@+id/rl6" android:layout_toRightOf="@+id/LedsLL" android:background="@drawable/border1" android:orientation="vertical"
+            android:id="@+id/BodyLL">
+            <TextView android:id="@+id/tvCarInfo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="5dp" android:text="-" android:textAppearance="?android:attr/textAppearanceMedium"/>
+        </LinearLayout>
+      
+      <RelativeLayout android:id="@+id/rl6" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_alignTop="@+id/LedsLL" android:layout_marginRight="2dp">
+             <TextView android:id="@+id/tv1rl6" android:layout_width="60dp" android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:text="RX #" android:textAppearance="?android:attr/textAppearanceLarge" android:textSize="16sp"/>
+             <TextView android:id="@+id/tvNmsg" android:layout_width="75dp" android:layout_height="wrap_content" android:layout_alignBaseline="@+id/tv1rl6" android:layout_marginLeft="5dp" android:layout_marginTop="10dp" android:layout_toRightOf="@+id/tv1rl6" android:background="#404040" android:text="-" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#fff"/>
+      	     <TextView android:id="@+id/tv2rl6" android:layout_width="60dp" android:layout_height="wrap_content" android:layout_below="@+id/tv1rl6" android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:text="FW ver" android:textAppearance="?android:attr/textAppearanceLarge" android:textSize="16sp"/>
+             <TextView android:id="@+id/tvFW" android:layout_width="75dp" android:layout_height="wrap_content" android:layout_alignBaseline="@+id/tv2rl6" android:layout_marginLeft="5dp" android:layout_marginTop="10dp" android:layout_toRightOf="@+id/tv2rl6" android:background="#404040" android:text="-" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#fff"/>      		
+             <TextView android:id="@+id/tv3rl6" android:layout_width="60dp" android:layout_height="wrap_content" android:layout_below="@+id/tv2rl6" android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:text="Km" android:textAppearance="?android:attr/textAppearanceLarge" android:textSize="16sp"/>
+             <TextView android:id="@+id/tvKm" android:layout_width="75dp" android:layout_height="wrap_content" android:layout_alignBaseline="@+id/tv3rl6" android:layout_alignParentRight="false" android:layout_marginLeft="5dp" android:layout_marginTop="10dp" android:layout_toRightOf="@+id/tv3rl6" android:background="#404040" android:text="-" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#fff"/>             
+             <TextView android:id="@+id/tv4rl6" android:layout_width="60dp" android:layout_height="wrap_content" android:layout_below="@+id/tv3rl6" android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:text="KEY" android:textAppearance="?android:attr/textAppearanceLarge" android:textSize="16sp"/>
+             <TextView android:id="@+id/tvQuadro" android:layout_width="75dp" android:layout_height="wrap_content" android:layout_alignBaseline="@+id/tv4rl6" android:layout_marginLeft="5dp" android:layout_marginTop="10dp" android:layout_toRightOf="@+id/tv4rl6" android:background="#404040" android:text="-" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#fff"/>
+             <TextView android:id="@+id/tv5rl6" android:layout_width="60dp" android:layout_height="wrap_content" android:layout_below="@+id/tv4rl6" android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:text="A volt" android:textAppearance="?android:attr/textAppearanceLarge" android:textSize="16sp"/>
+             <TextView android:id="@+id/tvAvolt" android:layout_width="75dp" android:layout_height="wrap_content" android:layout_alignBaseline="@+id/tv5rl6" android:layout_marginLeft="5dp" android:layout_marginTop="10dp" android:layout_toRightOf="@+id/tv5rl6" android:background="#404040" android:text="-" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#fff"/>      		
+             <TextView android:id="@+id/tv6rl6" android:layout_width="60dp" android:layout_height="wrap_content" android:layout_below="@+id/tv5rl6" android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:text="M volt" android:textAppearance="?android:attr/textAppearanceLarge" android:textSize="16sp"/>
+             <TextView android:id="@+id/tvMvolt" android:layout_width="75dp" android:layout_height="wrap_content" android:layout_alignBaseline="@+id/tv6rl6" android:layout_marginLeft="5dp" android:layout_marginTop="10dp" android:layout_toRightOf="@+id/tv6rl6" android:background="#404040" android:text="-" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#fff"/>
+             <TextView android:id="@+id/tv7rl6" android:layout_width="60dp" android:layout_height="wrap_content" android:layout_below="@+id/tv6rl6" android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:text="SOC" android:textAppearance="?android:attr/textAppearanceLarge" android:textSize="16sp"/>
+             <TextView android:id="@+id/tvFuelLevel" android:layout_width="75dp" android:layout_height="wrap_content" android:layout_alignBaseline="@+id/tv7rl6" android:layout_marginLeft="5dp" android:layout_marginTop="10dp" android:layout_toRightOf="@+id/tv7rl6" android:background="#404040" android:text="-" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#fff"/>
+             <TextView android:id="@+id/tv8rl6" android:layout_width="60dp" android:layout_height="wrap_content" android:layout_below="@+id/tv7rl6" android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:text="RPM:" android:textAppearance="?android:attr/textAppearanceLarge" android:textSize="16sp"/>
+             <TextView android:id="@+id/tvRpm" android:layout_width="90dp" android:layout_height="wrap_content" android:layout_alignBaseline="@+id/tv8rl6" android:layout_marginLeft="5dp" android:layout_marginTop="10dp" android:layout_toRightOf="@+id/tv8rl6" android:background="#404040" android:text="-" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#fff"/>
+             <TextView android:id="@+id/tv9rl6" android:layout_width="60dp" android:layout_height="wrap_content" android:layout_below="@+id/tv8rl6" android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:text="Speed:" android:textAppearance="?android:attr/textAppearanceLarge" android:textSize="16sp"/>
+             <TextView android:id="@+id/tvSpeed" android:layout_width="90dp" android:layout_height="wrap_content" android:layout_alignBaseline="@+id/tv9rl6" android:layout_marginLeft="5dp" android:layout_marginTop="10dp" android:layout_toRightOf="@+id/tv9rl6" android:background="#404040" android:text="-" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#fff"/>
+             <TextView android:id="@+id/tv10rl6"  android:layout_width="60dp" android:layout_height="wrap_content" android:layout_below="@+id/tv9rl6" android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:text="Plate" android:textAppearance="?android:attr/textAppearanceLarge" android:textSize="16sp"/>
+             <TextView android:id="@+id/tvTarga" android:layout_width="90dp" android:layout_height="wrap_content" android:layout_alignBaseline="@+id/tv10rl6" android:layout_marginLeft="5dp" android:layout_marginTop="10dp" android:layout_toRightOf="@+id/tv10rl6" android:background="#404040" android:text="-" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#fff"/>
+             
+         </RelativeLayout>
+
+    <LinearLayout android:id="@+id/ServerLL" android:layout_width="240dp" android:layout_height="wrap_content"
+        android:background="@drawable/border1" android:orientation="vertical"
+        android:layout_below="@+id/rl6"
+        android:layout_toEndOf="@+id/BodyLL"
+        android:visibility="visible"
+        android:layout_alignParentRight="true"
+        android:layout_alignLeft="@+id/rl6">
+        <TextView android:id="@+id/textViewIP" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_horizontal" android:text="Server IP" android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="20dp" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal">
+            <Button android:id="@+id/btnAltIP" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Alternative" android:textSize="14.8dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/btnDefIP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Default"
+                android:textSize="14.8dp"
+                android:layout_gravity="left"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/LogLL"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border1"
+        android:orientation="vertical"
+        android:layout_below="@+id/ServerLL"
+        android:layout_toEndOf="@+id/BodyLL"
+        android:visibility="visible"
+        android:layout_alignLeft="@+id/rl6">
+
+        <TextView
+            android:id="@+id/logTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="LOG"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="20dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/btnLogY"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enable"
+                android:textSize="14.8dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/btnlogN"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Disable"
+                android:textSize="14.8dp"
+                android:layout_gravity="left"
+                android:layout_weight="1" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/DoorsLL" android:layout_width="240dp" android:layout_height="wrap_content" android:layout_below="@+id/LedsLL" android:layout_marginLeft="10dp" android:layout_marginTop="15dp" android:background="@drawable/border1" android:orientation="vertical"
+                android:visibility="visible">
+                <TextView android:id="@+id/textView3" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_horizontal" android:text="Doors" android:textAppearance="?android:attr/textAppearanceLarge"/>
+          <LinearLayout android:layout_width="wrap_content" android:layout_height="match_parent" android:orientation="horizontal">
+              <Button android:id="@+id/btnOpen" android:layout_width="120dp" android:layout_height="match_parent" android:text="Open" android:textSize="25sp"/>
+
+              <Button
+                  android:id="@+id/btnClose"
+                  android:layout_width="120dp"
+                  android:layout_height="match_parent"
+                  android:text="Close"
+                  android:textSize="25sp" />
+
+          </LinearLayout>
+      </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/LedsLL"
+                android:layout_alignRight="@+id/LedsLL"
+                android:layout_below="@+id/MotorLL"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/border1"
+                android:orientation="vertical"
+                android:id="@+id/ShowBodyLL"
+                android:longClickable="true">
+
+					<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_horizontal" android:text="Show Body" android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal" >
+
+                    <Button
+                        android:id="@+id/btnGPRS"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="GPRS"
+                        android:textSize="25sp"
+                        android:layout_weight="1" />
+
+                    <Button
+                        android:id="@+id/btnCells"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="Cells"
+                        android:textSize="25sp"
+                        android:layout_gravity="left"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+            </LinearLayout>
+      
+      <LinearLayout android:id="@+id/MotorLL" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/DoorsLL" android:layout_marginLeft="10dp" android:layout_marginTop="15dp" android:background="@drawable/border1" android:orientation="vertical">
+          <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_horizontal" android:text="Motor" android:textAppearance="?android:attr/textAppearanceLarge"/>
+      	<LinearLayout android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_centerHorizontal="true" android:orientation="horizontal">
+          <Button android:id="@+id/btnEngineOn" android:layout_width="120dp" android:layout_height="match_parent" android:text="Enable" android:textSize="25sp"/>
+          <Button android:id="@+id/btnEngineOff" android:layout_width="120dp" android:layout_height="match_parent" android:text="Disable" android:textSize="25sp"/>
+         </LinearLayout>
+
+      </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/TestLeaseLL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ShowBodyLL"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/border1"
+        android:orientation="vertical"
+        android:layout_alignLeft="@+id/ShowBodyLL"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/BodyLL"
+        android:layout_toStartOf="@+id/BodyLL">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Test Lease Card"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/btnTestLease"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Enter Card"
+                android:textSize="25sp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/llBottom" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true" android:background="#C0C0C0">
+	    
+	    <TextView android:id="@+id/tvBtnName" android:layout_width="wrap_content" android:layout_height="wrap_content"  android:layout_gravity="left|center_vertical" android:layout_marginLeft="16dp" android:text="RX:" android:textColor="#000"/>
+	    <TextView android:id="@+id/tvRX" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignBottom="@+id/tvBtnName" android:layout_gravity="center_vertical" android:layout_marginLeft="28dp" android:layout_toRightOf="@+id/tvBtnName" android:text="-"/>
+	    </LinearLayout>
+
+</RelativeLayout>
+

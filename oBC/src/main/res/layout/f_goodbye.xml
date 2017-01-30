@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black" >
+    
+    <View android:id="@+id/fgod_top_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentTop="true"
+        android:background="#fdee66" />
+    
+    <View android:id="@+id/fgod_bottom_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fdee66" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fgod_top_V"
+        android:layout_above="@+id/fgod_bottom_V"
+        android:weightSum="1">
+
+        <RelativeLayout
+            android:layout_width="724dp"
+            android:layout_height="574dp">
+
+            <WebView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:id="@+id/fgoodWV"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:id="@+id/fgoodIV"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:visibility="visible"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/offline_goodbye" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/fgod_top_V"
+            android:layout_above="@+id/fgod_bottom_V"
+            android:orientation="vertical">
+
+            <TextView android:id="@+id/fgodTopTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="15dp" android:gravity="center" android:text="@string/thank_for_choosing" android:textSize="30sp" android:textColor="@color/white"
+                android:layout_weight="1"
+                android:textStyle="bold" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <ImageView android:id="@+id/fgodLogoIV"
+                    android:layout_width="match_parent"
+                    android:layout_height="65dp"
+                    android:layout_gravity="center|top"
+                    android:src="@drawable/logo_goodbye" android:contentDescription="@string/content_description"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp" />
+
+            </FrameLayout>
+
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="8dp" android:layout_marginLeft="8dp" android:layout_marginRight="4dp"
+                android:background="@drawable/sha_roundedbox_selected" android:orientation="vertical"
+                android:weightSum="1"
+                android:layout_weight="1">
+                <TextView android:id="@+id/tvBtnName" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="left|center_vertical" android:padding="10dp" android:text="@string/goodbye_instructions" android:textAppearance="?android:attr/textAppearanceLarge" android:textSize="20sp" />
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" android:layout_marginLeft="4dp" android:layout_marginRight="8dp"
+                android:background="@drawable/sha_roundedbox_selected" android:orientation="vertical"
+                android:layout_weight="1">
+                <TextView android:id="@+id/fgod_Goodbye_Title_TV" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="15dp" android:gravity="center" android:text="@string/goodbye" android:textColor="@color/white" android:textSize="25dp" />
+                <TextView android:id="@+id/fgodGoodbyeTV" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="6dp" android:gravity="center" android:text="Gino Panino" android:textColor="@color/white" android:textSize="30sp" android:textStyle="bold"/>
+                <LinearLayout android:id="@+id/llSelfClose" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" android:layout_gravity="center_vertical|center_horizontal" android:layout_marginTop="12dp" android:background="@drawable/sha_roundedbox" android:orientation="horizontal"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:paddingTop="7dp"
+                    android:paddingBottom="7dp"
+                    android:layout_marginBottom="12dp">
+                    <TextView android:id="@+id/tvSelfclose" android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="left" android:text="@string/self_close_message" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#000" android:textSize="24sp"
+                        android:singleLine="true"
+                        android:layout_marginRight="5dp" />
+                    <TextView android:id="@+id/tvCountdown" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="5dp" android:gravity="center_horizontal" android:text="30 s" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#F00" android:textSize="30sp"
+                        android:layout_marginLeft="5dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:weightSum="2">
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

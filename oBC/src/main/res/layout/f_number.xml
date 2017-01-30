@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#090808" >
+
+    <View android:id="@+id/fchn_top_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentTop="true"
+        android:background="#fdee66" />
+    
+    <View android:id="@+id/fchn_bottom_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fdee66" />
+    
+    <FrameLayout android:id="@+id/fchn_right_FL"
+        android:layout_width="225dp"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fchn_top_V"
+        android:layout_above="@+id/fchn_bottom_V"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="#3ea447" >
+        
+        <ImageButton android:id="@+id/fchnNextIB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:src="@drawable/sel_button_next"
+            android:contentDescription="@string/content_description"
+            android:background="@null" />
+        
+    </FrameLayout>
+    
+    <RelativeLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/fchn_right_FL"
+        android:layout_toStartOf="@+id/fchn_right_FL"
+        android:layout_below="@+id/fchn_top_V" >
+        
+        <TextView android:id="@+id/fchnMessageTV"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_alignParentTop="true"
+        	android:layout_marginTop="25dp"
+        	android:layout_marginLeft="40dp"
+        	android:layout_marginStart="40dp"
+        	android:text="@string/number_type_new"
+        	android:textSize="30sp"
+        	android:textStyle="bold"
+        	android:textColor="#feef79" />
+        
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/fchnNumberTV"
+            android:layout_below="@+id/fchnMessageTV" >
+            
+            <LinearLayout 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+            	android:layout_centerInParent="true"
+                android:orientation="vertical" >
+                
+                <LinearLayout 
+                	android:layout_width="wrap_content"
+                	android:layout_height="wrap_content"
+                	android:orientation="horizontal" >
+                	
+                	<Button android:id="@+id/fchnOneB"
+                    	android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:text="@string/number_1"
+            			android:textColor="@color/black"
+            			android:textSize="68sp"
+            			android:textStyle="bold"
+            			android:background="@drawable/sel_button_pin" />
+		                   
+                	<Button android:id="@+id/fchnTwoB"
+	            		android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:text="@string/number_2"
+            			android:textColor="@color/black"
+            			android:textSize="68sp"
+            			android:textStyle="bold"
+            			android:background="@drawable/sel_button_pin" />
+		                  
+                	<Button android:id="@+id/fchnThreeB"
+	            		android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:text="@string/number_3"
+            			android:textColor="@color/black"
+            			android:textSize="68sp"
+            			android:textStyle="bold"
+            			android:background="@drawable/sel_button_pin" />
+		                  
+                	<Button android:id="@+id/fchnFourB"
+	            		android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:text="@string/number_4"
+            			android:textColor="@color/black"
+            			android:textSize="68sp"
+            			android:textStyle="bold"
+            			android:background="@drawable/sel_button_pin" />
+		                  
+                	<Button android:id="@+id/fchnFiveB"
+	            		android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:text="@string/number_5"
+            			android:textColor="@color/black"
+            			android:textSize="68sp"
+            			android:textStyle="bold"
+            			android:background="@drawable/sel_button_pin" />
+		                  
+                	<Button android:id="@+id/fchnSixB"
+	            		android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:text="@string/number_6"
+            			android:textColor="@color/black"
+            			android:textSize="68sp"
+            			android:textStyle="bold"
+            			android:background="@drawable/sel_button_pin" />
+	                
+            	</LinearLayout>
+	            
+            	<LinearLayout 
+	                android:layout_width="wrap_content"
+                	android:layout_height="wrap_content"
+                	android:orientation="horizontal" >
+	                
+                	<Button android:id="@+id/fchnSevenB"
+	                    android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:text="@string/number_7"
+            			android:textColor="@color/black"
+            			android:textSize="68sp"
+            			android:textStyle="bold"
+            			android:background="@drawable/sel_button_pin" />
+		                   
+                	<Button android:id="@+id/fchnEightB"
+	            		android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:text="@string/number_8"
+            			android:textColor="@color/black"
+            			android:textSize="68sp"
+            			android:textStyle="bold"
+            			android:background="@drawable/sel_button_pin" />
+		                  
+                	<Button android:id="@+id/fchnNineB"
+	            		android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:text="@string/number_9"
+            			android:textColor="@color/black"
+            			android:textSize="68sp"
+            			android:textStyle="bold"
+            			android:background="@drawable/sel_button_pin" />
+		                  
+                	<Button android:id="@+id/fchnZeroB"
+	            		android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:text="@string/number_0"
+            			android:textColor="@color/black"
+            			android:textSize="68sp"
+            			android:textStyle="bold"
+            			android:background="@drawable/sel_button_pin" />
+
+                	<LinearLayout
+                	    android:layout_width="wrap_content"
+                	    android:layout_height="wrap_content"
+                	    android:orientation="vertical" >
+
+                		<ImageButton
+                		    android:id="@+id/fchnDeleteIB"
+                		    android:layout_width="wrap_content"
+                		    android:layout_height="wrap_content"
+                		    android:background="@null"
+                		    android:contentDescription="@string/content_description"
+                		    android:src="@drawable/sel_button_delete" />
+
+                		<TextView
+                		    android:id="@+id/textView1"
+                		    android:layout_width="wrap_content"
+                		    android:layout_height="wrap_content"
+                		    android:layout_gravity="center_horizontal"
+                		    android:text="CANC"
+                		    android:textAppearance="?android:attr/textAppearanceMedium"
+                		    android:textSize="24dp" />
+
+                	</LinearLayout>
+	                
+            	</LinearLayout>
+                
+            </LinearLayout>
+                        
+        </RelativeLayout>
+        
+        <TextView android:id="@+id/fchnNumberTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+        	android:layout_alignParentBottom="true"
+        	android:layout_centerHorizontal="true"
+        	android:layout_marginBottom="80dp"
+        	android:layout_marginLeft="40dp"
+        	android:layout_marginStart="40dp"
+        	android:layout_marginRight="40dp"
+        	android:layout_marginEnd="40dp"
+        	android:drawableLeft="@drawable/number_icon_phone"
+        	android:drawableStart="@drawable/number_icon_phone"
+        	android:drawablePadding="8dp"
+            android:textSize="65sp"
+            android:textColor="#feef79"
+            android:textStyle="bold" />
+                
+    </RelativeLayout>
+    
+</RelativeLayout>

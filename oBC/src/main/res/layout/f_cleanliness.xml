@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#090808" >
+	
+    <View android:id="@+id/fcle_top_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentTop="true"
+        android:background="#fdee66" />
+    
+    <View android:id="@+id/fcle_bottom_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fdee66" />
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fcle_top_V"
+        android:layout_above="@+id/fcle_bottom_V"
+        android:layout_toLeftOf="@+id/fcle_right_FL"
+        android:layout_toStartOf="@+id/fcle_right_FL"
+        android:orientation="vertical" >
+        
+        <TextView android:id="@+id/fcleMessageTV"
+	        android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_marginTop="25dp"
+        	android:layout_marginStart="45dp"
+        	android:layout_marginLeft="45dp"
+        	android:text="@string/car_cleanliness_state"
+        	android:textSize="30sp"
+        	android:textStyle="bold"
+	        android:textColor="#feef79" />
+        
+        <TextView android:id="@+id/fcleMessageInsideTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+        	android:layout_marginTop="40dp"
+        	android:layout_marginStart="45dp"
+        	android:layout_marginLeft="45dp"
+            android:text="@string/car_cleanliness_inside"
+        	android:textSize="28sp"
+        	android:textColor="@color/white" />
+        
+        <LinearLayout 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+        	android:layout_marginTop="20dp"
+        	android:layout_marginStart="45dp"
+        	android:layout_marginLeft="45dp"
+        	android:orientation="horizontal" >
+            
+            <ImageView android:id="@+id/fcleIconInsideIV"            
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:src="@drawable/img_car_inside"
+            	android:contentDescription="@string/content_description" />
+        
+        	<ImageButton android:id="@+id/fcleInsideRedLedIB"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_marginLeft="100dp"
+            	android:layout_marginStart="100dp"
+            	android:src="@drawable/sel_button_led_red"
+            	android:contentDescription="@string/content_description"
+            	android:background="@null" />
+        		
+        	<ImageButton android:id="@+id/fcleInsideYellowLedIB"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_marginLeft="15dp"
+            	android:layout_marginStart="15dp"
+            	android:src="@drawable/sel_button_led_yellow"
+            	android:contentDescription="@string/content_description"
+            	android:background="@null" />
+        		
+        	<ImageButton android:id="@+id/fcleInsideGreenLedIB"
+	            android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_marginLeft="15dp"
+            	android:layout_marginStart="15dp"
+	            android:src="@drawable/sel_button_led_green"
+            	android:contentDescription="@string/content_description"
+            	android:background="@null" />
+            
+        </LinearLayout>
+        
+        <TextView android:id="@+id/fcleMessageOutsideTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+        	android:layout_marginTop="40dp"
+        	android:layout_marginStart="45dp"
+        	android:layout_marginLeft="45dp"
+            android:text="@string/car_cleanliness_outside"
+        	android:textSize="28sp"
+        	android:textColor="@color/white" />
+        
+        <LinearLayout 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+        	android:layout_marginTop="20dp"
+        	android:layout_marginStart="45dp"
+        	android:layout_marginLeft="45dp"
+        	android:orientation="horizontal" >
+        
+        	<ImageView android:id="@+id/fcleIconOutsideIV"            
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:src="@drawable/img_car_outside"
+            	android:contentDescription="@string/content_description" />
+        	
+            <ImageButton android:id="@+id/fcleOutsideRedLedIB"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_marginLeft="100dp"
+            	android:layout_marginStart="100dp"
+            	android:src="@drawable/sel_button_led_red"
+            	android:contentDescription="@string/content_description"
+            	android:background="@null" />
+        	
+        	<ImageButton android:id="@+id/fcleOutsideYellowLedIB"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_marginLeft="15dp"
+            	android:layout_marginStart="15dp"
+            	android:src="@drawable/sel_button_led_yellow"
+            	android:contentDescription="@string/content_description"
+            	android:background="@null" />
+	        
+        	<ImageButton android:id="@+id/fcleOutsideGreenLedIB"
+	            android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_marginLeft="15dp"
+            	android:layout_marginStart="15dp"
+            	android:src="@drawable/sel_button_led_green"
+            	android:contentDescription="@string/content_description"
+            	android:background="@null" />
+	            
+      	</LinearLayout>
+	        
+    </LinearLayout>
+    
+    <FrameLayout android:id="@+id/fcle_right_FL"
+        android:layout_width="225dp"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fcle_top_V"
+        android:layout_above="@+id/fcle_bottom_V"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="#3ea447" >
+        
+        <Button android:id="@+id/fcleSOSB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/sel_button_sos"
+			android:visibility="gone" />
+        
+    </FrameLayout>
+    
+</RelativeLayout>

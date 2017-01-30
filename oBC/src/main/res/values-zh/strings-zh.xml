@@ -1,0 +1,219 @@
+<resources>
+
+   <string name="Acra_message">发送错误报告</string>
+   <string name="address">地址</string>
+   <string name="housenumber">公民</string>
+   <string name="app_name">OBC</string>
+   <string name="are_you_drunk">你有没有喝酒？</string>
+
+   <string name="back_to_navigation">继续进行，并返回到导航</string>
+   <string name="button_call">本书叫援助</string>
+   <string name="button_break">停止 结束</string>
+   <string name="button_close">关闭</string>
+   <string name="button_navigator">航海家</string>
+   <string name="button_radio">无线电</string>
+   <string name="button_points">要点</string>
+   <string name="button_recharge">充电站</string>
+   <string name="button_search">搜索</string>
+   <string name="button_home">菜单</string>
+   <string name="button_park">停车</string>
+   <string name="button_end">结束</string>
+
+	<string name="call_book">预订电话或输入新号码</string>
+	<string name="call_dealt_old">呼叫中心渠道的援助</string>
+	<string name="call_dealt">发送到服务中心的要求，你会被要求指定的号码</string>
+	<string name="car_cleanliness_inside">车辆清洗 <font style="color:#feef79"><b>内部</b></font></string>
+   <string name="car_cleanliness_outside">车辆清洗 <font style="color:#feef79"><b>外部</b></font></string>
+   <string name="car_cleanliness_state">报告车辆状态</string>
+   <string name="change">具体数量</string>
+   <string name="checking_pin">PIN控制</string>
+   <string name="city">城市</string>
+	<string name="content_description">复活节彩蛋</string>
+
+	<string name="damage_observed">发生损坏</string>
+	<string name="damages_observed">发生损坏</string>
+
+	<string name="error_empty_address">Il campo Indirizzo non pu&#242; essere vuoto</string>
+	<string name="error_empty_city">Il campo Citt&#224; non pu&#242; essere vuoto</string>
+	<string name="error_http_code_failure">免费无线网络连接失败，HTTP响应</string>
+	<string name="error_malformed_url">网址错误地在请求</string>
+	<string name="error_parsing_invalid_type">无效的类型\'地址</string>
+	<string name="error_parsing_missing_address">参数地址未找到</string>
+	<string name="error_parsing_missing_geometry">参数几何未找到</string>
+	<string name="error_parsing_missing_latitude">参数纬度未找到</string>
+	<string name="error_parsing_missing_location">参数的位置没有找到</string>
+	<string name="error_parsing_missing_longitude">参数经度未找到</string>
+	<string name="error_parsing_missing_results">参数结果未发现</string>
+	<string name="error_parsing_missing_status">参数类型未找到</string>
+	<string name="error_parsing_missing_types">Parametro-types non trovato</string>
+	<string name="error_parsing_response_not_json">服务器响应不是一个JSON</string>
+	<string name="error_parsing_result_not_json">一的结果是不是一个JSON</string>
+	<string name="error_unable_to_close_buffer_reader">无法接收到的服务器响应后关闭读缓冲</string>
+	<string name="error_unable_to_get_request_response">无法读取请求的响应</string>
+	<string name="error_unable_to_open_connection">未连接</string>
+	<string name="error_unable_to_read_message_content">无法读取邮件内容</string>
+	<string name="error_unable_to_read_server_response">无法读取服务器的响应</string>
+
+	<string name="fuel_stations">经销商</string>
+	<string name="fuel_station_list">经销商名单</string>
+	<string name="find_destination">查找目的地</string>
+	<string name="fuel_status_one_quarter">燃料水平大于25％：<b>供应禁用</b></string>
+	<string name="fuel_status_pin_card">A一个加油完毕后，点击下一步</string>
+	<string name="fuel_status_show_pin">能级</string>
+
+	<string name="go_to_map_or_back">进入地图或返回所有\'名单目的地</string>
+	<string name="goodbye">再见</string>
+
+	<string name="search_title">地址搜索</string>
+	<string name="hint_housenumber">写一个公民</string>
+	<string name="hint_address">写一个地址</string>
+	<string name="hint_city">写城市</string>
+
+	<string name="instruction_title">要开始使用\“的车</string>
+
+	<string name="instruction_start_1">检查大红色按钮位于座椅之间已调高</string>
+	<string name="instruction_start_2">转动钥匙</string>
+	<string name="instruction_start_3">等待仪表盘上的准备申遗</string>
+	<string name="instruction_start_4">按下按钮D，或R</string>
+
+	<string name="instruction_damages">查看\'车损？</string>
+	<string name="instruction_dirty"> 它\'脏？?</string>
+
+	<string name="priority_lanes_title">要开始使用\“的车</string>
+	<string name="attention">警告：</string>
+	<string name="priority_lanes">该车辆不得在公交专用车道行驶</string>
+
+	<string name="instruction_title_preclose">调试前THE PARK或关闭出租：</string>
+	<string name="instruction_preclose_1">置于空挡（N键）</string>
+	<string name="instruction_preclose_2">关灯</string>
+	<string name="instruction_preclose_3">拉手刹</string>
+	<string name="instruction_preclose_4">关闭窗口</string>
+	<string name="instruction_preclose_5">TURN OFF面板转动钥匙（键处于ON）</string>
+
+
+
+	<string name="instruction_title_close">这就像在离开汽车</string>
+	<string name="instruction_close_1">收集你的东西。你有灯和车窗关闭？</string>
+	<string name="instruction_close_2">按下仪表盘上的N按钮</string>
+	<string name="instruction_close_3">拉手刹</string>
+	<string name="instruction_close_4">下来。门在期间自动关闭，右边</string>
+	<string name="instruction_close_4_note">如果您改变了主意，您可以锁上车门并打开租赁新一届</string>
+	<string name="instruction_close_5">关注汽车无法正常关闭，可能会导致你和刑事不必要的费用</string>
+
+	<string name="self_close_message">截止\ n搬运工</string>
+
+
+	<string name="loading">负载</string>
+
+	<string name="menu_rent_end"><b>TERMINA NOLEGGIO</b> - <u>Prima</u> 控件不把事情给力，把你的东西出来行李箱，灯光和关闭窗口，并通过转动钥匙关闭图片</string>
+	<string name="menu_rent_end_off"><b>TERMINA NOLEGGIO</b> - <u>Prima</u> 控件不把事情给力，把你的东西出来行李箱，灯光和关闭窗口，并通过关闭键关闭画面（禁用）</string>
+	<string name="menu_rent_end_outside_park_area"><b>TERMINA NOLEGGIO</b> -  不可用：你是停车区之外。它属于允许范围内关闭了比赛。</string>
+	<string name="menu_rent_end_shutdown_engine"><b>TERMINA NOLEGGIO</b> - <u>Prima</u> 控件不把事情给力，把你的东西出来行李箱，灯光和关闭窗口，并通过关闭键关闭画面（发动机之前关闭）</string>
+
+	<string name="inside_area">内部</string>
+    <string name="outside_area">输出\n面积</string>
+
+
+	<string name="menu_refuel">得到一些燃料</string>
+	<string name="menu_refuel_off">使电源（禁用）</string>
+	<string name="menu_refuel_shutdown_engine">使电源（发动机之前关闭）</string>
+	<string name="menu_park_mode_resume">简历租赁</string>
+	<string name="menu_park_mode_resume_shutdown_engine">简历租赁（发动机之前关闭）</string>
+
+	<string name="menu_park_mode_suspend"><b>INIZIA LA SOSTA</b> - <u>Prima</u> 控件不把事情在船上，带走你从行李箱，灯光和关闭窗口所需要的东西</string>
+	<string name="menu_park_mode_suspend_off"><b>INIZIA LA SOSTA</b> - <u>Prima</u> 控制不留在船上的东西，带走你从行李箱，灯光和关闭窗口所需要的东西（禁用）</string>
+
+	<string name="menu_park_mode_suspend_shutdown_engine"><b>INIZIA LA SOSTA</b> - <u>Prima</u> 控制不留在船上的东西，带走您从后备箱所需要的东西，靠近窗户和灯（发动机之前关闭）</string>
+
+	<string name="menu_park_mode_suspend_instructions">您在公园 - 现在你可以走了。在右边的时间段自动关闭的门。\ n \ n在公园使用手机或卡上的开门指令取回在车上</string>
+
+	<string name="push_to_cancel">奖\ nannullare</string>
+
+	<string name="goodbye_instructions">你能不能降下来。在右边的时间段自动关闭的门。\ n \ n如果你改变主意去了，留下的大门关闭和打开一个新员工会议</string>
+
+	<string name="milan">Milano</string>
+	<string name="minutes_saved">挣分：</string>
+	<string name="mu_distance_kilometers">千米</string>
+	<string name="mu_distance_meters">米</string>
+	<string name="mu_distance_time">分</string>
+
+	<string name="navigation_start">开始导航</string>
+	<string name="navigation_stop">停止指导</string>
+	<string name="navigator_almost_there">你几乎没有</string>
+	<string name="navigator_continue">继续</string>
+	<string name="navigator_continue_onto">继续沿</string>
+	<string name="navigator_finish">到达目的地</string>
+	<string name="navigator_get_ready_to">有备无患</string>
+	<string name="navigator_left">左</string>
+	<string name="navigator_right">权</string>
+	<string name="navigator_sharp_left">左急转弯</string>
+	<string name="navigator_sharp_right">没错，急弯</string>
+	<string name="navigator_slight_left">左，略带曲线</string>
+	<string name="navigator_slight_right">没错，略带曲线</string>
+	<string name="navigator_stopover">沿着停止</string>
+	<string name="navigator_turn">转</string>
+	<string name="navigator_turn_onto_it">沿</string>
+	<string name="navigator_turn_onto_en"></string>
+	<string name="navigator_uturn">为尽快扭转</string>
+	<string name="navigator_range">自治</string>
+	<string name="navigator_stop">停航</string>
+	<string name="navigator_2d3d">2D//3D</string>
+	<string name="navigator_zoom">放大</string>
+	<string name="navigator_go">奥钢联</string>
+	<string name="hint_navigator">Inserici一些字符，然后单击用镜头选择目标按钮</string>
+
+	<string name="new_damage">新的损害？</string>
+	<string name="new_damage2">在哪里？</string>
+	<string name="no">没有</string>
+	<string name="no_results">没有找到结果</string>
+	<string name="gotoCity"> 前往市中心</string>
+	<string name="gotoStreet">去从街道中心</string>
+
+	<string name="number_0">0</string>
+	<string name="number_1">1</string>
+	<string name="number_2">2</string>
+	<string name="number_3">3</string>
+	<string name="number_4">4</string>
+	<string name="number_5">5</string>
+	<string name="number_6">6</string>
+	<string name="number_7">7</string>
+	<string name="number_8">8</string>
+	<string name="number_9">9</string>
+	<string name="number_invalid">不正确的数字格式</string>
+	<string name="number_type_new">输入一个新号码</string>
+
+	<string name="pin">PIN&#58;</string>
+	<string name="pin_card"><b>PIN</b> 纸</string>
+	<string name="pin_message">输入4位PIN码，使您可以聘请</string>
+	<string name="pin_right"><b>PIN</b> 正确</string>
+	<string name="pin_type">键入 <b>PIN</b></string>
+	<string name="pin_wrong"><b>PIN</b> 错了，再试一次</string>
+	<string name="points_of_interest">兴趣点</string>
+	<string name="pin_FAQ_Title">从哪里获取PIN码？</string>
+	<string name="pin_FAQ_1">Sharengo.it您可以登录并找到在左侧栏中您的PIN在网站上。</string>
+	<string name="pin_FAQ_2">该网站做登录上Mobile.sharengo.it，点击你的姓名，找到你的PIN码。</string>
+	<string name="pin_FAQ_3">萨尔\“应用程序，请登录后，点击用户配置文件，向下滚动到PIN部分。</string>
+
+
+	<string name="refuel_title">汽车充电</string>
+	<string name="refueling_done">提供完整的！</string>
+
+	<string name="search">搜索</string>
+	<string name="select_a_destination">选择感兴趣的目的地</string>
+	<string name="select_fuel_station">选择经销商</string>
+	<string name="select_travel_path">选择路线</string>
+	<string name="show_pin">视图 <b>PIN</b></string>
+	<string name="sos">SOS</string>
+	<string name="plate">牌照:</string>
+
+	<string name="text_view_are_there_new_damages">新的损害？</string>
+	<string name="text_view_call_message">预订电话或输入一个新号码</string>
+	<string name="text_view_set_a_choice">设置一个选择</string>
+	<string name="thank_for_choosing">感谢您选择</string>
+
+	<string name="welcome">欢迎</string>
+
+	<string name="yes">是的</string>
+
+	<string name="menu_rent_end_time_startup_app"><b>TERMINA NOLEGGIO</b>- 不可用：L \'应用程序仍在启动，请稍候。</string>
+</resources>

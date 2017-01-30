@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black" >
+	
+    <View android:id="@+id/fins_top_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentTop="true"
+        android:background="#fdee66" />
+    
+    <View android:id="@+id/fins_bottom_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fdee66" />
+    
+    <RelativeLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fins_top_V"
+        android:layout_above="@+id/fins_bottom_V"
+        android:layout_toLeftOf="@+id/fpca_right_RL"
+        android:layout_toStartOf="@+id/fpca_right_RL" >
+        
+        <LinearLayout android:id="@+id/fpcaCardLL" 
+        	android:layout_width="500dp"
+        	android:layout_height="wrap_content"
+        	android:layout_centerInParent="true"
+        	android:padding="20dp"
+        	android:orientation="vertical"
+        	android:background="@drawable/sha_pin"
+        	android:visibility="invisible" >
+        	
+        	<ImageView 
+	            android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+        		android:layout_gravity="center_horizontal"
+            	android:src="@drawable/img_totalerg_logo"
+            	android:contentDescription="@string/content_description" />
+        	
+        	<TextView android:id="@+id/fpcaPinTV"
+	        	android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:layout_marginTop="20dp"
+        		android:text="@string/pin"
+        		android:textSize="20sp"
+        		android:textColor="@color/black" />
+	        
+        	<LinearLayout 
+	            android:layout_width="match_parent"
+            	android:layout_height="wrap_content"
+        		android:layout_marginTop="20dp"
+            	android:orientation="horizontal"
+            	android:weightSum="4" >
+	            
+            	<TextView android:id="@+id/fpcaPinCodeOneTV"
+	        		android:layout_width="0dp"
+        			android:layout_height="wrap_content"
+        			android:layout_weight="1"
+        			android:gravity="center"
+        			android:textSize="70sp"
+        			android:textStyle="bold"
+        			android:textColor="@color/black" />
+	            
+            	<TextView android:id="@+id/fpcaPinCodeTwoTV"
+	        		android:layout_width="0dp"
+        			android:layout_height="wrap_content"
+        			android:layout_weight="1"
+        			android:gravity="center"
+        			android:textSize="70sp"
+        			android:textStyle="bold"
+        			android:textColor="@color/black" />
+	            
+            	<TextView android:id="@+id/fpcaPinCodeThreeTV"
+	        		android:layout_width="0dp"
+        			android:layout_height="wrap_content"
+        			android:layout_weight="1"
+        			android:gravity="center"
+        			android:textSize="70sp"
+        			android:textStyle="bold"
+        			android:textColor="@color/black" />
+	            
+            	<TextView android:id="@+id/fpcaPinCodeFourTV"
+	        		android:layout_width="0dp"
+        			android:layout_height="wrap_content"
+        			android:layout_weight="1"
+        			android:gravity="center"
+        			android:textSize="70sp"
+        			android:textStyle="bold"
+        			android:textColor="@color/black" />
+	            
+        	</LinearLayout>
+        	
+    	</LinearLayout>
+    
+    	<ImageView android:id="@+id/fpcaFuelFullIV"        
+	        android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_centerHorizontal="true"
+        	android:layout_centerInParent="true"
+        	android:src="@drawable/img_fuel_full"
+        	android:contentDescription="@string/content_description"
+        	android:visibility="invisible" />
+    	
+    	<LinearLayout android:id="@+id/fpcaSavedMinutesLL"
+	        android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_centerInParent="true"
+        	android:orientation="vertical"
+        	android:visibility="visible" >
+	        
+        	<TextView android:id="@+id/fpcaSavedMinutesTV"
+	        	android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:layout_gravity="center_horizontal"
+        		android:text="@string/minutes_saved"
+        		android:textSize="24sp"
+        		android:textColor="@color/white" />
+	        
+        	<LinearLayout 
+	        	android:layout_width="600dp"
+        		android:layout_height="wrap_content"
+        		android:layout_gravity="center_horizontal"
+        		android:layout_marginTop="60dp"
+        		android:orientation="horizontal" >
+	            
+            	<ImageView 
+	            	android:layout_width="wrap_content"
+            		android:layout_height="wrap_content"
+        			android:layout_gravity="center_horizontal"
+            		android:src="@drawable/img_car_vrooom"
+            		android:contentDescription="@string/content_description" />
+	            
+            	<TextView android:id="@+id/fpcaMinutesTV"
+	        		android:layout_width="300dp"
+        			android:layout_height="wrap_content"
+        			android:layout_gravity="center_horizontal"
+        			android:gravity="center"
+        			android:textSize="130sp"
+        			android:textStyle="bold"
+        			android:textColor="@color/green" />
+	            
+        	</LinearLayout>
+	        
+	    </LinearLayout>
+	    
+    	<TextView android:id="@+id/fpcaMessageTV"
+	        android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_centerHorizontal="true"
+        	android:layout_marginTop="25dp"
+        	android:text="@string/fuel_status_pin_card"
+        	android:textSize="26sp"
+        	android:textColor="@color/white" />
+	        
+    </RelativeLayout>
+    
+    <RelativeLayout android:id="@+id/fpca_right_RL"
+        android:layout_width="225dp"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fins_top_V"
+        android:layout_above="@+id/fins_bottom_V"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="#3ea447" >
+        
+        <Button android:id="@+id/fpcaSOSB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/sel_button_sos" />
+        
+        <ImageButton android:id="@+id/fpcaBackIB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@+id/fpcaNextIB"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/sel_button_back"
+            android:contentDescription="@string/content_description"
+            android:background="@null" />
+        
+        <ImageButton android:id="@+id/fpcaNextIB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="25dp"
+            android:src="@drawable/sel_button_next"
+            android:contentDescription="@string/content_description"
+            android:background="@null" />
+        
+    </RelativeLayout>
+    
+</RelativeLayout>

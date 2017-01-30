@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#090808" >
+	
+    <View android:id="@+id/fdam_top_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentTop="true"
+        android:background="#fdee66" />
+    
+    <View android:id="@+id/fdam_bottom_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fdee66" />
+    
+    <LinearLayout
+        android:id="@+id/fdam_second_LL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/fdam_bottom_V"
+        android:layout_below="@+id/fdam_top_V"
+        android:layout_toLeftOf="@+id/fdam_right_FL"
+        android:layout_toStartOf="@+id/fdam_right_FL"
+        android:baselineAligned="false"
+        android:orientation="vertical"
+        android:visibility="invisible" >
+        
+        <TextView android:id="@+id/fdam_alternative_question_TV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:text="@string/text_view_are_there_new_damages"
+        	android:textSize="28sp"
+        	android:textColor="#feef79"
+        	android:textStyle="bold" />
+        
+        <FrameLayout 
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_horizontal" >
+            
+            <ImageView 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/img_car_damage_alternative"
+                android:contentDescription="@string/app_name"
+                android:background="@null" />
+            
+        </FrameLayout>
+        
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="70dp"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal" >
+                	
+            <Button android:id="@+id/fdamAlternativeYesB"
+	        	android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+            	android:layout_marginRight="10dp"
+            	android:layout_marginEnd="10dp"
+            	android:text="@string/yes"
+            	android:textSize="46sp"
+            	android:textStyle="bold"
+            	android:textColor="@color/white"
+            	android:background="@drawable/sel_button_damage_yes" />
+	           		
+            <Button android:id="@+id/fdamAlternativeNoB"
+			   	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_marginLeft="10dp"
+            	android:layout_marginStart="10dp"
+            	android:text="@string/no"
+            	android:textSize="46sp"
+            	android:textStyle="bold"
+            	android:textColor="@color/white"
+            	android:background="@drawable/sel_button_damage_no" />
+            		
+        </LinearLayout>
+        
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/fdam_first_LL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/fdam_bottom_V"
+        android:layout_below="@+id/fdam_top_V"
+        android:layout_toLeftOf="@+id/fdam_right_FL"
+        android:layout_toStartOf="@+id/fdam_right_FL"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        android:weightSum="2" >
+        
+        <LinearLayout
+	        android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+	        
+            <TextView android:id="@+id/fdamMessageTV"
+		       	android:layout_width="wrap_content"
+    	    	android:layout_height="wrap_content"
+    	    	android:layout_marginTop="25dp"
+    	    	android:layout_marginStart="45dp"
+    	    	android:layout_marginLeft="45dp"
+        		android:text="@string/new_damage"
+        		android:textSize="30sp"
+        		android:textStyle="bold"
+        		android:textColor="#feef79" />
+            
+            <TextView android:id="@+id/fdamDamagesObservedTV"
+	            android:layout_width="match_parent"
+             	android:layout_height="wrap_content"
+    	    	android:layout_marginTop="50dp"
+    	    	android:layout_marginStart="45dp"
+    	    	android:layout_marginLeft="45dp"
+               	android:text="@string/damages_observed"
+        		android:textSize="28sp"
+        		android:textColor="#FFFFFF"
+        		android:textStyle="bold" />
+	            
+            <View 
+	            android:layout_width="match_parent"
+               	android:layout_height="1dp"
+    	    	android:layout_marginTop="15dp"
+    	    	android:layout_marginStart="45dp"
+    	    	android:layout_marginLeft="45dp"
+               	android:background="@color/white" />
+	        
+            <LinearLayout 
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+    	    	android:layout_marginTop="15dp"
+    	    	android:layout_marginBottom="25dp"
+    	    	android:layout_marginStart="45dp"
+    	    	android:layout_marginLeft="45dp"
+                android:orientation="horizontal" >
+                
+                <eu.philcar.csg.OBC.controller.welcome.VerticalSeekBar android:id="@+id/fdamDamageListSB"
+    				android:layout_width="wrap_content"
+    				android:layout_height="match_parent"
+    				android:progressDrawable="@drawable/red_scrubber_progress"
+    				android:thumb="@drawable/red_scrubber_control" 
+    				android:progress="10"
+            		android:max="10" />
+                
+                <ListView android:id="@+id/fdamDamagesLV"
+	            	android:layout_width="match_parent"
+              		android:layout_height="match_parent"
+              		android:layout_marginLeft="8dp"
+              		android:layout_marginStart="8dp"
+               		android:divider="@null"
+               		android:dividerHeight="0dp"
+               		android:scrollbars="none" />
+                
+            </LinearLayout>
+	           
+        </LinearLayout>
+        
+        <FrameLayout 
+	        android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            
+            <LinearLayout android:id="@+id/fdam_question_LL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:visibility="visible" >
+                
+                <ImageView android:id="@+id/fdamDamageIV"
+            		android:layout_width="wrap_content"
+            		android:layout_height="wrap_content"
+            		android:layout_gravity="center_horizontal"
+            		android:src="@drawable/img_car_damage"
+            		android:contentDescription="@string/content_description" />
+                
+                <TextView android:id="@+id/fdam_question_TV"
+	            	android:layout_width="wrap_content"
+             		android:layout_height="wrap_content"
+             		android:layout_marginTop="20dp"
+            		android:layout_gravity="center_horizontal"
+            		android:gravity="center_horizontal"
+               		android:text="@string/text_view_are_there_new_damages"
+        			android:textSize="28sp"
+        			android:textColor="#feef79"
+        			android:textStyle="bold" />
+                
+                <LinearLayout
+                	android:layout_width="wrap_content"
+                	android:layout_height="wrap_content"
+             		android:layout_marginTop="20dp"
+                	android:layout_gravity="center_horizontal"
+                	android:orientation="horizontal" >
+                	
+                	<Button android:id="@+id/fdamYesB"
+	           			android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:layout_marginRight="10dp"
+            			android:layout_marginEnd="10dp"
+            			android:text="@string/yes"
+            			android:textSize="46sp"
+            			android:textStyle="bold"
+            			android:textColor="@color/white"
+            			android:background="@drawable/sel_button_damage_yes" />
+	           		
+            		<Button android:id="@+id/fdamNoB"
+			           	android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:layout_marginLeft="10dp"
+            			android:layout_marginStart="10dp"
+            			android:text="@string/no"
+            			android:textSize="46sp"
+            			android:textStyle="bold"
+            			android:textColor="@color/white"
+            			android:background="@drawable/sel_button_damage_no" />
+            		
+            	</LinearLayout>
+                
+            </LinearLayout>
+            
+            <LinearLayout android:id="@+id/fdam_number_LL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone" >
+                
+                <TextView android:id="@+id/fdamNumberTV"
+            	    android:layout_width="wrap_content"
+            	    android:layout_height="wrap_content"
+            	    android:layout_gravity="center_horizontal"
+            	    android:drawableLeft="@drawable/damages_icon_phone"
+            	    android:drawableStart="@drawable/damages_icon_phone"
+            	    android:drawablePadding="8dp"
+            	    android:gravity="center_horizontal"
+            	    android:textSize="30sp"
+            	    android:textColor="#feef79"
+            	    android:textStyle="bold" />
+                
+                <TextView android:id="@+id/fdam_call_message_TV"
+            	    android:layout_width="wrap_content"
+            	    android:layout_height="wrap_content"
+            	    android:layout_marginTop="20dp"
+            	    android:layout_gravity="center_horizontal"
+            	    android:gravity="center_horizontal"
+            	    android:text="@string/text_view_call_message"
+            	    android:textSize="24sp"
+            	    android:textColor="#FFFFFF" />
+	           	
+            	<Button android:id="@+id/fdamCallB"
+		           	android:layout_width="wrap_content"
+            		android:layout_height="wrap_content"
+            	    android:layout_marginTop="25dp"
+            	    android:layout_gravity="center_horizontal"
+            		android:text="@string/button_call"
+            		android:textSize="46sp"
+            		android:textStyle="bold"
+            		android:textColor="#FFFFFF"
+            		android:background="@drawable/sel_button_damages_green" />
+	           	
+            	<Button android:id="@+id/fdamChangeNumberB"
+		           	android:layout_width="wrap_content"
+            		android:layout_height="wrap_content"
+            	    android:layout_marginTop="25dp"
+            	    android:layout_gravity="center_horizontal"
+            		android:text="@string/change"
+            		android:textSize="46sp"
+            		android:textStyle="bold"
+            		android:textColor="#FFFFFF"
+            		android:background="@drawable/sel_button_damages_red" />
+                
+            </LinearLayout>
+            
+            <LinearLayout android:id="@+id/fdam_call_reserved_LL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone" >
+                
+                <TextView android:id="@+id/fdamNumberCallTV"
+            	    android:layout_width="wrap_content"
+            	    android:layout_height="wrap_content"
+            	    android:layout_gravity="center_horizontal"
+            	    android:drawableLeft="@drawable/damages_icon_phone"
+            	    android:drawableStart="@drawable/damages_icon_phone"
+            	    android:drawablePadding="8dp"
+            	    android:gravity="center_horizontal"
+            	    android:textSize="30sp"
+            	    android:textColor="#feef79"
+            	    android:textStyle="bold" />
+                
+                <TextView android:id="@+id/fdam_call_reserved_message_TV"
+            	    android:layout_width="wrap_content"
+            	    android:layout_height="wrap_content"
+            	    android:layout_marginTop="20dp"
+            	    android:layout_gravity="center_horizontal"
+            	    android:gravity="center_horizontal"
+            	    android:text="@string/call_dealt"
+            	    android:textSize="24sp"
+            	    android:textColor="#feef79"
+            	    android:textStyle="bold" />
+	           	
+                <ImageView 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+            	    android:layout_marginTop="55dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/damages_image_clouds"
+                    android:contentDescription="@string/app_name" />
+                
+            	<Button android:id="@+id/fdam_call_reserved_close_B"
+		           	android:layout_width="wrap_content"
+            		android:layout_height="wrap_content"
+            	    android:layout_marginTop="25dp"
+            	    android:layout_gravity="center_horizontal"
+            		android:text="@string/button_close"
+            		android:textSize="46sp"
+            		android:textStyle="bold"
+            		android:textColor="#FFFFFF"
+            		android:background="@drawable/sel_button_damages_red" />
+                
+            </LinearLayout>
+            
+        </FrameLayout>
+        
+    </LinearLayout>
+    
+    <FrameLayout android:id="@+id/fdam_right_FL"
+        android:layout_width="225dp"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fdam_top_V"
+        android:layout_above="@+id/fdam_bottom_V"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="#3ea447" >
+        
+        <Button android:id="@+id/fdamSOSB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/sel_button_sos" />
+        
+        <ImageButton android:id="@+id/fdamCloseIB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="25dp"
+            android:src="@drawable/sel_button_cancel"
+            android:contentDescription="@string/app_name"
+            android:background="@null" />
+        
+    </FrameLayout>
+    
+</RelativeLayout>

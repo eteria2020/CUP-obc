@@ -1,0 +1,137 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="eu.philcar.csg.OBC"
+
+	android:versionCode="104"
+	android:versionName="0.104.9-bis" >
+
+		<uses-sdk
+		android:minSdkVersion="13"
+		android:targetSdkVersion="19" />
+	
+	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+	
+	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+	<uses-permission android:name="android.permission.BLUETOOTH"/>
+	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.READ_SMS"/>
+	<uses-permission android:name="android.permission.RECEIVE_SMS"/>
+	<uses-permission android:name="android.permission.WRITE_SMS"/>
+	<uses-permission android:name="android.permission.SEND_SMS"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+	<uses-permission android:name="android.permission.WAKE_LOCK"/>
+	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+	<uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+	<uses-permission android:name="android.permission.WRITE_APN_SETTINGS"/>
+	
+	<uses-permission android:name="android.permission.ACCESS_GPS"/>
+	<uses-permission android:name="android.permission.ACCESS_VEHICLE_OBD"/>
+    <uses-permission android:name="android.permission.ACCESS_SERIALPORT_AVN"/>
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.SHUTDOWN"/>
+
+	<uses-feature android:name="android.hardware.usb.host" />
+	
+	<application
+		android:allowBackup="true"
+		android:icon="@drawable/ic_launcher"
+		android:label="@string/app_name"
+		android:largeHeap="true"
+		  
+		android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+		android:name="eu.philcar.csg.OBC.App"
+		android:hardwareAccelerated="false">
+		
+		<activity
+			android:name="eu.philcar.csg.OBC.helpers.StubActivity"
+			android:label="@string/app_name" >
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+
+				<category android:name="android.intent.category.LAUNCHER" />                
+			
+			</intent-filter>
+		</activity>
+
+		<receiver android:enabled="true" android:exported="true" android:name="eu.philcar.csg.OBC.helpers.RunOnStartup" android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+
+			<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
+				<action android:name="android.intent.action.QUICKBOOT_POWERON" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+
+		</receiver>
+		
+		<activity
+			android:name="eu.philcar.csg.OBC.devices.UsbReceiverActivity"
+			android:excludeFromRecents="true"
+			android:exported="false"
+			android:label="OBC"
+			android:noHistory="true"
+			android:process=":UsbReceiverActivityProcess"
+			android:taskAffinity="eu.philcar.csg.OBC.taskAffinityUsbEventReceiver"
+			android:theme="@style/Theme.Transparent" >
+			<intent-filter>
+				<action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+			</intent-filter>
+
+			<meta-data
+				android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+				android:resource="@xml/usb_device_filter" />
+		</activity>
+		
+		<activity android:name="eu.philcar.csg.OBC.helpers.ServiceTestActivity"
+			 	  android:label="@string/app_name" 
+			  	  android:screenOrientation="landscape" 
+			  	  android:theme="@*android:style/Theme.Black.NoTitleBar.Fullscreen">    	
+	    </activity>
+		
+	    <activity android:name="eu.philcar.csg.OBC.AWelcome"
+	        android:label="@string/app_name"
+	        android:screenOrientation="landscape" 
+	        android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+	     >
+	    </activity>
+       
+	    <activity android:name="eu.philcar.csg.OBC.AMainOBC"
+	        android:label="@string/app_name"
+	        android:screenOrientation="landscape" >
+
+	    </activity>
+		
+	    <activity android:name="eu.philcar.csg.OBC.ASOS"
+	        android:label="@string/app_name"
+	        android:screenOrientation="landscape" >
+	    </activity>
+
+		<activity android:name="eu.philcar.csg.OBC.AFAQ"
+			android:label="@string/app_name"
+			android:screenOrientation="landscape" >
+		</activity>
+	    
+	    <activity android:name="eu.philcar.csg.OBC.AGoodbye"
+	        android:label="@string/app_name"
+	        android:screenOrientation="landscape" >
+	    </activity>
+	    
+	
+	   
+		<service android:enabled="true" android:name="eu.philcar.csg.OBC.service.ObcService"></service>
+		<service android:enabled="true" android:name="eu.philcar.csg.OBC.service.AdvertisementService"></service>
+		
+		<receiver android:name="eu.philcar.csg.OBC.usbReceiver" android:enabled="true">
+
+    	</receiver>
+    	
+
+
+		
+	</application>
+
+</manifest>

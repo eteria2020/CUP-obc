@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black" >
+	
+    <View android:id="@+id/fdru_top_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentTop="true"
+        android:background="#fdee66" />
+    
+    <View android:id="@+id/fdru_bottom_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fdee66" />
+    
+    <FrameLayout
+      	android:layout_width="match_parent"
+       	android:layout_height="match_parent"
+        android:layout_below="@+id/fdru_top_V"
+        android:layout_above="@+id/fdru_bottom_V"
+        android:layout_toLeftOf="@+id/fdru_right_FL"
+        android:layout_toStartOf="@+id/fdru_right_FL" >
+    
+		<RelativeLayout android:id="@+id/fdruMediumRL"
+      		android:layout_width="match_parent"
+       		android:layout_height="wrap_content"
+       		android:layout_gravity="center_vertical" >
+		        
+	    	<LinearLayout android:id="@+id/fdruAskForDamagesLL"
+		       	android:layout_width="wrap_content"
+          		android:layout_height="wrap_content"
+           		android:layout_centerHorizontal="true"
+           		android:layout_marginBottom="16dp"
+           		android:orientation="horizontal" >
+		          	
+           		<Button android:id="@+id/fdruYesB"
+		       		android:layout_width="wrap_content"
+           			android:layout_height="wrap_content"
+           			android:layout_marginRight="64dp"
+           			android:layout_marginEnd="64dp"
+           			android:text="@string/yes"
+           			android:textSize="36sp"
+           			android:textStyle="bold"
+           			android:textColor="@color/white"
+           			android:background="@drawable/sel_button_damage_yes" />
+		          	
+           		<Button android:id="@+id/fdruNoB"
+		           	android:layout_width="wrap_content"
+           			android:layout_height="wrap_content"
+           			android:layout_marginLeft="64dp"
+           			android:layout_marginStart="64dp"
+           			android:text="@string/no"
+           			android:textSize="36sp"
+           			android:textStyle="bold"
+           			android:textColor="@color/white"
+           			android:background="@drawable/sel_button_damage_no" />
+		           
+       		</LinearLayout>
+		        
+       		<TextView android:id="@+id/fdruMessageTV"
+		       	android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:layout_below="@+id/fdruAskForDamagesLL"
+        		android:layout_marginTop="20dp"
+       			android:layout_centerHorizontal="true"
+       			android:text="@string/are_you_drunk"
+       			android:textSize="28sp"
+       			android:textColor="@color/white" />
+	       	
+		</RelativeLayout>
+	
+	</FrameLayout>
+    
+    <FrameLayout android:id="@+id/fdru_right_FL"
+        android:layout_width="225dp"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fdru_top_V"
+        android:layout_above="@+id/fdru_bottom_V"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="#3ea447" >
+        
+        <Button android:id="@+id/fdruSOSB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/sel_button_sos" />
+        
+    </FrameLayout>
+    
+</RelativeLayout>

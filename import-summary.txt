@@ -1,0 +1,104 @@
+ECLIPSE ANDROID PROJECT IMPORT SUMMARY
+======================================
+
+Ignored Files:
+--------------
+The following files were *not* copied into the new Gradle project; you
+should evaluate whether these are still needed in your project and if
+so manually move them:
+
+From OBC:
+* .gitignore
+* .idea\
+* .idea\.name
+* .idea\OBC.iml
+* .idea\compiler.xml
+* .idea\copyright\
+* .idea\copyright\profiles_settings.xml
+* .idea\encodings.xml
+* .idea\misc.xml
+* .idea\modules.xml
+* .idea\workspace.xml
+* OBC.iml
+* ic_launcher-web.png
+* vectors\
+* vectors\button_home.9.pspimage
+* vectors\button_radio.9.pspimage
+* vectors\img_car_damage.pspimage
+* vectors\img_car_dirty.pspimage
+From SDKTools:
+* .gitignore
+* SDKTools.iml
+* proguard-project.txt
+
+Replaced Jars with Dependencies:
+--------------------------------
+The importer recognized the following .jar files as third party
+libraries and replaced them with Gradle dependencies instead. This has
+the advantage that more explicit version information is known, and the
+libraries can be updated automatically. However, it is possible that
+the .jar file in your project was of an older version than the
+dependency we picked, which could render the project not compileable.
+You can disable the jar replacement in the import wizard and try again:
+
+android-support-v4.jar => com.android.support:support-v4:19.1.0
+gson-2.2.4.jar => com.google.code.gson:gson:2.2.4
+joda-time-2.4.jar => joda-time:joda-time:2.4
+
+Potentially Missing Dependency:
+-------------------------------
+When we replaced the following .jar files with a Gradle dependency, we
+inferred the dependency version number from the filename. This
+specific version may not actually be available from the repository.
+If you get a build error stating that the dependency is missing, edit
+the version number to for example "+" to pick up the latest version
+instead. (This may require you to update your code if the library APIs
+have changed.)
+
+gson-2.2.4.jar => version 2.2.4 in com.google.code.gson:gson:2.2.4
+joda-time-2.4.jar => version 2.4 in joda-time:joda-time:2.4
+
+Moved Files:
+------------
+Android Gradle projects use a different directory structure than ADT
+Eclipse projects. Here's how the projects were restructured:
+
+In SDKTools:
+* AndroidManifest.xml => sDKTools\src\main\AndroidManifest.xml
+* libs\SKMaps-docs.jar => sDKTools\libs\SKMaps-docs.jar
+* libs\SKMaps.jar => sDKTools\libs\SKMaps.jar
+* res\ => sDKTools\src\main\res\
+* src\ => sDKTools\src\main\java\
+In OBC:
+* AndroidManifest.xml => oBC\src\main\AndroidManifest.xml
+* assets\ => oBC\src\main\assets\
+* libs\acra-4.5.0.jar => oBC\libs\acra-4.5.0.jar
+* libs\armeabi-v7a\libngnative.so => oBC\src\main\jniLibs\armeabi-v7a\libngnative.so
+* libs\edm.jar => oBC\libs\edm.jar
+* libs\hikmercurysdk.jar => oBC\libs\hikmercurysdk.jar
+* libs\logback-android-1.1.1-2.jar => oBC\libs\logback-android-1.1.1-2.jar
+* libs\okhttp-3.0.0-RC1.jar => oBC\libs\okhttp-3.0.0-RC1.jar
+* libs\okio-1.6.0.jar => oBC\libs\okio-1.6.0.jar
+* libs\ormlite-android-4.48.jar => oBC\libs\ormlite-android-4.48.jar
+* libs\ormlite-core-4.48.jar => oBC\libs\ormlite-core-4.48.jar
+* libs\rc.jar => oBC\libs\rc.jar
+* libs\slf4j-api-1.7.6.jar => oBC\libs\slf4j-api-1.7.6.jar
+* lint.xml => oBC\lint.xml
+* proguard-project.txt => oBC\proguard-project.txt
+* res\ => oBC\src\main\res\
+* src\ => oBC\src\main\java\
+
+Next Steps:
+-----------
+You can now build the project. The Gradle project needs network
+connectivity to download dependencies.
+
+Bugs:
+-----
+If for some reason your project does not build, and you determine that
+it is due to a bug or limitation of the Eclipse to Gradle importer,
+please file a bug at http://b.android.com with category
+Component-Tools.
+
+(This import summary is for your information only, and can be deleted
+after import once you are satisfied with the results.)

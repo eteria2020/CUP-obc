@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="match_parent" android:layout_marginBottom="5dp" xmlns:android="http://schemas.android.com/apk/res/android" android:background="@color/black">
+
+    <View android:id="@+id/fins_top_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentTop="true"
+        android:background="#fdee66" />
+    
+    <View android:id="@+id/fins_bottom_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fdee66" />
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/fins_right_FL"
+        android:layout_toStartOf="@+id/fins_right_FL"
+        android:layout_below="@+id/fins_top_V"
+        android:layout_above="@+id/fins_bottom_V"
+        android:layout_marginTop="25dp"
+        android:orientation="vertical" >
+        
+        <TextView
+            android:id="@+id/fins_message_TV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginStart="40dp"
+            android:text="@string/instruction_title_preclose"
+            android:textColor="#feef79"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+        
+        <FrameLayout 
+            android:layout_width="match_parent"
+            android:layout_height="0dp" android:layout_marginTop="10dp" android:layout_weight="1">
+            <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="40dp" android:layout_marginStart="40dp" android:orientation="vertical" >
+                <LinearLayout android:id="@+id/fins_first_LL" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:layout_weight="1" android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/fbullet1TV"
+                        android:layout_width="65dp"
+                        android:layout_height="65dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/img_circle_white"
+                        android:gravity="center"
+                        android:text="@string/number_1"
+                        android:textColor="#FFFFFF"
+                        android:textSize="40sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/finsInstructions1TV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:gravity="start"
+                        android:padding="8dp"
+                        android:text="@string/instruction_preclose_1"
+                        android:textColor="@color/white"
+                        android:textSize="28sp" />
+
+                </LinearLayout>
+                <LinearLayout android:id="@+id/fins_second_LL" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/fins_first_LL" android:layout_marginTop="10dp" android:layout_weight="1" android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/fbullet2TV"
+                        android:layout_width="65dp"
+                        android:layout_height="65dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/img_circle_white"
+                        android:gravity="center"
+                        android:text="@string/number_2"
+                        android:textColor="#FFFFFF"
+                        android:textSize="40sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/finsInstructions2TV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:gravity="start"
+                        android:padding="8dp"
+                        android:text="@string/instruction_preclose_2"
+                        android:textColor="@color/white"
+                        android:textSize="28sp" />
+
+                </LinearLayout>
+                <LinearLayout android:id="@+id/fins_third_LL" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/fins_second_LL" android:layout_marginTop="10dp" android:layout_weight="1" android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/fbullet3TV"
+                        android:layout_width="65dp"
+                        android:layout_height="65dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/img_circle_white"
+                        android:gravity="center"
+                        android:text="@string/number_3"
+                        android:textColor="#FFFFFF"
+                        android:textSize="40sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/finsInstructions3TV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:gravity="start"
+                        android:padding="8dp"
+                        android:text="@string/instruction_preclose_3"
+                        android:textColor="@color/white"
+                        android:textSize="28sp" />
+
+                </LinearLayout>
+                <LinearLayout android:id="@+id/fins_fourth_LL" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/fins_third_LL" android:layout_marginTop="10dp" android:layout_weight="1" android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/fbullet4TV"
+                        android:layout_width="65dp"
+                        android:layout_height="65dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/img_circle_white"
+                        android:gravity="center"
+                        android:text="@string/number_4"
+                        android:textColor="#FFFFFF"
+                        android:textSize="40sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/finsInstructions4TV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:gravity="start"
+                        android:padding="8dp"
+                        android:text="@string/instruction_preclose_4"
+                        android:textColor="@color/white"
+                        android:textSize="28sp" />
+
+                </LinearLayout>
+                <LinearLayout android:id="@+id/fins_fifth_LL" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/fins_fourth_LL" android:layout_marginTop="10dp" android:layout_weight="0.5" android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/fbullet5TV"
+                        android:layout_width="65dp"
+                        android:layout_height="65dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/img_circle_white"
+                        android:gravity="center"
+                        android:text="@string/number_5"
+                        android:textColor="#FFFFFF"
+                        android:textSize="40sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/finsInstructions5TV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:gravity="start"
+                        android:padding="8dp"
+                        android:text="@string/instruction_preclose_5"
+                        android:textColor="@color/white"
+                        android:textSize="28sp" />
+
+                </LinearLayout>
+            </RelativeLayout>
+            
+        </FrameLayout>
+        
+    </LinearLayout>
+    
+    <RelativeLayout
+        android:id="@+id/fins_right_FL"
+        android:layout_width="500dp"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/fins_bottom_V"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/fins_top_V"
+        android:background="#3ea447" >
+        
+        <ImageView
+            android:id="@+id/ivDamages"
+            android:layout_width="200dp"
+            android:layout_height="138dp"
+            android:layout_alignTop="@+id/finsSOSB"
+            android:layout_marginLeft="30dp"
+            android:background="@drawable/sel_button_roundedblack"
+            android:clickable="true"
+            android:padding="9dp"
+            android:src="@drawable/img_car_damage_alternative" />
+
+        <TextView
+            android:id="@+id/tvDamages"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/ivDamages"
+            android:layout_below="@+id/ivDamages"
+            android:text="@string/new_damage"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="28sp" />
+        
+        <Button
+            android:id="@+id/fmenPauseRentIB"
+            android:layout_width="wrap_content"
+            android:layout_height="138dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="30dp"
+            android:background="@drawable/sel_button_park_text"
+            android:text="@string/button_park"
+            android:textColor="@color/text_green"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="40dp"
+            android:layout_below="@+id/tvDamages" />
+
+        <Button
+            android:id="@+id/fmenEndRentIB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/fmenBackIB"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="30dp"
+            android:background="@drawable/sel_button_cancel_text"
+            android:text="@string/button_end"
+            android:textColor="@color/text_green"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
+        
+        <Button
+            android:id="@+id/finsSOSB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/sel_button_sos"
+            android:visibility="gone" />
+        
+         <ImageButton
+             android:id="@+id/fmenBackIB"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignParentBottom="true"
+             android:layout_alignParentRight="true"
+             android:layout_centerHorizontal="true"
+             android:layout_gravity="center_vertical|center_horizontal"
+             android:layout_marginBottom="15dp"
+             android:layout_marginRight="15dp"
+             android:background="@null"
+             android:src="@drawable/sel_button_back" />
+
+        <TextView
+            android:layout_width="144dp"
+            android:layout_height="138dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/menu_rent_end_outside_park_area"
+            android:id="@+id/tvOutside"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            android:layout_alignLeft="@+id/fmenPauseRentIB"
+            android:layout_alignStart="@+id/fmenPauseRentIB"
+            android:layout_toLeftOf="@+id/fmenBackIB"
+            android:layout_toStartOf="@+id/fmenBackIB" />
+
+        <TextView
+            android:layout_width="144dp"
+            android:layout_height="138dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/menu_rent_end_time_startup_app"
+            android:id="@+id/tvTime"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            android:layout_alignLeft="@+id/fmenPauseRentIB"
+            android:layout_alignStart="@+id/fmenPauseRentIB"
+            android:layout_toLeftOf="@+id/fmenBackIB"
+            android:layout_toStartOf="@+id/fmenBackIB" />
+
+    </RelativeLayout>
+    
+</RelativeLayout>

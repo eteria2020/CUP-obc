@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#090808" >
+
+    <View android:id="@+id/fchn_top_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentTop="true"
+        android:background="#fdee66" />
+    
+    <View android:id="@+id/fchn_bottom_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fdee66" />
+    
+    <FrameLayout android:id="@+id/fchn_right_FL"
+        android:layout_width="224dp"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fchn_top_V"
+        android:layout_above="@+id/fchn_bottom_V"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="#3ea447" >
+        
+        <Button
+            android:id="@+id/btnSOS"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/sel_button_sos"
+            android:visibility="gone" />
+        
+        <ImageButton
+            android:id="@+id/btnNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="40dp"
+            android:background="@null"
+            android:contentDescription="@string/content_description"
+            android:src="@drawable/sel_button_next" />
+
+        <TextView
+            android:id="@+id/tvCountdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="100dp"
+            android:text="-"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="36sp" />
+        
+    </FrameLayout>
+    
+    <RelativeLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/fchn_right_FL"
+        android:layout_toStartOf="@+id/fchn_right_FL"
+        android:layout_below="@+id/fchn_top_V"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvPageTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="12dp"
+            android:text="@string/priority_lanes_title"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#fdee66"
+            android:textSize="36sp" />
+        
+        <TextView
+            android:id="@+id/tvMessageTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/ivPicture"
+            android:layout_marginLeft="40dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="25dp"
+            android:layout_toRightOf="@+id/ivPicture"
+            android:text="@string/attention"
+            android:textColor="#F00"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/ivPicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/fchnMessageTV"
+            android:layout_below="@+id/tvPageTitle"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="16dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/priority_lanes" />
+
+        <TextView
+            android:id="@+id/tvMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/tvMessageTitle"
+            android:layout_below="@+id/tvMessageTitle"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/priority_lanes"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="34sp" />
+                
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toStartOf="@+id/fchn_right_FL"
+        android:layout_toLeftOf="@+id/fchn_right_FL"
+        android:layout_below="@+id/fchn_top_V"
+        android:layout_above="@+id/fchn_bottom_V">
+
+        <WebView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/bannerfsWV"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/imgfsIV"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/offline_welcome"
+            android:visibility="invisible"
+            android:layout_alignParentTop="true" />
+    </RelativeLayout>
+
+</RelativeLayout>

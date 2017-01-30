@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black" >
+	
+    <View android:id="@+id/fpoi_top_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentTop="true"
+        android:background="#fdee66" />
+    
+    <View android:id="@+id/fpoi_bottom_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fdee66" />
+    
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fpoi_top_V"
+        android:layout_above="@+id/fpoi_bottom_V"
+        android:layout_toLeftOf="@+id/fpoi_right_FL"
+        android:layout_toStartOf="@+id/fpoi_right_FL" >
+        
+        <LinearLayout android:id="@+id/fpoiFuelStationsLL"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="40dp"
+            android:orientation="vertical" >
+            
+            <TextView android:id="@+id/fpoiMessageTV"
+	        	android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:layout_marginBottom="8dp"
+        		android:text="@string/select_fuel_station"
+        		android:textSize="32sp"
+        		android:textStyle="bold"
+        		android:textColor="#feef79" />
+			
+            <LinearLayout 
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal" >
+                
+                <eu.philcar.csg.OBC.controller.welcome.VerticalSeekBar android:id="@+id/fpoiBarSB"
+    				android:layout_width="wrap_content"
+    				android:layout_height="match_parent"
+    				android:progressDrawable="@drawable/red_scrubber_progress"
+    				android:thumb="@drawable/red_scrubber_control" 
+    				android:progress="10"
+            		android:max="10" />
+                
+                <ListView android:id="@+id/fpoiFuelStationsLV"
+	    			android:layout_width="match_parent"
+		    		android:layout_height="match_parent"
+		    		android:layout_marginLeft="8dp"
+		    		android:layout_marginStart="8dp"
+		    		android:dividerHeight="1dp"
+	    			android:divider="@color/gray"
+		    		android:visibility="invisible" />
+                
+            </LinearLayout>
+            
+        </LinearLayout>
+        
+        <RelativeLayout android:id="@+id/fpoiDescriptionRL"	    
+	    	android:layout_width="match_parent"
+	    	android:layout_height="match_parent"
+	    	android:layout_margin="30dp"
+	    	android:padding="2dp"
+	    	android:visibility="invisible" >
+	    
+	    	<RelativeLayout android:id="@+id/fpoiDescriptionInfoRL"
+    			android:layout_width="match_parent"
+    			android:layout_height="wrap_content"
+    			android:layout_alignParentTop="true"
+    			android:padding="8dp" >
+    		
+				<LinearLayout 
+		    		android:layout_width="match_parent"
+	    			android:layout_height="wrap_content"
+	    			android:layout_toLeftOf="@+id/fpoiDisclosureIndicatorIB"
+	    			android:layout_toStartOf="@+id/fpoiDisclosureIndicatorIB"
+	    			android:orientation="vertical" >
+			
+	    			<TextView android:id="@+id/fpoiTitleTV"
+	        			android:layout_width="wrap_content"
+	        			android:layout_height="wrap_content"
+	        			android:textColor="@color/cyan"
+	        			android:textSize="28sp"
+	        			android:textStyle="bold" />
+			    	
+	    			<LinearLayout 
+	    				android:layout_width="match_parent"
+	    				android:layout_height="wrap_content"
+	    				android:orientation="horizontal" >
+			    	
+	    	    		<TextView android:id="@+id/fpoiAddressTV"
+	        				android:layout_width="300dp"
+	        				android:layout_height="wrap_content"
+	        				android:gravity="center"
+	        				android:textColor="@color/white"
+	        				android:textSize="22sp" />
+			        	
+	        			<View
+	            			android:layout_width="1dp"
+	            			android:layout_height="match_parent"
+	            			android:background="@color/white" />
+			        	
+	        			<TextView android:id="@+id/fpoiDistanceTV"
+	        				android:layout_width="120dp"
+	        				android:layout_height="wrap_content"
+	        				android:gravity="center"
+	        				android:textColor="@color/white"
+	        				android:textSize="22sp" />
+			        	
+	        			<View
+	            			android:layout_width="1dp"
+	            			android:layout_height="match_parent"
+	            			android:background="@color/white" />
+			        	
+	        			<TextView android:id="@+id/fpoiTimeTV"
+	        				android:layout_width="120dp"
+	        				android:layout_height="wrap_content"
+	        				android:gravity="center"
+	        				android:textColor="@color/white"
+	        				android:textSize="22sp" />
+				        
+				    </LinearLayout>
+	        		
+				</LinearLayout>
+		    	
+				<ImageButton android:id="@+id/fpoiDisclosureIndicatorIB"
+	    			android:layout_width="wrap_content"
+	    			android:layout_height="wrap_content"
+	    			android:layout_alignParentRight="true"
+	    			android:layout_alignParentEnd="true"
+	    			android:focusable="false"
+	    			android:focusableInTouchMode="false"
+	    			android:padding="4dp"
+	    			android:src="@drawable/sel_button_disclosure_indicator"
+	    			android:contentDescription="@string/content_description"
+	    			android:background="@null" />
+		    	
+			</RelativeLayout>
+	    
+	    	<LinearLayout 
+	        	android:layout_width="match_parent"
+	        	android:layout_height="wrap_content"
+	        	android:layout_below="@+id/fpoiDescriptionInfoRL"
+	        	android:padding="10dp"
+	        	android:orientation="horizontal"
+	        	android:weightSum="7" >
+		        
+		        <FrameLayout 
+	            	android:layout_width="0dp"
+	            	android:layout_height="wrap_content"
+	            	android:layout_weight="2" >
+		            
+	            	<ImageView android:id="@+id/fpoiDescriptionImageIV"
+		                android:layout_width="wrap_content"
+	                	android:layout_height="wrap_content"
+	                	android:layout_gravity="center"
+	                	android:src="@drawable/img_placeholder"
+	                	android:contentDescription="@string/content_description" />
+		            
+	        	</FrameLayout>
+		        
+	        	<TextView android:id="@+id/fpoiDescriptionDetailsTV"
+	        		android:layout_width="0dp"
+        			android:layout_height="wrap_content"
+        			android:layout_weight="5"
+        			android:padding="10dp"
+        			android:gravity="start"
+        			android:textSize="20sp"
+        			android:textColor="@color/white" />
+		        
+	    	</LinearLayout>
+	    	
+		</RelativeLayout>
+	    
+    </FrameLayout>
+    
+    <FrameLayout android:id="@+id/fpoi_right_FL"
+        android:layout_width="225dp"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fpoi_top_V"
+        android:layout_above="@+id/fpoi_bottom_V"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="#3ea447" >
+        
+        <Button android:id="@+id/fpoiSOSB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/sel_button_sos" />
+        
+        <ImageButton android:id="@+id/fpoiBackIB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="25dp"
+            android:src="@drawable/sel_button_back"
+            android:contentDescription="@string/app_name"
+            android:background="@null" />
+        
+    </FrameLayout>
+    
+</RelativeLayout>

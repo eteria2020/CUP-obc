@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
+    android:keyWidth="9.5%p"
+    android:keyHeight="14%p"
+    android:horizontalGap="0.5%p"
+    android:verticalGap="0.5%p" >
+
+    <Row>
+        <Key android:codes="49" android:keyLabel="1" android:horizontalGap="37%p" android:keyEdgeFlags="left"/>
+        <Key android:codes="50" android:keyLabel="2"/>
+        <Key android:codes="51" android:keyLabel="3" android:keyEdgeFlags="right" />
+
+    </Row>
+    
+    <Row>
+        <Key android:codes="52" android:keyLabel="4" android:horizontalGap="37%p" android:keyEdgeFlags="left"/>
+        <Key android:codes="53" android:keyLabel="5" />
+        <Key android:codes="54" android:keyLabel="6" android:keyEdgeFlags="right" />
+
+    </Row>
+    
+    <Row>
+        <Key android:codes="55" android:keyLabel="7" android:horizontalGap="37%p" android:keyEdgeFlags="left"/>
+        <Key android:codes="56" android:keyLabel="8"/>
+        <Key android:codes="57" android:keyLabel="9"/>
+        <Key android:codes="-5" android:keyIcon="@drawable/canc_key" android:isRepeatable="true" android:horizontalGap="19%p" android:keyEdgeFlags="right" android:keyWidth="15%p" />
+
+    </Row>
+    
+    <Row>
+        <Key android:codes="-2" android:keyLabel="A B C"  android:keyWidth="15%p" android:keyEdgeFlags="left" />
+        <Key android:codes="48" android:keyLabel="0" android:horizontalGap="31.5%p" android:keyEdgeFlags="left"/>
+        <Key android:codes="-4" android:keyLabel="go" android:horizontalGap="28.5%p" android:keyWidth="15%p" android:keyEdgeFlags="right" />
+
+    </Row>
+    
+
+    
+</Keyboard>

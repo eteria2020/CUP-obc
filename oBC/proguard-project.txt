@@ -1,0 +1,84 @@
+# To enable ProGuard in your project, edit project.properties
+# to define the proguard.config property as described in that file.
+#
+# Add project specific ProGuard rules here.
+# By default, the flags in this file are appended to flags specified
+# in ${sdk.dir}/tools/proguard/proguard-android.txt
+# You can edit the include path and order by changing the ProGuard
+# include property in project.properties.
+#
+# For more details, see
+#   http://developer.android.com/guide/developing/tools/proguard.html
+
+# Add any project specific keep options here:
+
+# If your project uses WebView with JS, uncomment the following
+# and specify the fully qualified class name to the JavaScript interface
+# class:
+#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
+#   public *;
+#}
+
+-libraryjars ../SDKtools/bin/sdktools.jar
+-libraryjars libs/acra-4.5.0.jar
+-libraryjars libs/hikmercurysdk.jar
+-libraryjars libs/ormlite-android-4.48.jar
+-libraryjars libs/ormlite-core-4.48.jar
+-libraryjars libs/slf4j-api-1.7.6.jar
+
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+
+-keep class org.acra.** { *; }
+#-keep class eu.philcar.csg.**
+-keepclassmembers class eu.philcar.csg.OBC.db.** { *; }
+-keepclassmembers class com.Hik.Mercury.SDK.** { *; }
+-keep class  com.Hik.Mercury.SDK.**
+
+-keep class ch.qos.** { *; }
+-keep class org.slf4j.** { *; }
+
+
+
+#Skobbler
+-keep class javax.annotation.**
+-keep class com.skobbler.**
+-keepclassmembers class javax.annotation.** { *; }
+-keepclassmembers class com.skobbler.** { *; }
+
+
+-keep class org.joda.**
+-keepclassmembers class org.joda.** { *; }
+
+# OrmLite u
+-keep class com.j256.**
+-keepclassmembers class com.j256.** { *; }
+-keep enum com.j256.**
+-keepclassmembers enum com.j256.** { *; }
+-keep interface com.j256.**
+-keepclassmembers interface com.j256.** { *; }
+
+-dontwarn javax.xml.stream.**
+-dontwarn java.awt.**
+-dontwarn org.openstreetmap.osmosis.**
+-dontwarn sun.misc.Unsafe.**
+-dontwarn com.applantation.android.**
+-dontwarn ch.qos.logback.**
+-dontwarn android.os.ServiceManager.** 
+-dontwarn javax.imageio.ImageIO.**
+-dontwarn sun.misc.Unsafe.** 
+-dontwarn java.lang.management.**
+-dontwarn com.Hik.Mercury.SDK.Manager.**
+-dontwarn com.graphhopper.**
+-dontwarn android.os.ServiceManager
+-dontwarn com.android.internal.telephony.**
+-dontwarn com.skobbler.ngx.**
+-dontwarn org.joda.time.**
+-dontwarn okio.**
+-dontwarn android.app.QueuedWork
+-dontwarn android.app.QueuedWork.**
+-dontwarn android.view.**
+-dontwarn android.os.SystemProperties
+
+

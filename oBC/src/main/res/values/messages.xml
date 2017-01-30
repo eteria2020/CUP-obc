@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="MSG_DN_CLIENTI">3</integer>
+    <integer name="MSG_DN_ADMINS">4</integer>
+    <integer name="MSG_DN_POIS">1020</integer>
+    <integer name="MSG_DN_AREAS">1021</integer>
+    <integer name="MSG_DN_CONFIGS">1022</integer>
+    <integer name="MSG_UP_BEACON">2020</integer>
+    <integer name="MSG_CALL_CENTER">1</integer>
+    <integer name="MSG_TRIPS_SENT_REALTIME">1</integer>
+    <integer name="MSG_TRIPS_SENT_OFFLINE">2</integer>
+    <integer name="MSG_EVENTS_SENT_REALTIME">11</integer>
+    <integer name="MSG_EVENTS_SENT_OFFLINE">12</integer>
+    <integer name="MSG_SENT_REALTIME">21</integer>
+    <integer name="MSG_SENT_OFFLINE">22</integer>  
+</resources>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp" >
+
+    <ImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ico_target" />
+    
+	<TextView
+	    android:id="@+id/alvgeoAddressTV"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_centerVertical="true"
+	    android:layout_marginLeft="2dp"
+	    android:layout_toLeftOf="@+id/alvgeoDisclosureIndicatorIB"
+	    android:layout_toRightOf="@+id/ivIcon"
+	    android:textColor="@color/white"
+	    android:textSize="28sp"
+	    android:textStyle="bold" />
+    
+	<ImageButton android:id="@+id/alvgeoDisclosureIndicatorIB"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:layout_centerVertical="true"
+	    android:focusable="false"
+	    android:focusableInTouchMode="false"
+	    android:padding="4dp"
+	    android:src="@drawable/sel_button_disclosure_indicator"
+	    android:contentDescription="@string/content_description"
+	    android:background="@null" />
+    
+</RelativeLayout>

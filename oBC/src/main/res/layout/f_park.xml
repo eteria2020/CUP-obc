@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="match_parent" android:layout_marginBottom="5dp" xmlns:android="http://schemas.android.com/apk/res/android" android:background="@color/black">
+
+    <View android:id="@+id/fins_top_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentTop="true"
+        android:background="#fdee66" />
+    
+    <View android:id="@+id/fins_bottom_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fdee66" />
+    
+    <RelativeLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/fins_right_FL"
+        android:layout_toStartOf="@+id/fins_right_FL"
+        android:layout_below="@+id/fins_top_V"
+        android:layout_above="@+id/fins_bottom_V"
+        android:layout_marginTop="25dp" >
+
+        <ImageView
+            android:id="@+id/ivPark"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="32dp"
+            android:src="@drawable/sel_button_rent_pause" />
+
+        <TextView
+            android:id="@+id/tvRow1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivPark"
+            android:layout_marginTop="20dp"
+            android:padding="20dp"
+            android:text="@string/menu_park_mode_suspend_instructions"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+    </RelativeLayout>
+    
+    <RelativeLayout
+        android:id="@+id/fins_right_FL"
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/fins_bottom_V"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/fins_top_V"
+        android:background="#3ea447" >
+        
+        <Button
+            android:id="@+id/finsSOSB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/sel_button_sos" />
+
+		<LinearLayout
+		    android:id="@+id/llSelfClose"
+		    android:layout_width="140dp"
+		    android:layout_height="wrap_content"
+		    android:layout_alignParentRight="true"
+		    android:layout_centerVertical="true"
+		    android:layout_gravity="right|center_vertical"
+		    android:layout_marginRight="15dp"
+		    android:background="@drawable/sha_roundedbox"
+		    android:orientation="vertical"
+		    android:padding="20dp" >
+
+            <TextView android:id="@+id/tvSelfclose" android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_horizontal" android:text="@string/self_close_message" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#000" android:textSize="24sp"/>
+            <TextView android:id="@+id/tvCountdown" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="5dp" android:gravity="center_horizontal" android:text="30 s" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#F00" android:textSize="42sp"/>
+        </LinearLayout>        
+        
+         <ImageButton
+             android:id="@+id/fmenBackIB"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignParentBottom="true"
+             android:layout_alignParentRight="true"
+             android:layout_centerHorizontal="true"
+             android:layout_gravity="center_vertical|center_horizontal"
+             android:layout_marginBottom="15dp"
+             android:layout_marginRight="15dp"
+             android:background="@null"
+             android:src="@drawable/sel_button_back"
+             android:visibility="gone" />
+        
+    </RelativeLayout>
+    
+</RelativeLayout>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="match_parent" android:layout_marginBottom="5dp" xmlns:android="http://schemas.android.com/apk/res/android" android:background="@color/black">
+
+    <View android:id="@+id/fins_top_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentTop="true"
+        android:background="#fdee66" />
+    
+    <View android:id="@+id/fins_bottom_V"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fdee66" />
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/fins_right_FL"
+        android:layout_toStartOf="@+id/fins_right_FL"
+        android:layout_below="@+id/fins_top_V"
+        android:layout_above="@+id/fins_bottom_V"
+        android:layout_marginTop="25dp"
+        android:orientation="vertical" >
+        
+        <TextView android:id="@+id/fins_message_TV"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_marginLeft="40dp"
+        	android:layout_marginStart="40dp"
+        	android:text="@string/instruction_title"
+        	android:textSize="30sp"
+        	android:textStyle="bold"
+        	android:textColor="#feef79" />
+        
+        <FrameLayout 
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" >
+            
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="40dp"
+                android:layout_marginStart="40dp"
+                android:orientation="vertical" >
+                
+                <LinearLayout
+                    android:id="@+id/fins_first_LL"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+                    
+            		<TextView
+            		    android:id="@+id/fbullet1TV"
+            		    android:layout_width="70dp"
+            		    android:layout_height="70dp"
+            		    android:layout_gravity="center"
+            		    android:background="@drawable/img_circle_white"
+            		    android:gravity="center"
+            		    android:text="@string/number_1"
+            		    android:textColor="#FFFFFF"
+            		    android:textSize="48sp"
+            		    android:textStyle="bold" />
+		            
+            		<TextView
+            		    android:id="@+id/finsInstructions1TV"
+            		    android:layout_width="wrap_content"
+            		    android:layout_height="wrap_content"
+            		    android:layout_gravity="center"
+            		    android:layout_marginLeft="8dp"
+            		    android:layout_marginStart="8dp"
+            		    android:gravity="start"
+            		    android:padding="8dp"
+            		    android:text="@string/instruction_start_1"
+            		    android:textColor="@color/white"
+            		    android:textSize="30sp" />
+		            
+        		</LinearLayout>
+        		
+                <LinearLayout
+                    android:id="@+id/fins_second_LL"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal" >
+                    
+            		<TextView
+            		    android:id="@+id/fbullet2TV"
+            		    android:layout_width="70dp"
+            		    android:layout_height="70dp"
+            		    android:layout_gravity="center"
+            		    android:background="@drawable/img_circle_white"
+            		    android:gravity="center"
+            		    android:text="@string/number_2"
+            		    android:textColor="#FFFFFF"
+            		    android:textSize="48sp"
+            		    android:textStyle="bold" />
+		            
+            		<TextView
+            		    android:id="@+id/finsInstructions2TV"
+            		    android:layout_width="wrap_content"
+            		    android:layout_height="wrap_content"
+            		    android:layout_gravity="center"
+            		    android:layout_marginLeft="8dp"
+            		    android:layout_marginStart="8dp"
+            		    android:gravity="start"
+            		    android:padding="8dp"
+            		    android:text="@string/instruction_start_2"
+            		    android:textColor="@color/white"
+            		    android:textSize="30dp" />
+		            
+        		</LinearLayout>
+        		
+                <LinearLayout
+                    android:id="@+id/fins_third_LL"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal" >
+                    
+            		<TextView
+            		    android:id="@+id/fbullet3TV"
+            		    android:layout_width="70dp"
+            		    android:layout_height="70dp"
+            		    android:layout_gravity="center"
+            		    android:background="@drawable/img_circle_white"
+            		    android:gravity="center"
+            		    android:text="@string/number_3"
+            		    android:textColor="#FFFFFF"
+            		    android:textSize="48sp"
+            		    android:textStyle="bold" />
+		            
+            		<TextView
+            		    android:id="@+id/finsInstructions3TV"
+            		    android:layout_width="wrap_content"
+            		    android:layout_height="wrap_content"
+            		    android:layout_gravity="center"
+            		    android:layout_marginLeft="8dp"
+            		    android:layout_marginStart="8dp"
+            		    android:gravity="start"
+            		    android:padding="8dp"
+            		    android:text="@string/instruction_start_3"
+            		    android:textColor="@color/white"
+            		    android:textSize="30dp" />
+		            
+        		</LinearLayout>
+        		
+                <LinearLayout
+                    android:id="@+id/fins_fourth_LL"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal" >
+                    
+            		<TextView
+            		    android:id="@+id/fbullet4TV"
+            		    android:layout_width="70dp"
+            		    android:layout_height="70dp"
+            		    android:layout_gravity="center"
+            		    android:background="@drawable/img_circle_white"
+            		    android:gravity="center"
+            		    android:text="@string/number_4"
+            		    android:textColor="#FFFFFF"
+            		    android:textSize="48sp"
+            		    android:textStyle="bold" />
+		            
+            		<TextView
+            		    android:id="@+id/finsInstructions4TV"
+            		    android:layout_width="wrap_content"
+            		    android:layout_height="wrap_content"
+            		    android:layout_gravity="center"
+            		    android:layout_marginLeft="8dp"
+            		    android:layout_marginStart="8dp"
+            		    android:gravity="start"
+            		    android:padding="8dp"
+            		    android:text="@string/instruction_start_4"
+            		    android:textColor="@color/white"
+            		    android:textSize="30dp" />
+		            
+        		</LinearLayout>
+                
+            </LinearLayout>
+            
+        </FrameLayout>
+        
+        <TextView android:id="@+id/fins_message_bottom_TV"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_marginLeft="5dp" android:layout_marginStart="40dp" android:padding="8dp" android:text="@string/instruction_close_5" android:textSize="16sp" android:textColor="@color/white"/>
+        
+    </LinearLayout>
+    
+    <RelativeLayout android:id="@+id/fins_right_FL"
+        android:layout_width="450dp" android:layout_height="match_parent" android:layout_below="@+id/fins_top_V" android:layout_above="@+id/fins_bottom_V" android:layout_alignParentRight="true" android:layout_alignParentEnd="true" android:background="#3ea447">
+        
+        <Button android:id="@+id/finsSOSB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_alignParentTop="true" android:layout_gravity="top|right" android:layout_marginRight="10dp" android:layout_marginTop="16dp" android:background="@drawable/sel_button_sos"/>
+        <ImageView android:id="@+id/ivDamages" android:layout_width="200dp" android:layout_height="138dp" android:layout_alignTop="@+id/finsSOSB" android:layout_marginLeft="40dp" android:background="@drawable/sel_button_roundedblack" android:clickable="true" android:padding="9dp" android:src="@drawable/img_car_damage_alternative"/>
+        <TextView android:id="@+id/tvDamages" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignLeft="@+id/ivDamages" android:layout_alignRight="@+id/ivDamages" android:layout_below="@+id/ivDamages" android:text="@string/instruction_damages" android:textAppearance="?android:attr/textAppearanceMedium" android:textSize="32sp"/>
+
+        <ImageView android:id="@+id/ivDirty" android:layout_width="200dp" android:layout_height="138dp" android:layout_above="@+id/tvDirty" android:layout_alignLeft="@id/ivDamages" android:layout_alignTop="@+id/finsNextIB" android:background="@drawable/sel_button_roundedblack" android:clickable="true" android:padding="9dp" android:src="@drawable/img_car_dirty"/>
+        <TextView android:id="@+id/tvDirty" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignLeft="@+id/ivDirty" android:layout_alignParentBottom="true" android:layout_alignRight="@+id/ivDirty" android:text="@string/instruction_dirty" android:textAppearance="?android:attr/textAppearanceMedium" android:textSize="32sp"/>
+        
+        
+        <LinearLayout android:id="@+id/llSelfClose" android:layout_width="140dp" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_centerVertical="true" android:layout_gravity="right|center_vertical" android:layout_marginRight="10dp" android:background="@drawable/sha_roundedbox" android:orientation="vertical" android:padding="20dp">
+            <TextView android:id="@+id/tvSelfclose" android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_horizontal" android:text="@string/self_close_message" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#000" android:textSize="24sp"/>
+            <TextView android:id="@+id/tvCountdown" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="5dp" android:gravity="center_horizontal" android:text="30 s" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#F00" android:textSize="42sp"/>
+        </LinearLayout>
+        
+        
+        <ImageButton android:id="@+id/finsNextIB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:layout_gravity="bottom|right" android:layout_marginBottom="25dp" android:layout_marginRight="10dp" android:src="@drawable/sel_button_next" android:contentDescription="@string/content_description" android:background="@null"/>
+        
+    </RelativeLayout>
+    
+</RelativeLayout>
