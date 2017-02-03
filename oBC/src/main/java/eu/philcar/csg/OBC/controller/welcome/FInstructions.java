@@ -14,6 +14,8 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +33,7 @@ public class FInstructions extends FBase {
 	
 	private DLog dlog = new DLog(this.getClass());
 	private RelativeLayout fins_right_FL;
+	private final static int  MSG_CLOSE_FRAGMENT  = 1;
 
 	public static FInstructions newInstance(boolean login) {
 		
@@ -40,7 +43,27 @@ public class FInstructions extends FBase {
 		
 		return fi;
 	}
-	
+
+	private Handler localHandler = new Handler()  {
+
+		@Override
+		public void handleMessage(Message msg) {
+
+			switch (msg.what)  {
+
+
+				case MSG_CLOSE_FRAGMENT:
+					try {
+						dlog.d("FInstruction timeout ");
+						((ABase)getActivity()).pushFragment(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true);
+					}catch(Exception e){
+						dlog.e("FInstruction : MSG_CLOSE_FRAGMENT Exception",e);
+					}
+					break;
+			}
+		}
+	};
+
 	private boolean login;
 	
 	@Override
@@ -69,6 +92,9 @@ public class FInstructions extends FBase {
 				startActivity(new Intent(getActivity(), ASOS.class));
 			}
 		});
+
+		localHandler.removeMessages(MSG_CLOSE_FRAGMENT);
+		localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,60000);
 		
 		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 		

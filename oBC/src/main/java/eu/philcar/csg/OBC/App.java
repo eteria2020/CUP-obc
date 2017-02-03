@@ -357,6 +357,8 @@ public class App extends Application {
 	private static final String  KEY_ServerIP = "server_ip";
 	private static final String  KEY_RebootTime = "reboot_time";
 	private static final String  KEY_PersistLog = "persist_log";
+	private static final String  KEY_IsAskClose = "is_ask_close";
+	private static final String  KEY_IdAskClose = "id_ask_close";
 	
 	
 	public static final String  KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
@@ -473,6 +475,7 @@ public class App extends Application {
 	public static boolean first_UP_Start=true; //flag per primo update Start Images
 	public static boolean first_UP_End=true; //flag per primo update End Images
 	public static Bundle BannerName= new Bundle();
+	public static Bundle askClose=new Bundle();
 	
 	public static String AreaPolygonMD5;
 	public static ArrayList<double[]> AreaPolygons;
@@ -488,6 +491,15 @@ public class App extends Application {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_ParkMode, App.parkMode.toInt());
+			e.commit();
+		}
+	}public void persistAskClose() {
+		if (preferences != null) {
+			Editor e = this.preferences.edit();
+			if(App.askClose!=null) {
+				e.putInt(KEY_IdAskClose, App.askClose.getInt("id",0));
+				e.putBoolean(KEY_IsAskClose, App.askClose.getBoolean("close",false));
+			}
 			e.commit();
 		}
 	}
@@ -595,7 +607,7 @@ public class App extends Application {
 			e.commit();
 		}
 	}
-	
+
 	public void loadInSosta() {
 		if (this.preferences != null) {
 			App.parkMode = ParkMode.fromInt( this.preferences.getInt(KEY_ParkMode, ParkMode.PARK_OFF_VALUE) );
@@ -603,6 +615,16 @@ public class App extends Application {
 			App.parkMode = ParkMode.PARK_OFF;
 		}
 	}
+
+	public void loadAskClose() {
+		if (this.preferences != null) {
+			askClose.putInt("id",preferences.getInt(KEY_IdAskClose,0));
+			askClose.putBoolean("close",preferences.getBoolean(KEY_IsAskClose,false));
+		} else {
+			askClose=null;
+		}
+	}
+
 	public void loadMotoreAvviato() {
 		if (this.preferences != null) {
 			App.motoreAvviato = this.preferences.getBoolean("motoreAvviato", false);
@@ -1587,6 +1609,8 @@ private void  initPhase2() {
 
 		ServerIP = preferences.getInt(KEY_ServerIP, 0);
 		saveLog = preferences.getBoolean(KEY_PersistLog, true);
+		askClose.putInt("id",preferences.getInt(KEY_IdAskClose,0));
+		askClose.putBoolean("close",preferences.getBoolean(KEY_IsAskClose,false));
 		try {
 			SystemControl.rebootInProgress = preferences.getLong(KEY_RebootTime, 0);
 		}catch(Exception e){

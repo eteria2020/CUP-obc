@@ -24,9 +24,9 @@ public class AGoodbye extends ABase {
 	private DLog dlog = new DLog(this.getClass());
 	private final boolean SKIP_DAMAGES = true;
 	
-	public static String JUMP_TO_END = "JUMP_TO_END";
+	public static final String JUMP_TO_END = "JUMP_TO_END";
 
-	public static String EUTHANASIA = "I_WANT_TO_DIE";
+	public static final String EUTHANASIA = "I_WANT_TO_DIE";
 	public AudioPlayer player;
 	
 	
@@ -53,10 +53,10 @@ public class AGoodbye extends ABase {
 		serviceConnector = new ServiceConnector(this, serviceHandler);
 		
 		
-		if (savedInstanceState == null) {
+		/*if (savedInstanceState == null) {
 			
 
-		}
+		}*/
 	}
 	
 	@Override

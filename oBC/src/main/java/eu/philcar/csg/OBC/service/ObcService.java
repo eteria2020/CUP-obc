@@ -1583,6 +1583,9 @@ public class ObcService extends Service {
 				startActivity(i);
 			}
 			else if ( (tripInfo.isOpen && App.pinChecked)) {
+				App.Instance.loadAskClose();
+
+				if ( (App.askClose!=null && App.askClose.getInt("id",0)==tripInfo.trip.remote_id && App.askClose.getBoolean("close",false) && App.getParkModeStarted()==null)) {
 
 				/*try {
 					while (((App) getApplicationContext()).getCurrentActivity()!=null)
@@ -1594,18 +1597,38 @@ public class ObcService extends Service {
 					dlog.e("Eccezione durante kill activity",e);
 				}
 				removeSelfCloseTrip();*/
-				dlog.d("Restarting map");
-				App.Instance.loadInSosta();
-				App.Instance.loadMotoreAvviato();
-				App.Instance.loadParkModeStarted();				
-				Intent i  = new Intent(ObcService.this, AMainOBC.class);
-				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				//sperimental!!
+					Intent i = new Intent(this, AGoodbye.class);
+					i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					i.putExtra(AGoodbye.JUMP_TO_END, true);
+					i.putExtra(AGoodbye.EUTHANASIA, false);
+					startActivity(i);
 
-				startActivity(i);
+					_lastRestart = System.currentTimeMillis();
 
-				_lastRestart = System.currentTimeMillis();
-				
+				}else {
+
+				/*try {
+					while (((App) getApplicationContext()).getCurrentActivity()!=null)
+						if(((App) getApplicationContext()).getCurrentActivity() instanceof AGoodbye) {
+							((App) getApplicationContext()).getCurrentActivity().finish();
+							dlog.d("kill AGoodbye");
+						}
+				}catch(Exception e){
+					dlog.e("Eccezione durante kill activity",e);
+				}
+				removeSelfCloseTrip();*/
+					dlog.d("Restarting map");
+					App.Instance.loadInSosta();
+					App.Instance.loadMotoreAvviato();
+					App.Instance.loadParkModeStarted();
+					Intent i = new Intent(ObcService.this, AMainOBC.class);
+					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					//sperimental!!
+
+					startActivity(i);
+
+					_lastRestart = System.currentTimeMillis();
+				}
 			} else {
 
 				/*try {
@@ -1619,7 +1642,7 @@ public class ObcService extends Service {
 				dlog.d("Restarting welcome");
 				//Intent i  = new Intent(ObcService.this, ServiceTestActivity.class);
 				Intent i  = new Intent(ObcService.this, AWelcome.class);
-				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);		
+				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(i);
 			}
 		}
@@ -1639,6 +1662,12 @@ public class ObcService extends Service {
 	}
 	
 	public void scheduleSelfCloseTrip(int seconds, boolean beforePin) {
+
+		if(App.getParkModeStarted()==null) {
+			App.askClose.putInt("id", App.currentTripInfo.trip.remote_id);
+			App.askClose.putBoolean("close", true);
+			App.Instance.persistAskClose();
+		}
 		Handler handler = getHandler();
 		dlog.d("Schedule selfclose in "+seconds +"secs. BeforePin="+beforePin);
 		Message msg = handler.obtainMessage(ObcService.MSG_TRIP_SELFCLOSE);  //TODO chiudere porte e corsa
@@ -1648,6 +1677,8 @@ public class ObcService extends Service {
 	}
 	
 	public void removeSelfCloseTrip() {
+		App.askClose.putBoolean("close",false);
+		App.Instance.persistAskClose();
 		Handler handler = getHandler();
 		handler.removeMessages(MSG_TRIP_SELFCLOSE);
 	}

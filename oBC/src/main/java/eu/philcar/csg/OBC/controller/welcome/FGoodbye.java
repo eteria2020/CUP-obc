@@ -64,14 +64,11 @@ public class FGoodbye extends FBase {
 	private static Boolean handleClick=false;
 	private static CountDownTimer timer_5sec;
 	private static Boolean RequestBanner=false;
-
-
-	private ArrayList<Bundle> endImages = new ArrayList<Bundle>();
 	
 	public static FGoodbye newInstance() {
 		
-		FGoodbye fw = new FGoodbye();
-		return fw;
+
+		return new FGoodbye();
 	}
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -105,7 +102,7 @@ public class FGoodbye extends FBase {
 		
 		App.isCloseable = true;
 		dlog.d("OnCreareView FGoodbye");
-		if(App.Instance.BannerName.getBundle("END")==null&&!RequestBanner){
+		if(App.BannerName.getBundle("END")==null&&!RequestBanner){
 			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
 			RequestBanner=true;
 			new Thread(new Runnable() {
@@ -158,7 +155,7 @@ public class FGoodbye extends FBase {
 				
 		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 	
-		((LinearLayout)view.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
+		(view.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
 
 		
 		((TextView)view.findViewById(R.id.fgodTopTV)).setTypeface(font);
@@ -198,33 +195,40 @@ public class FGoodbye extends FBase {
 		adIV.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(App.Instance.BannerName.getBundle("END")!=null){
-					if(App.Instance.BannerName.getBundle("END").getString("CLICK").compareTo("null")!=0){
+				if(App.BannerName.getBundle("END")!=null){
+					try {
+						if (App.BannerName.getBundle("END").getString("CLICK", "null").compareTo("null") != 0) {
 
-						if(!handleClick) {
-							adIV.setColorFilter(R.color.overlay_banner);
-							handleClick=true;
-							dlog.i(FDriveMessage.class.toString()+" Click su banner ");
-							new Thread(new Runnable() {
-								@Override
-								public void run() {
-
-									loadBanner(App.BannerName.getBundle("END").getString("CLICK"), "END", true);
-									getActivity().runOnUiThread(new Runnable() {
-										@Override
-										public void run() {
-											if(FGoodbye.this.isVisible()) {
-												adIV.clearColorFilter();
-												updateBanner("END");
-												timer_5sec.start();//Modifico l'IV
-												handleClick = false;
-											}
+							if (!handleClick) {
+								adIV.setColorFilter(R.color.overlay_banner);
+								handleClick = true;
+								dlog.i(FDriveMessage.class.toString() + " Click su banner ");
+								new Thread(new Runnable() {
+									@Override
+									public void run() {
+										try {
+											loadBanner(App.BannerName.getBundle("END").getString("CLICK"), "END", true);
+											getActivity().runOnUiThread(new Runnable() {
+												@Override
+												public void run() {
+													if (FGoodbye.this.isVisible()) {
+														adIV.clearColorFilter();
+														updateBanner("END");
+														timer_5sec.start();//Modifico l'IV
+														handleClick = false;
+													}
+												}
+											});
+										} catch (Exception e) {
+											dlog.e("Exception while updating banner", e);
 										}
-									});
 
-								}
-							}).start();
+									}
+								}).start();
+							}
 						}
+					} catch (Exception e) {
+						dlog.e("Exception during onclick", e);
 					}
 				}
 			}
@@ -237,8 +241,8 @@ public class FGoodbye extends FBase {
 		}
 		((TextView)view.findViewById(R.id.fgodGoodbyeTV)).setText(name);
 		
-//		((AGoodbye)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
-		((LinearLayout)view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
+		((AGoodbye)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
+		(view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
 		
 		new CountDownTimer(41000,1000) {
 			@Override
@@ -292,20 +296,20 @@ public class FGoodbye extends FBase {
 	public void loadBanner(String Url, String type, Boolean isClick) {
 
 		File outDir = new File(App.BANNER_IMAGES_FOLDER);
-		if (!outDir.isDirectory()) {
-			outDir.mkdir();
+		if (outDir.mkdir()) {
+			dlog.d("Banner directory created");
 		}
 
 
 
 		if (!App.hasNetworkConnection) {
 			dlog.e(" loadBanner: nessuna connessione");
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 		}
 		StringBuilder  builder = new StringBuilder();
-		List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
-		HttpResponse response=null;
+		List<NameValuePair> paramsList = new ArrayList<>();
+		HttpResponse response;
 		if(!isClick) {
 
 
@@ -321,10 +325,10 @@ public class FGoodbye extends FBase {
 		}
 		try {
 			if (App.BannerName.getBundle(type) != null )
-				paramsList.add(new BasicNameValuePair("index", App.Instance.BannerName.getBundle(type).getString("INDEX",null)));
+				paramsList.add(new BasicNameValuePair("index", App.BannerName.getBundle(type).getString("INDEX",null)));
 
 			if (App.BannerName.getBundle(type) != null )
-				paramsList.add(new BasicNameValuePair("end", App.Instance.BannerName.getBundle(type).getString("END",null)));
+				paramsList.add(new BasicNameValuePair("end", App.BannerName.getBundle(type).getString("END",null)));
 
 
 
@@ -351,23 +355,23 @@ public class FGoodbye extends FBase {
 			} else {
 
 				dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode));
-				App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+				App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 				return;
 			}
 		}catch (Exception e){
 			dlog.e(" loadBanner: eccezione in connessione ",e);
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 		}
 		String jsonStr = builder.toString();
 		if(jsonStr.compareTo("")==0){
 			dlog.e(" loadBanner: nessuna connessione");
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 		}
 
 		DLog.D(" loadBanner: risposta "+jsonStr);
-		File file = new File(outDir, "placeholder.lol");;
+		File file = new File(outDir, "placeholder.lol");
 
 		try {
 			JSONObject json = new JSONObject(jsonStr);
@@ -390,7 +394,7 @@ public class FGoodbye extends FBase {
 			if (jsonObject.has("END"))
 				Image.putString(("END"), jsonObject.getString("END"));
 
-			App.Instance.BannerName.putBundle(type,Image);
+			App.BannerName.putBundle(type,Image);
 
 			//ricavo nome file
 			URL urlImg = new URL(Image.getString("URL"));
@@ -402,7 +406,7 @@ public class FGoodbye extends FBase {
 
 			if(file.exists()){
 				Image.putString(("FILENAME"),filename);
-				App.Instance.BannerName.putBundle(type,Image);
+				App.BannerName.putBundle(type,Image);
 				dlog.i(" loadBanner: file già esistente: "+filename);
 				return;
 			}
@@ -429,13 +433,13 @@ public class FGoodbye extends FBase {
 			}
 			fileOutput.close();
 			Image.putString(("FILENAME"),filename);
-			App.Instance.BannerName.putBundle(type,Image);
+			App.BannerName.putBundle(type,Image);
 			dlog.d(" loadBanner: File scaricato e creato "+filename);
 
 
 		} catch (Exception e) {
 			if(file.exists()) file.delete();
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			dlog.e(" loadBanner: eccezione in creazione e download file ",e);
 
 			e.printStackTrace();
@@ -448,7 +452,7 @@ public class FGoodbye extends FBase {
 	private void updateBanner(String type){
 
 		File ImageV;
-		Bundle Banner = App.Instance.BannerName.getBundle(type);
+		Bundle Banner = App.BannerName.getBundle(type);
 		if(Banner!=null){
 			ImageV=new File(App.BANNER_IMAGES_FOLDER,Banner.getString("FILENAME",null));
 

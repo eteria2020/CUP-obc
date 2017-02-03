@@ -34,8 +34,8 @@ public class FMenu extends FBase implements OnClickListener {
 	
 	public static FMenu newInstance() {
 		
-		FMenu fm = new FMenu();
-		return fm;
+
+		return new FMenu();
 	}
 	
 	private ImageButton endRentIB, pauseRentIB, refuelIB, backIB;
@@ -56,8 +56,8 @@ public class FMenu extends FBase implements OnClickListener {
 		
 		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 		
-		((TextView)view.findViewById(R.id.tvPushToCancel)).setVisibility(View.INVISIBLE);
-		((LinearLayout)view.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
+		(view.findViewById(R.id.tvPushToCancel)).setVisibility(View.INVISIBLE);
+		(view.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
 		
 		endRentIB = (ImageButton)view.findViewById(R.id.fmenEndRentIB);
 		pauseRentIB = (ImageButton)view.findViewById(R.id.fmenPauseRentIB);
@@ -149,8 +149,8 @@ public class FMenu extends FBase implements OnClickListener {
 			
 			if (startParkingMode) {
 				startSelfClose(rootView);
-				((View)rootView.findViewById(R.id.llCancel)).animate().alpha(0.25f);
-				((TextView)rootView.findViewById(R.id.tvPushToCancel)).setVisibility(View.VISIBLE);
+				(rootView.findViewById(R.id.llCancel)).animate().alpha(0.25f);
+				(rootView.findViewById(R.id.tvPushToCancel)).setVisibility(View.VISIBLE);
 			} else {
 				stopSelfClose(rootView);
 				//((ABase)getActivity()).popFragment();
@@ -161,7 +161,7 @@ public class FMenu extends FBase implements OnClickListener {
 			
 		case R.id.fmenRefuelIB:
 		case R.id.fmenRefuelTV:
-			((ABase)getActivity()).pushFragment(FRefuel.newInstance(App.fuel_level <= 9 ? true : false), FRefuel.class.getName(), true);
+			((ABase)getActivity()).pushFragment(FRefuel.newInstance(App.fuel_level <= 9), FRefuel.class.getName(), true);
 			break;
 			
 		case R.id.fmenSOSB:
@@ -274,7 +274,7 @@ public class FMenu extends FBase implements OnClickListener {
 					break;
 				case PARK_STARTED:	// (FALSE, DATE, STARTED)
 					UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end_off, null, 
-							 R.drawable.button_rent_resume_pushed, R.string.menu_park_mode_resume, null, 
+							 R.drawable.button_rent_resume_pushed, R.string.menu_park_mode_started, null,
 							 R.drawable.button_fuel_station_small_pushed, R.string.menu_refuel_off, null, 
 							 R.drawable.button_back_pushed, null);
 					break;
@@ -381,7 +381,7 @@ public class FMenu extends FBase implements OnClickListener {
 			return;
 		
 		((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(durata));
-		((LinearLayout)root.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
+		(root.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
 
 		(root.findViewById(R.id.ivDamages)).setVisibility(View.INVISIBLE);
 		
@@ -394,7 +394,7 @@ public class FMenu extends FBase implements OnClickListener {
 			@Override
 			public void onFinish() {
 				dlog.d("FMenu: finish countdown");
-				((LinearLayout)root.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
+				(root.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
 
 			}
 
@@ -406,7 +406,7 @@ public class FMenu extends FBase implements OnClickListener {
 	
 	private void stopSelfClose(final View root) {
 		((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(0));
-		((LinearLayout)root.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
+		(root.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
 
 		
 		if (timer!=null)

@@ -117,6 +117,7 @@
 	<string name="menu_refuel">Fai rifornimento</string>
 	<string name="menu_refuel_off">Fai rifornimento (disabilitato)</string>
 	<string name="menu_refuel_shutdown_engine">Fai rifornimento (spegni prima il motore)</string>
+	<string name="menu_park_mode_started">Per riprendere il noleggio usa il comando APRI PORTE sul telefono o passa la tua Card per rientrare in macchina</string>
 	<string name="menu_park_mode_resume">Riprendi il noleggio</string>
 	<string name="menu_park_mode_resume_shutdown_engine">Riprendi il noleggio (spegni prima il motore)</string>
 

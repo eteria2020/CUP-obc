@@ -120,6 +120,7 @@
    <string name="menu_refuel">Refuel</string>
    <string name="menu_refuel_off">Refuel (not available)</string>
    <string name="menu_refuel_shutdown_engine">Refuel (switch off engine first)</string>
+	<string name="menu_park_mode_started">To resume rent please use command OPEN DOORS on your phone or your card to get back in the car</string>
    <string name="menu_park_mode_resume">Resume rent</string>
    <string name="menu_park_mode_resume_shutdown_engine">Resume rent (switch off engine first)</string>
    <string name="menu_park_mode_suspend">Suspend rent</string>
