@@ -8,7 +8,7 @@
 
    <string name="back_to_navigation">Procedi e torna alla navigazione</string>
    <string name="button_call">Prenota chiamata assistenza</string>
-   <string name="button_break">SOSTA\no TERMINA</string>
+   <string name="button_break">SOSTA o\nTERMINA</string>
    <string name="button_close">Chiudi</string>
    <string name="button_navigator">NAVIGATORE</string>
    <string name="button_radio">RADIO</string>
@@ -198,6 +198,7 @@
 
 	<string name="refuel_title">Ricarica vettura</string>
 	<string name="refueling_done">Rifornimento completato&#33;</string>
+	<string name="refuel_customer">P</string>
 
 	<string name="search">Cerca</string>
 	<string name="select_a_destination">Selezionare una meta di interesse</string>

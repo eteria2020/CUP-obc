@@ -91,16 +91,17 @@ public class PoisConnector implements RemoteEntityInterface {
 				Poi c = new Poi();
 				c.id = id;
 				c.tipo = jobj.getString("type");
-				c.codice= jobj.getString("code");
+				c.codice = jobj.getString("code");
 				c.via = jobj.getString("address");
 				c.citta = jobj.getString("town");
 				c.cap = jobj.getString("zip_code");
-				c.provincia =  jobj.getString("province");
+				c.provincia = jobj.getString("province");
 				c.attivo = true;
 				c.lon = jobj.getDouble("lon");
 				c.lat = jobj.getDouble("lat");
 				c.aggiornamento = jobj.getLong("update");
-				
+				c.abilitato = jobj.has("abilitato") && jobj.getBoolean("abilitato");
+
 				try {
 					pois.createOrUpdate(c);
 				} catch (SQLException e) {

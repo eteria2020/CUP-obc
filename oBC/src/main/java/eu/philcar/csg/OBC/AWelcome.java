@@ -148,7 +148,7 @@ public class AWelcome extends ABase {
 							f.setMaintenance(ti.isMaintenance);
 							DLog.D(AWelcome.class.getName() + "AWelcome: visualizzazione bandiere e nome");
 						} else {
-							DLog.E(AWelcome.class.getName() + "Impossibile cast a FWelcome di :" + fb.getClass().getName());
+							DLog.E(AWelcome.class.getName() + "Impossibile cast a FWelcome  :");
 						}
 					}
 				} else {

@@ -8,7 +8,7 @@
 	
    <string name="back_to_navigation">Back to navigation</string>
    <string name="button_call">Apply for support call</string>
-   <string name="button_break">PARK\nor END RENT</string>
+   <string name="button_break">PARK or\nEND RENT</string>
    <string name="button_close">Close</string>
    <string name="button_navigator">SAT NAV</string>
    <string name="button_radio">RADIO</string>
@@ -193,6 +193,7 @@
 
 	<string name="refuel_title">Recharge car</string>
 	<string name="refueling_done">Refueling done&#33;</string>
+	<string name="refuel_customer">Please unplug the cable from the charging station and put it in the bag in the trunk</string>
 	
 	<string name="search">Search</string>
 	<string name="select_a_destination">Select a destination</string>

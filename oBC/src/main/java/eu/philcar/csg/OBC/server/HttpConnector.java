@@ -292,7 +292,7 @@ public class HttpConnector {
 				
 				case 200:
 					HttpEntity entity = response.getEntity();
-					logtxt.append("- Content length: " + entity.getContentLength());
+					logtxt.append("- Content length: ").append( entity.getContentLength());
 					
 					Header encoding = entity.getContentEncoding();
 					
@@ -309,7 +309,7 @@ public class HttpConnector {
 					
 					if (entity != null) {
 						responseBody = EntityUtils.toString(entity);
-						logtxt.append(" Response body length: " + responseBody.length() );
+						logtxt.append(" Response body length: ").append(responseBody.length() );
 					}
 					break;
 

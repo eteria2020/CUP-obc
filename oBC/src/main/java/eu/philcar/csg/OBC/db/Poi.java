@@ -1,5 +1,7 @@
 package eu.philcar.csg.OBC.db;
 
+import android.location.Location;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -39,6 +41,9 @@ public class Poi extends DbRecord {
 	
 	@DatabaseField
 	public Boolean attivo;
+
+	@DatabaseField
+	public Boolean abilitato;
 	
 
 	@DatabaseField
@@ -49,6 +54,13 @@ public class Poi extends DbRecord {
 
 	@DatabaseField(index = true)
 	public long aggiornamento;
+
+	public Location getLoc(){
+		Location loc1 = new Location("");
+		loc1.setLatitude(lat);
+		loc1.setLongitude(lon);
+		return loc1;
+	}
 	
 
 	

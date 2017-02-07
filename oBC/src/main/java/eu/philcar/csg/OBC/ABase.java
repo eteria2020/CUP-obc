@@ -232,7 +232,7 @@ public abstract class ABase extends Activity {
 		SharedPreferences sp = getSharedPreferences(getResources().getString(R.string.app_name), Context.MODE_PRIVATE);
 		Editor edit = sp.edit();
 		edit.putString("language", locale);
-		edit.commit();
+		edit.apply();
 	}
 	
 	private void changeLanguage(String locale) {

@@ -304,10 +304,16 @@ public class SystemControl {
 
 	public static void doReboot() {
 		//If there is another reboot in progress not older than 6 hour : ignore
+
 		if (System.currentTimeMillis() - rebootInProgress>21600000) {
 			Thread th = new Thread(new Reboot());
 			th.start();
 		} else {
+			if(System.currentTimeMillis() - rebootInProgress<0 && System.currentTimeMillis()-App.AppStartupTime.getTime()>3600000) { //if date is 01/01/2000 reboot every hour
+				Thread th = new Thread(new Reboot());
+				th.start();
+			}
+			else
 			DLog.D(SystemControl.class.toString()+" Last Reboot within 6 hour, wait");
 		}
 	}

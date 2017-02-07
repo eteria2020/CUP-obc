@@ -112,35 +112,67 @@ public class FMaintenance extends FBase {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		Events.Maintenance("Show");
-		askPin();
-		
-		view = inflater.inflate(R.layout.f_maintenance, container, false);
-		
-		
-		
-		((Button)view.findViewById(R.id.finsNextIB)).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {				
-				((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
-				dlog.d("Closing FMaintenance");
-			}
-		});
-		
-		
-		((Button)view.findViewById(R.id.btnEndCharging)).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				dlog.d("Pushed EndCharging");
-				((AWelcome)getActivity()).sendMessage(MessageFactory.sendEndCharging());
-				Events.Maintenance("EndCharging");
-				
-			}
-		});
-		
-		
-		((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
-		
+
+		if(App.currentTripInfo.customer.checkAdmin()) {
+			Events.Maintenance("Show");
+			askPin();
+
+			view = inflater.inflate(R.layout.f_maintenance, container, false);
+
+
+			((Button) view.findViewById(R.id.finsNextIB)).setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					((ABase) getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
+					dlog.d("Closing FMaintenance");
+				}
+			});
+
+
+			((Button) view.findViewById(R.id.btnEndCharging)).setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dlog.d("Pushed EndCharging");
+					((AWelcome) getActivity()).sendMessage(MessageFactory.sendEndCharging());
+					Events.Maintenance("EndCharging");
+
+				}
+			});
+
+
+			((Button) view.findViewById(R.id.btnEndCharging)).setEnabled(false);
+
+		}
+		else{
+			Events.Maintenance("Customer");
+			askPin();
+
+			view = inflater.inflate(R.layout.f_maintenance, container, false);
+
+
+			((Button) view.findViewById(R.id.finsNextIB)).setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					((ABase) getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
+					dlog.d("Closing FMaintenance");
+				}
+			});
+
+
+			((Button) view.findViewById(R.id.btnEndCharging)).setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dlog.d("Pushed EndCharging");
+					((AWelcome) getActivity()).sendMessage(MessageFactory.sendEndCharging());
+					Events.Maintenance("EndCharging");
+
+				}
+			});
+
+
+			((Button) view.findViewById(R.id.btnEndCharging)).setEnabled(false);
+
+		}
 		return view;
 	}
 	

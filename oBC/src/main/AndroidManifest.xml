@@ -88,8 +88,8 @@
 		
 		<activity android:name="eu.philcar.csg.OBC.helpers.ServiceTestActivity"
 			 	  android:label="@string/app_name" 
-			  	  android:screenOrientation="landscape" 
-			  	  android:theme="@*android:style/Theme.Black.NoTitleBar.Fullscreen">    	
+			  	  android:screenOrientation="landscape"
+			  	  android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
 	    </activity>
 		
 	    <activity android:name="eu.philcar.csg.OBC.AWelcome"
@@ -125,10 +125,8 @@
 		<service android:enabled="true" android:name="eu.philcar.csg.OBC.service.ObcService"></service>
 		<service android:enabled="true" android:name="eu.philcar.csg.OBC.service.AdvertisementService"></service>
 		
-		<receiver android:name="eu.philcar.csg.OBC.usbReceiver" android:enabled="true">
 
-    	</receiver>
-    	
+
 
 
 		

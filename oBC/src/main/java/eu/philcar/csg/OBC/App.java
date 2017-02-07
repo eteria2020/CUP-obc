@@ -349,6 +349,7 @@ public class App extends Application {
 	private static final String  KEY_AlarmSmsNumber = "alarm_sms_number";
 	private static final String  KEY_BatteryAlarmSmsNumbers = "battery_alarm_sms_numbers";
 	private static final String  KEY_Charging = "Charging";
+	private static final String  KEY_AbilitedPoi = "abilited_poi";
 	private static final String  KEY_UseExternalGPS ="use_external_gps";
 	private static final String  KEY_RadioSetup ="radio_setup";
 	private static final String  KEY_Watchdog = "watchdog";
@@ -400,6 +401,9 @@ public class App extends Application {
 	public static long   networkExceptions=0;
 	public static Location lastLocation;
 	public static Boolean saveLog =true;
+
+
+	public static Boolean abilitedPoi;
 	
 	public static TripInfo  currentTripInfo;	
 	
@@ -491,7 +495,7 @@ public class App extends Application {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_ParkMode, App.parkMode.toInt());
-			e.commit();
+			e.apply();
 		}
 	}public void persistAskClose() {
 		if (preferences != null) {
@@ -500,38 +504,38 @@ public class App extends Application {
 				e.putInt(KEY_IdAskClose, App.askClose.getInt("id",0));
 				e.putBoolean(KEY_IsAskClose, App.askClose.getBoolean("close",false));
 			}
-			e.commit();
+			e.apply();
 		}
 	}
 	public void persistMotoreAvviato() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putBoolean("motoreAvviato", App.motoreAvviato);
-			e.commit();
+			e.apply();
 		}
 	}
 	public void persistParkModeStarted() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putLong(KEY_parkModeStarted, (ParkModeStarted != null) ? ParkModeStarted.getTime() : 0);
-			e.commit();
+			e.apply();
 		}
 	}
 	public void persistPinChecked() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putBoolean("pinChecked", App.pinChecked);
-			e.commit();
+			e.apply();
 		}
 	}
 	public void persistUserDrunk() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putBoolean("userDrunk", App.userDrunk);
-			e.commit();
+			e.apply();
 		}
 	}
-	
+
 	public void persistReservation() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
@@ -539,7 +543,16 @@ public class App extends Application {
 				e.putString("reservation", App.reservation.toJson());
 			else
 				e.putString("reservation", null);
-			e.commit();
+			e.apply();
+		}
+	}
+	public void persistAbilitedPoi() {
+		if (this.preferences != null) {
+			Editor e = this.preferences.edit();
+			if (App.abilitedPoi!=null) {
+				e.putBoolean(KEY_AbilitedPoi, App.abilitedPoi);
+				e.apply();
+			}
 		}
 	}
 	
@@ -547,7 +560,7 @@ public class App extends Application {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putBoolean(KEY_Charging, App.Charging);
-			e.commit();
+			e.apply();
 		}
 	}
 	
@@ -558,7 +571,7 @@ public class App extends Application {
 				e.putString(KEY_RadioSetup, radioSetup.toJson());
 			else
 				e.putString(KEY_RadioSetup, "");
-			e.commit();
+			e.apply();
 		}
 	}
 	
@@ -566,7 +579,7 @@ public class App extends Application {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_Watchdog, Watchdog);
-			e.commit();
+			e.apply();
 		}
 	}
 	
@@ -574,7 +587,7 @@ public class App extends Application {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_BatteryShutdownLevel, BatteryShutdownLevel);
-			e.commit();
+			e.apply();
 		}		
 		
 	}
@@ -583,28 +596,28 @@ public class App extends Application {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_FleetId, FleetId);
-			e.commit();
+			e.apply();
 		}
 	}
 	public void persistServerIP() {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_ServerIP, ServerIP);
-			e.commit();
+			e.apply();
 		}
 	}
 	public void persistRebootTime() {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putLong(KEY_RebootTime, SystemControl.rebootInProgress);
-			e.commit();
+			e.apply();
 		}
 	}
 	public void persistSaveLog() {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putBoolean(KEY_PersistLog, saveLog);
-			e.commit();
+			e.apply();
 		}
 	}
 
@@ -796,8 +809,8 @@ public void loadRadioSetup() {
 		
 			
 	}
-	
-	
+
+
 	public void setMockLocation(String json) {
 		
 		if (json==null || json.isEmpty() || json.equalsIgnoreCase("null")) {
@@ -1591,6 +1604,7 @@ private void  initPhase2() {
 		Damages = preferences.getString(KEY_damages, "");
 		Pulizia_int = preferences.getInt(KEY_pulizia_int, 0);
 		Pulizia_ext = preferences.getInt(KEY_pulizia_ext, 0);
+		abilitedPoi = preferences.getBoolean(KEY_AbilitedPoi,false);
 
 		currentAmp =(double) preferences.getLong(KEY_current_apm, 0);
 		chargingAmp =(double) preferences.getLong(KEY_charging_amp, 0);
@@ -1964,7 +1978,7 @@ private void  initPhase2() {
 					SmsMessage smsmsg = SmsMessage
 							.createFromPdu((byte[]) smsextras[i]);
 
-					String strMsgBody = smsmsg.getMessageBody().toString();
+					String strMsgBody = smsmsg.getMessageBody();
 					String strMsgSrc = smsmsg.getOriginatingAddress();
 
 					strMessage += "SMS from " + strMsgSrc + " : " + strMsgBody;

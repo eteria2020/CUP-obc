@@ -8,34 +8,108 @@
         android:layout_alignParentTop="true"
         android:background="#fdee66" />
 
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/fins_top_V"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"
-        android:text="Maintenance page"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="32sp" />
-
-    <Button
-        android:id="@+id/btnEndCharging"
-        android:layout_width="180dp"
-        android:layout_height="90dp"
-        android:layout_below="@+id/tvTitle"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="40dp"
-        android:text="End charge"
-        android:textSize="26sp" />
-
-    <TextView android:id="@+id/tvEndCharging" android:layout_width="300dp" android:layout_height="wrap_content" android:layout_alignTop="@+id/btnEndCharging" android:layout_marginLeft="26dp" android:layout_toRightOf="@+id/btnEndCharging" android:text="-" android:textAppearance="?android:attr/textAppearanceMedium"/>
-    <Button android:id="@+id/finsNextIB" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_above="@+id/fins_bottom_V" android:layout_alignParentRight="true" android:layout_marginBottom="10dp" android:layout_marginRight="10dp" android:background="@drawable/button_next"/>
-    
     <View android:id="@+id/fins_bottom_V"
         android:layout_width="match_parent"
         android:layout_height="13dp"
         android:layout_alignParentBottom="true"
         android:background="#fdee66" />
-    
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/frameLayout"
+        android:layout_toStartOf="@+id/frameLayout"
+        android:layout_above="@+id/fins_bottom_V"
+        android:layout_below="@+id/fins_top_V">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/fins_top_V"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_toLeftOf="@+id/frameLayout"
+            android:layout_toStartOf="@+id/frameLayout"
+            android:id="@+id/linearLayout"
+            android:layout_above="@+id/fins_bottom_V">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fins_top_V"
+                android:text="Maintenance page"
+                android:textSize="55sp"
+                android:gravity="center_horizontal"
+                android:layout_toLeftOf="@+id/frameLayout"
+                android:textStyle="bold"
+                android:textColor="#feef79" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/img_circle_white"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="40sp"
+                    android:textStyle="bold"
+                    android:text="-" />
+
+                <TextView
+                    android:id="@+id/tvEndCharging"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:gravity="start"
+                    android:padding="8dp"
+                    android:text="@string/pin_FAQ_1"
+                    android:textColor="@color/white"
+                    android:textSize="35sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnEndCharging"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="End charge"
+            android:textSize="22sp"
+            android:layout_above="@+id/fins_bottom_V"
+            android:layout_alignLeft="@+id/tvEndCharging"
+            android:layout_alignStart="@+id/tvEndCharging"
+            android:layout_gravity="center_horizontal|bottom"
+            android:background="@drawable/sel_button_fuel_station"
+            android:layout_marginBottom="25dp"
+            android:textColor="@color/text_green"
+            android:textStyle="bold" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="225dp"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fins_top_V"
+        android:layout_above="@+id/fins_bottom_V"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="#3ea447" >
+
+        <Button android:id="@+id/finsNextIB" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_above="@+id/fins_bottom_V" android:layout_alignParentRight="true" android:layout_marginBottom="25dp"
+            android:background="@drawable/button_next"
+            android:layout_gravity="center_horizontal|bottom" />
+    </FrameLayout>
+
 </RelativeLayout>

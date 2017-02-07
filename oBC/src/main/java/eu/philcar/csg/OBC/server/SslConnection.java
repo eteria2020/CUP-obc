@@ -140,7 +140,7 @@ public class SslConnection {
 			String line;
 			StringBuilder content = new StringBuilder();
 			while ((line = bufferedReader.readLine()) != null) {
-				content.append(line + "\n");
+				content.append(line).append("\n");
 			}
 			bufferedReader.close();	
 			
