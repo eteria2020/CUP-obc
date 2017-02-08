@@ -176,6 +176,7 @@ public class ObcService extends Service {
 	private ArrayList<Messenger> clients = new ArrayList<Messenger>();
 	
 	private boolean isStarted;
+	private long lastValidSOC = 0;
 	private boolean isStopRequested=false;
 	
 	
@@ -454,74 +455,69 @@ public class ObcService extends Service {
 			public void run() {
 				try {
 
-					float currVolt=0;
-					boolean cellLow=false;
-					String lowCellNumber=" ";
-					String cellsVoltage="";
+					float currVolt = 0;
+					boolean cellLow = false;
+					String lowCellNumber = " ";
+					String cellsVoltage = "";
 
-					carInfo.cellVoltageValue=getCellVoltages();
-					carInfo.bmsSOC=getSOCValue();
-					carInfo.outAmp=getCurrentValue();
+					carInfo.cellVoltageValue = getCellVoltages();
+					carInfo.bmsSOC = getSOCValue();
+					carInfo.outAmp = getCurrentValue();
 
-					carInfo.minVoltage=carInfo.cellVoltageValue[22]==0?2.8f:2.5f;
-					carInfo.batteryType=carInfo.cellVoltageValue[22]==0?"DFD":"HNLD";
+					carInfo.minVoltage = carInfo.cellVoltageValue[22] == 0 ? 2.8f : 2.5f;
+					carInfo.batteryType = carInfo.cellVoltageValue[22] == 0 ? "DFD" : "HNLD";
 
 
-					for(int i =0;i<carInfo.cellVoltageValue.length;i++){
-						currVolt+=carInfo.cellVoltageValue[i];	//		battery cell voltages
-						cellsVoltage=cellsVoltage.concat(" " + carInfo.cellVoltageValue[i]);
-						if(carInfo.cellVoltageValue[i]<carInfo.minVoltage &&carInfo.cellVoltageValue[i] !=0){
-							cellLow=true;
-							lowCellNumber=lowCellNumber.concat((i+1)+" ");
+					for (int i = 0; i < carInfo.cellVoltageValue.length; i++) {
+						currVolt += carInfo.cellVoltageValue[i];    //		battery cell voltages
+						cellsVoltage = cellsVoltage.concat(" " + carInfo.cellVoltageValue[i]);
+						if (carInfo.cellVoltageValue[i] < carInfo.minVoltage && carInfo.cellVoltageValue[i] != 0) {
+							cellLow = true;
+							lowCellNumber = lowCellNumber.concat((i + 1) + " ");
 						}
 					}
 
-					carInfo.isCellLowVoltage =cellLow;
-					carInfo.lowCells=lowCellNumber;
-					carInfo.currVoltage= (float)Math.round(currVolt*100)/100f;
+					carInfo.isCellLowVoltage = cellLow;
+					carInfo.lowCells = lowCellNumber;
+					carInfo.currVoltage = (float) Math.round(currVolt * 100) / 100f;
 
-					if (carInfo.currVoltage<=0){
-						carInfo.batteryLevel=Math.min(carInfo.bmsSOC,carInfo.bmsSOC_GPRS);
-						App.Instance.setBatteryLevel(carInfo.batteryLevel);
+					if (carInfo.currVoltage <= 0 && (lastValidSOC - System.currentTimeMillis() < 60000 * 5)) {
+						carInfo.setBatteryLevel(Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS));
 						dlog.d("virtualBMSUpdateScheduler: value null ignoring data.");
 						return;
 					}
+					lastValidSOC = System.currentTimeMillis();
 
-					if(carInfo.bmsSOC>=100 ||carInfo.bmsSOC_GPRS>=100){
-						if(!carInfo.Charging || (carInfo.currVoltage > App.getMax_voltage())) {
+					if (carInfo.bmsSOC >= 100 || carInfo.bmsSOC_GPRS >= 100) {
+						if (!carInfo.Charging || (carInfo.currVoltage > App.getMax_voltage())) {
 							App.Instance.setMaxVoltage(carInfo.currVoltage > 85f || carInfo.currVoltage < 80f ? 83f : carInfo.currVoltage);
-							dlog.d("virtualBMSUpdateScheduler: set maxVoltage to " + App.getMax_voltage() + "% bmsSOC: " + carInfo.bmsSOC +" % bmsSOC_GPRS: " + carInfo.bmsSOC_GPRS + "% currVoltage "+ carInfo.currVoltage +"% Charging: "+carInfo.Charging);
-							carInfo.Charging=true;
+							dlog.d("virtualBMSUpdateScheduler: set maxVoltage to " + App.getMax_voltage() + "% bmsSOC: " + carInfo.bmsSOC + " % bmsSOC_GPRS: " + carInfo.bmsSOC_GPRS + "% currVoltage " + carInfo.currVoltage + "% Charging: " + carInfo.Charging);
+							carInfo.Charging = true;
 						}
-					}else{
-						carInfo.Charging=false;
+					} else {
+						carInfo.Charging = false;
 					}
-					carInfo.virtualSOC = (carInfo.cellVoltageValue[22]==0?((float)Math.round((100-90*(App.Instance.getMax_voltage()-currVolt)/12) * 10) / 10f):((float)Math.round((100-90*(App.Instance.getMax_voltage()-3-currVolt)/9.5) * 10) / 10f));//DFD:H
+					carInfo.virtualSOC = (carInfo.cellVoltageValue[22] == 0 ? ((float) Math.round((100 - 90 * (App.Instance.getMax_voltage() - currVolt) / 12) * 10) / 10f) : ((float) Math.round((100 - 90 * (App.Instance.getMax_voltage() - 3 - currVolt) / 9.5) * 10) / 10f));//DFD:H
 
-					carInfo.SOCR =carInfo.bmsSOC==carInfo.bmsSOC_GPRS? Math.min(Math.min(carInfo.bmsSOC,carInfo.bmsSOC_GPRS),carInfo.virtualSOC):carInfo.virtualSOC;
-					if((carInfo.isCellLowVoltage) || carInfo.currVoltage<=67f){
+					carInfo.SOCR = carInfo.bmsSOC == carInfo.bmsSOC_GPRS ? Math.min(Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS), carInfo.virtualSOC) : carInfo.virtualSOC;
+					if ((carInfo.isCellLowVoltage) || carInfo.currVoltage <= 67f) {
 
-						carInfo.SOCR = Math.min(carInfo.virtualSOC,0f);
+						carInfo.SOCR = Math.min(carInfo.virtualSOC, 0f);
 					}
 
-					if(Math.abs(carInfo.batteryLevel-carInfo.SOCR)>=5)
-					{
-						carInfo.batteryLevel=Math.round(carInfo.batteryLevel>carInfo.SOCR?carInfo.batteryLevel-5:carInfo.batteryLevel+5);
-					}else
-						carInfo.batteryLevel=Math.round(carInfo.SOCR);
+					carInfo.setBatteryLevel(Math.round(carInfo.SOCR));
 
 					//carInfo.batteryLevel=Math.min(carInfo.bmsSOC,carInfo.bmsSOC_GPRS); //PER VERSIONI NON -BMS SCOMMENTARE E COMMENTARE IF SOPRA
 
-					App.Instance.setBatteryLevel(carInfo.batteryLevel);
 
 					/*Message msg = MessageFactory.notifyCANDataUpdate(carInfo);
-					sendAll(msg);*/
+                    sendAll(msg);*/
 
-					dlog.d("virtualBMSUpdateScheduler: VBATT: "+carInfo.currVoltage+"V V100%: "+App.Instance.max_voltage+"V cell voltage: " +cellsVoltage +" soc: "+carInfo.bmsSOC+"% SOCR: "+carInfo.SOCR+"% SOC2:"+carInfo.virtualSOC+"% SOC.ADMIN:"+carInfo.batteryLevel+"% bmsSOC_GPRS:"+carInfo.bmsSOC_GPRS+"%");
+					dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.Instance.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
 
 
 				} catch (Exception e) {
-					dlog.e("virtualBMSUpdateScheduler error",e);
+					dlog.e("virtualBMSUpdateScheduler error", e);
 				}
 			}
 
