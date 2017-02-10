@@ -118,7 +118,17 @@ public class CarInfo {
 		serviceLocationListener = new ServiceLocationListener();
 		allData = new Bundle();
 	}
-	
+
+	public void setBatteryLevel(int batteryLevel) {
+
+		if (Math.abs(this.batteryLevel - batteryLevel) >= 5) {
+			this.batteryLevel = (Math.round(this.batteryLevel > batteryLevel ? this.batteryLevel - 5 : this.batteryLevel + 5));
+		} else
+			this.batteryLevel = (Math.round(SOCR));
+
+		this.batteryLevel = batteryLevel;
+		App.Instance.setBatteryLevel(batteryLevel);
+	}
 	
 	private void  setLocation(Location loc) {
 		
