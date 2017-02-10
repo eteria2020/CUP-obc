@@ -76,22 +76,6 @@ public class Pois extends DbTable<Poi,Integer> {
 		
 		return null;
 	}
-	public List<Poi> getPoisAbilitedToCustomer() {
-
-		try {
-
-			PreparedQuery<Poi> query =  queryBuilder().where().eq("abilitato",true).and().eq("attivo", true).prepare();
-
-			return this.query(query);
-
-
-		} catch (SQLException e) {
-			DLog.E("getPois fail:",e);
-
-		}
-
-		return null;
-	}
 	
 	
 	public long mostRecent() {

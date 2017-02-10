@@ -349,7 +349,6 @@ public class App extends Application {
 	private static final String  KEY_AlarmSmsNumber = "alarm_sms_number";
 	private static final String  KEY_BatteryAlarmSmsNumbers = "battery_alarm_sms_numbers";
 	private static final String  KEY_Charging = "Charging";
-	private static final String  KEY_AbilitedPoi = "abilited_poi";
 	private static final String  KEY_UseExternalGPS ="use_external_gps";
 	private static final String  KEY_RadioSetup ="radio_setup";
 	private static final String  KEY_Watchdog = "watchdog";
@@ -403,7 +402,6 @@ public class App extends Application {
 	public static Boolean saveLog =true;
 
 
-	public static Boolean abilitedPoi;
 	
 	public static TripInfo  currentTripInfo;	
 	
@@ -544,15 +542,6 @@ public class App extends Application {
 			else
 				e.putString("reservation", null);
 			e.apply();
-		}
-	}
-	public void persistAbilitedPoi() {
-		if (this.preferences != null) {
-			Editor e = this.preferences.edit();
-			if (App.abilitedPoi!=null) {
-				e.putBoolean(KEY_AbilitedPoi, App.abilitedPoi);
-				e.apply();
-			}
 		}
 	}
 	
@@ -1604,7 +1593,6 @@ private void  initPhase2() {
 		Damages = preferences.getString(KEY_damages, "");
 		Pulizia_int = preferences.getInt(KEY_pulizia_int, 0);
 		Pulizia_ext = preferences.getInt(KEY_pulizia_ext, 0);
-		abilitedPoi = preferences.getBoolean(KEY_AbilitedPoi,false);
 
 		currentAmp =(double) preferences.getLong(KEY_current_apm, 0);
 		chargingAmp =(double) preferences.getLong(KEY_charging_amp, 0);

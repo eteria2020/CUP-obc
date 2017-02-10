@@ -2128,8 +2128,7 @@ public class ObcService extends Service {
 
                 case MSG_CAR_END_CHARGING:
 
-                    if(!carInfo.chargingPlug)
-                        carInfo.setPoiAbilited(false);
+
 
                     if (!carInfo.chargingPlug && App.Charging) {
                         App.Charging = false;
@@ -2151,7 +2150,6 @@ public class ObcService extends Service {
                     break;
                 case ObcService.MSG_CAR_START_CHARGING:
 
-                    carInfo.setPoiAbilited(checkIfAbilitatedPois(App.lastLocation));
                     if (carInfo.chargingPlug) {
                         carInfo.chargingAmpere = carInfo.currentAmpere;
                     }
@@ -2204,21 +2202,7 @@ public class ObcService extends Service {
         return (3500 - obc_io.getPackCurrentValue()) / 10;
     }
 
-    public Boolean checkIfAbilitatedPois(Location lastLoc) {
 
-        Pois pois = App.Instance.dbManager.getPoisDao();
-        List<Poi> poiList = pois.getPoisAbilitedToCustomer();
-        for (Poi poi : poiList) {
-            if (lastLoc.distanceTo(poi.getLoc()) < 50) {
-                return true;
-            }
-        }
-
-
-        return false;
-
-
-    }
 
 
 }

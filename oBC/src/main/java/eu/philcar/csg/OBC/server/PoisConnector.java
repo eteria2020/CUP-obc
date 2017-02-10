@@ -100,7 +100,6 @@ public class PoisConnector implements RemoteEntityInterface {
 				c.lon = jobj.getDouble("lon");
 				c.lat = jobj.getDouble("lat");
 				c.aggiornamento = jobj.getLong("update");
-				c.abilitato = jobj.has("abilitato") && jobj.getBoolean("abilitato");
 
 				try {
 					pois.createOrUpdate(c);

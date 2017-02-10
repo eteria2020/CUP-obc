@@ -43,10 +43,6 @@ public class Poi extends DbRecord {
 	public Boolean attivo;
 
 	@DatabaseField
-	public Boolean abilitato;
-	
-
-	@DatabaseField
 	public Double lon;
 
 	@DatabaseField

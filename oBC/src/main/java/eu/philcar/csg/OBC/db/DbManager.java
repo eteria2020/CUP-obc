@@ -14,7 +14,7 @@ import eu.philcar.csg.OBC.helpers.DLog;
 public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public  static final String DATABASE_NAME = "/sdcard/csg/sharengo.db";
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 1;
 
 	private static DbManager instance = null;;
 
