@@ -145,7 +145,6 @@ public class FMaintenance extends FBase {
 		}
 		else{
 			Events.Maintenance("Customer");
-			askPin();
 
 			view = inflater.inflate(R.layout.f_maintenance, container, false);
 
@@ -185,8 +184,11 @@ public class FMaintenance extends FBase {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
 			if (carinfo.chargingPlug)
 				((TextView)view.findViewById(R.id.tvEndCharging)).setText("IMPOSSIBILE TERMINARE RICARCA: spina ancora inserita");
-			else
-				((TextView)view.findViewById(R.id.tvEndCharging)).setText("Auto non in ricarica");
+			else {
+
+				((Button)view.findViewById(R.id.btnEndCharging)).setVisibility(View.INVISIBLE);
+				((TextView) view.findViewById(R.id.tvEndCharging)).setText(R.string.refueling_done);
+			}
 		}
 	}
 

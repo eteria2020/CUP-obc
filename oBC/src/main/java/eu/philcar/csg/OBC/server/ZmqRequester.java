@@ -229,7 +229,7 @@ public class ZmqRequester {
 		@Override
 		public void run() {
 			
-			zmqSocket.connect("tcp://185.81.1.24:8011");
+			zmqSocket.connect(App.URL_ZMQNotifier);
 						
 			String sid="";
 	        while(!Thread.currentThread().isInterrupted()) {

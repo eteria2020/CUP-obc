@@ -197,8 +197,8 @@
 
 
 	<string name="refuel_title">Ricarica vettura</string>
-	<string name="refueling_done">Rifornimento completato&#33;</string>
-	<string name="refuel_customer">P</string>
+	<string name="refueling_done">Ricarica completata! \nProcedi alla schermata successiva per riprendere la tua corsa\nRicordari di rimettere il cavo nel bagagliaio</string>
+	<string name="refuel_customer">Prima di partire controlla di aver staccato dalla torretta e rimesso nel bagagliaio il cavo della ricarica!</string>
 
 	<string name="search">Cerca</string>
 	<string name="select_a_destination">Selezionare una meta di interesse</string>

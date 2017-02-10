@@ -43,8 +43,9 @@ public class ZmqSubscriber {
 				zmqThread.join(5000);
 			} catch (InterruptedException e) {
 				dlog.e("ZMQException ",e);
-			}
 
+			}	
+			
 		}
 
 		Start(serviceHandler);
@@ -93,6 +94,7 @@ public class ZmqSubscriber {
 						dlog.e("Exception in zmqStop",e);
 					}
 				}
+
 			};
 
 			t.start();
@@ -153,6 +155,7 @@ public class ZmqSubscriber {
 							dlog.e("ZMQ message exception", e);
 						}
 						Log.d("ZMQ", str);
+
 					}
 				}
 
@@ -160,6 +163,7 @@ public class ZmqSubscriber {
 
 
 			}catch(Exception e){
+
 				isStarting=false;
 				dlog.e("ZMQException ",e);
 			}

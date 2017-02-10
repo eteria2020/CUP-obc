@@ -74,9 +74,10 @@
                     android:layout_marginStart="8dp"
                     android:gravity="start"
                     android:padding="8dp"
-                    android:text="@string/pin_FAQ_1"
+                    android:text="@string/refuel_customer"
                     android:textColor="@color/white"
-                    android:textSize="35sp" />
+                    android:textSize="35sp"
+                    android:layout_marginTop="20dp" />
             </LinearLayout>
 
         </LinearLayout>

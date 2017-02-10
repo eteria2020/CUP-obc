@@ -332,7 +332,7 @@ public class HttpConnector {
 	 	    	if(App.networkExceptions%100==0) {
 	 	    		dlog.e("Network exceptions: "+ App.networkExceptions);	
 	 	    	}
-	 	    	dlog.e("Http IOException");
+	 	    	dlog.e("Http IOException",e);
 	 	    } catch (Exception e) {
 	 	    	dlog.e("Http Unexpected exception",e);
 	 	    }

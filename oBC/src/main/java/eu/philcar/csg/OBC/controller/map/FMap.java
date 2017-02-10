@@ -612,6 +612,7 @@ public class FMap extends FBase implements OnClickListener {
 				public void run() {
 					loadBanner(App.URL_AdsBuilderCar,"CAR",false);
 					try{
+						if(getActivity()!=null)
 						getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -3171,11 +3172,11 @@ public class FMap extends FBase implements OnClickListener {
 			Url= UrlTools.buildQuery(Url.concat("?"),paramsList).toString();
 			//connessione per scaricare id immagine
 
+			DLog.D(FMap.class.toString()+" loadBanner: Url richiesta "+Url);
 			HttpClient client = new DefaultHttpClient();
 			HttpGet httpGet = new HttpGet(Url);
 
 			 response = client.execute(httpGet);
-			DLog.D(FMap.class.toString()+" loadBanner: Url richiesta "+Url);
 			StatusLine statusLine = response.getStatusLine();
 			int statusCode = statusLine.getStatusCode();
 			if (statusCode == 200) {

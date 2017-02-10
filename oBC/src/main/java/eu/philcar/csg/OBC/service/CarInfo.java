@@ -132,7 +132,7 @@ public class CarInfo {
     }
 
     public void setBatteryLevel(int batteryLevel) {
-        if (App.Charging && isPoiAbilited && batteryLevel > 95 ){
+        if (App.Charging && isPoiAbilited && batteryLevel > 95 && chargingPlug){
             App.Charging=false;
             App.Instance.persistCharging();
             Events.eventCharge(0);
@@ -452,7 +452,22 @@ public class CarInfo {
                     this.chargingPlug = bo;
                     Events.eventCharge(bo ? 1 : 0);
 
-                    if (!App.Charging && this.chargingPlug) {
+                    if(!bo) {                       //if false
+
+                        if(batteryLevel>95 && isPoiAbilited){        //if battery over 95% and poi abilited force auto off charging
+                            App.Charging = false;
+                            App.Instance.persistCharging();
+                        }
+                        setPoiAbilited(false); //car not plugged disable auto exit charge
+                    }
+                    if(isPoiAbilited && batteryLevel>95) {
+
+                        forceBeacon = true;
+                        continue;
+                    }
+
+                    if (!App.Charging && this.chargingPlug ) {
+
                         App.Charging = true;
                         serviceHandler.sendMessage(MessageFactory.notifyStartCharging(this));
                         App.Instance.persistCharging();

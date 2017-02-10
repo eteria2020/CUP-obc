@@ -192,7 +192,7 @@
 	<string name="pin_FAQ_3">After you logged on the App click on User Profile and scroll down until the PIN section.</string>
 
 	<string name="refuel_title">Recharge car</string>
-	<string name="refueling_done">Refueling done&#33;</string>
+	<string name="refueling_done">Refueling done!\nProceed to the next page to continue your trip</string>
 	<string name="refuel_customer">Please unplug the cable from the charging station and put it in the bag in the trunk</string>
 	
 	<string name="search">Search</string>

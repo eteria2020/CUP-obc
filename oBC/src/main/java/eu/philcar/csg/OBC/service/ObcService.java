@@ -2128,7 +2128,8 @@ public class ObcService extends Service {
 
                 case MSG_CAR_END_CHARGING:
 
-                    carInfo.setPoiAbilited(false);
+                    if(!carInfo.chargingPlug)
+                        carInfo.setPoiAbilited(false);
 
                     if (!carInfo.chargingPlug && App.Charging) {
                         App.Charging = false;
