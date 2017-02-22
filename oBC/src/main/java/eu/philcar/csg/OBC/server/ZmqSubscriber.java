@@ -23,12 +23,16 @@ public class ZmqSubscriber {
 	private Handler handler;
 
 	public void Start(Handler serviceHandler) {
+		try {
 
-		dlog.d("Starting ZMQ thread");
-		handler = serviceHandler;
-		zmqRunnable = new ZmqRunnable();
-		zmqThread = new Thread(zmqRunnable);
-		zmqThread.start();
+			dlog.d("Starting ZMQ thread");
+			handler = serviceHandler;
+			zmqRunnable = new ZmqRunnable();
+			zmqThread = new Thread(zmqRunnable);
+			zmqThread.start();
+		}catch (Exception e){
+			dlog.e("Exception while starting thread ",e);
+		}
 	}
 
 	public void Restart(Handler serviceHandler) {

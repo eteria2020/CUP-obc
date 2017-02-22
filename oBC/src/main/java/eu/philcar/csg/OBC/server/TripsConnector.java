@@ -127,9 +127,10 @@ public class TripsConnector implements RemoteEntityInterface {
 		try {
 			
 			if (responseBody==null || responseBody.isEmpty()) {				
-				tripInfo.serverResult=0;
+				tripInfo.trip.recharge=0; //server result
 				tripInfo.trip.offline=true;
 				tripInfo.setTxOffline();
+				tripInfo.UpdateCorsa();
 				dlog.w("No response from server, keeping info off-line");
 				return MsgId();
 			}
@@ -144,7 +145,7 @@ public class TripsConnector implements RemoteEntityInterface {
 			dlog.i("DecodeJson: result " + result);
 			dlog.i("DecodeJson: caption " + (caption!=null?caption:"NULL"));
 			
-			tripInfo.serverResult = result;
+			tripInfo.trip.recharge = result; //server result
 			tripInfo.serverMessage = caption;
 			
 			if (result > 0) {
@@ -158,7 +159,7 @@ public class TripsConnector implements RemoteEntityInterface {
 						tripInfo.setTxChiusura();
 					}
 					
-//					tripInfo.UpdateCorsa();
+					tripInfo.UpdateCorsa();
 	
 			} else {
 				switch (result) {
@@ -193,6 +194,8 @@ public class TripsConnector implements RemoteEntityInterface {
 					tripInfo.trip.warning="FAIL";
 					tripInfo.setWarning("FAIL");
 				}
+
+				tripInfo.UpdateCorsa();
 				
 			}
 		} catch (JSONException e) {

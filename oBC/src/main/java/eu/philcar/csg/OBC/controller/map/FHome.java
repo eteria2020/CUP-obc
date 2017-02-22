@@ -32,6 +32,8 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.db.Events;
+import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.BannerJsInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
@@ -88,15 +90,16 @@ public class FHome extends FBase implements OnClickListener {
     private RelativeLayout rlBody;
     private LinearLayout fmap_top_LL;
     public static FHome Instance;
-    private Animation animBoth, anim3g, animArea;
-    private static boolean animToggle=true, animFull=false, lastInside=true;
+    private Animation alertAnimation;
+    private static boolean animToggle=true, animFull=false;
     private TextView dayTV, timeTV, tvRange;
     private FrameLayout  fmapAlarm, fmapRange;
-    private ImageView parkingStatusIV, parkingDirectionIV, adIV, no3gIV;
-    private View  outsideAreaWarning;
+    private ImageView parkingStatusIV, adIV, no3gIV; // parkingDirectionIV,
+   // private View  outsideAreaWarning;
 
+    private List<String> animQueue =new ArrayList<String>();
     private Uri uri;
-    private int actualAnim=0;//0:no anim 1:anim3g 2:animArea 3:animBoth
+    private int  lastInside=0;//0:no anim 1:anim3g 2:animArea 3:animBoth
     private static Boolean RequestBanner=false;
 
     private static Boolean handleClick=false;
@@ -165,9 +168,9 @@ public class FHome extends FBase implements OnClickListener {
 
         parkingStatusIV = (ImageView) view.findViewById(R.id.fmapParkingStatusIV);
         no3gIV = (ImageView) view.findViewById(R.id.no3gIV_HOME);
-        outsideAreaWarning = view.findViewById(R.id.llOutsideArea);
+       // outsideAreaWarning = view.findViewById(R.id.llOutsideArea);
         no3gwarning = view.findViewById(R.id.ll3G_HOME);
-        parkingDirectionIV = (ImageView) view.findViewById(R.id.fmapParkingDirectionIV);
+      //  parkingDirectionIV = (ImageView) view.findViewById(R.id.fmapParkingDirectionIV);
         fmapAlarm = (FrameLayout) view.findViewById(R.id.fmapAlarm);
         fmapRange = (FrameLayout) view.findViewById(R.id.fmapRange);
         tvRange = (TextView) view.findViewById(R.id.tvRange);
@@ -175,22 +178,55 @@ public class FHome extends FBase implements OnClickListener {
         alertTV = (TextView) view.findViewById(R.id.alertTV);
 
 
-        //no3gAnimation.start();
-        anim3g = new AlphaAnimation(0.0f, 1.0f);
-        anim3g.setDuration(500); //You can manage the time of the blink with this parameter
-        anim3g.setStartOffset(200);
-        anim3g.setRepeatMode(Animation.REVERSE);
-        anim3g.setRepeatCount(Animation.INFINITE);
-        anim3g.setAnimationListener(new Animation.AnimationListener() {
+        alertAnimation = new AlphaAnimation(0.0f, 1.0f);
+        alertAnimation.setDuration(500); //You can manage the time of the blink with this parameter
+        alertAnimation.setStartOffset(200);
+        alertAnimation.setRepeatMode(Animation.REVERSE);
+        alertAnimation.setRepeatCount(Animation.INFINITE);
+        alertAnimation.setAnimationListener(new Animation.AnimationListener() {
+
+            int index=0;
+            String playing = "" ;
 
             @Override
             public void onAnimationStart(Animation animator) {
-                no3gIV.setVisibility(View.VISIBLE);
-                no3gIV.setImageResource(R.drawable.no_connection);
-                no3gtxt.setText("NO 3G");
-                no3gIV.invalidate();
-                no3gtxt.invalidate();
-                actualAnim=1;
+                dlog.d(FMap.class.toString()+"StartAnimation: alertAnimation");
+                index=0;
+
+                playing=animQueue.get(0);
+
+
+
+                switch(playing){
+
+                    case "none"://no anim
+                        no3gwarning.setVisibility(View.INVISIBLE);
+                        break;
+                    case "area"://out of area
+                        no3gIV.setVisibility(View.GONE); //icona no3G
+                        // no3gIV.setImageResource(R.drawable.img_parking_p_green);
+                        no3gtxt.setText(R.string.outside_area);
+                        animToggle = !animToggle;
+                        no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedredbox);
+                        break;
+                    case "3g"://3G
+                        no3gIV.setVisibility(View.GONE);
+                        no3gIV.setImageResource(R.drawable.no_connection);
+                        no3gtxt.setText("NO 3G");
+                        animToggle = !animToggle;
+                        no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedredbox);
+                        break;
+                    case "bonus"://Bonus
+                        no3gIV.setVisibility(View.GONE);
+                        no3gtxt.setText("BONUS");
+                        no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedyellowbox);
+                        animToggle = !animToggle;
+                        break;
+
+
+
+
+                }
                 animToggle=true;
                 animFull=false;
 
@@ -198,89 +234,57 @@ public class FHome extends FBase implements OnClickListener {
 
             @Override
             public void onAnimationEnd(Animation animation) {
+                dlog.d(FMap.class.toString()+"EndAnimation: alertAnimation");
 
             }
 
             @Override
             public void onAnimationRepeat(Animation animation) {
-            }
-
-        });
-
-        animArea = new AlphaAnimation(0.0f, 1.0f);
-        animArea.setDuration(500); //You can manage the time of the blink with this parameter
-        animArea.setStartOffset(200);
-        animArea.setRepeatMode(Animation.REVERSE);
-        animArea.setRepeatCount(Animation.INFINITE);
-        animArea.setAnimationListener(new Animation.AnimationListener() {
-
-            @Override
-            public void onAnimationStart(Animation animator) {
-                no3gIV.setVisibility(View.GONE);
-                // no3gIV.setImageResource(R.drawable.img_parking_p_green);
-                no3gtxt.setText(R.string.outside_area);
-                no3gtxt.invalidate();
-                no3gIV.invalidate();
-                actualAnim=2;
-                animToggle=true;
-                animFull=false;
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-
-            }
-
-        });
-
-        animBoth = new AlphaAnimation(0.0f, 1.0f);
-        animBoth.setDuration(500); //You can manage the time of the blink with this parameter
-        animBoth.setStartOffset(200);
-        animBoth.setRepeatMode(Animation.REVERSE);
-        animBoth.setRepeatCount(Animation.INFINITE);
-        animBoth.setAnimationListener(new Animation.AnimationListener() {
-
-            @Override
-            public void onAnimationStart(Animation animator) {
-                actualAnim=3;
-                animToggle=true;
-                animFull=false;
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+                if(animQueue.size()==0) {
+                    no3gwarning.clearAnimation();
+                    return;
+                }
 
                 if (animFull){
-                if(animToggle) {
-                    no3gIV.setVisibility(View.GONE);
-                   // no3gIV.setImageResource(R.drawable.img_parking_p_green);
-                    no3gtxt.setText(R.string.outside_area);
-                    animToggle = !animToggle;
-                    no3gtxt.invalidate();
-                    no3gIV.invalidate();
-                }
-                else {
+                    index++;
 
-                    no3gIV.setVisibility(View.VISIBLE);
-                    no3gIV.setImageResource(R.drawable.no_connection);
-                    no3gtxt.setText("NO 3G");
-                    animToggle = !animToggle;
-                    no3gIV.invalidate();
-                    no3gtxt.invalidate();
-                }
+                    if(index>=animQueue.size())
+                        index=0;
+
+                    playing=animQueue.get(index);
+
+
+
+                    switch(playing){
+
+                        case "none"://no anim
+                            no3gwarning.setVisibility(View.INVISIBLE);
+                            break;
+                        case "area"://out of area
+                            no3gIV.setVisibility(View.GONE); //icona no3G
+                            // no3gIV.setImageResource(R.drawable.img_parking_p_green);
+                            no3gtxt.setText(R.string.outside_area);
+                            animToggle = !animToggle;
+                            no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedredbox);
+                            break;
+                        case "3g"://3G
+                            no3gIV.setVisibility(View.VISIBLE);
+                            no3gIV.setImageResource(R.drawable.no_connection);
+                            no3gtxt.setText("NO 3G");
+                            animToggle = !animToggle;
+                            no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedredbox);
+                            break;
+                        case "bonus"://Bonus
+                            no3gIV.setVisibility(View.GONE);
+                            no3gtxt.setText("BONUS");
+                            no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedyellowbox);
+                            animToggle = !animToggle;
+                            break;
+
+
+
+
+                    }
 
                     animFull=!animFull;
                 }
@@ -292,7 +296,7 @@ public class FHome extends FBase implements OnClickListener {
 
 
 
-        outsideAreaWarning.setVisibility(View.INVISIBLE); //TODO rimuovere commento e llOutsideArea riga 286
+       // outsideAreaWarning.setVisibility(View.INVISIBLE); //TODO rimuovere commento e llOutsideArea riga 286
         no3gwarning.setVisibility(View.INVISIBLE);
 
         fmapAlarm.setVisibility(View.GONE);
@@ -338,15 +342,36 @@ public class FHome extends FBase implements OnClickListener {
 
     public void onPause() {
         super.onPause();
-        actualAnim=0;
-        anim3g.cancel();
-        animBoth.cancel();
-        animArea.cancel();
-
+        //actualAnim=0;
+        lastInside=1;
+        getActivity().unregisterReceiver(this.ConnectivityChangeReceiver);
 
 
     }
 
+    @Override
+    public void onDestroy() {
+        ((Button) rootView.findViewById(R.id.fmapSOSB)).setOnClickListener(null);
+        ((Button) rootView.findViewById(R.id.fmapSearchB)).setOnClickListener(null);
+        ((Button) rootView.findViewById(R.id.fmapRadioB)).setOnClickListener(null);
+        ((Button) rootView.findViewById(R.id.fmapCancelB)).setOnClickListener(null);
+        rootView=null;
+        tvRange=null;
+        fmapRange=null;
+        fmap_top_LL=null;
+        rlBody=null;
+        adIV=null;
+        alertAnimation.cancel();
+        fmapAlarm=null;
+        timeTV=null;
+        dayTV=null;
+        no3gwarning=null;
+        no3gIV=null;
+        no3gtxt=null;
+        parkingStatusIV=null;
+        alertTV=null;
+        super.onDestroy();
+    }
 
     @Override
     public void onDetach() {
@@ -430,60 +455,53 @@ public class FHome extends FBase implements OnClickListener {
         //rotationAngle =0;
 
         if (isInside) {
-            lastInside=true;
-            if(SystemControl.hasNetworkConnection(getActivity())) {
-               if(no3gwarning.getAnimation()!=null)
-                   no3gwarning.clearAnimation();
+            if(animQueue.contains("area")){
+                animQueue.remove("area");
+            }
+            if(lastInside!=0)
+                Events.outOfArea(false);
+            lastInside=0;
 
-                no3gwarning.setVisibility(View.INVISIBLE);
-            }
-            else{
-                if(actualAnim != 1) {
-                    no3gwarning.clearAnimation();
-                    anim3g.setRepeatCount(Animation.INFINITE);
-                    no3gwarning.startAnimation(anim3g);
-                }
-            }
         } else {
+            if(!animQueue.contains("area")){
+                animQueue.add("area");
+            }
+            if(no3gwarning.getAnimation()==null)
+                no3gwarning.startAnimation(alertAnimation);
 
-            if (lastInside) {
-                lastInside=false;
 
-               /* ((AMainOBC) getActivity()).player.inizializePlayer();
-                ((AMainOBC) getActivity()).player.reqSystem = true;
+
+            if (lastInside==0) {
+                lastInside=2;
+
+
+                //((AMainOBC) getActivity()).player.inizializePlayer();
+                AMainOBC.player.reqSystem = true;
                 ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
                 dlog.d("updateParkAreaStatus: Imposto Audio a AUDIO_SYSTEM");
-                dlog.d("updateParkAreaStatus: riproduzione audio per segnalare fuori area");
                 new Thread(new Runnable() {
                     public void run() {
                         try {
-                            ((AMainOBC) getActivity()).player.waitToPlayFile(uri);
-                        }catch(Exception e){
-                            dlog.e("Exception trying to play audio",e);
+                            Events.outOfArea(true);
+                            AMainOBC.player.waitToPlayFile(uri);
+                        } catch (Exception e) {
+                            dlog.e("Exception trying to play audio", e);
                         }
                     }
-                }).start();*/
+                }).start();
+            }
+            else{
+                if(lastInside==1){
+                    lastInside=2;
 
-                if (SystemControl.hasNetworkConnection(getActivity())) {
-
-                    no3gwarning.clearAnimation();
-                    no3gwarning.setVisibility(View.VISIBLE);
-
-                    animBoth.setRepeatCount(Animation.INFINITE);
-                    no3gwarning.startAnimation(animArea);
-                    // outsideAreaWarning.setVisibility(View.VISIBLE);
-                    //parkingStatusIV.setImageResource(R.drawable.img_parking_p_green);
-                    //parkingDirectionIV.setImageResource(R.drawable.img_parking_arrow);
-                } else {
-                    no3gwarning.clearAnimation();
-                    no3gwarning.setVisibility(View.VISIBLE);
-
-                    animBoth.setRepeatCount(Animation.INFINITE);
-                    no3gwarning.startAnimation(animBoth);
 
                 }
             }
+
+
+
         }
+
 
         //parkingDirectionIV.setRotation((float)rotationAngle);
     }
@@ -515,6 +533,27 @@ public class FHome extends FBase implements OnClickListener {
         }
 
 
+    }
+
+    public void updatePoiInfo(int status,Poi Poi){
+
+        if(status>0){
+            if(!animQueue.contains("bonus")){
+                if(App.DefaultCity.toLowerCase().equals("milano")) {
+                    AMainOBC.player.reqSystem = true;
+
+                }
+                animQueue.add("bonus");
+            }
+            if(no3gwarning.getAnimation()==null)
+                no3gwarning.startAnimation(alertAnimation);
+        }
+        else {
+
+            if(animQueue.contains("bonus")){
+                animQueue.remove("bonus");
+            }
+        }
     }
 
 
@@ -648,37 +687,26 @@ public class FHome extends FBase implements OnClickListener {
 
         @Override
         public void onReceive(Context c, Intent i) {
+
             try {
+                if (getActivity() == null)
+                    return;
                 boolean status = SystemControl.hasNetworkConnection(getActivity());
 
                 if (status) {
-                    if (((AMainOBC) getActivity()).getisInsideParkingArea()) {
-                        if (no3gwarning.getAnimation() != null)
-                            no3gwarning.getAnimation().setRepeatCount(0);
-
-                        no3gwarning.setVisibility(View.INVISIBLE);
-                    } else if (actualAnim != 2) {
-
-                        animArea.setRepeatCount(Animation.INFINITE);
-                        no3gwarning.startAnimation(animArea);
+                    if (animQueue.contains("3g")) {
+                        animQueue.remove("3g");
                     }
 
                 } else {
-                    if (((AMainOBC) getActivity()).getisInsideParkingArea()) {
-                        no3gwarning.setVisibility(View.VISIBLE);
-
-                        anim3g.setRepeatCount(Animation.INFINITE);
-                        no3gwarning.startAnimation(anim3g);
-                    } else {
-
-                        no3gwarning.setVisibility(View.VISIBLE);
-
-                        animBoth.setRepeatCount(Animation.INFINITE);
-                        no3gwarning.startAnimation(animBoth);
+                    if (!animQueue.contains("3g")) {
+                        animQueue.add("3g");
                     }
+                    if (no3gwarning.getAnimation() == null)
+                        no3gwarning.startAnimation(alertAnimation);
                 }
             }catch(Exception e){
-                dlog.e(" eccezione durante ricezione broadcast 3g",e);
+                dlog.e("Exception while handling connectivity broadcast",e);
             }
         }
 
@@ -797,6 +825,7 @@ public class FHome extends FBase implements OnClickListener {
 
             dlog.i(FHome.class.toString()+" loadBanner: file mancante inizio download a url: "+urlImg.toString());
             HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
+            urlConnection.setDefaultUseCaches(false);
             urlConnection.setRequestMethod("GET");
             urlConnection.setDoOutput(true);
             urlConnection.connect();
@@ -892,7 +921,5 @@ public class FHome extends FBase implements OnClickListener {
         }
 
     }
-
-
 
 }

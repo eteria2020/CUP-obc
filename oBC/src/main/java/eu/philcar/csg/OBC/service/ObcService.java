@@ -132,6 +132,7 @@ public class ObcService extends Service {
     public static final int MSG_TRIP_SELFCLOSE = 56;
     public static final int MSG_TRIP_SCHEDULE_SELFCLOSE = 57;
     public static final int MSG_TRIP_SENDBEACON = 58;
+    public static final int MSG_TRIP_NEAR_POI = 59;
 
     public static final int MSG_SERVER_NOTIFY = 60;
     public static final int MSG_SERVER_RESERVATION = 61;
@@ -199,6 +200,7 @@ public class ObcService extends Service {
 
     ScheduledExecutorService serverUpdateScheduler;
     ScheduledExecutorService tripUpdateScheduler;
+    ScheduledExecutorService tripPoiUpdateScheduler;
     ScheduledExecutorService virtualBMSUpdateScheduler;
     ScheduledExecutorService gpsCheckeScheduler;
 
@@ -324,6 +326,7 @@ public class ObcService extends Service {
             dlog.d("Restarting from open trip. Acquiring lock");
             obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
             startRemoteUpdateCycle();
+            startRemotePoiCheckCycle();
         } else {
             setDisplayStatus(false, 15);
 
@@ -651,6 +654,7 @@ public class ObcService extends Service {
             gpsCheckeScheduler.shutdown();
 
         stopRemoteUpdateCycle();
+        stopRemotePoiCheckCycle();
 
         locationManager.removeUpdates(carInfo.serviceLocationListener);
         locationManager.removeGpsStatusListener(gpsStatusListener);
@@ -837,7 +841,7 @@ public class ObcService extends Service {
             if (tripInfo.isOpen) {
                 dlog.d("Sending cardCode to OBC_IO: " + tripInfo.cardCode);
                 if (!App.motoreAvviato && App.getParkModeStarted() != null && (App.parkMode == ParkMode.PARK_STARTED)) {
-                    obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_BLINK);
+                    obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);//LowLevelInterface.ID_LED_BLINK
                     obc_io.setLcd(null, " IN SOSTA");
                 } else {
                     obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
@@ -1519,7 +1523,7 @@ public class ObcService extends Service {
 
             }
 
-        }, 0, 6, TimeUnit.SECONDS);
+        }, 0, 20, TimeUnit.SECONDS);
 
         dlog.d("Started remote Update Cycle");
     }
@@ -1633,6 +1637,7 @@ public class ObcService extends Service {
                 dlog.d("Restarting welcome");
                 //Intent i  = new Intent(ObcService.this, ServiceTestActivity.class);
                 Intent i = new Intent(ObcService.this, AWelcome.class);
+                scheduleSelfCloseTrip(600,true);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
             }
@@ -1654,7 +1659,7 @@ public class ObcService extends Service {
 
     public void scheduleSelfCloseTrip(int seconds, boolean beforePin) {
 
-        if (App.getParkModeStarted() == null) {
+        if (App.getParkModeStarted() == null&&!beforePin) {
             App.askClose.putInt("id", App.currentTripInfo.trip.remote_id);
             App.askClose.putBoolean("close", true);
             App.Instance.persistAskClose();
@@ -1974,8 +1979,10 @@ public class ObcService extends Service {
                 case MSG_CAR_REMOTEUPDATECYCLE:
                     if (msg.arg1 == 1) {  //Start
                         startRemoteUpdateCycle();
+                        startRemotePoiCheckCycle();
                     } else {             //Stop
                         stopRemoteUpdateCycle();
+                        stopRemotePoiCheckCycle();
                     }
                     break;
 
@@ -2010,7 +2017,7 @@ public class ObcService extends Service {
                         Events.selfCloseTrip(App.currentTripInfo.trip.remote_id, msg.arg1);
 
 
-                        ObcService.this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, true);
+                        ObcService.this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, false);
                     } else {
                         dlog.w("MSG_TRIP_SELFCLOSE discarded");
                     }
@@ -2201,6 +2208,64 @@ public class ObcService extends Service {
 
         return (3500 - obc_io.getPackCurrentValue()) / 10;
     }
+
+
+   public void startRemotePoiCheckCycle() {
+
+       stopRemotePoiCheckCycle();
+
+       DbManager dbm = App.Instance.dbManager;
+       Pois DaoPois = dbm.getPoisDao();
+       final List<Poi> PoiList =DaoPois.getCityPois(App.DefaultCity.toLowerCase());
+       if(PoiList==null) {
+           dlog.d("Abort remote PoiCheck Cycle PoiList is null, city: " +App.DefaultCity);
+           return;
+       }
+
+       tripPoiUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
+       tripPoiUpdateScheduler.scheduleAtFixedRate(new Runnable() {
+
+
+            @SuppressWarnings("unused")
+            @Override
+            public void run() {
+                try {
+
+                    if(System.currentTimeMillis()/1000- App.currentTripInfo.trip.begin_timestamp<60*5 || carInfo.batteryLevel>=25 || App.lastLocation==null )
+                        return;
+
+                    for(Poi singlePoi : PoiList){
+                        if(App.lastLocation.distanceTo(singlePoi.getLoc())<100){
+                                sendAll(MessageFactory.notifyTripPoiUpdate(1,singlePoi));
+                            return;
+                        }
+
+                    }
+
+                    sendAll(MessageFactory.notifyTripPoiUpdate(0,null));
+
+                } catch (Exception e) {
+                    dlog.e("Exception inside tripPoiUpdateScheduler", e);
+                }
+
+            }
+
+        }, 20, 10, TimeUnit.SECONDS);
+
+        dlog.d("Started remote PoiCheck Cycle, city: " +App.DefaultCity);
+   }
+
+   public void stopRemotePoiCheckCycle() {
+
+        if (tripPoiUpdateScheduler != null) {
+            tripPoiUpdateScheduler.shutdown();
+            dlog.d("Stopped remote PoiCheck Cycle");
+        }
+
+        tripPoiUpdateScheduler = null;
+
+
+   }
 
 
 

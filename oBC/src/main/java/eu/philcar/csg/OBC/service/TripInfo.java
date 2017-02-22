@@ -76,6 +76,7 @@ public class TripInfo {
 
     // Status
     public boolean isOpen;
+    public boolean isBonusEnabled=false;
     public boolean isMaintenance;
     public boolean hasBeenStopped = false;
     public boolean reopenSuspend = false;
@@ -248,7 +249,7 @@ public class TripInfo {
                     }
                 }
 
-                customer = customer;
+                this.customer = customer;
 
                 cardCode = code;					
 
@@ -322,7 +323,7 @@ public class TripInfo {
                         obc_io.setLcd(null, " Auto prenotata");
                         obc_io.setDoors(null, 0,"IN SOSTA");
                         obc_io.setEngine(null, 0);
-                        obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_BLINK);
+                        obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
                         Events.eventRfid(3, code);
                         Events.eventParkBegin();
                         hasBeenStopped = true;
@@ -398,6 +399,7 @@ public class TripInfo {
                         FRadio.savedInstance = null;
 
                         SuspendRfid(obc_io,"  Auto libera");
+                        service.removeSelfCloseTrip();
 
                         service.getHandler().sendMessage(MessageFactory.stopRemoteUpdateCycle()); 
 
@@ -439,7 +441,7 @@ public class TripInfo {
 
 
         if (!App.hasNetworkConnection) {
-            dlog.e(" loadBanner: nessuna connessione");
+            dlog.w(" loadBanner: nessuna connessione");
             App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
             return;
         }
@@ -501,7 +503,7 @@ public class TripInfo {
         }
         String jsonStr = builder.toString();
         if(jsonStr.compareTo("")==0){
-            dlog.e(TripInfo.class.toString()+" loadBanner: nessuna connessione");
+            dlog.w(TripInfo.class.toString()+" loadBanner: nessuna connessione");
             App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
             return;
         }
@@ -546,6 +548,7 @@ public class TripInfo {
 
             dlog.i(" loadBanner: file mancante inizio download a url: "+urlImg.toString());
             HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
+            urlConnection.setDefaultUseCaches(false);
             urlConnection.setRequestMethod("GET");
             urlConnection.setDoOutput(true);
             urlConnection.connect();
@@ -730,7 +733,7 @@ public class TripInfo {
             return false;
         }
 
-        if (this.serverResult == -15) {
+        if (this.trip.recharge== -15) {
             dlog.e("CheckPin : Trip open in other car");
             return false;
         }

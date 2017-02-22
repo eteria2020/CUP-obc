@@ -354,6 +354,7 @@ public class Hik_io implements LowLevelInterface {
 	@Override
 	public void setEngine(Messenger replyTo, int status) {
 		dlog.d("setEngine :" + status );
+
 		int ctl = (status==0?LeaseInfoItaly.LEASE_CTL_DISABLE_POWER:LeaseInfoItaly.LEASE_CTL_ENABLE_POWER);
 		if (mLeaseManagerItaly!=null) {
 			if (mLeaseManagerItaly.SetPowerStatus(ctl))

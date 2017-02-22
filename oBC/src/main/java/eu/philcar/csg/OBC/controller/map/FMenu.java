@@ -290,7 +290,7 @@ public class FMenu extends FBase implements OnClickListener {
 								
 				switch (App.parkMode) {
 				case PARK_OFF: 		// (FALSE, NULL, OFF)
-					if (activity.isInsideParkArea()) {
+					if (activity.checkisInsideParkingArea()) {
 						UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end, this, 
 								 R.drawable.sel_button_rent_pause, R.string.menu_park_mode_suspend, this, 
 								 R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this, 
@@ -303,7 +303,7 @@ public class FMenu extends FBase implements OnClickListener {
 					}
 					break;
 				case PARK_STARTED:	// (FALSE, NULL, STARTED) - WTF STATE
-					if (activity.isInsideParkArea()) {
+					if (activity.checkisInsideParkingArea()) {
 						UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end, this, 
 								 R.drawable.button_rent_pause_pushed, R.string.menu_park_mode_suspend_off, null, 
 								 R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this, 
@@ -317,7 +317,7 @@ public class FMenu extends FBase implements OnClickListener {
 					DLog.E("FMENU: illegal state reached on updateUIUsingAppValues: (Engine OFF, ParkMode NOT started, Park_STARTED)");
 					break;
 				case PARK_ENDED:	// (FALSE, NULL, ENDED) - WTF STATE
-					if (activity.isInsideParkArea()) {
+					if (activity.checkisInsideParkingArea()) {
 						UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end, this, 
 								 R.drawable.sel_button_rent_pause, R.string.menu_park_mode_suspend, this, 
 								 R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this, 
@@ -412,6 +412,15 @@ public class FMenu extends FBase implements OnClickListener {
 		if (timer!=null)
 			timer.cancel();
 	}
-	
 
+	@Override
+	public void onDestroy() {
+		refuelIB=null;
+		ivDamages=null;
+		endRentIB=null;
+		endRentIB=null;
+		pauseRentIB=null;
+		pauseRentTV=null;
+		super.onDestroy();
+	}
 }

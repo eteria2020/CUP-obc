@@ -194,7 +194,7 @@ public class FPin extends FBase implements OnClickListener {
 				
 				((AWelcome)getActivity()).sendMessage(MessageFactory.checkPin(pin));
 				
-				if (App.currentTripInfo.serverResult != -15) {
+				if (App.currentTripInfo.trip.recharge != -15) {
 					pinChecked(App.currentTripInfo.CheckPin(pin));
 				} else {
 					progressDF.dismiss();
@@ -257,7 +257,7 @@ public class FPin extends FBase implements OnClickListener {
 			h.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					((ABase)getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
+					((ABase)getActivity()).pushFragmentnoBack(FInstructions.newInstance(true), FInstructions.class.getName(), true);
 				}
 			}, 1000);
 			

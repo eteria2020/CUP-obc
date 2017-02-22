@@ -119,7 +119,7 @@ import android.widget.Toast;
         formKey = "", // This is required for backward compatibility but not used
         formUri = "http://core.sharengo.it/api/post_crashreport.php",
         mode = ReportingInteractionMode.SILENT, 
-        customReportContent = {APP_VERSION_CODE , APP_VERSION_NAME,/* SETTINGS_GLOBAL, AVAILABLE_MEM_SIZE,*/ CUSTOM_DATA, STACK_TRACE, USER_APP_START_DATE ,LOGCAT/*, DEVICE_ID, SHARED_PREFERENCES*/ },
+        customReportContent = {APP_VERSION_CODE , APP_VERSION_NAME,/* SETTINGS_GLOBAL,*/ AVAILABLE_MEM_SIZE, CUSTOM_DATA, STACK_TRACE, USER_APP_START_DATE ,LOGCAT/*, DEVICE_ID, SHARED_PREFERENCES*/ },
         reportType=org.acra.sender.HttpSender.Type.JSON,
         resToastText = R.string.Acra_message
 )
@@ -420,6 +420,7 @@ public class App extends Application {
 	public static boolean userDrunk = false;
 	
 	public static boolean isCloseable=true;
+	public static boolean isClosing=false;
 	
 	public static boolean  ObcIoError=false;
 	public static boolean  Charging = false;
@@ -501,6 +502,10 @@ public class App extends Application {
 			if(App.askClose!=null) {
 				e.putInt(KEY_IdAskClose, App.askClose.getInt("id",0));
 				e.putBoolean(KEY_IsAskClose, App.askClose.getBoolean("close",false));
+			}
+			else{
+				e.putInt(KEY_IdAskClose, 0);
+				e.putBoolean(KEY_IsAskClose, false);
 			}
 			e.apply();
 		}
@@ -623,7 +628,9 @@ public class App extends Application {
 			askClose.putInt("id",preferences.getInt(KEY_IdAskClose,0));
 			askClose.putBoolean("close",preferences.getBoolean(KEY_IsAskClose,false));
 		} else {
-			askClose=null;
+
+			askClose.putInt("id",0);
+			askClose.putBoolean("close",false);
 		}
 	}
 
@@ -1611,9 +1618,10 @@ private void  initPhase2() {
 
 		ServerIP = preferences.getInt(KEY_ServerIP, 0);
 		saveLog = preferences.getBoolean(KEY_PersistLog, true);
+		try {
 		askClose.putInt("id",preferences.getInt(KEY_IdAskClose,0));
 		askClose.putBoolean("close",preferences.getBoolean(KEY_IsAskClose,false));
-		try {
+
 			SystemControl.rebootInProgress = preferences.getLong(KEY_RebootTime, 0);
 		}catch(Exception e){
 			dlog.e("loadPreferences: errore in reboot time ",e);

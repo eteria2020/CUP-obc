@@ -325,7 +325,7 @@ public class HttpConnector {
 	 	    } catch (java.net.UnknownHostException e) {
 	 	    	App.networkExceptions++;
 	 	    	if(App.networkExceptions%100==0) {
-	 	    		dlog.e("Network exceptions: "+ App.networkExceptions);
+	 	    		dlog.e("Network exceptions: "+ App.networkExceptions,e);
 	 	    	}
 	 	    } catch (IOException e) {
 	 	    	App.networkExceptions++;

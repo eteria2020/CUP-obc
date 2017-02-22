@@ -29,6 +29,9 @@ public class Poi extends DbRecord {
 	
 	@DatabaseField
 	public String via;
+
+	@DatabaseField
+	public String nome;
 	
 	@DatabaseField
 	public String citta;

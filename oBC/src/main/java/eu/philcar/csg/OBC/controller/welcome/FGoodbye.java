@@ -59,10 +59,10 @@ import okhttp3.HttpUrl;
 public class FGoodbye extends FBase {
 
 	private DLog dlog = new DLog(this.getClass());
-	private WebView webViewBanner;
+	//private WebView webViewBanner;
 	private ImageView adIV;
 	private static Boolean handleClick=false;
-	private static CountDownTimer timer_5sec;
+	private static CountDownTimer timer_5sec,selfclose;
 	private static Boolean RequestBanner=false;
 	
 	public static FGoodbye newInstance() {
@@ -101,6 +101,7 @@ public class FGoodbye extends FBase {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
 		App.isCloseable = true;
+		App.isClosing=true;
 		dlog.d("OnCreareView FGoodbye");
 		if(App.BannerName.getBundle("END")==null&&!RequestBanner){
 			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
@@ -161,7 +162,7 @@ public class FGoodbye extends FBase {
 		((TextView)view.findViewById(R.id.fgodTopTV)).setTypeface(font);
 		((TextView)view.findViewById(R.id.fgod_Goodbye_Title_TV)).setTypeface(font);
 		((TextView)view.findViewById(R.id.fgodGoodbyeTV)).setTypeface(font);
-		webViewBanner = (WebView)view.findViewById(R.id.fgoodWV);
+		//webViewBanner = (WebView)view.findViewById(R.id.fgoodWV);
 		adIV=(ImageView) view.findViewById(R.id.fgoodIV);
 		timer_5sec = new CountDownTimer((5)*1000,1000) {
 			@Override
@@ -244,7 +245,7 @@ public class FGoodbye extends FBase {
 		((AGoodbye)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
 		(view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
 		
-		new CountDownTimer(41000,1000) {
+		selfclose = new CountDownTimer(41000,1000) {
 			@Override
 		     public void onTick(long millisUntilFinished) {
 		    	 ((TextView)view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished/1000)+ " s");
@@ -270,6 +271,25 @@ public class FGoodbye extends FBase {
 
 
 		//App.Instance.BannerName.clear();
+
+		if(App.currentTripInfo.isBonusEnabled){
+			(view.findViewById(R.id.fgodTopTV)).setVisibility(View.GONE);
+			((TextView)view.findViewById(R.id.fgodInstructionTV)).setText(R.string.instruction_close_4);
+			(view.findViewById(R.id.fgodBonusLL)).setVisibility(View.VISIBLE);
+			((TextView)view.findViewById(R.id.fgodBonusTV)).setText(R.string.bonus_message_poi);
+		}
+		else{
+			(view.findViewById(R.id.fgodTopTV)).setVisibility(View.VISIBLE);
+			((TextView)view.findViewById(R.id.fgodInstructionTV)).setText(R.string.goodbye_instructions);
+			((TextView)view.findViewById(R.id.fgodInstructionTV)).setTextSize(24f);
+			((TextView)view.findViewById(R.id.fgodTopTV)).setTextSize(35f);
+			(view.findViewById(R.id.fgodBonusLL)).setVisibility(View.GONE);
+
+			((TextView)view.findViewById(R.id.fgodBonusTV)).setText("");
+
+		}
+
+
 		updateBanner("END");
 		return view;
 	}
@@ -414,6 +434,7 @@ public class FGoodbye extends FBase {
 
 			dlog.i(" loadBanner: file mancante inizio download a url: "+urlImg.toString());
 			HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
+			urlConnection.setDefaultUseCaches(false);
 			urlConnection.setRequestMethod("GET");
 			urlConnection.setDoOutput(true);
 			urlConnection.connect();
@@ -459,18 +480,21 @@ public class FGoodbye extends FBase {
 			try{
 				if(ImageV!=null && ImageV.exists()){
 					dlog.i(FGoodbye.class.toString()+" updateBanner: file trovato imposto immagine "+ImageV.getName());
-					Bitmap myBitmap = BitmapFactory.decodeFile(ImageV.getAbsolutePath());
+					BitmapFactory.Options options = new BitmapFactory.Options();
+					options.inSampleSize = 2;
+					Bitmap myBitmap = BitmapFactory.decodeFile(ImageV.getAbsolutePath(),options);
 					if(myBitmap==null){
 
 						dlog.e(FGoodbye.class.toString()+" updateBanner: file corrotto, elimino e visualizzo offline ");
 						ImageV.delete();
 						//initWebBanner(Banner.getString("URL",null));
-						webViewBanner.setVisibility(View.INVISIBLE);
+						//webViewBanner.setVisibility(View.INVISIBLE);
 						adIV.setImageResource(R.drawable.offline_goodbye);
 						adIV.setVisibility(View.VISIBLE);
 						return;
 					}
-					webViewBanner.setVisibility(View.INVISIBLE);
+					//webViewBanner.setVisibility(View.INVISIBLE);
+
 					adIV.setImageBitmap(myBitmap);
 					adIV.setVisibility(View.VISIBLE);
 					adIV.invalidate();
@@ -481,7 +505,7 @@ public class FGoodbye extends FBase {
 				dlog.e(FGoodbye.class.toString()+" updateBanner: eccezione in caricamento file visualizzo offline ",e);
 				e.printStackTrace();
 				//initWebBanner(Banner.getString("URL",null));
-				webViewBanner.setVisibility(View.INVISIBLE);
+				//webViewBanner.setVisibility(View.INVISIBLE);
 				adIV.setImageResource(R.drawable.offline_goodbye);
 				adIV.setVisibility(View.VISIBLE);
 				return;
@@ -490,7 +514,7 @@ public class FGoodbye extends FBase {
 		else{
 			dlog.e(FGoodbye.class.toString()+" updateBanner: Bundle null, visualizzo offline");
 			//initWebBanner(Banner.getString("URL",null));
-			webViewBanner.setVisibility(View.INVISIBLE);
+			//webViewBanner.setVisibility(View.INVISIBLE);
 			adIV.setImageResource(R.drawable.offline_goodbye);
 			adIV.setVisibility(View.VISIBLE);
 			return;
@@ -498,4 +522,13 @@ public class FGoodbye extends FBase {
 
 	}
 
+	@Override
+	public void onDestroy() {
+		adIV=null;
+		timer_5sec.cancel();
+		handleClick=null;
+		RequestBanner=null;
+		selfclose=null;
+		super.onDestroy();
+	}
 }

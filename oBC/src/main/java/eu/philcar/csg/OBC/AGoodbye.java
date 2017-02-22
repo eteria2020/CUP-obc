@@ -148,6 +148,7 @@ public class AGoodbye extends ABase {
 				Intent i = new Intent(AGoodbye.this, AWelcome.class);
 				i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(i);
+				AGoodbye.this.finish();
 	
 				break;					
 				
@@ -179,7 +180,11 @@ public class AGoodbye extends ABase {
 		 }
 	};
 
-
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		App.isClosing=false;
+	}
 
 	@Override
 	public int getActivityUID() {

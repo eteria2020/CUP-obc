@@ -91,14 +91,14 @@
 		    android:visibility="visible" >
 
 		    <ImageView
-		        android:id="@+id/ivDamages"
+		        android:id="@+id/fmapAlarmIV"
 		        android:layout_width="wrap_content"
 		        android:layout_height="114dp"
 		        android:adjustViewBounds="true"
 		        android:alpha="75"
 		        android:maxWidth="120dp"
 		        android:scaleType="fitXY"
-		        android:src="@drawable/outofcharge" />
+				android:background="@drawable/outofcharge" />
 		</FrameLayout>
 
 		<FrameLayout
@@ -159,21 +159,22 @@
 
 			<LinearLayout
 			    android:id="@+id/llTray"
-			    android:layout_width="wrap_content"
+			    android:layout_width="120dp"
 			    android:layout_height="wrap_content"
 				android:layout_centerVertical="true"
 			    android:layout_gravity="center_vertical|end"
 				android:layout_marginLeft="2dp"
 				android:orientation="vertical"
 				android:layout_alignParentRight="true"
-				android:layout_alignParentEnd="true"
-				android:paddingRight="15dp">
+				android:layout_alignParentEnd="true">
 
 				<TextView android:id="@+id/fmap_date_TV"
 					android:layout_width="wrap_content" android:layout_height="wrap_content"
 					android:layout_gravity="center" android:layout_marginBottom="8dp"
 					android:text="01/04/2016" android:textSize="20sp"
-					android:textColor="#FFFFFF" />
+					android:textColor="#FFFFFF"
+					android:layout_marginRight="2dp"
+					android:layout_marginLeft="2dp" />
 
 				<TextView android:id="@+id/fmap_hour_TV"
 					android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -237,13 +238,9 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:background="@drawable/sha_whiteroundedredbox"
-					android:layout_alignParentBottom="true"
-					android:layout_alignParentRight="true"
-					android:layout_alignParentEnd="true"
-					android:layout_marginRight="9dp"
 					android:layout_marginBottom="13dp"
-					android:layout_gravity="right|bottom"
-					android:visibility="invisible" >
+					android:layout_gravity="bottom|center_horizontal"
+					android:visibility="invisible">
 
 					<ImageView
 						android:layout_width="22dp"
@@ -303,7 +300,7 @@
         android:layout_gravity="center"
         android:background="@drawable/sha_redalertbox"
         android:id="@+id/fmapAlertSOCFL"
-		android:visibility="visible"
+		android:visibility="gone"
 		android:layout_alignParentRight="false"
 		android:layout_below="@+id/txtNextStreet"
 		android:layout_alignLeft="@+id/fmapMapMV"

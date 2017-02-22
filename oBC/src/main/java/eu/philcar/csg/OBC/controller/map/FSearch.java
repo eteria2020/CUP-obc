@@ -640,6 +640,29 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 		
 	}
 
-
-
+	@Override
+	public void onDestroy() {
+		resultsLV=null;
+		rootView=null;
+		adapter=null;
+		backIB=null;
+		mCustomKeyboard=null;
+		sosB=null;
+		fpca_right_RL=null;
+		searchB=null;
+		gotoTV=null;
+		btnGo=null;
+		btnSearch1=null;
+		btnSearch1=null;
+		btnSearch3=null;
+		llRow1=null;
+		llRow2=null;
+		llRow3=null;
+		resultsLV=null;
+		resultsRL=null;
+		resultsTV=null;
+		sks=null;
+		searchHandler=null;
+		super.onDestroy();
+	}
 }

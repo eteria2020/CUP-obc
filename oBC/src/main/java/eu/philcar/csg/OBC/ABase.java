@@ -6,6 +6,7 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.helpers.DLog;
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.FragmentManager.BackStackEntry;
 import android.content.Context;
@@ -97,7 +98,7 @@ public abstract class ABase extends Activity {
 		saveLanguage("fr");
 		changeLanguage("fr");
 	}
-	
+
 	/**
 	 * Use this method to push (and display) a new fragment (i.e., like [UINavigationController pushViewController:animated]).
 	 * Note that "fragment" must inherits from FBase.
@@ -119,6 +120,27 @@ public abstract class ABase extends Activity {
 		transaction.commit();
 	}
 
+	/**
+	 * Use this method to push (and display) a new fragment (i.e., like [UINavigationController pushViewController:animated]).
+	 * Note that "fragment" must inherits from FBase.
+	 *
+	 * @param fragment		A fragment (which inherits from FBase) that will be displayed
+	 * @param fragmentName The name associated with the transaction (e.g., [YourClassHere].class.getName()). If the back button won't be used, then this parameter will be removed before release but until then you should stick with it.
+	 * @param animated		Self-explanatory
+	 */
+	public void pushFragmentnoBack(FBase fragment, String fragmentName, boolean animated) {
+
+		//getFragmentManager().popBackStack();
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+
+		if (animated) {
+			transaction.setCustomAnimations(R.animator.slide_in_right, R.animator.slide_out_left, R.animator.slide_in_left, R.animator.slide_out_right);
+		}
+		transaction.add(getPlaceholderResource(), fragment, fragmentName);
+		transaction.disallowAddToBackStack();
+		transaction.commit();
+	}
 	/**
 	 * Use this method to pop the fragment until the fragment name, in not present push (and display) a new fragment (i.e., like [UINavigationController pushViewController:animated]).
 	 * Note that "fragment" must inherits from FBase.

@@ -177,9 +177,9 @@ public class FMaintenance extends FBase {
 	
 	
 	private void update(CarInfo carinfo) {
-		if (App.Charging && carinfo.chargingPlug==false) {
+		if (App.Charging && !carinfo.chargingPlug) {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(true);
-			((TextView)view.findViewById(R.id.tvEndCharging)).setText("TERMINA RICARICA: L'auto sar� nuovamente disponible al noleggio a meno di altre condizioni di allarme");
+			((TextView)view.findViewById(R.id.tvEndCharging)).setText("TERMINA RICARICA: L'auto sarà nuovamente disponible al noleggio a meno di altre condizioni di allarme");
 		} else {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
 			if (carinfo.chargingPlug)

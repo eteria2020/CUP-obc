@@ -46,7 +46,7 @@ public class Pois extends DbTable<Poi,Integer> {
 		
 		try {
 			
-			PreparedQuery<Poi> query =  queryBuilder().setCountOf(true).where().eq("id",id).and().eq("aggiornamento", aggiornamento).prepare();	
+			PreparedQuery<Poi> query =  queryBuilder().setCountOf(true).where().eq("id",id).and().eq("aggiornamento", aggiornamento).prepare();
 			long c = this.countOf(query);
 			
 			return (c>0)?true:false;
@@ -74,6 +74,38 @@ public class Pois extends DbTable<Poi,Integer> {
 
 		}
 		
+		return null;
+	}
+	public List<Poi> getCityPois(String city) {
+
+		try {
+			PreparedQuery<Poi> query;
+
+			switch (city) {
+				case "milano":
+					query = queryBuilder().where().eq("citta", city.toLowerCase()).and().eq("attivo", true).and().eq("tipo", "Isole Digitali").prepare();
+					break;
+				/*case "firenze":
+					//query = queryBuilder().where().eq("citta", city.toLowerCase()).and().eq("attivo", true).prepare();
+					break;
+				case "roma":
+					//query = queryBuilder().where().eq("citta", city.toLowerCase()).and().eq("attivo", true).and().ne("tipo", "Stazione ENEL Drive").prepare();
+					break;*/
+				default:
+					return null;
+					//query = queryBuilder().where().eq("citta", city.toLowerCase()).and().eq("attivo", true).prepare();
+					//break;
+			}
+
+
+			return this.query(query);
+
+
+		} catch (SQLException e) {
+			DLog.E("getPois fail:",e);
+
+		}
+
 		return null;
 	}
 	

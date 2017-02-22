@@ -125,7 +125,8 @@ public class SslConnection {
 
 				
 			}
-		
+
+			urlConnection.setDefaultUseCaches(false);
 			urlConnection.setRequestMethod("GET");
 			urlConnection.setConnectTimeout(3000);
 			urlConnection.setReadTimeout(3000);

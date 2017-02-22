@@ -62,6 +62,7 @@ public class CarInfo {
     public String gear = "";
     public int outAmp = 0;
     public Long timestampCurrent = null;
+    public Long lastForceReady=System.currentTimeMillis();
 
 
 
@@ -131,13 +132,13 @@ public class CarInfo {
         } else
             this.batteryLevel = (Math.round(SOCR));
 
-            
     }
 
     private void setLocation(Location loc) {
 
         if (App.mockLocation != null) {
             location = App.mockLocation;
+            long a=loc.getTime();
             longitude = App.mockLocation.getLongitude();
             latitude = App.mockLocation.getLatitude();
             accuracy = App.mockLocation.getAccuracy();
@@ -147,6 +148,8 @@ public class CarInfo {
 
         if (loc != null) {
             location = loc;
+            long a=loc.getTime();
+            String time = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS").format(location.getTime());
             if (longitude != loc.getLongitude() || latitude != loc.getLatitude()) {
                 lastLocationChange = System.nanoTime();
                 longitude = loc.getLongitude();
@@ -339,6 +342,11 @@ public class CarInfo {
                     isKeyOn = i;
                     Events.eventKey(i);
 
+                    if(i==1&& App.currentTripInfo!=null && App.currentTripInfo.isOpen && App.pinChecked && App.getParkModeStarted()==null && !App.isClosing && System.currentTimeMillis()-lastForceReady>5000){        //Ask Rosco if good idea
+                        lastForceReady=System.currentTimeMillis();
+                        serviceHandler.sendMessage(MessageFactory.setEngine(true));
+                    }
+
                 }
             } else if (key.equalsIgnoreCase("PackAmp")) {
 
@@ -410,10 +418,11 @@ public class CarInfo {
                 }
             } else if (key.equalsIgnoreCase("VIN")) {
                 s = b.getString(key);
-                if (!s.equals(id)) {
+                if (!s.equals(App.CarPlate)) {
                     hasChanged = true;
                     id = s;
                     App.Instance.setCarPlate(id);
+                    serviceHandler.sendMessage(MessageFactory.zmqRestart());
                 }
             } else if (key.equalsIgnoreCase("VER")) {
                 s = b.getString(key);
@@ -511,7 +520,7 @@ public class CarInfo {
 
             }
         }
-        if (System.currentTimeMillis() - lastUpdate > 10000) {
+        if (System.currentTimeMillis() - lastUpdate > 12000) {
             lastUpdate = System.currentTimeMillis();
             hasChanged = true;
         }

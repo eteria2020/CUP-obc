@@ -61,7 +61,7 @@ public class Trip  extends DbRecord {
 		public Date recharge_time;
 		
 		@DatabaseField
-		public int  recharge;
+		public int  recharge; //initially unused now used to store server result
 	
 		@DatabaseField
 		public boolean begin_sent;
@@ -88,9 +88,9 @@ public class Trip  extends DbRecord {
 		public int n_pin;
 		
 		@DatabaseField 
-		public int id_parent;		
-		
-		
+		public int id_parent;
+
+
 //		@DatabaseField
 //		public boolean sospeso;
 		

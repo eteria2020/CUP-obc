@@ -22,6 +22,7 @@ import eu.philcar.csg.OBC.controller.map.FSearch;
 import eu.philcar.csg.OBC.controller.map.util.GeoUtils;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.db.Pois;
+import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
@@ -39,6 +40,7 @@ import android.content.IntentFilter;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -55,6 +57,7 @@ public class AMainOBC extends ABase implements LocationListener {
 	public final static int  MSG_UPDATE_DATE = 11;
 
 	public static AudioPlayer player;
+	private Boolean firstUpCharging=true;
 
 	
 	private final static int MIN_MOVE_TOL = 1; // meters
@@ -106,7 +109,6 @@ public class AMainOBC extends ABase implements LocationListener {
 	private Location currentPosition,  endingPosition;
 	private String currentRouting;
 	private Date lastUpdate=new Date();
-	private Date mapUpdate=new Date();
 	public boolean firstUpPoi=true;
 	
 	private File[] theAds;
@@ -126,6 +128,16 @@ public class AMainOBC extends ABase implements LocationListener {
 
 	public boolean getisInsideParkingArea() {
 		return isInsideParkingArea;
+	}
+
+	public boolean checkisInsideParkingArea() {
+		Boolean inside=true;
+		try{
+		 inside =	App.checkParkArea(App.lastLocation.getLatitude(), App.lastLocation.getLongitude());
+		}catch(Exception e){
+			dlog.e("Exception while controlling inside area ",e);
+		}
+		return inside;
 	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -447,10 +459,6 @@ public class AMainOBC extends ABase implements LocationListener {
 		
 
 
-		if(new Date().getTime() - mapUpdate.getTime() <700) {
-			return;
-		}else{
-			mapUpdate=new Date();
 			if (App.isNavigatorEnabled) {
 
 				FMap fMap = (FMap)getFragmentManager().findFragmentByTag(FMap.class.getName());
@@ -460,7 +468,7 @@ public class AMainOBC extends ABase implements LocationListener {
 			}
 			//dlog.d("onLocationChanged: lastUpdate "+ (new Date().getTime() - lastUpdate.getTime()) );
 
-		}
+
 
 
 		//Attenzione il codice commentato sotto per qualche motivo impedisce l'aggiornamento corretto della posizione!!!
@@ -469,7 +477,7 @@ public class AMainOBC extends ABase implements LocationListener {
 			return;
 		}*/
 
-		if(new Date().getTime() - lastUpdate.getTime() <10000) {
+		if( System.currentTimeMillis() - lastUpdate.getTime() <10000) {
 			return;
 		}else {
 			lastUpdate = new Date();
@@ -736,6 +744,40 @@ public class AMainOBC extends ABase implements LocationListener {
 				}
 				
 				break;
+			case ObcService.MSG_TRIP_NEAR_POI:
+				App.currentTripInfo.isBonusEnabled=msg.arg1>0;
+
+				if(firstUpCharging) {
+					firstUpCharging=false;
+					setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
+					dlog.d("updateParkAreaStatus: Imposto Audio a AUDIO_SYSTEM");
+					new Thread(new Runnable() {
+						public void run() {
+							try {
+								player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/" + R.raw.tts_advise_charging_bonus));
+							} catch (Exception e) {
+								dlog.e("Exception trying to play audio", e);
+							}
+						}
+					}).start();
+				}
+
+				fMenu = (FMenu)getFragmentManager().findFragmentByTag(FMenu.class.getName());
+				if (fMenu != null) {
+					fMenu.updateUIUsingAppValues();
+				}
+
+				fHome = (FHome)getFragmentManager().findFragmentByTag(FHome.class.getName());
+				if (fHome != null) {
+					fHome.updatePoiInfo(msg.arg1,(Poi)msg.obj);
+				}
+
+
+				fMap = (FMap)getFragmentManager().findFragmentByTag(FMap.class.getName());
+				if (fMap != null) {
+					fMap.updatePoiInfo(msg.arg1,(Poi)msg.obj);
+				}
+				break;
 				
 			default:
 				super.handleMessage(msg);
@@ -812,6 +854,9 @@ public class AMainOBC extends ABase implements LocationListener {
 						//	((FMap) getActiveFragment()).setIsSecondCallout(true);
 						//	((TextView) ((FMap) getActiveFragment()).getCalloutView().findViewById(R.id.customDescTV)).setText(((FMap) getActiveFragment()).getCalloutPoi().getString("code", "SURPRISE!!!!"));
 						//}
+						break;
+					case 3:
+						((FMap) getActiveFragment()).startRouteCallout();
 						break;
 				}
 

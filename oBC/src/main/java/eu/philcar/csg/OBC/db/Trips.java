@@ -246,6 +246,24 @@ public class Trips extends DbTable<Trip,Integer> {
 		
 		return true;
 	}
+
+	public int getRemoteIDfromLocal(int id){
+		try {
+			Where<Trip,Integer> where  = queryBuilder().where();
+
+
+					where.eq("id",id);
+
+
+
+			Trip trip =  where.queryForFirst();
+			return trip!=null?trip.remote_id:0;
+
+		} catch (SQLException e) {
+			dlog.e("getNTripsToSend fail:",e);
+			return 0;
+		}
+	}
 	
 	
 }

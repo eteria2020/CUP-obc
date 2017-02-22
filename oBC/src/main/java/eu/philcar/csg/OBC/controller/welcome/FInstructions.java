@@ -137,36 +137,40 @@ public class FInstructions extends FBase {
 			});
 			
 		} else {
-			App.isCloseable = true;
-			
-			((AGoodbye)this.getActivity()).sendMessage(MessageFactory.sendBeacon());
-			((AGoodbye)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
-			((LinearLayout)view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
-			
-			new CountDownTimer(41000,1000) {
-				@Override
-			     public void onTick(long millisUntilFinished) {
-			    	 ((TextView)view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished/1000)+ " s");
-			     }
+			try {
+				App.isCloseable = true;
 
-				@Override
-				public void onFinish() {
-				}
+				((AGoodbye) this.getActivity()).sendMessage(MessageFactory.sendBeacon());
+				((AGoodbye) this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
+				((LinearLayout) view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
 
-			}.start();
-			
-			((TextView)view.findViewById(R.id.fins_message_TV)).setText(R.string.instruction_title_close);
-			((TextView)view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_close_1);
-			
-			// Instruction N.2 is removed and the following shifted up
-			
-			((TextView)view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_close_3);			
-			((TextView)view.findViewById(R.id.finsInstructions3TV)).setText(R.string.instruction_close_4);
-			
-			((LinearLayout)view.findViewById(R.id.fins_fourth_LL)).setVisibility(View.GONE);
-			
+				new CountDownTimer(41000, 1000) {
+					@Override
+					public void onTick(long millisUntilFinished) {
+						((TextView) view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished / 1000) + " s");
+					}
 
-			((TextView)view.findViewById(R.id.fins_message_bottom_TV)).setVisibility(View.VISIBLE);
+					@Override
+					public void onFinish() {
+					}
+
+				}.start();
+
+				((TextView) view.findViewById(R.id.fins_message_TV)).setText(R.string.instruction_title_close);
+				((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_close_1);
+
+				// Instruction N.2 is removed and the following shifted up
+
+				((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_close_3);
+				((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(R.string.instruction_close_4);
+
+				((LinearLayout) view.findViewById(R.id.fins_fourth_LL)).setVisibility(View.GONE);
+
+
+				((TextView) view.findViewById(R.id.fins_message_bottom_TV)).setVisibility(View.VISIBLE);
+			}catch(Exception e){
+				dlog.e("Exception in FInstruction wtf login is: "+login,e);
+			}
 		}
 
 		if (App.currentTripInfo.isMaintenance) {
@@ -187,5 +191,12 @@ public class FInstructions extends FBase {
 		} else {
 			return true;
 		}
+	}
+
+	@Override
+	public void onDestroy() {
+		fins_right_FL=null;
+
+		super.onDestroy();
 	}
 }

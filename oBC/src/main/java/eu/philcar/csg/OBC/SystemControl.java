@@ -254,6 +254,7 @@ public class SystemControl {
 		    if (hasNetworkConnection(ctx)) {
 		        try {
 		            HttpURLConnection urlc = (HttpURLConnection) (new URL("http://www.google.com").openConnection());
+					urlc.setDefaultUseCaches(false);
 		            urlc.setRequestProperty("User-Agent", "Test");
 		            urlc.setRequestProperty("Connection", "close");
 		            urlc.setConnectTimeout(1500); 

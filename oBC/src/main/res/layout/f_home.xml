@@ -74,9 +74,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
             	android:layout_marginRight="15dp"
-            	android:layout_marginEnd="15dp"
-                android:layout_gravity="center_vertical|end"
-                android:orientation="vertical" >
+                android:layout_gravity="top|end|center_horizontal"
+                android:orientation="vertical"
+                android:layout_marginTop="5dp">
                 
                 <TextView android:id="@+id/fmap_date_TV"
                     android:layout_width="wrap_content"
@@ -91,7 +91,7 @@
                 <LinearLayout 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="5dp"
                     android:layout_gravity="end"
                     android:orientation="horizontal" >
 
@@ -142,7 +142,7 @@
         			    android:visibility="gone" />
                     
                 </LinearLayout>
-                
+
             </LinearLayout>
 
             <LinearLayout android:id="@+id/ll3G_HOME"
@@ -153,10 +153,11 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:layout_marginRight="9dp"
                 android:layout_marginBottom="13dp"
-                android:layout_gravity="right|bottom"
-                android:visibility="visible">
+                android:layout_gravity="bottom"
+                android:visibility="visible"
+                android:gravity="center_horizontal"
+                android:layout_marginLeft="9dp">
 
                 <ImageView
                     android:layout_width="22dp"

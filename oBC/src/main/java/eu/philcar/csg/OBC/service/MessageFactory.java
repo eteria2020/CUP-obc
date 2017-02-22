@@ -6,6 +6,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Message;
 
+import eu.philcar.csg.OBC.db.Poi;
+
 public class MessageFactory {
 
 	
@@ -203,6 +205,12 @@ public class MessageFactory {
 		msg.obj = carInfo;
 		if (carInfo!=null)
 			msg.setData(carInfo.getBundle());
+		return msg;
+	}
+	public static Message notifyTripPoiUpdate(int status,Poi poi) {
+		Message msg = Message.obtain(null, ObcService.MSG_TRIP_NEAR_POI);
+		msg.arg1=status;
+		msg.obj=poi;
 		return msg;
 	}
 

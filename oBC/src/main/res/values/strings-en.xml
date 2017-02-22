@@ -99,6 +99,9 @@
 	<string name="instruction_close_4">Leave the car.Doors will close automatically in the time shown in the right</string>
 	<string name="instruction_close_4_note">If you change your mind let the doors close, and then open a new rent session</string>	
 	<string name="instruction_close_5">Be careful, a vehicle not closed correctly can mean additional costs and penalties</string>
+
+
+	<string name="bonus_message_poi">Congratulations\nIn the coming days, after paying this race, you will be awarded a bonus for having this car parked near a charging station!</string>
 	
 	<string name="self_close_message">Closing doors</string>
 	

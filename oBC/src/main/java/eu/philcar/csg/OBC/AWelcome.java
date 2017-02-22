@@ -141,7 +141,7 @@ public class AWelcome extends ABase {
 				TripInfo ti = (TripInfo)msg.obj;
 				if (msg.arg1==0) {
 					if (ti!=null && ti.customer !=  null) {
-						Fragment fb = getFragmentManager().findFragmentById(R.id.awelPlaceholderFL);
+						Fragment fb = getActiveFragment();// getFragmentManager().findFragmentById(R.id.awelPlaceholderFL);
 						if (fb!=null && fb instanceof FWelcome) {
 							FWelcome f = (FWelcome)fb;
 							f.setName(ti.customer.name + " " + ti.customer.surname);

@@ -2,6 +2,8 @@ package eu.philcar.csg.OBC.db;
 import android.content.Context;
 import java.io.File;
 import java.sql.SQLException;
+
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import ch.qos.logback.core.net.server.Client;
@@ -14,7 +16,7 @@ import eu.philcar.csg.OBC.helpers.DLog;
 public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public  static final String DATABASE_NAME = "/sdcard/csg/sharengo.db";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 
 	private static DbManager instance = null;;
 
@@ -59,11 +61,21 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 				updateFromVersion1(database, connectionSource, oldVersion, newVersion);
 				break;
 
+			/*case 2:
+				updateFromVersion2(database, connectionSource, oldVersion, newVersion);
+				break;*/
+
 			default:
 				// no updates needed
 				break;
 		}
 	}
+
+	@Override
+	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		
+	}
+
 	@SuppressWarnings("unchecked")
 	private void updateFromVersion1(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
 		try {
@@ -77,6 +89,18 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 		}
 		onUpgrade(db, connectionSource, oldVersion + 1, newVersion);
 	}
+
+	/*private void updateFromVersion2(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
+		try {
+
+			db.execSQL("ALTER TABLE eventi ADD COLUMN id_trip_local int DEFAULT 0");
+			DLog.D("Upgrade to Db versione 2 sucessfull");
+
+		}catch (Exception e) {
+			DLog.E("Upgrade to Db versione 2 failed",e);
+		}
+		onUpgrade(db, connectionSource, oldVersion + 1, newVersion);
+	}*/
 	/*
 	private void updateFromVersion2(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
 		try {

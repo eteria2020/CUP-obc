@@ -96,9 +96,10 @@
 	<string name="instruction_close_1">Raccogli le tue cose. Hai chiuso luci e finestrini?</string>
 	<string name="instruction_close_2">Premi il pulsante N sul cruscotto</string>
 	<string name="instruction_close_3">Tira il freno a mano</string>
-	<string name="instruction_close_4">Scendi. Le porte si chiuderanno automaticamente nel tempo indicato a destra</string>
+	<string name="instruction_close_4">Puoi scendere. Le porte si chiuderanno automaticamente nel tempo indicato sotto</string>
 	<string name="instruction_close_4_note">Se cambiassi idea lascia chiudere le porte ed apri una nuova sessione di noleggio</string>
 	<string name="instruction_close_5">Attenzione una vettura non correttamente chiusa pu&#242; comportare per te inutili costi e penali</string>
+	<string name="bonus_message_poi">Congratulazioni!\nNei prossimi giorni, dopo aver pagato questa corsa, ti verrà accreditato un bonus per aver parcheggiato questa macchina vicino ad un\'isola digitale</string>
 
 	<string name="self_close_message">Chiusura \n portiere</string>
 
@@ -117,7 +118,7 @@
 	<string name="menu_refuel">Fai rifornimento</string>
 	<string name="menu_refuel_off">Fai rifornimento (disabilitato)</string>
 	<string name="menu_refuel_shutdown_engine">Fai rifornimento (spegni prima il motore)</string>
-	<string name="menu_park_mode_started">Per riprendere il noleggio usa il comando APRI PORTE sul telefono o passa la tua Card per rientrare in macchina</string>
+	<string name="menu_park_mode_started">Per riprendere il noleggio usa il comando APRI PORTE sul telefono o passa la tua Card per abilitare il motore</string>
 	<string name="menu_park_mode_resume">Riprendi il noleggio</string>
 	<string name="menu_park_mode_resume_shutdown_engine">Riprendi il noleggio (spegni prima il motore)</string>
 
@@ -130,7 +131,7 @@
 
 	<string name="push_to_cancel">Premi per\nannullare</string>
 
-	<string name="goodbye_instructions">Puoi scendere. Le porte si chiuderanno automaticamente nel tempo indicato a destra.\n\nSe cambiassi idea  esci, lascia chiudere le porte e apri una nuova sessione di noleggio</string>
+	<string name="goodbye_instructions">Puoi scendere. Le porte si chiuderanno automaticamente nel tempo indicato sotto.\n\nSe cambiassi idea  esci, lascia chiudere le porte e apri una nuova sessione di noleggio</string>
 
 	<string name="milan">Milano</string>
 	<string name="minutes_saved">Minuti guadagnati&#58;</string>
