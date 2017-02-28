@@ -99,7 +99,7 @@
 	<string name="instruction_close_4">Puoi scendere. Le porte si chiuderanno automaticamente nel tempo indicato sotto</string>
 	<string name="instruction_close_4_note">Se cambiassi idea lascia chiudere le porte ed apri una nuova sessione di noleggio</string>
 	<string name="instruction_close_5">Attenzione una vettura non correttamente chiusa pu&#242; comportare per te inutili costi e penali</string>
-	<string name="bonus_message_poi">Congratulazioni!\nNei prossimi giorni, dopo aver pagato questa corsa, ti verrà accreditato un bonus per aver parcheggiato questa macchina vicino ad un\'isola digitale</string>
+	<string name="bonus_message_poi">Congratulazioni!\nNei prossimi giorni, dopo aver pagato questa corsa, ti verrà accreditato un bonus per aver parcheggiato questa macchina vicino ad una stazione di ricartica</string>
 
 	<string name="self_close_message">Chiusura \n portiere</string>
 
@@ -216,6 +216,10 @@
 
 	<string name="alert_20km">L’autonomia dell’auto, per come la stai utilizzando, potrebbe ora essere inferiore ai 20 km. Tienine conto.</string>
 	<string name="alert_5km">L’autonomia dell’auto, per come la stai utilizzando, è di circa 5 km. Ti invitiamo a chiudere la corsa per non incorrere in penali.</string>
+
+
+	<string name="poi_bonus_title">STAZIONE DI RICARICA</string>
+	<string name="poi_bonus_body">Parcheggia l’auto qui vicino per ricevere un BONUS di 5 minuti sul tuo profilo</string>
 
 	<string name="welcome">Benvenuto</string>
 

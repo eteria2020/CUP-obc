@@ -272,6 +272,37 @@ public class Events extends DbTable<Event,Integer> {
 			this.create(event);
 		} catch (SQLException e) {
 			dlog.e("Error inserting evento:",e);
+			try{
+				event = new Event();
+				event.timestamp = DbManager.getTimestamp();
+
+				event.event = eventId;
+
+				if (labels.containsKey(eventId))
+					event.label = labels.get(eventId);
+
+				event.intval = intValue;
+				event.txtval = strValue;
+
+				event.km = App.km;
+				event.battery = App.fuel_level;
+
+				if (App.currentTripInfo!=null  && App.currentTripInfo.trip!=null) {
+					event.id_trip = App.currentTripInfo.trip.remote_id;
+					event.id_customer = App.currentTripInfo.trip.id_customer;
+				}
+
+				if (App.lastLocation!=null) {
+					event.lon = App.lastLocation.getLongitude();
+					event.lat = App.lastLocation.getLatitude();
+				}
+
+				this.create(event);
+				updateTableEvents();
+			}catch(SQLException ex){
+
+				dlog.e("Deep Error inserting evento, tried without: id_trip_local",ex);
+			}
 		}
 		
 		HttpConnector http = new HttpConnector(App.Instance.getApplicationContext());
@@ -296,6 +327,8 @@ public class Events extends DbTable<Event,Integer> {
 				where.eq("sent",false);
 				//where.eq("sending_error", false)
 			//);
+
+
 			
 			
 			PreparedQuery<Event> query =  where.prepare();
@@ -348,6 +381,14 @@ public class Events extends DbTable<Event,Integer> {
 		}
 		
 		return false;
+	}
+
+	public void updateTableEvents(){
+		try {
+			queryRaw("ALTER TABLE eventi ADD COLUMN id_trip_local int DEFAULT 0");
+		} catch (SQLException e) {
+			dlog.e("Exception while upgrading table",e);
+		}
 	}
 	
 	

@@ -180,6 +180,7 @@ public class FMaintenance extends FBase {
 		if (App.Charging && !carinfo.chargingPlug) {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(true);
 			((TextView)view.findViewById(R.id.tvEndCharging)).setText("TERMINA RICARICA: L'auto sarà nuovamente disponible al noleggio a meno di altre condizioni di allarme");
+			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
 		} else {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
 			if (carinfo.chargingPlug)

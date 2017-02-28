@@ -82,6 +82,10 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 			TableUtils.dropTable(connectionSource, Pois.GetRecordClass(),true);
 			TableUtils.createTable(connectionSource, Pois.GetRecordClass());
+
+			db.execSQL("ALTER TABLE eventi ADD COLUMN id_trip_local int DEFAULT 0");
+			DLog.D("Upgrade to Db versione 2 sucessfull");
+
 			DLog.D("Upgrade to Db versione 2 sucessfull");
 
 		}catch (Exception e) {
@@ -100,7 +104,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 			DLog.E("Upgrade to Db versione 2 failed",e);
 		}
 		onUpgrade(db, connectionSource, oldVersion + 1, newVersion);
-	}*/
+	}
 	/*
 	private void updateFromVersion2(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
 		try {

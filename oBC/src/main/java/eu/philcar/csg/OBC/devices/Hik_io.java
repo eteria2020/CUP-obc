@@ -532,7 +532,7 @@ public class Hik_io implements LowLevelInterface {
 			
 		case AUDIO_SYSTEM:
 			mAudioManager.audioSetChannel(AudioInfo.HIK_AUDIO_CHANNEL_ARM);
-			mAudioManager.audioSetVol(20);
+			mAudioManager.audioSetVol(15);
 			mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
 			dlog.d("HIK Audio channel : SYSTEM");
 			break;

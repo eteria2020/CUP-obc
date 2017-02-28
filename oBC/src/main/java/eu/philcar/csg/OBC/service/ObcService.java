@@ -481,11 +481,14 @@ public class ObcService extends Service {
                     carInfo.lowCells = lowCellNumber;
                     carInfo.currVoltage = (float) Math.round(currVolt * 100) / 100f;
 
-                    if (carInfo.currVoltage <= 0 && (lastValidSOC - System.currentTimeMillis() < 60000 * 5)) {
-                        carInfo.setBatteryLevel(Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS));
-                        dlog.d("virtualBMSUpdateScheduler: value null ignoring data.");
-                        return;
+                    if (carInfo.currVoltage <= 0 ){
+                        if (lastValidSOC - System.currentTimeMillis() < 60000 * 10) {
+                            carInfo.setBatteryLevel(Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS));
+                            dlog.d("virtualBMSUpdateScheduler: value null ignoring data.");
+                            return;
+                        }
                     }
+                    else
                     lastValidSOC = System.currentTimeMillis();
 
                     if (carInfo.bmsSOC >= 100 || carInfo.bmsSOC_GPRS >= 100) {
@@ -504,7 +507,6 @@ public class ObcService extends Service {
 
                         carInfo.SOCR = Math.min(carInfo.virtualSOC, 0f);
                     }
-
                         carInfo.setBatteryLevel(Math.round(carInfo.SOCR));
 
                     //carInfo.batteryLevel=Math.min(carInfo.bmsSOC,carInfo.bmsSOC_GPRS); //PER VERSIONI NON -BMS SCOMMENTARE E COMMENTARE IF SOPRA
@@ -677,6 +679,7 @@ public class ObcService extends Service {
     // Set the speed of locations updates
     private void setLocationMode(long minTime) {
         if (locationManager != null) {
+            dlog.d("setLocationMode "+minTime);
             locationManager.removeUpdates(carInfo.serviceLocationListener);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, 0, carInfo.serviceLocationListener);
         }
@@ -1592,6 +1595,7 @@ public class ObcService extends Service {
 					dlog.e("Eccezione durante kill activity",e);
 				}
 				removeSelfCloseTrip();*/
+                    dlog.d("checkAndRestartUI: Starting AGoodbye");
                     Intent i = new Intent(this, AGoodbye.class);
                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     i.putExtra(AGoodbye.JUMP_TO_END, true);
@@ -2235,7 +2239,7 @@ public class ObcService extends Service {
                         return;
 
                     for(Poi singlePoi : PoiList){
-                        if(App.lastLocation.distanceTo(singlePoi.getLoc())<100){
+                        if(App.lastLocation.distanceTo(singlePoi.getLoc())<=90){
                                 sendAll(MessageFactory.notifyTripPoiUpdate(1,singlePoi));
                             return;
                         }

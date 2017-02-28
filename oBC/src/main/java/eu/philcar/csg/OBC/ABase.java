@@ -15,6 +15,12 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 
+import com.skobbler.ngx.SKMaps;
+import com.skobbler.ngx.SKMapsInitSettings;
+import com.skobbler.ngx.map.SKMapViewStyle;
+import com.skobbler.ngx.navigation.SKAdvisorSettings;
+import com.skobbler.ngx.routing.SKRouteManager;
+
 public abstract class ABase extends Activity {
 
 
@@ -84,6 +90,30 @@ public abstract class ABase extends Activity {
 	public void setEnglishLanguage() {
 		saveLanguage("en");
 		changeLanguage("en");
+		SKMapsInitSettings initSettings = new SKMapsInitSettings();
+
+		initSettings.setConnectivityMode(SKMaps.CONNECTIVITY_MODE_OFFLINE);
+		initSettings.setMapsPath("/sdcard/SKMaps/");
+		initSettings.setMapResourcesPaths("/sdcard/SKMaps/", new SKMapViewStyle("/sdcard/SKMaps/daystyle/","daystyle.json"));
+		initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
+
+
+		initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_LIGHT);
+
+
+		SKAdvisorSettings advisorSettings = new SKAdvisorSettings();
+		advisorSettings.setLanguage(SKAdvisorSettings.SKAdvisorLanguage.LANGUAGE_EN);
+		advisorSettings.setAdvisorConfigPath("/sdcard/SKMaps/Advisor");
+		advisorSettings.setResourcePath("/sdcard/SKMaps/Advisor/Languages");
+		advisorSettings.setAdvisorVoice("en");
+		advisorSettings.setAdvisorType( SKAdvisorSettings.SKAdvisorType.TEXT_TO_SPEECH);
+		initSettings.setAdvisorSettings(advisorSettings);
+
+		SKMapViewStyle style = new SKMapViewStyle("/sdcard/skmaps/daystyle/","daystyle.json");
+		initSettings.setCurrentMapViewStyle(style);
+
+
+		SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
 	}
 	
 	/**
@@ -92,11 +122,88 @@ public abstract class ABase extends Activity {
 	public void setItalianLanguage() {
 		saveLanguage("it");
 		changeLanguage("it");
+		SKMapsInitSettings initSettings = new SKMapsInitSettings();
+
+		initSettings.setConnectivityMode(SKMaps.CONNECTIVITY_MODE_OFFLINE);
+		initSettings.setMapsPath("/sdcard/SKMaps/");
+		initSettings.setMapResourcesPaths("/sdcard/SKMaps/", new SKMapViewStyle("/sdcard/SKMaps/daystyle/","daystyle.json"));
+		initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
+
+
+		initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_LIGHT);
+
+
+		SKAdvisorSettings advisorSettings = new SKAdvisorSettings();
+		advisorSettings.setLanguage(SKAdvisorSettings.SKAdvisorLanguage.LANGUAGE_IT);
+		advisorSettings.setAdvisorConfigPath("/sdcard/SKMaps/Advisor");
+		advisorSettings.setResourcePath("/sdcard/SKMaps/Advisor/Languages");
+		advisorSettings.setAdvisorVoice("it");
+		advisorSettings.setAdvisorType( SKAdvisorSettings.SKAdvisorType.TEXT_TO_SPEECH);
+		initSettings.setAdvisorSettings(advisorSettings);
+
+		SKMapViewStyle style = new SKMapViewStyle("/sdcard/skmaps/daystyle/","daystyle.json");
+		initSettings.setCurrentMapViewStyle(style);
+
+
+		SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
 	}
 
 	public void setFrenchLanguage() {
 		saveLanguage("fr");
 		changeLanguage("fr");
+		SKMapsInitSettings initSettings = new SKMapsInitSettings();
+
+		initSettings.setConnectivityMode(SKMaps.CONNECTIVITY_MODE_OFFLINE);
+		initSettings.setMapsPath("/sdcard/SKMaps/");
+		initSettings.setMapResourcesPaths("/sdcard/SKMaps/", new SKMapViewStyle("/sdcard/SKMaps/daystyle/","daystyle.json"));
+		initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
+
+
+		initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_LIGHT);
+
+
+		SKAdvisorSettings advisorSettings = new SKAdvisorSettings();
+		advisorSettings.setLanguage(SKAdvisorSettings.SKAdvisorLanguage.LANGUAGE_FR);
+		advisorSettings.setAdvisorConfigPath("/sdcard/SKMaps/Advisor");
+		advisorSettings.setResourcePath("/sdcard/SKMaps/Advisor/Languages");
+		advisorSettings.setAdvisorVoice("fr");
+		advisorSettings.setAdvisorType( SKAdvisorSettings.SKAdvisorType.TEXT_TO_SPEECH);
+		initSettings.setAdvisorSettings(advisorSettings);
+
+		SKMapViewStyle style = new SKMapViewStyle("/sdcard/skmaps/daystyle/","daystyle.json");
+		initSettings.setCurrentMapViewStyle(style);
+
+
+		SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
+	}
+
+	public void setChinseseLanguage() {
+		saveLanguage("zh");
+		changeLanguage("zh");
+		SKMapsInitSettings initSettings = new SKMapsInitSettings();
+
+		initSettings.setConnectivityMode(SKMaps.CONNECTIVITY_MODE_OFFLINE);
+		initSettings.setMapsPath("/sdcard/SKMaps/");
+		initSettings.setMapResourcesPaths("/sdcard/SKMaps/", new SKMapViewStyle("/sdcard/SKMaps/daystyle/","daystyle.json"));
+		initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
+
+
+		initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_LIGHT);
+
+
+		SKAdvisorSettings advisorSettings = new SKAdvisorSettings();
+		advisorSettings.setLanguage(SKAdvisorSettings.SKAdvisorLanguage.LANGUAGE_EN);
+		advisorSettings.setAdvisorConfigPath("/sdcard/SKMaps/Advisor");
+		advisorSettings.setResourcePath("/sdcard/SKMaps/Advisor/Languages");
+		advisorSettings.setAdvisorVoice("en");
+		advisorSettings.setAdvisorType( SKAdvisorSettings.SKAdvisorType.TEXT_TO_SPEECH);
+		initSettings.setAdvisorSettings(advisorSettings);
+
+		SKMapViewStyle style = new SKMapViewStyle("/sdcard/skmaps/daystyle/","daystyle.json");
+		initSettings.setCurrentMapViewStyle(style);
+
+
+		SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
 	}
 
 	/**

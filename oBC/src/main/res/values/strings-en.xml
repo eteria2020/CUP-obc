@@ -162,6 +162,9 @@
 	<string name="hint_navigator">Enter a few characters and click the button with the magnifying glass to choose the destination</string>
 
 
+	<string name="poi_bonus_title">CHARGING STATION</string>
+	<string name="poi_bonus_body">Park your car nearby to get a five minutes BONUS on your profile </string>
+
 	<string name="new_damage">New damages&#63;</string>
 	<string name="new_damage2">Where&#63;</string>
 	<string name="no">No</string>
@@ -211,8 +214,8 @@
 	<string name="thank_for_choosing">Thank you for choosing</string>
 	<string name="text_view_set_a_choice">Choose an option</string>
 
-	<string name="alert_20km">L’autonomia dell’auto, per come la stai utilizzando, potrebbe ora essere inferiore ai 20 km. Tienine conto.</string>
-	<string name="alert_5km">L’autonomia dell’auto, per come la stai utilizzando, è di circa 5 km. Ti invitiamo a chiudere la corsa per non incorrere in penali.</string>
+	<string name="alert_20km">The autonomy of the car, as you\'re using, it may now be less than 20 km away. Please take that of it.</string>
+	<string name="alert_5km">The autonomy of the car, as we are using, is about 5 km. We invite you to quit the race to avoid penalties.</string>
 	
 	<string name="welcome">Welcome</string>
 	

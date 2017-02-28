@@ -276,6 +276,31 @@ public class App extends Application {
 
 
 			Port_UDP_Beacon = 7600;
+
+
+			/*URL_Area = "http://corecina.sharengo.it/api/zone/json.php?";
+			URL_Beacon = "http://corecina.sharengo.it/api/pushbeacon.php?";
+			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
+			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
+			URL_Clienti = "https://corecina.sharengo.it:8123/whitelist";
+			URL_Commands = "http://corecina.sharengo.it/api/get_commands.php?";
+			URL_Corse =  "http://corecina.sharengo.it/api/pushcorsa.php?";
+			URL_Eventi = "http://corecina.sharengo.it/api/pushevent.php?";
+			URL_Pois = "http://corecina.sharengo.it/api/get_pois.php?";
+			URL_PoisIcons = "http://manage.sharengo.it/pois_Icon.php";
+			URL_PoisBanner = "http://manage.sharengo.it/pois_Pos.php";
+			URL_Reservations = "http://corecina.sharengo.it/api/get_reservations.php?";
+			URL_Notifies = "http://corecina.sharengo.it:7600/notifies?";
+			URL_UploadLogs = "http://corecina.sharengo.it/api/pushlogs.php?";
+			URL_Configs = "https://corecina.sharengo.it:8123/configs";
+			URL_Admins = "https://CSDEMO01@corecina.sharengo.it:8123/admins";
+			//URL_Admins = "http://core.sharengo.it:8121/v1/admins";
+			URL_ZMQNotifier = "tcp://122.227.189.54:8001";
+			URL_AdsBuilder = "http://manage.sharengo.it/banner2.php";
+			URL_AdsBuilderCar = "http://manage.sharengo.it/banner2_offline.php";
+			URL_AdsBuilderStart = "http://manage.sharengo.it/banner4_offline.php";
+			URL_AdsBuilderEnd = "http://manage.sharengo.it/banner5_offline.php";
+			IP_UDP_Beacon = "122.227.189.54";*/
 		}
 
 	}
@@ -954,7 +979,7 @@ public void loadRadioSetup() {
 				initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
 				
 
-				initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_FULL);
+				initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_LIGHT);
 
 				
 				SKAdvisorSettings advisorSettings = new SKAdvisorSettings();

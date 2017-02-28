@@ -276,6 +276,7 @@ public class FDriveMessage_new extends FBase {
 				public void onFinish() {
 					((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.INVISIBLE);
 					((View)view.findViewById(R.id.btnNext)).setVisibility(View.VISIBLE);
+					localHandler.removeMessages(MSG_CLOSE_FRAGMENT);
 					localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,10000);
 
 				}

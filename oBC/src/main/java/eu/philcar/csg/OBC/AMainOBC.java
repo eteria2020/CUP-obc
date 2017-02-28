@@ -694,8 +694,15 @@ public class AMainOBC extends ABase implements LocationListener {
 				*/
 				break;
 				
+			case ObcService.MSG_TRIP_BEGIN:
+				if(!App.pinChecked) {
+					Intent in = new Intent(AMainOBC.this, AWelcome.class);
+					in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(in);
+					finish();
+				}
+					break;
 			case ObcService.MSG_TRIP_END:
-				
 				FMap fragmentMap = (FMap)getFragmentManager().findFragmentByTag(FMap.class.getName());
 				if (fragmentMap != null) {
 					fragmentMap.stopRouteNavigation();

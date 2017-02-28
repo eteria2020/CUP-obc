@@ -3,21 +3,17 @@ package eu.philcar.csg.OBC.controller.map;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -35,11 +31,9 @@ import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
-import eu.philcar.csg.OBC.helpers.BannerJsInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.CarInfo;
-import okhttp3.HttpUrl;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -50,20 +44,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
-import android.os.NetworkOnMainThreadException;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -84,7 +72,7 @@ public class FHome extends FBase implements OnClickListener {
 
     private View rootView;
 
-
+    private boolean seenA =false, seenB = false;
     private TextView  no3gtxt, alertTV;
     private View no3gwarning;
     private RelativeLayout rlBody;
@@ -219,7 +207,7 @@ public class FHome extends FBase implements OnClickListener {
                     case "bonus"://Bonus
                         no3gIV.setVisibility(View.GONE);
                         no3gtxt.setText("BONUS");
-                        no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedyellowbox);
+                        no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedorangebox);
                         animToggle = !animToggle;
                         break;
 
@@ -277,7 +265,7 @@ public class FHome extends FBase implements OnClickListener {
                         case "bonus"://Bonus
                             no3gIV.setVisibility(View.GONE);
                             no3gtxt.setText("BONUS");
-                            no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedyellowbox);
+                            no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedorangebox);
                             animToggle = !animToggle;
                             break;
 
@@ -344,6 +332,8 @@ public class FHome extends FBase implements OnClickListener {
         super.onPause();
         //actualAnim=0;
         lastInside=1;
+        seenA=false;
+        seenB=false;
         getActivity().unregisterReceiver(this.ConnectivityChangeReceiver);
 
 
@@ -523,7 +513,27 @@ public class FHome extends FBase implements OnClickListener {
         }
 
 
-        if (SOC <= 20) {
+        if(SOC<15) {
+            if(!seenA) {
+
+                seenA=true;
+                rootView.findViewById(R.id.ivDamages).setBackgroundResource(R.drawable.outofcharge);
+
+            }
+
+
+        }else
+        if(SOC<=30) {
+            if(!seenB) {
+                //drawChargingStation();
+                seenB=true;
+                rootView.findViewById(R.id.ivDamages).setBackgroundResource(R.drawable.almostoutofcharge);
+            }
+
+        }
+
+
+        if (SOC <= 30) {
             fmapAlarm.setVisibility(View.VISIBLE);
             fmapRange.setVisibility(View.GONE);
         } else {
@@ -691,7 +701,7 @@ public class FHome extends FBase implements OnClickListener {
             try {
                 if (getActivity() == null)
                     return;
-                boolean status = SystemControl.hasNetworkConnection(getActivity());
+                boolean status = SystemControl.hasNetworkConnection(c);
 
                 if (status) {
                     if (animQueue.contains("3g")) {
@@ -825,7 +835,6 @@ public class FHome extends FBase implements OnClickListener {
 
             dlog.i(FHome.class.toString()+" loadBanner: file mancante inizio download a url: "+urlImg.toString());
             HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
-            urlConnection.setDefaultUseCaches(false);
             urlConnection.setRequestMethod("GET");
             urlConnection.setDoOutput(true);
             urlConnection.connect();

@@ -17,7 +17,7 @@ import eu.philcar.csg.OBC.AMainOBC;
 public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener{
 
 
-    private MediaPlayer player;
+    private static MediaPlayer player;
     private static int queue=0;
     private static final String TAG = "AudioPlayer";
     private boolean isBusy=false; //indicate if the player is busy
@@ -86,6 +86,29 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
             dlog.e("Eccezione in play file",e);
         }
     }
+    public void pausePlayer(){
+        try {
+            player.pause();
+        }catch(Exception e){
+            dlog.e("Exception while pausing player",e);
+        }
+    }
+
+
+    public boolean isBusy(){
+        return isBusy;
+    }
+
+
+    public void resumePlayer(){
+        try {
+            player.start();
+        }catch(Exception e){
+            dlog.e("Exception while resuming player",e);
+        }
+    }
+
+
     public void waitToPlayFile(Uri uri) {
         int tries=0;
         try {
@@ -93,7 +116,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
             while(isBusy){
                 if(playing.compareTo(uri)==0)
                     return;
-                Thread.sleep(1000);
+                Thread.sleep(2000);
                 tries++;
                 if(tries>15){
                     reset();
@@ -106,11 +129,11 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
                     dlog.d("waitToPlayFile: reset and abort");
                     return;
                 }
-                dlog.d("waitToPlayFile: aspetto da "+tries +"s");
+                dlog.d("waitToPlayFile: aspetto da "+(tries*2) +"s queue is "+queue);
 
             }
-            player.reset();
             isBusy=true;
+            player.reset();
             try {
                 playing=uri;
                 player.setDataSource(context,uri);

@@ -40,6 +40,7 @@ import android.os.Message;
 import android.os.NetworkOnMainThreadException;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -406,10 +407,13 @@ public class TripInfo {
                         App.pinChecked = false;
                         App.Instance.persistPinChecked();
 
+
+
                         service.sendBeacon();
                         return (MessageFactory.notifyTripEnd(this));
                     } else {
 
+                        Toast.makeText(App.Instance.getBaseContext(), "Out of Operative Area", Toast.LENGTH_SHORT).show();
                         obc_io.setLcd(null, "   FUORI AREA");
                         return null;
                     }
@@ -548,7 +552,6 @@ public class TripInfo {
 
             dlog.i(" loadBanner: file mancante inizio download a url: "+urlImg.toString());
             HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
-            urlConnection.setDefaultUseCaches(false);
             urlConnection.setRequestMethod("GET");
             urlConnection.setDoOutput(true);
             urlConnection.connect();

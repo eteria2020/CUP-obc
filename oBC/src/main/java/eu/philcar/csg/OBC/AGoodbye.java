@@ -43,7 +43,7 @@ public class AGoodbye extends ABase {
 		}
 
 		//System.gc();
-		dlog.d("AGoodbye: onCreate");
+		dlog.d("AGoodbye: onCreate extra: "+ getIntent().getBooleanExtra(EUTHANASIA,true) );
 
 		setContentView(R.layout.a_base);
 		player = new AudioPlayer(this);
@@ -62,8 +62,9 @@ public class AGoodbye extends ABase {
 	@Override
 	protected void onResume() {				
 		super.onResume();
-		
-		serviceConnector.connect();
+		App.setForegroundActivity(this);
+		if (!serviceConnector.isConnected())
+			serviceConnector.connect();
 		
 	}
 		
@@ -73,7 +74,8 @@ public class AGoodbye extends ABase {
 	protected void onPause() {
 		
 		super.onPause();
-		
+
+		App.setForegroundActivity("Pause");
 		serviceConnector.unregister();
 		serviceConnector.disconnect();
 	}
@@ -96,10 +98,16 @@ public class AGoodbye extends ABase {
 		 @Override
 		 public void handleMessage(Message msg) {
 			FPark fPark;
+
+			 if(! App.isForegroundActivity(AGoodbye.this)) {
+				 DLog.W(AWelcome.class.getName() + " MSG to non foreground activity. finish Activity");
+				 AGoodbye.this.finish();
+				 return;
+			 }
 			switch (msg.what) {
 			
 			case ObcService.MSG_CLIENT_REGISTER:
-				DLog.E(AGoodbye.class.getName() + ": MSG_CLIENT_REGISTER");
+				DLog.D(AGoodbye.class.getName() + ": MSG_CLIENT_REGISTER");
 				
 				// Since this is the first fragment, we need to use the "add" method to show it to the user, and not the "replace"
 				FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -136,7 +144,7 @@ public class AGoodbye extends ABase {
 				
 			case ObcService.MSG_IO_RFID:
 				
-				DLog.E(AMainOBC.class.getName() + ": MSG_IO_RFID");
+				DLog.D(AMainOBC.class.getName() + ": MSG_IO_RFID");
 				break;
 				
 			

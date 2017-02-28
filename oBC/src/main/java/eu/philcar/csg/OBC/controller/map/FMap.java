@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.NetworkOnMainThreadException;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.util.LongSparseArray;
 import android.text.Html;
 import android.text.Spanned;
@@ -100,12 +101,12 @@ import java.io.InputStreamReader;
 import java.io.Writer;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -119,7 +120,6 @@ import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
-import eu.philcar.csg.OBC.db.Pois;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
@@ -160,7 +160,7 @@ public class FMap extends FBase implements OnClickListener {
 	private Button endB, navigationB,  findDestinationB, fuelStationsB, homeB;
 	private ImageView parkingStatusIV, parkingDirectionIV,  adIV, no3gIV;
 	private TextView  dayTV, timeTV, tvRange, fmapAlertTV;
-	private boolean seen=false,drawCharging=true;
+	private boolean seen=false,drawCharging=true,firstUpReceived=false;
 	private static int statusAlertSOC=0,lastInside=0; //0 none played | 1 played 20km | 2 player 5km
 
 	//anim
@@ -201,6 +201,7 @@ public class FMap extends FBase implements OnClickListener {
 
 
     private TextToSpeech tts;
+	private UtteranceProgressListener utteranceListener;
 
 	private boolean navigatorAT;
 
@@ -342,9 +343,34 @@ public class FMap extends FBase implements OnClickListener {
 					}
 				}
 		    }
+
 		});
 
+		utteranceListener = new UtteranceProgressListener() {
+			@Override
+			public void onStart(String utteranceId) {
+				if(AMainOBC.player.isBusy()) {
+					dlog.d("Player is Busy pausing advice");
+					AMainOBC.player.pausePlayer();
+				}
+			}
 
+			@Override
+			public void onDone(String utteranceId) {
+
+				if(AMainOBC.player.isBusy()) {
+					dlog.d("Player is Busy resuming advice");
+					AMainOBC.player.resumePlayer();
+				}
+			}
+
+			@Override
+			public void onError(String utteranceId) {
+
+			}
+		};
+
+		tts.setOnUtteranceProgressListener(utteranceListener);
 
 
 		seen=false;
@@ -456,7 +482,7 @@ public class FMap extends FBase implements OnClickListener {
 					case "bonus"://Bonus
 						no3gIV.setVisibility(View.GONE);
 						no3gtxt.setText("BONUS");
-						no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedyellowbox);
+						no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedorangebox);
 						animToggle = !animToggle;
 						break;
 
@@ -514,7 +540,7 @@ public class FMap extends FBase implements OnClickListener {
 						case "bonus"://Bonus
 							no3gIV.setVisibility(View.GONE);
 							no3gtxt.setText("BONUS");
-							no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedyellowbox);
+							no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedorangebox);
 							animToggle = !animToggle;
 							break;
 
@@ -710,7 +736,10 @@ public class FMap extends FBase implements OnClickListener {
 				no3gwarning.startAnimation(alertAnimation);
 		}
 
-
+		if(navigationActive){
+			homeB.setVisibility(View.INVISIBLE);
+			findDestinationB.setVisibility(View.INVISIBLE);
+		}
 
 		
 		return view;
@@ -970,7 +999,7 @@ public class FMap extends FBase implements OnClickListener {
 			if(animQueue.contains("area")){
 				animQueue.remove("area");
 			}
-			if(lastInside!=0)
+			if(lastInside!=0 && lastInside!=1)
 				Events.outOfArea(false);
 			lastInside=0;
 
@@ -1131,7 +1160,7 @@ public class FMap extends FBase implements OnClickListener {
 					new Thread(new Runnable() {
 						public void run() {
 							try{
-							((AMainOBC) getActivity()).player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/" + R.raw.alert_tts_20km));
+							//((AMainOBC) getActivity()).player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/" + R.raw.alert_tts_20km));
 							}catch(Exception e){
 								dlog.e("Exception trying to play audio",e);
 							}
@@ -1147,7 +1176,7 @@ public class FMap extends FBase implements OnClickListener {
 			fmapRange.setVisibility(View.INVISIBLE);
 
 		} else {
-			statusAlertSOC=0;
+			//statusAlertSOC=0;  //commented to limit
 			localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
 			rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
 			fmapAlarm.setVisibility(View.INVISIBLE);
@@ -1269,6 +1298,7 @@ public class FMap extends FBase implements OnClickListener {
 			
 		case R.id.fmapENDB:
 			((ABase)getActivity()).pushFragment(FMenu.newInstance(), FMenu.class.getName(), true);
+
 			break;
 
 		case R.id.fmapCancelB:
@@ -1544,9 +1574,9 @@ public class FMap extends FBase implements OnClickListener {
 						break;
 					case 3:
 						((ImageView) (customView.findViewById(R.id.customView))).setImageResource(R.drawable.bring_me_callout);
-						((TextView) (customView.findViewById(R.id.customTitleTV))).setText("Isola Digitale");
+						((TextView) (customView.findViewById(R.id.customTitleTV))).setText(R.string.poi_bonus_title);
 						((TextView) (customView.findViewById(R.id.customTitleTV))).setTextColor(Color.BLACK);
-						((TextView) (customView.findViewById(R.id.customDescTV))).setText("Parcheggia quì vicino la macchina per guadagnare un bonus di 5 minuti. ");
+						((TextView) (customView.findViewById(R.id.customDescTV))).setText(R.string.poi_bonus_body);
 						((TextView) (customView.findViewById(R.id.customDescTV))).setTextColor(Color.BLACK);
 						break;
 				}
@@ -1755,6 +1785,9 @@ public class FMap extends FBase implements OnClickListener {
 
     public void stopRouteNavigation() {
 
+
+		homeB.setVisibility(View.VISIBLE);
+		findDestinationB.setVisibility(View.VISIBLE);
 			try {
 				SKRouteManager.getInstance().clearCurrentRoute();
 				SKNavigationManager.getInstance().stopNavigation();
@@ -2630,7 +2663,10 @@ public class FMap extends FBase implements OnClickListener {
 		@Override
 		public void onSignalNewAdviceWithInstruction(String arg0) {
 			dlog.d("ADVICE STRING:" +  arg0);
-			tts.speak(arg0, 0, null);
+			HashMap<String, String> map = new HashMap<String, String>();
+			map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, arg0);
+				tts.speak(arg0, 0,map);
+			map.clear();
 
 		}
 
@@ -2861,7 +2897,6 @@ public class FMap extends FBase implements OnClickListener {
 						continue;
 
 					HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-					urlConnection.setDefaultUseCaches(false);
 					urlConnection.setRequestMethod("GET");
 					urlConnection.setDoOutput(true);
 					urlConnection.connect();
@@ -2995,6 +3030,7 @@ public class FMap extends FBase implements OnClickListener {
 				if(mapView!=null) {
 					mapView.deleteAllAnnotationsAndCustomPOIs();
 					drawPOIS();
+					drawChargingStation();
 				}
 
 				dlog.d(FMap.class.toString()+" updatePoiPos: Poi aggiornati");
@@ -3145,7 +3181,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		@Override
 		public void onReceive(Context c, Intent i) {
-			boolean status = SystemControl.hasNetworkConnection(getActivity());
+			boolean status = SystemControl.hasNetworkConnection(c);
 
 			if (status) {
 				if (animQueue.contains("3g")) {
@@ -3417,6 +3453,11 @@ public class FMap extends FBase implements OnClickListener {
 	}
 	private boolean drawChargingStation() {
 
+		if(!firstUpReceived){
+			return false;
+		}
+		dlog.d("drawChargingStation: "+firstUpReceived);
+
 		if(mapView==null || getActivity()==null) {
 			dlog.d(" drawPois: mapViw null or contemporary called, or activity null");
 			return false;
@@ -3482,6 +3523,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		if(drawCharging) {
 			drawCharging=false;
+			firstUpReceived=true;
 			drawChargingStation();
 
 		}

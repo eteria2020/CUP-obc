@@ -127,11 +127,17 @@ public class CarInfo {
 
     public void setBatteryLevel(int batteryLevel) {
 
+        /*if(this.batteryLevel<0){
+            this.batteryLevel=batteryLevel;
+            return;
+        }*/
+
         if (Math.abs(this.batteryLevel - batteryLevel) >= 5) {
             this.batteryLevel = (Math.round(this.batteryLevel > batteryLevel ? this.batteryLevel - 5 : this.batteryLevel + 5));
         } else
             this.batteryLevel = (Math.round(SOCR));
 
+        //this.batteryLevel=20;
     }
 
     private void setLocation(Location loc) {

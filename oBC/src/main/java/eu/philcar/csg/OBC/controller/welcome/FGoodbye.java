@@ -1,11 +1,14 @@
 package eu.philcar.csg.OBC.controller.welcome;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
 import android.os.NetworkOnMainThreadException;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
@@ -54,6 +58,7 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.MessageFactory;
+import eu.philcar.csg.OBC.service.TripInfo;
 import okhttp3.HttpUrl;
 
 public class FGoodbye extends FBase {
@@ -64,6 +69,28 @@ public class FGoodbye extends FBase {
 	private static Boolean handleClick=false;
 	private static CountDownTimer timer_5sec,selfclose;
 	private static Boolean RequestBanner=false;
+	private final static int  MSG_CLOSE_ACTIVITY  = 1;
+
+
+	private Handler localHandler = new Handler()  {
+
+		@Override
+		public void handleMessage(Message msg) {
+
+			switch (msg.what)  {
+
+
+				case MSG_CLOSE_ACTIVITY:
+					try {
+						dlog.d("FInstruction timeout ");
+						(getActivity()).finish();
+					}catch(Exception e){
+						dlog.e("FInstruction : MSG_CLOSE_FRAGMENT Exception",e);
+					}
+					break;
+			}
+		}
+	};
 	
 	public static FGoodbye newInstance() {
 		
@@ -103,32 +130,36 @@ public class FGoodbye extends FBase {
 		App.isCloseable = true;
 		App.isClosing=true;
 		dlog.d("OnCreareView FGoodbye");
-		if(App.BannerName.getBundle("END")==null&&!RequestBanner){
-			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
-			RequestBanner=true;
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						loadBanner(App.URL_AdsBuilderEnd, "END", false);        //scarico banner
-						getActivity().runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								try {
-									FGoodbye fGoodbye = (FGoodbye) getFragmentManager().findFragmentByTag(FGoodbye.class.getName());
-									if (fGoodbye != null) {
-										updateBanner("END");                            //Modifico l'IV
+		try {
+			if ((App.BannerName != null && App.BannerName.getBundle("END") == null) && !RequestBanner) {
+				//controllo se ho il banner e se non ho già iniziato a scaricarlo.
+				RequestBanner = true;
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							loadBanner(App.URL_AdsBuilderEnd, "END", false);        //scarico banner
+							getActivity().runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									try {
+										FGoodbye fGoodbye = (FGoodbye) getFragmentManager().findFragmentByTag(FGoodbye.class.getName());
+										if (fGoodbye != null) {
+											updateBanner("END");                            //Modifico l'IV
+										}
+									} catch (Exception e) {
+										dlog.e("updateBanner: eccezione in chiamata", e);
 									}
-								} catch (Exception e) {
-									dlog.e("updateBanner: eccezione in chiamata", e);
 								}
-							}
-						});
-					}catch(Exception e){
-						dlog.e("FGoodbye: Eccezione durante l'update dell'immagine",e);
+							});
+						} catch (Exception e) {
+							dlog.e("FGoodbye: Eccezione durante l'update dell'immagine", e);
+						}
 					}
-				}
-			}).start();
+				}).start();
+			}
+		}catch(Exception e){
+			dlog.e("Exception while updating banner end",e);
 		}
 		dlog.d("FGoodbye: onCreateView");
 		//((AMainOBC) getActivity()).player.inizializePlayer();
@@ -244,6 +275,7 @@ public class FGoodbye extends FBase {
 		
 		((AGoodbye)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
 		(view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
+		final Activity activity =this.getActivity();
 		
 		selfclose = new CountDownTimer(41000,1000) {
 			@Override
@@ -253,9 +285,20 @@ public class FGoodbye extends FBase {
 
 			@Override
 			public void onFinish() {
-				dlog.d(FGoodbye.class.toString()+" onFinish: finished countdown");
+				dlog.d(FGoodbye.class.toString()+" onFinish: finished countdown, ending activity");
+				try {
+					wait(2000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				if(App.currentTripInfo!=null) {
+					((AGoodbye) activity).sendMessage(MessageFactory.scheduleSelfCloseTrip(1));
+				}
+				localHandler.removeMessages(MSG_CLOSE_ACTIVITY);
+				localHandler.sendEmptyMessageDelayed(MSG_CLOSE_ACTIVITY,1000);
 
-			}
+				}
+
 
 		}.start();
 		dlog.d("FGoodbye: starting countdown");
@@ -344,10 +387,10 @@ public class FGoodbye extends FBase {
 			paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));//"ED93107"));//App.CarPlate));
 		}
 		try {
-			if (App.BannerName.getBundle(type) != null )
+			if (App.BannerName!=null && App.BannerName.getBundle(type) != null )
 				paramsList.add(new BasicNameValuePair("index", App.BannerName.getBundle(type).getString("INDEX",null)));
 
-			if (App.BannerName.getBundle(type) != null )
+			if (App.BannerName!=null && App.BannerName.getBundle(type) != null )
 				paramsList.add(new BasicNameValuePair("end", App.BannerName.getBundle(type).getString("END",null)));
 
 
@@ -434,7 +477,6 @@ public class FGoodbye extends FBase {
 
 			dlog.i(" loadBanner: file mancante inizio download a url: "+urlImg.toString());
 			HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
-			urlConnection.setDefaultUseCaches(false);
 			urlConnection.setRequestMethod("GET");
 			urlConnection.setDoOutput(true);
 			urlConnection.connect();
@@ -480,9 +522,7 @@ public class FGoodbye extends FBase {
 			try{
 				if(ImageV!=null && ImageV.exists()){
 					dlog.i(FGoodbye.class.toString()+" updateBanner: file trovato imposto immagine "+ImageV.getName());
-					BitmapFactory.Options options = new BitmapFactory.Options();
-					options.inSampleSize = 2;
-					Bitmap myBitmap = BitmapFactory.decodeFile(ImageV.getAbsolutePath(),options);
+					Bitmap myBitmap = BitmapFactory.decodeFile(ImageV.getAbsolutePath());
 					if(myBitmap==null){
 
 						dlog.e(FGoodbye.class.toString()+" updateBanner: file corrotto, elimino e visualizzo offline ");
@@ -524,11 +564,19 @@ public class FGoodbye extends FBase {
 
 	@Override
 	public void onDestroy() {
+		try{
 		adIV=null;
 		timer_5sec.cancel();
 		handleClick=null;
 		RequestBanner=null;
+		if(selfclose!=null)
+			selfclose.cancel();
 		selfclose=null;
-		super.onDestroy();
+		}catch(Exception e){
+			dlog.e("Exception while cleaning memory",e);
+		}finally {
+
+			super.onDestroy();
+		}
 	}
 }
