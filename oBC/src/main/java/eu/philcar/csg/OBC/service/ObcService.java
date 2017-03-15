@@ -252,6 +252,7 @@ public class ObcService extends Service {
         dlog.d("Service onCreate");
 
 
+
         if (App.Instance.loadZmqDisabledConfig()) {
             this.WITH_ZMQNOTIFY = false;
             this.WITH_HTTP_NOTIFIES = true;
@@ -1663,6 +1664,8 @@ public class ObcService extends Service {
 
     public void scheduleSelfCloseTrip(int seconds, boolean beforePin) {
 
+        if(App.currentTripInfo==null)
+            return;//no openTrip
         if (App.getParkModeStarted() == null&&!beforePin) {
             App.askClose.putInt("id", App.currentTripInfo.trip.remote_id);
             App.askClose.putBoolean("close", true);
@@ -1712,7 +1715,17 @@ public class ObcService extends Service {
 
             Message msg = MessageFactory.zmqRestart();
             localHandler.sendMessage(msg);
-
+            if(App.currentTripInfo==null && System.currentTimeMillis()- App.AppScheduledReboot.getTime()>24*60*60*1000){
+                if(App.reservation!=null) {
+                    if (!App.reservation.isMaintenance()) {
+                        dlog.d("found reservation while scheduling reboot, aborting");
+                        App.AppScheduledReboot.setTime(App.AppScheduledReboot.getTime()+35*60*1000);
+                        return;
+                    }
+                }
+                dlog.d("Excecuting scheduled reboot");
+                SystemControl.doReboot();
+            }
             SystemControl.ResycNTP();
 
             if (gpsStatus != null) {
@@ -2140,7 +2153,7 @@ public class ObcService extends Service {
                 case MSG_CAR_END_CHARGING:
 
 
-
+                    dlog.d("Received endCharging message");
                     if (!carInfo.chargingPlug && App.Charging) {
                         App.Charging = false;
                         App.Instance.persistCharging();
@@ -2263,7 +2276,7 @@ public class ObcService extends Service {
 
         if (tripPoiUpdateScheduler != null) {
             tripPoiUpdateScheduler.shutdown();
-            dlog.d("Stopped remote PoiCheck Cycle");
+            dlog.d("Stopped remotePoiCheckCycle");
         }
 
         tripPoiUpdateScheduler = null;

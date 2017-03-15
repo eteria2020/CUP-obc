@@ -113,7 +113,7 @@ public class FPin extends FBase implements OnClickListener {
 
 
 
-			if (App.currentTripInfo.isMaintenance) {
+			if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 				fpinRightFrame.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 			} else {

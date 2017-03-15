@@ -185,9 +185,9 @@ public class AWelcome extends ABase {
 					welcome.resetUI();
 				}
 		
-				break;	
-				
-			case ObcService.MSG_CAR_INFO: 
+				break;
+
+			case ObcService.MSG_CAR_INFO:
 				FWelcome fWelcome = (FWelcome)getFragmentManager().findFragmentByTag(FWelcome.class.getName());
 				if (fWelcome != null) {
 					fWelcome.setCarPlate(App.CarPlate);

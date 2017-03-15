@@ -142,7 +142,8 @@ public class SslConnection {
 			while ((line = bufferedReader.readLine()) != null) {
 				content.append(line).append("\n");
 			}
-			bufferedReader.close();	
+			bufferedReader.close();
+			urlConnection.disconnect();
 			
 			return content.toString();
 			

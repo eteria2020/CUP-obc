@@ -100,13 +100,12 @@ public class FSOS extends FBase implements OnClickListener {
 		changeNumberB.setOnClickListener(this);
 		cancelIB.setOnClickListener(this);
 
-		if (App.currentTripInfo.isMaintenance) {
+		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fsos_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 		} else {
 			fsos_right_FL.setBackgroundColor(getResources().getColor(R.color.background_green));
 		}
-		
 		return view;
 	}
 
@@ -134,6 +133,7 @@ public class FSOS extends FBase implements OnClickListener {
 			break;
 			
 		case R.id.fsosChangeNumberB:
+			dlog.d("Click on fsosChangeNumberB");
 			((ABase)getActivity()).pushFragment(FNumber.newInstance(), FNumber.class.getName(), true);
 			break;
 			

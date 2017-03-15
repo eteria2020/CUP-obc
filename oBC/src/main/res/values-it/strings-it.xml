@@ -216,6 +216,9 @@
 
 	<string name="alert_20km">L’autonomia dell’auto, per come la stai utilizzando, potrebbe ora essere inferiore ai 20 km. Tienine conto.</string>
 	<string name="alert_5km">L’autonomia dell’auto, per come la stai utilizzando, è di circa 5 km. Ti invitiamo a chiudere la corsa per non incorrere in penali.</string>
+	<string name="alert_bonus">Da questo momento, se lascerai l’auto vicino ad una stazione di ricarica indicata sul navigatore, riceverai 5 minuti bonus sul tuo profilo.</string>
+	<string name="alert_bonus_title">BONUS</string>
+	<string name="alert_warning_title">ATTENZIONE</string>
 
 
 	<string name="poi_bonus_title">STAZIONE DI RICARICA</string>

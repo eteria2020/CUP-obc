@@ -173,7 +173,7 @@ public class FInstructions extends FBase {
 			}
 		}
 
-		if (App.currentTripInfo.isMaintenance) {
+		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fins_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 		} else {
@@ -198,5 +198,12 @@ public class FInstructions extends FBase {
 		fins_right_FL=null;
 
 		super.onDestroy();
+	}
+
+	@Override
+	public void onPause() {
+
+		localHandler.removeCallbacksAndMessages(null);
+		super.onPause();
 	}
 }

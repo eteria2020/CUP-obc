@@ -306,8 +306,8 @@ public class FDriveMessage_new extends FBase {
 	}
 	@Override
 	public void onPause() {
+		localHandler.removeCallbacksAndMessages(null);
 		super.onPause();
-		localHandler.removeMessages(MSG_CLOSE_FRAGMENT);
 	}
 
     /*private void  initWebViewBanner() {
@@ -486,6 +486,8 @@ public class FDriveMessage_new extends FBase {
 				while ((line = reader.readLine()) != null) {
 					builder.append(line);
 				}
+				reader.close();
+				content.close();
 			} else {
 
 				Log.e(FDriveMessage_new.class.toString(), "Failed to download file");
@@ -530,6 +532,8 @@ public class FDriveMessage_new extends FBase {
 					Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
 				}
 				fileOutput.close();
+				urlConnection.disconnect();
+				inputStream.close();
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -666,6 +670,8 @@ public class FDriveMessage_new extends FBase {
 				while ((line = reader.readLine()) != null) {
 					builder.append(line);
 				}
+				reader.close();
+				content.close();
 			} else {
 
 				dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode));
@@ -747,6 +753,8 @@ public class FDriveMessage_new extends FBase {
 				//Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
 			}
 			fileOutput.close();
+			inputStream.close();
+			urlConnection.disconnect();
 			Image.putString(("FILENAME"),filename);
 			App.Instance.BannerName.putBundle(type,Image);
 			dlog.d(" loadBanner: File scaricato e creato "+filename);

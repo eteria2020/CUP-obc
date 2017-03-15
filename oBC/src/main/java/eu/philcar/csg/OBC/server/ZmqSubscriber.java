@@ -10,6 +10,7 @@ import org.zeromq.ZMQException;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Encryption;
+import eu.philcar.csg.OBC.service.MessageFactory;
 import eu.philcar.csg.OBC.service.ObcService;
 import android.os.Handler;
 import android.os.Message;
@@ -88,8 +89,7 @@ public class ZmqSubscriber {
 			Thread t = new Thread()	{
 				public void run()    {
 					try {
-						socket.close();
-						dlog.d("ZMQ socket closed");
+
 						context.term();
 						dlog.d("ZMQ context terminated");
 						th.interrupt();
@@ -111,6 +111,7 @@ public class ZmqSubscriber {
 		public void run() {
 
 			try{
+				Thread.currentThread().setName("ZMQSubscriber");
 				isStarting = true;
 				context = ZMQ.context(1);
 
@@ -164,13 +165,17 @@ public class ZmqSubscriber {
 				}
 
 				dlog.d("ZMQ thread exited");
+				socket.close();
+				dlog.d("ZMQ socket closed");
 
 
 			}catch(Exception e){
 
 				isStarting=false;
 				dlog.e("ZMQException ",e);
+				handler.sendMessage(MessageFactory.zmqRestart());
 			}
+
 		}
 
 	}

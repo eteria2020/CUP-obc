@@ -93,7 +93,7 @@ public class FPinCode extends FBase implements OnClickListener {
 		sosB.setOnClickListener(this);
 		nextIB.setOnClickListener(this);
 
-		if (App.currentTripInfo.isMaintenance) {
+		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fpca_right_RL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 		} else {

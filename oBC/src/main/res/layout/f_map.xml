@@ -311,10 +311,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=" Attenzione!"
-            android:id="@+id/textView2"
+            android:id="@+id/fmapAlertTitleTV"
             android:layout_gravity="center_horizontal|top"
             android:textStyle="bold"
-            android:textSize="38sp"
+            android:textSize="40sp"
             android:textColor="#fdef2c"
             android:layout_marginTop="10dp" />
 

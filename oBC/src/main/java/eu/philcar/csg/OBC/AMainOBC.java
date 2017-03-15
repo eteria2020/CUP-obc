@@ -57,22 +57,22 @@ public class AMainOBC extends ABase implements LocationListener {
 	public final static int  MSG_UPDATE_DATE = 11;
 
 	public static AudioPlayer player;
-	private Boolean firstUpCharging=true;
+	//private Boolean firstUpCharging=true;
 
-	
+
 	private final static int MIN_MOVE_TOL = 1; // meters
-	
-	
-	
+
+
+
 	private ServiceConnector serviceConnector;
-	
+
 	public static class POI {
-		
+
 		public long id;
 		public String title, address, description;
 		public int distance, time;
 		public Location location;
-		
+
 		public POI(long id, String title, String address, String description, int distance, int time, Location location) {
 			this.id = id;
 			this.title = title;
@@ -83,25 +83,25 @@ public class AMainOBC extends ABase implements LocationListener {
 			this.location = location;
 		}
 	}
-	
+
 	public static class FuelStation extends POI {
-		
+
 		public FuelStation(long id, String title, String address, String description, int distance, int time, Location location) {
 			super(id, title, address, description, distance, time, location);
 		}
 	}
-	
+
 	public static class GeocodedLocation {
-		
+
 		public Location location;
 		public String address;
-		
+
 		public GeocodedLocation(String address, Location location) {
 			this.address = address;
 			this.location = location;
 		}
 	}
-	
+
 	private LongSparseArray<POI> pois;
 	private LongSparseArray<FuelStation> fuelStations;
 	private POI selectedPOI;
@@ -110,20 +110,20 @@ public class AMainOBC extends ABase implements LocationListener {
 	private String currentRouting;
 	private Date lastUpdate=new Date();
 	public boolean firstUpPoi=true;
-	
+
 	private File[] theAds;
 	private int adPosition;
 	private long lastTimeAdChanged;
-	
+
 	private static final int AD_TIME = 10000;
-	
+
 	private LocationManager locationManager;
 
 
 
 	private boolean isInsideParkingArea = true;
 	private float rotationToParkingArea = 0.0f;
-	
+
 	private AdvertisementReceiver advertisementReceiver;
 
 	public boolean getisInsideParkingArea() {
@@ -148,23 +148,23 @@ public class AMainOBC extends ABase implements LocationListener {
 		player.inizializePlayer();
 
 		setContentView(R.layout.a_base);
-		
+
 		// Service
 		serviceConnector = new ServiceConnector(this, serviceHandler);
-		
+
 		// Don't know
 
-		
+
 		// Fragment
 		if (savedInstanceState == null) {
-			
+
 			fuelStations = new LongSparseArray<AMainOBC.FuelStation>();
 			pois = new LongSparseArray<AMainOBC.POI>();
 			currentPosition = null; //new LatLong(45.464189, 9.191181);
-			
+
 			// Since this is the first fragment, we need to use the "add" method to show it to the user, and not the "replace"
 			FragmentTransaction transaction = getFragmentManager().beginTransaction();
-			
+
 			if (App.isNavigatorEnabled) {
 				transaction.add(R.id.awelPlaceholderFL, FMap.newInstance(), FMap.class.getName());
 				transaction.addToBackStack(FMap.class.getName());
@@ -172,13 +172,13 @@ public class AMainOBC extends ABase implements LocationListener {
 				transaction.add(R.id.awelPlaceholderFL, FDriving.newInstance(), FDriving.class.getName());
 				transaction.addToBackStack(FDriving.class.getName());
 			}
-			
+
 			transaction.commit();
 		}
-		
+
 		registerAdsReceiver();
 		computeAdsList();
-		
+
 		// Location
 		/*
 		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -194,269 +194,270 @@ public class AMainOBC extends ABase implements LocationListener {
 				currentPosition = null; //new LatLong(45.464189, 9.191181);	// Udine 46.089952, 13.230475 Milano 45.464189, 9.191181
 			}
 		}*/
-		
+
 		if (App.lastLocation!=null)
 			currentPosition = App.lastLocation;
 		else
 			currentPosition = new Location("");
-		
+
 
 	}
-	
+
 	@Override
-	protected void onResume() {		
-		
+	protected void onResume() {
+
 		super.onResume();
-		
+
 		//locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
-		
+
 		App.setForegroundActivity(this);
-		
+
 		serviceConnector.connect();
-		
+
 		if (App.parkMode.isOn() && !App.motoreAvviato && App.getParkModeStarted() != null) {
 			pushFragment(FMenu.newInstance(), FMenu.class.getName(), false);
 		}
-		
+
 		if(timerHandler!=null) {
 			timerHandler.postDelayed(timerRunnable, 0);
 		}
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
 
 
 		App.setForegroundActivity("Pause");
-		
+
 		serviceConnector.unregister();
 		serviceConnector.disconnect();
-		
+
 		timerHandler.removeCallbacks(timerRunnable);
-		
+
 		//locationManager.removeUpdates(this);
 	}
-	
+
 	@Override
 	protected void onDestroy() {
-		
+
 		super.onDestroy();
-		
+
 		if (serviceConnector.isConnected()) {
 			serviceConnector.unregister();
 			serviceConnector.disconnect();
 		}
-		
+
 		unregisterReceiver(advertisementReceiver);
 	}
-	
+
 	public void sendMessage(Message msg) {
 		serviceConnector.send(msg);
 	}
-	
-	
+
+
 	private void registerAdsReceiver() {
-		
+
 		advertisementReceiver = new AdvertisementReceiver(this);
-		
+
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(AdvertisementService.ACTION_UPDATE_ADVERTISEMENT);
-		
+
 		registerReceiver(advertisementReceiver, intentFilter);
 	}
-	
+
 	private void computeAdsList() {
-		
+
 		// Ads
 		File adsFolder = null;
 		boolean greaterOrEqKitkat = Build.VERSION.SDK_INT >= 19;
 		if (greaterOrEqKitkat) {
-			
+
 			if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-				
+
 				adsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "/csg/ads/");
 		    }
-		            
+
 		} else {
-			
+
 			adsFolder = new File(Environment.getExternalStorageDirectory(), "/csg/ads/");
 		}
-		
+
 		if (adsFolder == null) {
 			return;
 		}
-		
+
 		if (!adsFolder.exists()) {
 			adsFolder.mkdirs();
 		}
-		
+
 		theAds = adsFolder.listFiles(new FilenameFilter() {
 			@Override
             public boolean accept(File dir, String filename) {
 				return filename.contains(".png");
             }
         });
-		
+
 		adPosition = 0;
 		lastTimeAdChanged = System.currentTimeMillis();
 	}
-	
+
 	@Override
 	protected int getPlaceholderResource() {
 		return R.id.awelPlaceholderFL;
 	}
-	
+
 	public void setParkModeStarted(boolean paused) {
-		
+
 		if (serviceConnector!=null) {
-			
+
 			Message msg = MessageFactory.changeTripParkMode(paused);
 			serviceConnector.send(msg);
 		}
 	}
-	
+
 	public LongSparseArray<POI> getPOIs() {
 		return this.pois;
 	}
-	
+
 	public LongSparseArray<FuelStation> computeFuelStations() {
-		
+
 		fuelStations.clear();
-		
+
 		SortedMap<Integer,FuelStation>  map = new TreeMap<Integer,FuelStation>();
-		
+
+
 		List<Poi> list;
 		if (Debug.IGNORE_HARDWARE) {
-			
+
 			list = new ArrayList<>(12);
-			
+
 			Poi poi = new Poi();
-			
+
 			for (int i=1; i<13; i++) {
 				poi.id = i;
-				poi.tipo = String.valueOf(i);
-				poi.codice = String.valueOf(i);
-				poi.via = String.valueOf(i);
-				poi.citta = String.valueOf(i);
-				poi.cap = String.valueOf(i);
-				poi.provincia = String.valueOf(i);
+				poi.type = String.valueOf(i);
+				poi.code = String.valueOf(i);
+				poi.address = String.valueOf(i);
+				poi.town = String.valueOf(i);
+				poi.zip = String.valueOf(i);
+				poi.province = String.valueOf(i);
 				poi.attivo = true;
-				poi.lon = 13.229069 + Math.random()*0.01; 
+				poi.lon = 13.229069 + Math.random()*0.01;
 				poi.lat = 46.089805 + Math.random()*0.01;
-				poi.aggiornamento = System.currentTimeMillis();
-				
+				poi.update = System.currentTimeMillis();
+
 				list.add(poi);
 			}
-			
+
 		} else {
 			Pois dao = App.Instance.dbManager.getPoisDao();
 			list =  dao.getPois("station");
 		}
-		
+
 		Location pll = null;
-		
+
 	    if (App.lastLocation!=null && App.lastLocation.getLatitude()!=0 && App.lastLocation.getLatitude()!=0) {
 	     pll = App.lastLocation;
 	    }
-	    
-		for(Poi p : list) {						
+
+		for(Poi p : list) {
 			if (p.lat!=0 && p.lon!=0) {
 				Location ll = null; //TODO			
 				int  d = (int) Math.round(GeoUtils.harvesineDistance(ll, pll)/100)*100;;
-				map.put(d, new FuelStation( p.id, "Total Erg", p.via,"",(int)d,0,ll));
+				map.put(d, new FuelStation( p.id, "Total Erg", p.address,"",(int)d,0,ll));
 			}
 		}
-		
+
 		int idx=0;
-		
+
 		for (FuelStation f : map.values()) {
-			fuelStations.put(idx++, f);	
+			fuelStations.put(idx++, f);
 		}
-		
-		
+
+
 		return this.fuelStations;
 	}
-	
+
 	public void setFuelStation(FuelStation fuelStation) {
 		this.selectedFS = fuelStation;
 	}
-	
+
 	public FuelStation getFuelStation() {
 		return this.selectedFS;
 	}
-	
+
 	public void setPOI(POI poi) {
 		this.selectedPOI = poi;
 	}
-	
+
 	public POI getPOI() {
 		return this.selectedPOI;
 	}
-	
+
 	public Location  getCurrentPosition() {
 		return null;
 	}
-	
+
 	public void setCurrentPosition(Location currentPosition) {
 		//this.currentPosition = currentPosition;
 	}
-	
-	
+
+
 	public void navigateTo(Location location) {
 		FMap fMap = (FMap)getFragmentManager().findFragmentByTag(FMap.class.getName());
 		if (fMap!=null) {
 			fMap.navigateTo(location);
 		}
 	}
-	
+
 	public Location getEndingPosition() {
 		return this.endingPosition;
 	}
-	
+
 	public void setEndingPosition(Location  endingPosition) {
 		this.endingPosition = endingPosition;
 	}
-	
+
 	public String getCurrentRouting() {
 		return this.currentRouting;
 	}
-	
+
 	public void setCurrentRouting(String currentRouting) {
 		this.currentRouting = currentRouting;
 	}
 
 	private void updateAd() {
-		
+
 		if ((lastTimeAdChanged+AD_TIME < System.currentTimeMillis()) && theAds != null && theAds.length > 0) {
-			
+
 			adPosition = (adPosition+1) % theAds.length;
-			
+
 			if (App.isNavigatorEnabled) {
-				
+
 				FMap fMap = (FMap)getFragmentManager().findFragmentByTag(FMap.class.getName());
 				if (fMap != null) {
 					fMap.updateAd(theAds[adPosition]);
 				}
-				
+
 			} else {
-				
+
 				FDriving fDriving = (FDriving)getFragmentManager().findFragmentByTag(FDriving.class.getName());
 				if (fDriving != null) {
 					fDriving.updateAd(theAds[adPosition]);
 				}
 			}
-			
+
 			lastTimeAdChanged = System.currentTimeMillis();
 		}
 	}
-	
+
 	@Override
 	public void onLocationChanged(Location location) {
-		
-		
+
+
 		//updateAd();
-		
+
 
 
 			if (App.isNavigatorEnabled) {
@@ -540,27 +541,27 @@ public class AMainOBC extends ABase implements LocationListener {
 
 	@Override
 	public void onProviderDisabled(String provider) {}
-	
+
 	public boolean isInsideParkArea() {
 		return isInsideParkingArea;
 	}
-	
+
 	public float getRotationToParkAngle() {
 		return rotationToParkingArea;
 	}
-	
+
     Handler timerHandler = new Handler();
     Handler fragmentHandler = null;
- 
+
     public void setFragmentHandler(Handler handler) {
     	fragmentHandler = handler;
     }
-    
+
 	Runnable timerRunnable = new Runnable() {
-    	
+
 		SimpleDateFormat day = new SimpleDateFormat("dd/MM/yyyy");
 		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-		
+
     	@Override
         public void run() {
 
@@ -568,18 +569,18 @@ public class AMainOBC extends ABase implements LocationListener {
     		if (fragmentHandler!=null) {
     			Message msg = fragmentHandler.obtainMessage(MSG_UPDATE_DATE, day.format(d));
     			fragmentHandler.sendMessage(msg);
-    			
+
     			msg = fragmentHandler.obtainMessage(MSG_UPDATE_TIME, time.format(d));
-    			fragmentHandler.sendMessage(msg);   			
+    			fragmentHandler.sendMessage(msg);
     		}
-    		
+
     		if (timerHandler!=null) {
     			timerHandler.postDelayed(this, 1000);
     		}
         }
     };
-	
-	
+
+
 	private int bearing=0;
 	private Handler serviceHandler = new Handler() {
 		 @Override
@@ -588,112 +589,111 @@ public class AMainOBC extends ABase implements LocationListener {
 			 FMap  fMap;
 			 FPark fPark;
 			 FHome fHome;
-			 
-			 if (! App.isForegroundActivity(AMainOBC.this))
-				 return;
-			 
-			 
+
+
+
+
 			// Random random = new Random();
 			// Location l = new Location("dummyprovider");
 			 //(12.9788f, 45.9559f);
 			 // 9.1910f, 45.4602f
-			 
+
 			 //MI
 			// l.setLatitude(45.4602f + random.nextFloat()*0.0 );
 			// l.setLongitude( 9.1910f+ random.nextFloat()*0.0 );
-			 
+
 			 //Codroipo
 			 //l.setLatitude(45.9559f + random.nextFloat()*0.0 );
-			 //l.setLongitude( 12.9788f+ random.nextFloat()*0.0 ); 
-			 
+			 //l.setLongitude( 12.9788f+ random.nextFloat()*0.0 );
+
 			// l.setBearing(bearing);
 			 //bearing = (bearing+1) % 359;
-			 
+
 			 //onLocationChanged(l);
-			 
-			 
+
+
 			switch (msg.what) {
-			
+
 			case ObcService.MSG_CLIENT_REGISTER:
 				DLog.E(AMainOBC.class.getName() + ": MSG_CLIENT_REGISTER");
 				break;
-				
+
 			case ObcService.MSG_CMD_TIMEOUT:
 				DLog.E(AMainOBC.class.getName() + ": MSG_CMD_TIMEOUT");
 				break;
-			
+
 			case ObcService.MSG_PING:
 				DLog.E(AMainOBC.class.getName() + ": MSG_PING");
 				break;
-				
+
 			case ObcService.MSG_IO_RFID:
-				
+
 				DLog.E(AMainOBC.class.getName() + ": MSG_IO_RFID");
 				break;
-				
+
 			case ObcService.MSG_CAR_UPDATE:
 			case ObcService.MSG_CAR_INFO:
-				
-				fMenu = (FMenu)getFragmentManager().findFragmentByTag(FMenu.class.getName());				
-				if (fMenu != null) {
-					fMenu.updateUIUsingAppValues();				
-				}
-				
-				fHome = (FHome)getFragmentManager().findFragmentByTag(FHome.class.getName());				
-				if (fHome != null) {					
-					fHome.updateCarInfo((CarInfo)msg.obj);
-				}
-				
-				
-				fMap = (FMap)getFragmentManager().findFragmentByTag(FMap.class.getName());				
-				if (fMap != null) {					
-					fMap.updateCarInfo((CarInfo)msg.obj);
-				}
-	
-				break;
-				
-				
-			case ObcService.MSG_TRIP_PARK:
-				
+
 				fMenu = (FMenu)getFragmentManager().findFragmentByTag(FMenu.class.getName());
-				
 				if (fMenu != null) {
-					
 					fMenu.updateUIUsingAppValues();
 				}
-		
+
+				fHome = (FHome)getFragmentManager().findFragmentByTag(FHome.class.getName());
+				if (fHome != null) {
+					fHome.updateCarInfo((CarInfo)msg.obj);
+				}
+
+
+				fMap = (FMap)getFragmentManager().findFragmentByTag(FMap.class.getName());
+				if (fMap != null) {
+					fMap.updateCarInfo((CarInfo)msg.obj);
+				}
+
 				break;
-			
+
+
+			case ObcService.MSG_TRIP_PARK:
+
+				fMenu = (FMenu)getFragmentManager().findFragmentByTag(FMenu.class.getName());
+
+				if (fMenu != null) {
+
+					fMenu.updateUIUsingAppValues();
+				}
+
+				break;
+
 			case ObcService.MSG_TRIP_PARK_CARD_BEGIN:
-				fPark = (FPark)getFragmentManager().findFragmentByTag(FPark.class.getName());
+				/*fPark = (FPark)getFragmentManager().findFragmentByTag(FPark.class.getName());
 				
 				if (fPark != null) {
 					fPark.showBeginPark();
-				}				
-				/*
+				}	*/
+
 				fMenu = (FMenu)getFragmentManager().findFragmentByTag(FMenu.class.getName());
-				
+
 				if (fMenu != null) {
 					fMenu.updateUIUsingAppValues();
 				}
-				*/
+
 				break;
-				
+
 			case ObcService.MSG_TRIP_PARK_CARD_END:
-				fPark = (FPark)getFragmentManager().findFragmentByTag(FPark.class.getName());
+				/*fPark = (FPark)getFragmentManager().findFragmentByTag(FPark.class.getName());
 				
 				if (fPark != null) {
 					fPark.showEndPark();
-				}
-				/*
+				}*/
+
 				fMenu = (FMenu)getFragmentManager().findFragmentByTag(FMenu.class.getName());
-				
+
 				if (fMenu != null) {
 					fMenu.updateUIUsingAppValues();
 				}
-				*/
+
 				break;
-				
+
 			case ObcService.MSG_TRIP_BEGIN:
 				if(!App.pinChecked) {
 					Intent in = new Intent(AMainOBC.this, AWelcome.class);
@@ -707,29 +707,29 @@ public class AMainOBC extends ABase implements LocationListener {
 				if (fragmentMap != null) {
 					fragmentMap.stopRouteNavigation();
 				}
-				
+
 				FSearch fragmentSearch = (FSearch)getFragmentManager().findFragmentByTag(FSearch.class.getName());
 				if (fragmentSearch != null) {
 					//fragmentSearch.shutdownSearch();
 				}
-				
+
 				if (serviceConnector.isConnected()) {
 					serviceConnector.unregister();
 					serviceConnector.disconnect();
 				}
-				
+
 				Intent i = new Intent(AMainOBC.this, AWelcome.class);
 				i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(i);
 				AMainOBC.this.finish();
 				break;
-				
+
 			case ObcService.MSG_CAR_LOCATION:
-				if (msg.obj!=null && msg.obj instanceof Location) {					
+				if (msg.obj!=null && msg.obj instanceof Location) {
 					onLocationChanged((Location)msg.obj);
 				}
 				break;
-				
+
 			case ObcService.MSG_RADIO_CURPLAY_INFO :
 			case ObcService.MSG_RADIO_SEEK_INFO:
 			case ObcService.MSG_RADIO_SEEK_VALID_INFO:
@@ -742,19 +742,19 @@ public class AMainOBC extends ABase implements LocationListener {
 					fRadio.notifyRadioMsg(fmsg);
 				}
 				break;
-				
-				
+
+
 			case ObcService.MSG_NAVIGATE_TO:
-				
+
 				if (msg.obj!=null && (msg.obj instanceof Location)) {
 					navigateTo((Location) msg.obj);
 				}
-				
+
 				break;
 			case ObcService.MSG_TRIP_NEAR_POI:
 				App.currentTripInfo.isBonusEnabled=msg.arg1>0;
 
-				if(firstUpCharging) {
+				/*if(firstUpCharging) {
 					firstUpCharging=false;
 					setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
 					dlog.d("updateParkAreaStatus: Imposto Audio a AUDIO_SYSTEM");
@@ -767,7 +767,7 @@ public class AMainOBC extends ABase implements LocationListener {
 							}
 						}
 					}).start();
-				}
+				}*/
 
 				fMenu = (FMenu)getFragmentManager().findFragmentByTag(FMenu.class.getName());
 				if (fMenu != null) {
@@ -785,7 +785,7 @@ public class AMainOBC extends ABase implements LocationListener {
 					fMap.updatePoiInfo(msg.arg1,(Poi)msg.obj);
 				}
 				break;
-				
+
 			default:
 				super.handleMessage(msg);
 			 }
@@ -796,20 +796,20 @@ public class AMainOBC extends ABase implements LocationListener {
 	public int getActivityUID() {
 		return App.AMAINOBC_UID;
 	}
-	
+
 	private class AdvertisementReceiver extends BroadcastReceiver {
-		
+
 		private WeakReference<AMainOBC> activity;
-		
+
 		public AdvertisementReceiver(AMainOBC activity) {
 			this.activity = new WeakReference<AMainOBC>(activity);
 		}
-		
+
 		public void onReceive(Context context, Intent intent) {
-					
+
 			AMainOBC strongActivity = activity.get();
 			if (strongActivity != null) {
-				
+
 				String action = intent.getAction();
 				if (action != null && action.equals(AdvertisementService.ACTION_UPDATE_ADVERTISEMENT)) {
 					strongActivity.computeAdsList();
@@ -874,6 +874,11 @@ public class AMainOBC extends ABase implements LocationListener {
 		dlog.e("Exception performing onclick on callout",e);
 	}
 
+	}
+	public void  setGPS(boolean status) {
+		Intent intent = new Intent("android.location.GPS_ENABLED_CHANGE");
+		intent.putExtra("enabled", status);
+		sendBroadcast(intent);
 	}
 
 }

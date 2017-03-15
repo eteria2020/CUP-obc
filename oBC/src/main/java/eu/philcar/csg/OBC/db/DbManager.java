@@ -16,9 +16,9 @@ import eu.philcar.csg.OBC.helpers.DLog;
 public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public  static final String DATABASE_NAME = "/sdcard/csg/sharengo.db";
-	private static final int DATABASE_VERSION = 2;
 
-	private static DbManager instance = null;;
+	private static final int DATABASE_VERSION = 2;
+	private static DbManager instance = null;
 
 	private final Class<?> tables[] = { Customers.GetRecordClass() , Trips.GetRecordClass(), Events.GetRecordClass(), Pois.GetRecordClass() };
 
@@ -57,13 +57,14 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
 		switch (oldVersion) {
+
 			case 1:
 				updateFromVersion1(database, connectionSource, oldVersion, newVersion);
 				break;
 
-			/*case 2:
-				updateFromVersion2(database, connectionSource, oldVersion, newVersion);
-				break;*/
+			case 2:
+				updateFromVersion1(database, connectionSource, oldVersion, newVersion);//still need to drop Poi
+				break;
 
 			default:
 				// no updates needed
@@ -71,9 +72,14 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 		}
 	}
 
+
 	@Override
 	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		
+		try {
+			db.execSQL("DELETE FROM poi ");
+		}catch (Exception e){
+			DLog.E(this.getClass().toString()+"onDowngrade Exception",e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -83,8 +89,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 			TableUtils.dropTable(connectionSource, Pois.GetRecordClass(),true);
 			TableUtils.createTable(connectionSource, Pois.GetRecordClass());
 
-			db.execSQL("ALTER TABLE eventi ADD COLUMN id_trip_local int DEFAULT 0");
-			DLog.D("Upgrade to Db versione 2 sucessfull");
+
 
 			DLog.D("Upgrade to Db versione 2 sucessfull");
 

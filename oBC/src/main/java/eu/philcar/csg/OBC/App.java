@@ -220,6 +220,7 @@ public class App extends Application {
 	}
 
 	
+
 	public void initSharengo() {
 
 		if(App.Instance.ServerIP==1) { //App.Instance.ServerIP==1
@@ -465,7 +466,7 @@ public class App extends Application {
 	public static boolean hasNetworkConnection=false;
 	public static Date    lastNetworkOn = new Date();
 	
-	public static Date    AppStartupTime = new Date();
+	public static Date    AppStartupTime = new Date(), AppScheduledReboot=new Date();
 	public static Date    lastUpdateCAN =new Date();
 	
 	public static final String APP_DATA_PATH = "/sdcard/csg/";
@@ -778,6 +779,7 @@ public void loadRadioSetup() {
 			    	br.close();
 			    	return Integer.parseInt(line);
 			    }
+				br.close();
 			} catch (Exception e) {
 				dlog.e("Loading split trip config : " + SPLIT_TRIP_CONFIG_FILE,e);
 			}
@@ -799,6 +801,7 @@ public void loadRadioSetup() {
 			    	App.DefaultCity = line;
 			    	return  line;
 			    }
+				br.close();
 			} catch (Exception e) {
 				dlog.e("Loading split trip config : " + DEFAULT_CITY_CONFIG_FILE,e);
 			}
@@ -1253,6 +1256,7 @@ private void  initPhase2() {
 
 
 	    AppStartupTime = new Date();
+		AppScheduledReboot = new Date();
 
 	    
 	    
@@ -1698,12 +1702,14 @@ private void  initPhase2() {
 				String str = reader.readLine();
 				temp = Integer.parseInt(str) / 1000;
 				is.close();
+				ir.close();
+				reader.close();
 			} catch (Exception e) {
 				DLog.E("GetCpuTemp:",e);
 			}
 		}
 		}
-		
+
 		return temp;
 	}
 
@@ -1769,6 +1775,8 @@ private void  initPhase2() {
 			String json = sb.toString();
 			AreaPolygonMD5 = Encryption.md5(json);
 			decodeAreaPolygon(sb.toString());
+			ims.close();
+			reader.close();
 			
 		} catch (IOException e) {
 			dlog.e("initAreaPolygon:",e);

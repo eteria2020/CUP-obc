@@ -61,7 +61,7 @@ public class Trip  extends DbRecord {
 		public Date recharge_time;
 		
 		@DatabaseField
-		public int  recharge; //initially unused now used to store server result
+		public int  recharge; //initially unused now used to store server result to deny trip if rebooted
 	
 		@DatabaseField
 		public boolean begin_sent;

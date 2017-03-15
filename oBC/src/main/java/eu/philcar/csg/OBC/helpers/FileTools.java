@@ -102,6 +102,7 @@ public class FileTools {
 					out.write(data, 0, count);
 				}
 				origin.close();
+				fi.close();
 			}
  
 			out.close();

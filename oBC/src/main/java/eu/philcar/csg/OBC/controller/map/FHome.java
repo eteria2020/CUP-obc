@@ -102,13 +102,13 @@ public class FHome extends FBase implements OnClickListener {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().registerReceiver(this.ConnectivityChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
 
 
         App.isCloseable = false;
     }
 
-
+/**This function create the view for the home fragment
+ * */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -323,6 +323,11 @@ public class FHome extends FBase implements OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+        try {
+            getActivity().registerReceiver(this.ConnectivityChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+        }catch(Exception e){
+            dlog.e("onResume: Exception while registering receiver ",e);
+        }
 
         //initWebViewBanner();
 
@@ -334,11 +339,18 @@ public class FHome extends FBase implements OnClickListener {
         lastInside=1;
         seenA=false;
         seenB=false;
-        getActivity().unregisterReceiver(this.ConnectivityChangeReceiver);
+        try{
+            getActivity().unregisterReceiver(this.ConnectivityChangeReceiver);
+        }catch(Exception e){
+            dlog.e("onPause: Exception while unresisting receiver ",e);
+        }
 
 
     }
 
+    /**
+     * Here I clean all the reference to free memory
+     * */
     @Override
     public void onDestroy() {
         ((Button) rootView.findViewById(R.id.fmapSOSB)).setOnClickListener(null);
@@ -370,38 +382,40 @@ public class FHome extends FBase implements OnClickListener {
 
     }
 
-
+/**
+ * Handling the click
+ * */
     @Override
     public void onClick(View v) {
 
         switch (v.getId()) {
 
 
-            case R.id.fmapSOSB:
+            case R.id.fmapSOSB://SOS
                 startActivity(new Intent(getActivity(), ASOS.class));
                 break;
 
-            case R.id.fmapSearchB:
+            case R.id.fmapSearchB://Search
                 ((ABase) getActivity()).pushBackFragment(FMap.newInstance(), FMap.class.getName(), true);
 
                 break;
 
-            case R.id.fmapRadioB:
+            case R.id.fmapRadioB://Radio
                 ((ABase) getActivity()).pushFragment(FRadio.newInstance(), FRadio.class.getName(), true);
                 break;
 
-            case R.id.fmapCancelB:
+            case R.id.fmapCancelB://End Trip
                 ((ABase) getActivity()).pushFragment(FMenu.newInstance(), FMenu.class.getName(), true);
                 break;
 
 
 
 
-            case R.id.fmapNavigationB:
+            case R.id.fmapNavigationB://Deprecated
 
 
                 break;
-            case R.id.fmapLeftBorderIV:
+            case R.id.fmapLeftBorderIV://Banner
                 if(App.Instance.BannerName.getBundle("CAR")!=null){
                     if(App.Instance.BannerName.getBundle("CAR").getString("CLICK").compareTo("null")!=0){
 
@@ -438,7 +452,9 @@ public class FHome extends FBase implements OnClickListener {
         }
     }
 
-
+/**
+ * Update the area status handle the animation for out of area
+ * */
     public void updateParkAreaStatus(boolean isInside, float rotationAngle) {
 
         //isInside = false;
@@ -449,7 +465,7 @@ public class FHome extends FBase implements OnClickListener {
                 animQueue.remove("area");
             }
             if(lastInside!=0)
-                Events.outOfArea(false);
+                //Events.outOfArea(false);
             lastInside=0;
 
         } else {
@@ -472,7 +488,7 @@ public class FHome extends FBase implements OnClickListener {
                 new Thread(new Runnable() {
                     public void run() {
                         try {
-                            Events.outOfArea(true);
+                            //Events.outOfArea(true);
                             AMainOBC.player.waitToPlayFile(uri);
                         } catch (Exception e) {
                             dlog.e("Exception trying to play audio", e);
@@ -495,7 +511,9 @@ public class FHome extends FBase implements OnClickListener {
 
         //parkingDirectionIV.setRotation((float)rotationAngle);
     }
-
+/**
+ * Update the Range indicator and handle the out of charge button display
+ * */
     public void updateCarInfo(CarInfo carInfo) {
 
         if (carInfo == null)
@@ -544,6 +562,9 @@ public class FHome extends FBase implements OnClickListener {
 
 
     }
+/***
+ * Update the information related to the bonus near a poi
+ */
 
     public void updatePoiInfo(int status,Poi Poi){
 
@@ -667,7 +688,9 @@ public class FHome extends FBase implements OnClickListener {
 
 
     }*/
-
+/**
+ * Handle message to update the time
+ * */
     private Handler localHandler = new Handler() {
 
         @Override
@@ -692,16 +715,18 @@ public class FHome extends FBase implements OnClickListener {
         }
     };
 
-
+/**
+ * Receive ConnectivityChangeBroadcast to update the animation for NO3G
+ * */
     private final BroadcastReceiver ConnectivityChangeReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context c, Intent i) {
 
             try {
-                if (getActivity() == null)
+                if (getActivity() == null && c==null)
                     return;
-                boolean status = SystemControl.hasNetworkConnection(c);
+                boolean status = SystemControl.hasNetworkConnection(c!=null?c:getActivity());
 
                 if (status) {
                     if (animQueue.contains("3g")) {
@@ -722,7 +747,10 @@ public class FHome extends FBase implements OnClickListener {
 
 
     };
-
+/**
+ * With a given URL and type (END-START...) load the Banner ID, if present Use the downloaded one otherwise download it.
+ * After Put the ID inside the App variable to share the current banner
+ * */
     private void loadBanner(String Url, String type, Boolean isClick) {
 
         File outDir = new File(App.BANNER_IMAGES_FOLDER);
@@ -778,6 +806,9 @@ public class FHome extends FBase implements OnClickListener {
                 while ((line = reader.readLine()) != null) {
                     builder.append(line);
                 }
+                content.close();
+                reader.close();
+                reader.close();
             } else {
 
                 dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode));
@@ -857,6 +888,7 @@ public class FHome extends FBase implements OnClickListener {
             Image.putString(("FILENAME"),filename);
             App.Instance.BannerName.putBundle(type,Image);
             dlog.i(FHome.class.toString()+" loadBanner: File scaricato e creato "+filename);
+            urlConnection.disconnect();
 
 
         } catch (Exception e) {
@@ -869,7 +901,9 @@ public class FHome extends FBase implements OnClickListener {
 
 
     }
-
+/**
+ * Set to screen the current banner from the App variable
+ * */
     public void updateBanner(String type){
 
         File ImageV;

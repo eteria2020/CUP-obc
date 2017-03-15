@@ -5,6 +5,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import org.acra.ACRA;
 
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.helpers.StubActivity;
 import eu.philcar.csg.OBC.service.ObcService;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -31,7 +32,8 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 //	    		mApp.getCurrentActivity().getIntent().getFlags());
 		
 	    // This code restarts the ObcService
-		PendingIntent pendingIntent = PendingIntent.getService(mApp.getBaseContext(), 0, new Intent(mApp.getApplicationContext(), ObcService.class), 0);
+
+		PendingIntent pendingIntent = PendingIntent.getActivity(mApp.getBaseContext(), 0, new Intent(mApp.getApplicationContext(), StubActivity.class), 0);
 		
 		DLog.E("Uncaught Exception ", e);
 		e.printStackTrace();
@@ -40,6 +42,7 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 		
 	    AlarmManager mgr = (AlarmManager)mApp.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 	    mgr.set(AlarmManager.RTC, System.currentTimeMillis()+RESTART_TIME_MILLIS, pendingIntent);
-	    System.exit(2);
+
+		System.exit(2);
 	}
 }

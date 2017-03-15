@@ -56,8 +56,6 @@ public class Event extends DbRecord {
 	@DatabaseField
 	public boolean sending_error;
 
-	@DatabaseField
-	public int id_trip_local;
 
 	public String json_data;
 	

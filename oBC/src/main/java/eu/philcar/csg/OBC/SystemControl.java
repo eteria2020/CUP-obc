@@ -164,6 +164,8 @@ public class SystemControl {
 	
 	private static int countFailedTests=0;
 	public static boolean hasNetworkConnection(Context ctx) {
+		if (ctx==null)
+			return false;
 	    ConnectivityManager connectivityManager  = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 	    
@@ -258,7 +260,8 @@ public class SystemControl {
 		            urlc.setRequestProperty("Connection", "close");
 		            urlc.setConnectTimeout(1500); 
 		            urlc.connect();
-		            msg.arg1=1;		            
+		            msg.arg1=1;
+					urlc.disconnect();
 		        } catch (IOException e) {
 		        	msg.arg1=0;		            
 		        }

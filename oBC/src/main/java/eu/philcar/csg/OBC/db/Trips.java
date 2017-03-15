@@ -81,7 +81,7 @@ public class Trips extends DbTable<Trip,Integer> {
 			
 			updateBuilder.updateColumnValue("warning", null);
 			updateBuilder.update();
-			
+			updateBuilder.reset();
 		} catch (SQLException e) {
 			dlog.e("ResetFailed error:",e);			
 		}
@@ -140,7 +140,7 @@ public class Trips extends DbTable<Trip,Integer> {
 			long count =  where.countOf();					
 			return count;
 										
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			dlog.e("getNTripsToSend fail:",e);
 			return 0;
 		}

@@ -174,7 +174,7 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 		
 		sks.SearchCity(defaultCity);
 
-		if (App.currentTripInfo.isMaintenance) {
+		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fpca_right_RL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 		} else {

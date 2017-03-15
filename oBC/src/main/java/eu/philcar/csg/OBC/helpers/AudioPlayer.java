@@ -149,7 +149,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
                     dlog.e("waitToPlayFile: deep Exception ");
                 }
             }
-            Thread.sleep(1100);
+            Thread.sleep(2000);
             //player.setDataSource(context,uri);
             player.prepare();
             player.start();

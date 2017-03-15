@@ -494,6 +494,8 @@ public class TripInfo {
                 while ((line = reader.readLine()) != null) {
                     builder.append(line);
                 }
+                reader.close();
+                content.close();
             } else {
 
                 dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode));
@@ -570,6 +572,8 @@ public class TripInfo {
                 //Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
             }
             fileOutput.close();
+            inputStream.close();
+            urlConnection.disconnect();
             Image.putString(("FILENAME"),filename);
             App.Instance.BannerName.putBundle(type,Image);
             dlog.d(" loadBanner: File scaricato e creato "+filename);
@@ -725,6 +729,9 @@ public class TripInfo {
             dlog.e("Error updating trip",e);
 
         }
+        if(App.currentTripInfo!= null && App.currentTripInfo.trip.id==trip.id){
+            App.currentTripInfo.trip=trip;
+        }
     }
 
 
@@ -764,6 +771,7 @@ public class TripInfo {
         try {			
             builder.updateColumnValue("offline", true).where().idEq(trip.id);
             builder.update();
+            builder.reset();
         } catch (SQLException e) {		
             DLog.E("setTxOffline : ",e);
         }
@@ -781,7 +789,7 @@ public class TripInfo {
             builder.updateColumnValue("begin_sent", true);
             builder.updateColumnValue("remote_id", trip.remote_id).where().idEq(trip.id);
             builder.update();
-
+            builder.reset();
         } catch (SQLException e) {		
             DLog.E("setTxApertura : ",e);
         }
@@ -797,7 +805,7 @@ public class TripInfo {
         try {
             builder.updateColumnValue("end_sent", true).where().idEq(trip.id);
             builder.update();
-
+            builder.reset();
         } catch (SQLException e) {		
             DLog.E("setTxChiusura : ",e);
         }
@@ -813,6 +821,7 @@ public class TripInfo {
         try {			
             builder.updateColumnValue("warning", warning).where().idEq(trip.id);
             builder.update();
+            builder.reset();
         } catch (SQLException e) {		
             DLog.E("setWarning : ",e);
         }

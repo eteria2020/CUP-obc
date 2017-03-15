@@ -59,7 +59,7 @@ public class FCleanliness extends FBase implements OnClickListener {
 		
 		enableUI();
 
-		if (App.currentTripInfo.isMaintenance) {
+		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fcle_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 		} else {

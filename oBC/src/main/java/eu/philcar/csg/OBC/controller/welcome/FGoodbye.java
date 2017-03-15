@@ -82,10 +82,11 @@ public class FGoodbye extends FBase {
 
 				case MSG_CLOSE_ACTIVITY:
 					try {
-						dlog.d("FInstruction timeout ");
-						(getActivity()).finish();
+						dlog.d("FGoodbye timeout ");
+						if(getActivity()!=null)
+							(getActivity()).finish();
 					}catch(Exception e){
-						dlog.e("FInstruction : MSG_CLOSE_FRAGMENT Exception",e);
+						dlog.e("FGoodbye : MSG_CLOSE_FRAGMENT Exception",e);
 					}
 					break;
 			}
@@ -134,7 +135,7 @@ public class FGoodbye extends FBase {
 			if ((App.BannerName != null && App.BannerName.getBundle("END") == null) && !RequestBanner) {
 				//controllo se ho il banner e se non ho già iniziato a scaricarlo.
 				RequestBanner = true;
-				new Thread(new Runnable() {
+				Thread bannerUpdate = new Thread(new Runnable() {
 					@Override
 					public void run() {
 						try {
@@ -156,7 +157,8 @@ public class FGoodbye extends FBase {
 							dlog.e("FGoodbye: Eccezione durante l'update dell'immagine", e);
 						}
 					}
-				}).start();
+				});
+				bannerUpdate.start();
 			}
 		}catch(Exception e){
 			dlog.e("Exception while updating banner end",e);
@@ -166,7 +168,7 @@ public class FGoodbye extends FBase {
 		((AGoodbye) getActivity()).player.reqSystem = true;
 		((AGoodbye) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
 		dlog.d("updateParkAreaStatus: Imposto Audio a AUDIO_SYSTEM");
-		new Thread(new Runnable() {
+		Thread playAdvice = new Thread(new Runnable() {
 			public void run() {
 				try{
 					((AGoodbye) getActivity()).player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ R.raw.alert_tts_end));
@@ -174,7 +176,8 @@ public class FGoodbye extends FBase {
 					dlog.e("Exception trying to play audio",e);
 				}
 			}
-		}).start();
+		});
+		playAdvice.start();
 
 		Bundle b = this.getArguments();
 		if (b==null || !b.containsKey("CLOSE")) {
@@ -203,7 +206,7 @@ public class FGoodbye extends FBase {
 
 			@Override
 			public void onFinish() {
-				new Thread(new Runnable() {
+				Thread afterClick= new Thread(new Runnable() {
 					@Override
 					public void run() {
 						loadBanner(App.URL_AdsBuilderEnd,"END",false);
@@ -221,7 +224,8 @@ public class FGoodbye extends FBase {
 						}
 
 					}
-				}).start();
+				});
+				afterClick.start();
 			}
 		};
 		adIV.setOnClickListener(new View.OnClickListener() {
@@ -235,7 +239,7 @@ public class FGoodbye extends FBase {
 								adIV.setColorFilter(R.color.overlay_banner);
 								handleClick = true;
 								dlog.i(FDriveMessage.class.toString() + " Click su banner ");
-								new Thread(new Runnable() {
+								Thread onBannerClick = new Thread(new Runnable() {
 									@Override
 									public void run() {
 										try {
@@ -256,7 +260,8 @@ public class FGoodbye extends FBase {
 										}
 
 									}
-								}).start();
+								});
+								onBannerClick.start();
 							}
 						}
 					} catch (Exception e) {
@@ -355,6 +360,10 @@ public class FGoodbye extends FBase {
 
 	}
 
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
 
 	public void loadBanner(String Url, String type, Boolean isClick) {
 
@@ -415,6 +424,8 @@ public class FGoodbye extends FBase {
 				while ((line = reader.readLine()) != null) {
 					builder.append(line);
 				}
+				reader.close();
+				content.close();
 			} else {
 
 				dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode));
@@ -498,7 +509,8 @@ public class FGoodbye extends FBase {
 			Image.putString(("FILENAME"),filename);
 			App.BannerName.putBundle(type,Image);
 			dlog.d(" loadBanner: File scaricato e creato "+filename);
-
+			urlConnection.disconnect();
+			inputStream.close();
 
 		} catch (Exception e) {
 			if(file.exists()) file.delete();
@@ -565,13 +577,14 @@ public class FGoodbye extends FBase {
 	@Override
 	public void onDestroy() {
 		try{
-		adIV=null;
-		timer_5sec.cancel();
-		handleClick=null;
-		RequestBanner=null;
-		if(selfclose!=null)
-			selfclose.cancel();
-		selfclose=null;
+			localHandler.removeCallbacksAndMessages(null);
+			adIV=null;
+			timer_5sec.cancel();
+			handleClick=null;
+			RequestBanner=null;
+			if(selfclose!=null)
+				selfclose.cancel();
+			selfclose=null;
 		}catch(Exception e){
 			dlog.e("Exception while cleaning memory",e);
 		}finally {

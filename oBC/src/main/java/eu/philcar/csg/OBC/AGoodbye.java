@@ -100,7 +100,16 @@ public class AGoodbye extends ABase {
 			FPark fPark;
 
 			 if(! App.isForegroundActivity(AGoodbye.this)) {
-				 DLog.W(AWelcome.class.getName() + " MSG to non foreground activity. finish Activity");
+				 DLog.W(AGoodbye.class.getName() + " MSG to non foreground activity. ignoring");
+				 //AGoodbye.this.finish();
+				 return;
+			 }
+			 if(App.currentTripInfo==null){
+
+				 DLog.W(AGoodbye.class.getName() + " no trip found wrong foreground activity restarting AWelcome");
+				 Intent i = new Intent(AGoodbye.this, AWelcome.class);
+				 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				 startActivity(i);
 				 AGoodbye.this.finish();
 				 return;
 			 }
@@ -192,6 +201,7 @@ public class AGoodbye extends ABase {
 	protected void onDestroy() {
 		super.onDestroy();
 		App.isClosing=false;
+		player = null;
 	}
 
 	@Override
