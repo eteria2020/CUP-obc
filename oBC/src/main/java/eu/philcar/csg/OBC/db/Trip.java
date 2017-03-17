@@ -90,6 +90,9 @@ public class Trip  extends DbRecord {
 		@DatabaseField 
 		public int id_parent;
 
+		@DatabaseField
+		public int done_cleanliness;
+
 
 //		@DatabaseField
 //		public boolean sospeso;

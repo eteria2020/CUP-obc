@@ -637,6 +637,14 @@ public class TripInfo {
 
         CloseCorsa(carInfo);
 
+        if(App.currentTripInfo.trip.done_cleanliness==0){
+            App.CounterCleanlines++;
+            if(App.CounterCleanlines>=5){
+                App.CounterCleanlines=0;
+                Events.eventCleanliness(0, 0);
+            }
+            App.Instance.persistCounterCleanlines();
+        }
         App.currentTripInfo = null;
 
         this.isOpen=false;
@@ -663,14 +671,8 @@ public class TripInfo {
             trip.end_lon = carInfo.longitude;
         }
 
-        DbManager dbm = App.Instance.dbManager;
-        Trips trips = dbm.getCorseDao();
-        try {
-            trips.createOrUpdate(trip);
-            dlog.d("CloseTrip: " + trip.toString());
-        } catch (SQLException e) {
-            dlog.e("Can't update trip:",e);
-        }		
+
+        UpdateCorsa();
     }
 
     //1 = PARKED , 0 = RUN

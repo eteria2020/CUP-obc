@@ -17,7 +17,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public  static final String DATABASE_NAME = "/sdcard/csg/sharengo.db";
 
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 	private static DbManager instance = null;
 
 	private final Class<?> tables[] = { Customers.GetRecordClass() , Trips.GetRecordClass(), Events.GetRecordClass(), Pois.GetRecordClass() };
@@ -59,11 +59,14 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 		switch (oldVersion) {
 
 			case 1:
-				updateFromVersion1(database, connectionSource, oldVersion, newVersion);
+				updateFromVersion1(database, connectionSource, oldVersion, newVersion);//Change poi Name value
 				break;
 
 			case 2:
-				updateFromVersion1(database, connectionSource, oldVersion, newVersion);//still need to drop Poi
+				updateFromVersion1(database, connectionSource, oldVersion, newVersion);// poi variable lenght
+				break;
+			case 3:
+				updateFromVersion3(database, connectionSource, oldVersion, newVersion);//added column to trips
 				break;
 
 			default:
@@ -96,6 +99,22 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 		}catch (Exception e) {
 			DLog.E("Upgrade to Db versione 2 failed",e);
+		}
+		onUpgrade(db, connectionSource, oldVersion + 1, newVersion);
+	}
+	@SuppressWarnings("unchecked")
+	private void updateFromVersion3(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
+		try {
+
+			db.beginTransaction();
+			db.execSQL("ALTER TABLE trips ADD COLUMN done_cleanliness INTEGER DEFAULT 0");
+			db.endTransaction();
+
+
+			DLog.D("Upgrade to Db versione 4 sucessfull");
+
+		}catch (Exception e) {
+			DLog.E("Upgrade to Db versione 4 failed",e);
 		}
 		onUpgrade(db, connectionSource, oldVersion + 1, newVersion);
 	}

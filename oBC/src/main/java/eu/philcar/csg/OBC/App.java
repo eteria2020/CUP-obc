@@ -385,6 +385,7 @@ public class App extends Application {
 	private static final String  KEY_PersistLog = "persist_log";
 	private static final String  KEY_IsAskClose = "is_ask_close";
 	private static final String  KEY_IdAskClose = "id_ask_close";
+	private static final String  KEY_CounterCleanliness = "Cleanliness";
 	
 	
 	public static final String  KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
@@ -505,6 +506,7 @@ public class App extends Application {
 	public static boolean first_UP_End=true; //flag per primo update End Images
 	public static Bundle BannerName= new Bundle();
 	public static Bundle askClose=new Bundle();
+	public static int CounterCleanlines=0;
 	
 	public static String AreaPolygonMD5;
 	public static ArrayList<double[]> AreaPolygons;
@@ -522,7 +524,15 @@ public class App extends Application {
 			e.putInt(KEY_ParkMode, App.parkMode.toInt());
 			e.apply();
 		}
-	}public void persistAskClose() {
+	}
+	public void persistCounterCleanlines() {
+		if (this.preferences != null) {
+			Editor e = this.preferences.edit();
+			e.putInt(KEY_CounterCleanliness, App.CounterCleanlines);
+			e.apply();
+		}
+	}
+	public void persistAskClose() {
 		if (preferences != null) {
 			Editor e = this.preferences.edit();
 			if(App.askClose!=null) {
@@ -1644,6 +1654,7 @@ private void  initPhase2() {
 		BatteryShutdownLevel = preferences.getInt(KEY_BatteryShutdownLevel, 0);
 
 		FleetId = preferences.getInt(KEY_FleetId, 0);
+		CounterCleanlines=preferences.getInt(KEY_CounterCleanliness,0);
 
 		ServerIP = preferences.getInt(KEY_ServerIP, 0);
 		saveLog = preferences.getBoolean(KEY_PersistLog, true);

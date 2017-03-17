@@ -5,7 +5,9 @@ import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Events;
+import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.helpers.DLog;
 
 import android.content.Intent;
@@ -19,6 +21,8 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import java.sql.SQLException;
 
 public class FCleanliness extends FBase implements OnClickListener {
 
@@ -159,7 +163,19 @@ public class FCleanliness extends FBase implements OnClickListener {
 		if (insideState > 0 && outsideState > 0) {
 			
 			if (App.currentTripInfo!=null && App.currentTripInfo.trip!=null) {
+				App.currentTripInfo.trip.done_cleanliness=1;
+				App.CounterCleanlines=0;
+				App.Instance.persistCounterCleanlines();
 				Events.eventCleanliness(App.currentTripInfo.trip.int_cleanliness, App.currentTripInfo.trip.ext_cleanliness);
+
+				DbManager dbm = App.Instance.dbManager;
+				Trips trips = dbm.getCorseDao();
+				try {
+					trips.createOrUpdate(App.currentTripInfo.trip);
+					dlog.d("Update cleanliness: " + App.currentTripInfo.trip.toString());
+				} catch (Exception e) {
+					dlog.e("Can't update trip:",e);
+				}
 			}
 			
 			((ABase)getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
