@@ -13,6 +13,8 @@ import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.service.MessageFactory;
+import eu.philcar.csg.OBC.service.ParkMode;
+
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -117,23 +119,28 @@ public class FMenu extends FBase implements OnClickListener {
 		// Also note that when I'm talking about "incorrect" (tuples/triples of) values, I'm not referring
 		// to errors but to car/trip states that prevent some other states to be reachable, e.g., if the 
 		// engine is actually on, the UI must NOT allow the user to stop rent or suspend trip.
+
+		AMainOBC activity = (AMainOBC)getActivity();
+
 		
 		switch (v.getId()) {
 		case R.id.fmenEndRentIB:
 		case R.id.fmenEndRentTV:
+			if (activity!=null && activity.checkisInsideParkingArea()) {
 
-			FMap.timer_2min.cancel();
-			FMap.timer_5sec.cancel();
-			dlog.d("Banner: end rent stopping update, start countdown");
-			FMap.firstRun=true;
-			((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(false));
+				FMap.timer_2min.cancel();
+				FMap.timer_5sec.cancel();
+				dlog.d("Banner: end rent stopping update, start countdown");
+				FMap.firstRun=true;
+				((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(false));
 
-			Intent i = new Intent(getActivity(), AGoodbye.class);
-			i.putExtra(AGoodbye.EUTHANASIA, false);
+				Intent i = new Intent(getActivity(), AGoodbye.class);
+				i.putExtra(AGoodbye.EUTHANASIA, false);
 
-			startActivity(i);
-			((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
-			getActivity().finish();
+				startActivity(i);
+				((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
+				getActivity().finish();
+			}
 			break;
 			
 		case R.id.fmenPauseRentIB:
@@ -146,6 +153,12 @@ public class FMenu extends FBase implements OnClickListener {
 			dlog.d("Banner: pause rent stopping update");
 			boolean startParkingMode = (App.getParkModeStarted() == null);
 			((AMainOBC)getActivity()).setParkModeStarted( startParkingMode );
+
+			if(!App.motoreAvviato && App.getParkModeStarted()!=null && App.parkMode == ParkMode.PARK_ENDED){
+
+				((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(true));
+
+			}
 			
 			if (startParkingMode) {
 				startSelfClose(rootView);
@@ -277,6 +290,7 @@ public class FMenu extends FBase implements OnClickListener {
 							 R.drawable.button_rent_resume_pushed, R.string.menu_park_mode_started, null,
 							 R.drawable.button_fuel_station_small_pushed, R.string.menu_refuel_off, null, 
 							 R.drawable.button_back_pushed, null);
+					stopSelfClose(rootView);
 					break;
 				case PARK_ENDED:	// (FALSE, DATE, ENDED)
 					UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end_off, null, 

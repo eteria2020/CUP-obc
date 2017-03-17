@@ -1121,7 +1121,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		if(FMap.this.isVisible())
 		if(SOC<15) {
-			rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
+			/*rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
 			if(!seen) {
 				//drawChargingStation();
 				seen=true;
@@ -1134,16 +1134,17 @@ public class FMap extends FBase implements OnClickListener {
 				//localHandler.removeMessages(MSG_CLOSE_SOC_ALERT);
 				//localHandler.sendEmptyMessageDelayed(MSG_CLOSE_SOC_ALERT, 20000);
 				//(rootView.findViewById(R.id.fmapAlertSOCFL)).invalidate();
-			}
+			}*/
 			if(statusAlertSOC<=1) {
+				dlog.d("Display popup 5km");
 				statusAlertSOC=2;
 				Events.eventSoc(SOC,"Popup 5km");
 				rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
 				rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
 				((FrameLayout) (rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_redalertbox);
 				((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
-				localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
 				((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_5km);
+				localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
 				//((AMainOBC) getActivity()).player.inizializePlayer();
 				((AMainOBC) getActivity()).player.reqSystem = true;
 				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
@@ -1161,7 +1162,7 @@ public class FMap extends FBase implements OnClickListener {
 			}
 		}else
 			if(SOC<=30) {
-				rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
+				/*rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
 				if(!seen) {
 					//drawChargingStation();
 					seen=true;
@@ -1174,8 +1175,9 @@ public class FMap extends FBase implements OnClickListener {
 					//localHandler.removeMessages(MSG_CLOSE_SOC_ALERT);
 					//localHandler.sendEmptyMessageDelayed(MSG_CLOSE_SOC_ALERT, 20000);
 					//(rootView.findViewById(R.id.fmapAlertSOCFL)).invalidate();
-				}
+				}*/
 				if (statusAlertSOC <= 0) {
+					dlog.d("Display popup 20km");
 
 					statusAlertSOC = 1;
 					Events.eventSoc(SOC,"Popup 20km");
@@ -1207,6 +1209,10 @@ public class FMap extends FBase implements OnClickListener {
 
 
 		if (SOC<=30) {
+			if(SOC>15)
+				rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
+			else
+				rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
 			fmapAlarm.setVisibility(View.VISIBLE);
 			fmapRange.setVisibility(View.INVISIBLE);
 
@@ -2440,9 +2446,16 @@ public class FMap extends FBase implements OnClickListener {
 						break;
 					case MSG_OPEN_SOC_ALERT:
 						localHandler.removeMessages(MSG_OPEN_SOC_ALERT);
-						localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
-						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
-						//rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
+						if(localCarInfo.batteryLevel<=15) {
+							rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+							rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
+							((rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_redalertbox);
+							((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
+							((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_5km);
+							localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
+							rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+							//rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
+						}
 						break;
 				}
 			}catch(Exception e){
@@ -3630,15 +3643,14 @@ public class FMap extends FBase implements OnClickListener {
 			drawCharging=false;
 			firstUpReceived=true;
 			drawChargingStation();
+			dlog.d("Displayed bonus popup");
 
 		}
 		if(status>0){
 			if(!animQueue.contains("bonus")){
-				if(App.DefaultCity.toLowerCase().equals("milano")) {
-					AMainOBC.player.reqSystem = true;
-
-				}
 				animQueue.add("bonus");
+				dlog.d("Stating bonus anim");
+
 			}
 			if(no3gwarning.getAnimation()==null)
 				no3gwarning.startAnimation(alertAnimation);

@@ -274,7 +274,7 @@ public class TripInfo {
                 http.Execute(cc);
 
                 // Prepara un messaggio ritardato che chiude l'auto se non viene abilitata la trip entro un timeout
-                service.scheduleSelfCloseTrip(600,true);
+                service.scheduleSelfCloseTrip(180,true);
 
                 service.getHandler().sendMessage(MessageFactory.RadioVolume(1));
                 service.getHandler().sendMessage(MessageFactory.RadioVolume(0));
@@ -344,7 +344,7 @@ public class TripInfo {
                         obc_io.setLcd(null, " Auto prenotata");
                         if (!forced)  { //Se non ? una chiusura forzata da remoto  apri le portiere ed abilita il motore
                             obc_io.setDoors(null, 1,"BENTORNATO");
-                            obc_io.setEngine(null, 1);
+                            //obc_io.setEngine(null, 1);
                             dlog.d(TripInfo.class.toString()+" handleCard: Pending trips. Park mode ON user returned, open car");
                         }
                         obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);

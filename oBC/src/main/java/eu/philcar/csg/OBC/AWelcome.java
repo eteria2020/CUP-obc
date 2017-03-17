@@ -79,7 +79,7 @@ public class AWelcome extends ABase {
 	protected void onPause() {
 		
 		super.onPause();
-		App.setForegroundActivity(this.getClass().toString() +"Pause");
+		//App.setForegroundActivity(this.getClass().toString() +"Pause");
 
 	}
 

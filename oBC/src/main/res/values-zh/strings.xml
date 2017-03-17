@@ -228,5 +228,6 @@
 
     <string name="menu_rent_end_time_startup_app"><b>TERMINA NOLEGGIO</b>- 不可用：L \'应用程序仍在启动，请稍候。</string>
     <string name="navigation_active_error">请在回家之前停止导航</string>
+    <string name="other_trip_message">您已经有一个开放的行程。请联系呼叫中心以获取信息</string>
 
 </resources>

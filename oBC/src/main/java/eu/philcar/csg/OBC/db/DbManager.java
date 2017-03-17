@@ -17,7 +17,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public  static final String DATABASE_NAME = "/sdcard/csg/sharengo.db";
 
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 	private static DbManager instance = null;
 
 	private final Class<?> tables[] = { Customers.GetRecordClass() , Trips.GetRecordClass(), Events.GetRecordClass(), Pois.GetRecordClass() };
@@ -76,7 +76,9 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 	@Override
 	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		try {
-			db.execSQL("DELETE FROM poi ");
+			ConnectionSource connectionSource = getConnectionSource();
+			TableUtils.dropTable(connectionSource, Pois.GetRecordClass(),true);
+			TableUtils.createTable(connectionSource, Pois.GetRecordClass());
 		}catch (Exception e){
 			DLog.E(this.getClass().toString()+"onDowngrade Exception",e);
 		}
@@ -88,7 +90,6 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 			TableUtils.dropTable(connectionSource, Pois.GetRecordClass(),true);
 			TableUtils.createTable(connectionSource, Pois.GetRecordClass());
-
 
 
 			DLog.D("Upgrade to Db versione 2 sucessfull");

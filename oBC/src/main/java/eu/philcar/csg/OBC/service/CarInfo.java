@@ -131,13 +131,17 @@ public class CarInfo {
             this.batteryLevel=batteryLevel;
             return;
         }*/
+        dlog.d("setBatteryLevel: first "+this.batteryLevel +" target: "+batteryLevel);
 
         if (Math.abs(this.batteryLevel - batteryLevel) >= 5) {
             this.batteryLevel = (Math.round(this.batteryLevel > batteryLevel ? this.batteryLevel - 5 : this.batteryLevel + 5));
         } else
             this.batteryLevel = (Math.round(SOCR));
 
-        //this.batteryLevel=20;
+        //this.batteryLevel=20;//FOR DEVELOP PURPOSE
+
+        App.Instance.setBatteryLevel(this.batteryLevel);
+        dlog.d("setBatteryLevel: result "+this.batteryLevel);
     }
 
     private void setLocation(Location loc) {
@@ -378,14 +382,13 @@ public class CarInfo {
                     hasChanged = true;
                     //batteryLevel = b.getInt(key);
                     bmsSOC_GPRS = i;
-                    dlog.d("UpdateBmsSoc: " + i);
-                    if (batteryLevel > 20)
+                    dlog.d("UpdateBmsSoc_GPRS: " + i);
+                    /*if (batteryLevel > 20)
                         sent = false;
                     if (batteryLevel <= 15 && batteryLevel > 0 && !sent && sendMail("http://manage.sharengo.it/mailObcLowBattery.php")) {
                         Events.eventSoc(batteryLevel, "Email");
                         sent = true;
-                    }
-                    App.Instance.setBatteryLevel(batteryLevel);
+                    }*/
                     if (batteryLevel <= 50)
                         rangeKm = Math.max(batteryLevel - 10, 0);
                     else if (batteryLevel <= 60)

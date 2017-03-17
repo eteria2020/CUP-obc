@@ -1642,7 +1642,7 @@ public class ObcService extends Service {
                 dlog.d("Restarting welcome");
                 //Intent i  = new Intent(ObcService.this, ServiceTestActivity.class);
                 Intent i = new Intent(ObcService.this, AWelcome.class);
-                scheduleSelfCloseTrip(600,true);
+                scheduleSelfCloseTrip(180,true);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
             }

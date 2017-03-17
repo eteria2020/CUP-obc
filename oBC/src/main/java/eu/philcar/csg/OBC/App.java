@@ -1620,7 +1620,7 @@ private void  initPhase2() {
 		}
 		CarPlate = preferences.getString(KEY_CarPlate,"NO_PLATE");
 		fw_version = preferences.getString(KEY_fw_version,"nd");
-		fuel_level = preferences.getInt(KEY_fuel_level, 0);
+		fuel_level = preferences.getInt(KEY_fuel_level, 0); dlog.d("loadPreferences: fuel_level is "+fuel_level);
 		max_voltage = preferences.getFloat(KEY_MaxVoltage,83);
 			max_voltage=(max_voltage > 85f || max_voltage < 80f ? 83f : max_voltage); //controllo bontà maxVoltage
 		km = preferences.getInt(KEY_Km, 0);		

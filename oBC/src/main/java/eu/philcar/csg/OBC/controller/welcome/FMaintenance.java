@@ -141,6 +141,7 @@ public class FMaintenance extends FBase {
 				dlog.d("Pushed EndCharging");
 				((AWelcome)getActivity()).sendMessage(MessageFactory.sendEndCharging());
 				Events.Maintenance("EndCharging");
+				((TextView)view.findViewById(R.id.tvEndCharging)).setText("Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.");
 
 			}
 		});

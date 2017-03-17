@@ -227,6 +227,7 @@
     <string name="yes">Yes</string>
 
     <string name="menu_rent_end_time_startup_app">End rent - Not available : the App is still in startup, please wait.</string>
+    <string name="other_trip_message">You already have an open trip.Please contact the call center for information</string>
 
 
 </resources>
