@@ -1,6 +1,7 @@
 package eu.philcar.csg.OBC.controller.welcome;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -48,6 +49,7 @@ import java.util.List;
 
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AGoodbye;
+import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
@@ -66,8 +68,9 @@ public class FGoodbye extends FBase {
 	private DLog dlog = new DLog(this.getClass());
 	//private WebView webViewBanner;
 	private ImageView adIV;
+	private static int closingTripid;
 	private static Boolean handleClick=false;
-	private static CountDownTimer timer_5sec,selfclose;
+	private static CountDownTimer timer_5sec,selfclose=null;
 	private static Boolean RequestBanner=false;
 	private final static int  MSG_CLOSE_ACTIVITY  = 1;
 
@@ -84,7 +87,15 @@ public class FGoodbye extends FBase {
 					try {
 						dlog.d("FGoodbye timeout ");
 						if(getActivity()!=null)
-							(getActivity()).finish();
+							if(App.currentTripInfo==null)
+								(getActivity()).finish();
+						else if(App.currentTripInfo.isOpen){
+								dlog.d("handleMessage:MSG_CLOSE_ACTIVITY Unable to close trip, restoring AmainOBC");
+								Intent i = new Intent(getActivity(), AMainOBC.class);
+								i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+								startActivity(i);
+								getActivity().finish();
+							}
 					}catch(Exception e){
 						dlog.e("FGoodbye : MSG_CLOSE_FRAGMENT Exception",e);
 					}
@@ -102,7 +113,7 @@ public class FGoodbye extends FBase {
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-
+		closingTripid=App.currentTripInfo.trip.id;
 		/*if(App.first_UP_End && App.hasNetworkConnection){
 			App.first_UP_End=false;
 
@@ -281,7 +292,8 @@ public class FGoodbye extends FBase {
 		((AGoodbye)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
 		(view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
 		final Activity activity =this.getActivity();
-		
+		if(selfclose!=null)
+			selfclose.cancel();
 		selfclose = new CountDownTimer(41000,1000) {
 			@Override
 		     public void onTick(long millisUntilFinished) {
@@ -291,12 +303,14 @@ public class FGoodbye extends FBase {
 			@Override
 			public void onFinish() {
 				dlog.d(FGoodbye.class.toString()+" onFinish: finished countdown, ending activity");
+				if(getActivity()==null)
+					return;
 				try {
 					wait(2000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				if(App.currentTripInfo!=null) {
+				if(App.currentTripInfo!=null && App.currentTripInfo.trip.id==closingTripid) {
 					((AGoodbye) activity).sendMessage(MessageFactory.scheduleSelfCloseTrip(1));
 				}
 				localHandler.removeMessages(MSG_CLOSE_ACTIVITY);
@@ -584,7 +598,7 @@ public class FGoodbye extends FBase {
 			RequestBanner=null;
 			if(selfclose!=null)
 				selfclose.cancel();
-			selfclose=null;
+
 		}catch(Exception e){
 			dlog.e("Exception while cleaning memory",e);
 		}finally {

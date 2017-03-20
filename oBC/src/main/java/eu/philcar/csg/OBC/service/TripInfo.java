@@ -637,7 +637,7 @@ public class TripInfo {
 
         CloseCorsa(carInfo);
 
-        if(App.currentTripInfo.trip.done_cleanliness==0){
+        if(App.pinChecked && App.currentTripInfo.trip.int_cleanliness==0 && App.currentTripInfo.trip.ext_cleanliness==0){
             App.CounterCleanlines++;
             if(App.CounterCleanlines>=5){
                 App.CounterCleanlines=0;

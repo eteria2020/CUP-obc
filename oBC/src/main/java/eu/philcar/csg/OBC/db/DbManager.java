@@ -17,7 +17,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public  static final String DATABASE_NAME = "/sdcard/csg/sharengo.db";
 
-	private static final int DATABASE_VERSION = 4;
+	private static final int DATABASE_VERSION = 3;
 	private static DbManager instance = null;
 
 	private final Class<?> tables[] = { Customers.GetRecordClass() , Trips.GetRecordClass(), Events.GetRecordClass(), Pois.GetRecordClass() };
@@ -66,7 +66,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 				updateFromVersion1(database, connectionSource, oldVersion, newVersion);// poi variable lenght
 				break;
 			case 3:
-				updateFromVersion3(database, connectionSource, oldVersion, newVersion);//added column to trips
+				//updateFromVersion3(database, connectionSource, oldVersion, newVersion);//added column to trips
 				break;
 
 			default:

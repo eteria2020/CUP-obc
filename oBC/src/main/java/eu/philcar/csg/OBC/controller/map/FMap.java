@@ -1318,6 +1318,8 @@ public class FMap extends FBase implements OnClickListener {
 		case R.id.fmapHomeB:
 			if (!navigationActive) {
 				((ABase) getActivity()).pushBackFragment(FHome.newInstance(), FHome.class.getName(), true);
+
+			}else{
 				Toast toast = Toast.makeText(getActivity(),R.string.navigation_active_error , Toast.LENGTH_LONG);
 				toast.show();
 			}
@@ -1328,6 +1330,8 @@ public class FMap extends FBase implements OnClickListener {
 		case R.id.fmapRadioB:
 			if (!navigationActive) {
 				((ABase) getActivity()).pushFragment(FRadio.newInstance(), FRadio.class.getName(), true);
+			}else{
+
 				Toast toast = Toast.makeText(getActivity(),R.string.navigation_active_error , Toast.LENGTH_LONG);
 				toast.show();
 			}

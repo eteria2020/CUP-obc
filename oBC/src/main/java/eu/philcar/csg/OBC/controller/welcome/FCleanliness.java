@@ -163,19 +163,12 @@ public class FCleanliness extends FBase implements OnClickListener {
 		if (insideState > 0 && outsideState > 0) {
 			
 			if (App.currentTripInfo!=null && App.currentTripInfo.trip!=null) {
-				App.currentTripInfo.trip.done_cleanliness=1;
 				App.CounterCleanlines=0;
 				App.Instance.persistCounterCleanlines();
 				Events.eventCleanliness(App.currentTripInfo.trip.int_cleanliness, App.currentTripInfo.trip.ext_cleanliness);
+				App.currentTripInfo.UpdateCorsa();
 
-				DbManager dbm = App.Instance.dbManager;
-				Trips trips = dbm.getCorseDao();
-				try {
-					trips.createOrUpdate(App.currentTripInfo.trip);
-					dlog.d("Update cleanliness: " + App.currentTripInfo.trip.toString());
-				} catch (Exception e) {
-					dlog.e("Can't update trip:",e);
-				}
+
 			}
 			
 			((ABase)getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
