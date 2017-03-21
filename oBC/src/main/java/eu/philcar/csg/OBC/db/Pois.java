@@ -15,6 +15,7 @@ import com.j256.ormlite.support.ConnectionSource;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.CustomersConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
+import eu.philcar.csg.OBC.server.HttpsConnector;
 import eu.philcar.csg.OBC.server.PoisConnector;
 
 public class Pois extends DbTable<Poi,Integer> {
@@ -42,11 +43,11 @@ public class Pois extends DbTable<Poi,Integer> {
 		}
 	}
 	
-	public boolean isPresent(int id, long aggiornamento) {
+	public boolean isPresent(int id, long update) {
 		
 		try {
 			
-			PreparedQuery<Poi> query =  queryBuilder().setCountOf(true).where().eq("id",id).and().eq("aggiornamento", aggiornamento).prepare();	
+			PreparedQuery<Poi> query =  queryBuilder().setCountOf(true).where().eq("id",id).and().eq("update", update).prepare();	
 			long c = this.countOf(query);
 			
 			return (c>0)?true:false;
@@ -60,11 +61,11 @@ public class Pois extends DbTable<Poi,Integer> {
 	}
 	
 	
-	public List<Poi> getPois(String tipo) {
+	public List<Poi> getPois(String typeGroup) {
 		
 		try {
 			
-			PreparedQuery<Poi> query =  queryBuilder().where().eq("tipo",tipo).and().eq("attivo", true).prepare();
+			PreparedQuery<Poi> query =  queryBuilder().where().eq("type_group",typeGroup).prepare();
 			
 			return this.query(query);
 		
@@ -76,12 +77,45 @@ public class Pois extends DbTable<Poi,Integer> {
 		
 		return null;
 	}
+	public List<Poi> getCityPois(String city) {
+
+		try {
+			PreparedQuery<Poi> query;
+
+			switch (city.toLowerCase()) {
+				case "milano":
+					query = queryBuilder().where().eq("town", city.toLowerCase()).and().eq("attivo", true).and().eq("type", "Isole Digitali").prepare();
+					break;
+				case "firenze":
+					query = queryBuilder().where().eq("town", city.toLowerCase()).and().eq("attivo", true).and().eq("type", "Isole Digitali").prepare();
+					break;
+				/*case "roma":
+					//query = queryBuilder().where().eq("citta", city.toLowerCase()).and().eq("attivo", true).and().ne("type", "Stazione ENEL Drive").prepare();
+					break;*/
+				default:
+					return null;
+					//query = queryBuilder().where().eq("citta", city.toLowerCase()).and().eq("attivo", true).prepare();
+					//break;
+			}
+
+
+			return this.query(query);
+
+
+		} catch (Exception e) {
+			DLog.E("getPois fail:",e);
+
+		}
+
+		return null;
+	}
 	
 	
 	public long mostRecent() {
 		long max =0;
 		try {
-			 max = this.queryRawValue("SELECT max(aggiornamento) FROM poi"); 
+			 
+			 max = this.queryRawValue("SELECT max(\"update\") FROM poi"); 
 					
 		} catch (SQLException e) {
 			DLog.E("mostRecent fail:",e);
@@ -111,7 +145,7 @@ public class Pois extends DbTable<Poi,Integer> {
 		DLog.D("Start pois download..");
 		PoisConnector cn = new PoisConnector();
 		cn.setLastUpdate(mostRecent());
-		HttpConnector http = new HttpConnector(ctx);
+		HttpsConnector http = new HttpsConnector(ctx);
 		http.SetHandler(handler);
 		http.Execute(cn);
 	}

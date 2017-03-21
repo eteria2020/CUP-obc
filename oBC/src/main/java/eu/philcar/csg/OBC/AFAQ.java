@@ -77,6 +77,7 @@ public class AFAQ  extends ABase {
                     Intent i = new Intent(AFAQ.this, AWelcome.class);
                     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(i);
+                    AFAQ.this.finish();
 
                     break;
 

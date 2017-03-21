@@ -54,6 +54,9 @@ public class AWelcome extends ABase {
 	    
 	    App.userDrunk = false;
 		App.Instance.persistUserDrunk();
+		if(App.currentTripInfo==null){
+			App.askClose.clear();
+		}
 		
 		serviceConnector = new ServiceConnector(this, serviceHandler);
 	
@@ -76,7 +79,7 @@ public class AWelcome extends ABase {
 	protected void onPause() {
 		
 		super.onPause();
-		App.setForegroundActivity(this.getClass().toString() +"Pause");
+		//App.setForegroundActivity(this.getClass().toString() +"Pause");
 
 	}
 
@@ -116,7 +119,8 @@ public class AWelcome extends ABase {
 		 public void handleMessage(Message msg) {
 			
 			 if (! App.isForegroundActivity(AWelcome.this)) {
-				 //DLog.W(AWelcome.class.getName() + " MSG to non foreground activity. Ignoring");
+				 DLog.W(AWelcome.class.getName() + " MSG to non foreground activity. finish Activity");
+				 AWelcome.this.finish();
 				 return;
 			 }
 			 
@@ -141,14 +145,13 @@ public class AWelcome extends ABase {
 				TripInfo ti = (TripInfo)msg.obj;
 				if (msg.arg1==0) {
 					if (ti!=null && ti.customer !=  null) {
-						Fragment fb = getFragmentManager().findFragmentById(R.id.awelPlaceholderFL);
+						Fragment fb = getActiveFragment();// getFragmentManager().findFragmentById(R.id.awelPlaceholderFL);
 						if (fb!=null && fb instanceof FWelcome) {
 							FWelcome f = (FWelcome)fb;
 							f.setName(ti.customer.name + " " + ti.customer.surname);
 							f.setMaintenance(ti.isMaintenance);
-							DLog.D(AWelcome.class.getName() + "AWelcome: visualizzazione bandiere e nome");
 						} else {
-							DLog.E(AWelcome.class.getName() + "Impossibile cast a FWelcome di :" + fb.getClass().getName());
+							DLog.E(AWelcome.class.getName() + "Impossibile cast a FWelcome  :");
 						}
 					}
 				} else {
@@ -163,6 +166,7 @@ public class AWelcome extends ABase {
 						if (fWelcome != null) {
 							fWelcome.setName(ti.customer.name + " " + ti.customer.surname);
 							fWelcome.setMaintenance(ti.isMaintenance);
+							DLog.D(AWelcome.class.getName() + "AWelcome: visualizzazione bandiere e nome corsa già aperta");
 						}
 					}
 				}
@@ -181,9 +185,9 @@ public class AWelcome extends ABase {
 					welcome.resetUI();
 				}
 		
-				break;	
-				
-			case ObcService.MSG_CAR_INFO: 
+				break;
+
+			case ObcService.MSG_CAR_INFO:
 				FWelcome fWelcome = (FWelcome)getFragmentManager().findFragmentByTag(FWelcome.class.getName());
 				if (fWelcome != null) {
 					fWelcome.setCarPlate(App.CarPlate);

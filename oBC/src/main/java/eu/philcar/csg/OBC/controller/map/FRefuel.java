@@ -65,7 +65,7 @@ public class FRefuel extends FBase implements OnClickListener {
 		
 		updateUI();
 
-		if (App.currentTripInfo.isMaintenance) {
+		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fref_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 		} else {

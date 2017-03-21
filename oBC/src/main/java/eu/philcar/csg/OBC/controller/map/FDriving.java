@@ -94,7 +94,7 @@ public class FDriving extends FBase implements OnClickListener {
 		
 		App.isCloseable = false;
 
-		if (App.currentTripInfo.isMaintenance) {
+		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fdri_top_LL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 		} else {

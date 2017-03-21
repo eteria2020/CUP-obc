@@ -119,7 +119,7 @@ import android.widget.Toast;
         formKey = "", // This is required for backward compatibility but not used
         formUri = "http://core.sharengo.it/api/post_crashreport.php",
         mode = ReportingInteractionMode.SILENT, 
-        customReportContent = {APP_VERSION_CODE , APP_VERSION_NAME,/* SETTINGS_GLOBAL, AVAILABLE_MEM_SIZE,*/ CUSTOM_DATA, STACK_TRACE, USER_APP_START_DATE ,LOGCAT/*, DEVICE_ID, SHARED_PREFERENCES*/ },
+        customReportContent = {APP_VERSION_CODE , APP_VERSION_NAME,/* SETTINGS_GLOBAL,*/ AVAILABLE_MEM_SIZE, CUSTOM_DATA, STACK_TRACE, USER_APP_START_DATE ,LOGCAT/*, DEVICE_ID, SHARED_PREFERENCES*/ },
         reportType=org.acra.sender.HttpSender.Type.JSON,
         resToastText = R.string.Acra_message
 )
@@ -220,6 +220,7 @@ public class App extends Application {
 	}
 
 	
+
 	public void initSharengo() {
 
 		if(App.Instance.ServerIP==1) { //App.Instance.ServerIP==1
@@ -276,6 +277,31 @@ public class App extends Application {
 
 
 			Port_UDP_Beacon = 7600;
+
+
+			/*URL_Area = "http://corecina.sharengo.it/api/zone/json.php?";
+			URL_Beacon = "http://corecina.sharengo.it/api/pushbeacon.php?";
+			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
+			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
+			URL_Clienti = "https://corecina.sharengo.it:8123/whitelist";
+			URL_Commands = "http://corecina.sharengo.it/api/get_commands.php?";
+			URL_Corse =  "http://corecina.sharengo.it/api/pushcorsa.php?";
+			URL_Eventi = "http://corecina.sharengo.it/api/pushevent.php?";
+			URL_Pois = "http://corecina.sharengo.it/api/get_pois.php?";
+			URL_PoisIcons = "http://manage.sharengo.it/pois_Icon.php";
+			URL_PoisBanner = "http://manage.sharengo.it/pois_Pos.php";
+			URL_Reservations = "http://corecina.sharengo.it/api/get_reservations.php?";
+			URL_Notifies = "http://corecina.sharengo.it:7600/notifies?";
+			URL_UploadLogs = "http://corecina.sharengo.it/api/pushlogs.php?";
+			URL_Configs = "https://corecina.sharengo.it:8123/configs";
+			URL_Admins = "https://CSDEMO01@corecina.sharengo.it:8123/admins";
+			//URL_Admins = "http://core.sharengo.it:8121/v1/admins";
+			URL_ZMQNotifier = "tcp://122.227.189.54:8001";
+			URL_AdsBuilder = "http://manage.sharengo.it/banner2.php";
+			URL_AdsBuilderCar = "http://manage.sharengo.it/banner2_offline.php";
+			URL_AdsBuilderStart = "http://manage.sharengo.it/banner4_offline.php";
+			URL_AdsBuilderEnd = "http://manage.sharengo.it/banner5_offline.php";
+			IP_UDP_Beacon = "122.227.189.54";*/
 		}
 
 	}
@@ -357,6 +383,9 @@ public class App extends Application {
 	private static final String  KEY_ServerIP = "server_ip";
 	private static final String  KEY_RebootTime = "reboot_time";
 	private static final String  KEY_PersistLog = "persist_log";
+	private static final String  KEY_IsAskClose = "is_ask_close";
+	private static final String  KEY_IdAskClose = "id_ask_close";
+	private static final String  KEY_CounterCleanliness = "Cleanliness";
 	
 	
 	public static final String  KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
@@ -398,6 +427,8 @@ public class App extends Application {
 	public static long   networkExceptions=0;
 	public static Location lastLocation;
 	public static Boolean saveLog =true;
+
+
 	
 	public static TripInfo  currentTripInfo;	
 	
@@ -416,6 +447,7 @@ public class App extends Application {
 	public static boolean userDrunk = false;
 	
 	public static boolean isCloseable=true;
+	public static boolean isClosing=false;
 	
 	public static boolean  ObcIoError=false;
 	public static boolean  Charging = false;
@@ -435,7 +467,7 @@ public class App extends Application {
 	public static boolean hasNetworkConnection=false;
 	public static Date    lastNetworkOn = new Date();
 	
-	public static Date    AppStartupTime = new Date();
+	public static Date    AppStartupTime = new Date(), AppScheduledReboot=new Date();
 	public static Date    lastUpdateCAN =new Date();
 	
 	public static final String APP_DATA_PATH = "/sdcard/csg/";
@@ -473,6 +505,8 @@ public class App extends Application {
 	public static boolean first_UP_Start=true; //flag per primo update Start Images
 	public static boolean first_UP_End=true; //flag per primo update End Images
 	public static Bundle BannerName= new Bundle();
+	public static Bundle askClose=new Bundle();
+	public static int CounterCleanlines=0;
 	
 	public static String AreaPolygonMD5;
 	public static ArrayList<double[]> AreaPolygons;
@@ -488,38 +522,59 @@ public class App extends Application {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_ParkMode, App.parkMode.toInt());
-			e.commit();
+			e.apply();
+		}
+	}
+	public void persistCounterCleanlines() {
+		if (this.preferences != null) {
+			Editor e = this.preferences.edit();
+			e.putInt(KEY_CounterCleanliness, App.CounterCleanlines);
+			e.apply();
+		}
+	}
+	public void persistAskClose() {
+		if (preferences != null) {
+			Editor e = this.preferences.edit();
+			if(App.askClose!=null) {
+				e.putInt(KEY_IdAskClose, App.askClose.getInt("id",0));
+				e.putBoolean(KEY_IsAskClose, App.askClose.getBoolean("close",false));
+			}
+			else{
+				e.putInt(KEY_IdAskClose, 0);
+				e.putBoolean(KEY_IsAskClose, false);
+			}
+			e.apply();
 		}
 	}
 	public void persistMotoreAvviato() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putBoolean("motoreAvviato", App.motoreAvviato);
-			e.commit();
+			e.apply();
 		}
 	}
 	public void persistParkModeStarted() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putLong(KEY_parkModeStarted, (ParkModeStarted != null) ? ParkModeStarted.getTime() : 0);
-			e.commit();
+			e.apply();
 		}
 	}
 	public void persistPinChecked() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putBoolean("pinChecked", App.pinChecked);
-			e.commit();
+			e.apply();
 		}
 	}
 	public void persistUserDrunk() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putBoolean("userDrunk", App.userDrunk);
-			e.commit();
+			e.apply();
 		}
 	}
-	
+
 	public void persistReservation() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
@@ -527,7 +582,7 @@ public class App extends Application {
 				e.putString("reservation", App.reservation.toJson());
 			else
 				e.putString("reservation", null);
-			e.commit();
+			e.apply();
 		}
 	}
 	
@@ -535,7 +590,7 @@ public class App extends Application {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putBoolean(KEY_Charging, App.Charging);
-			e.commit();
+			e.apply();
 		}
 	}
 	
@@ -546,7 +601,7 @@ public class App extends Application {
 				e.putString(KEY_RadioSetup, radioSetup.toJson());
 			else
 				e.putString(KEY_RadioSetup, "");
-			e.commit();
+			e.apply();
 		}
 	}
 	
@@ -554,7 +609,7 @@ public class App extends Application {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_Watchdog, Watchdog);
-			e.commit();
+			e.apply();
 		}
 	}
 	
@@ -562,7 +617,7 @@ public class App extends Application {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_BatteryShutdownLevel, BatteryShutdownLevel);
-			e.commit();
+			e.apply();
 		}		
 		
 	}
@@ -571,31 +626,31 @@ public class App extends Application {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_FleetId, FleetId);
-			e.commit();
+			e.apply();
 		}
 	}
 	public void persistServerIP() {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_ServerIP, ServerIP);
-			e.commit();
+			e.apply();
 		}
 	}
 	public void persistRebootTime() {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putLong(KEY_RebootTime, SystemControl.rebootInProgress);
-			e.commit();
+			e.apply();
 		}
 	}
 	public void persistSaveLog() {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putBoolean(KEY_PersistLog, saveLog);
-			e.commit();
+			e.apply();
 		}
 	}
-	
+
 	public void loadInSosta() {
 		if (this.preferences != null) {
 			App.parkMode = ParkMode.fromInt( this.preferences.getInt(KEY_ParkMode, ParkMode.PARK_OFF_VALUE) );
@@ -603,6 +658,18 @@ public class App extends Application {
 			App.parkMode = ParkMode.PARK_OFF;
 		}
 	}
+
+	public void loadAskClose() {
+		if (this.preferences != null) {
+			askClose.putInt("id",preferences.getInt(KEY_IdAskClose,0));
+			askClose.putBoolean("close",preferences.getBoolean(KEY_IsAskClose,false));
+		} else {
+
+			askClose.putInt("id",0);
+			askClose.putBoolean("close",false);
+		}
+	}
+
 	public void loadMotoreAvviato() {
 		if (this.preferences != null) {
 			App.motoreAvviato = this.preferences.getBoolean("motoreAvviato", false);
@@ -722,6 +789,7 @@ public void loadRadioSetup() {
 			    	br.close();
 			    	return Integer.parseInt(line);
 			    }
+				br.close();
 			} catch (Exception e) {
 				dlog.e("Loading split trip config : " + SPLIT_TRIP_CONFIG_FILE,e);
 			}
@@ -743,6 +811,7 @@ public void loadRadioSetup() {
 			    	App.DefaultCity = line;
 			    	return  line;
 			    }
+				br.close();
 			} catch (Exception e) {
 				dlog.e("Loading split trip config : " + DEFAULT_CITY_CONFIG_FILE,e);
 			}
@@ -774,8 +843,8 @@ public void loadRadioSetup() {
 		
 			
 	}
-	
-	
+
+
 	public void setMockLocation(String json) {
 		
 		if (json==null || json.isEmpty() || json.equalsIgnoreCase("null")) {
@@ -923,7 +992,7 @@ public void loadRadioSetup() {
 				initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
 				
 
-				initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_FULL);
+				initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_LIGHT);
 
 				
 				SKAdvisorSettings advisorSettings = new SKAdvisorSettings();
@@ -1197,6 +1266,7 @@ private void  initPhase2() {
 
 
 	    AppStartupTime = new Date();
+		AppScheduledReboot = new Date();
 
 	    
 	    
@@ -1560,7 +1630,7 @@ private void  initPhase2() {
 		}
 		CarPlate = preferences.getString(KEY_CarPlate,"NO_PLATE");
 		fw_version = preferences.getString(KEY_fw_version,"nd");
-		fuel_level = preferences.getInt(KEY_fuel_level, 0);
+		fuel_level = preferences.getInt(KEY_fuel_level, 0); dlog.d("loadPreferences: fuel_level is "+fuel_level);
 		max_voltage = preferences.getFloat(KEY_MaxVoltage,83);
 			max_voltage=(max_voltage > 85f || max_voltage < 80f ? 83f : max_voltage); //controllo bontà maxVoltage
 		km = preferences.getInt(KEY_Km, 0);		
@@ -1584,10 +1654,14 @@ private void  initPhase2() {
 		BatteryShutdownLevel = preferences.getInt(KEY_BatteryShutdownLevel, 0);
 
 		FleetId = preferences.getInt(KEY_FleetId, 0);
+		CounterCleanlines=preferences.getInt(KEY_CounterCleanliness,0);
 
 		ServerIP = preferences.getInt(KEY_ServerIP, 0);
 		saveLog = preferences.getBoolean(KEY_PersistLog, true);
 		try {
+		askClose.putInt("id",preferences.getInt(KEY_IdAskClose,0));
+		askClose.putBoolean("close",preferences.getBoolean(KEY_IsAskClose,false));
+
 			SystemControl.rebootInProgress = preferences.getLong(KEY_RebootTime, 0);
 		}catch(Exception e){
 			dlog.e("loadPreferences: errore in reboot time ",e);
@@ -1639,12 +1713,14 @@ private void  initPhase2() {
 				String str = reader.readLine();
 				temp = Integer.parseInt(str) / 1000;
 				is.close();
+				ir.close();
+				reader.close();
 			} catch (Exception e) {
 				DLog.E("GetCpuTemp:",e);
 			}
 		}
 		}
-		
+
 		return temp;
 	}
 
@@ -1710,6 +1786,8 @@ private void  initPhase2() {
 			String json = sb.toString();
 			AreaPolygonMD5 = Encryption.md5(json);
 			decodeAreaPolygon(sb.toString());
+			ims.close();
+			reader.close();
 			
 		} catch (IOException e) {
 			dlog.e("initAreaPolygon:",e);
@@ -1940,7 +2018,7 @@ private void  initPhase2() {
 					SmsMessage smsmsg = SmsMessage
 							.createFromPdu((byte[]) smsextras[i]);
 
-					String strMsgBody = smsmsg.getMessageBody().toString();
+					String strMsgBody = smsmsg.getMessageBody();
 					String strMsgSrc = smsmsg.getOriginatingAddress();
 
 					strMessage += "SMS from " + strMsgSrc + " : " + strMsgBody;

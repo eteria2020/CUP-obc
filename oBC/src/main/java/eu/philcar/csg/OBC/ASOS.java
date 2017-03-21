@@ -78,6 +78,7 @@ public class ASOS extends ABase {
 				Intent i = new Intent(ASOS.this, AWelcome.class);
 				i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(i);
+				ASOS.this.finish();
 	
 				break;					
 				

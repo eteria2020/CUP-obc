@@ -1,5 +1,7 @@
 package eu.philcar.csg.OBC.db;
 
+import android.location.Location;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -15,31 +17,38 @@ import eu.philcar.csg.OBC.helpers.Encryption;
 @DatabaseTable(tableName = "poi", daoClass = Pois.class )  
 public class Poi extends DbRecord {
 	
-
 	@DatabaseField(id = true)
 	public int id;
 	
 	@DatabaseField(index = true)
-	public String tipo;
+	public String type;
+	
+	@DatabaseField(index = true)
+	public String type_group;
 	
 	@DatabaseField	
-	public String codice;
+	public String code;
+	
+	@DatabaseField	
+	public String name;	
+	
+	@DatabaseField	
+	public String brand;		
 	
 	@DatabaseField
-	public String via;
+	public String address;
 	
 	@DatabaseField
-	public String citta;
+	public String town;
 	
 	@DatabaseField
-	public String cap;
+	public String zip;
 	
 	@DatabaseField
-	public String provincia;
+	public String province;
 	
 	@DatabaseField
 	public Boolean attivo;
-	
 
 	@DatabaseField
 	public Double lon;
@@ -48,7 +57,14 @@ public class Poi extends DbRecord {
 	public Double lat;
 
 	@DatabaseField(index = true)
-	public long aggiornamento;
+	public long update;
+
+	public Location getLoc(){
+		Location loc1 = new Location("");
+		loc1.setLatitude(lat);
+		loc1.setLongitude(lon);
+		return loc1;
+	}
 	
 
 	

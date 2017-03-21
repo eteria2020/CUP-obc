@@ -40,6 +40,7 @@ import android.os.Message;
 import android.os.NetworkOnMainThreadException;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -76,6 +77,7 @@ public class TripInfo {
 
     // Status
     public boolean isOpen;
+    public boolean isBonusEnabled=false;
     public boolean isMaintenance;
     public boolean hasBeenStopped = false;
     public boolean reopenSuspend = false;
@@ -248,7 +250,7 @@ public class TripInfo {
                     }
                 }
 
-                customer = customer;
+                this.customer = customer;
 
                 cardCode = code;					
 
@@ -272,7 +274,7 @@ public class TripInfo {
                 http.Execute(cc);
 
                 // Prepara un messaggio ritardato che chiude l'auto se non viene abilitata la trip entro un timeout
-                service.scheduleSelfCloseTrip(600,true);
+                service.scheduleSelfCloseTrip(180,true);
 
                 service.getHandler().sendMessage(MessageFactory.RadioVolume(1));
                 service.getHandler().sendMessage(MessageFactory.RadioVolume(0));
@@ -322,7 +324,7 @@ public class TripInfo {
                         obc_io.setLcd(null, " Auto prenotata");
                         obc_io.setDoors(null, 0,"IN SOSTA");
                         obc_io.setEngine(null, 0);
-                        obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_BLINK);
+                        obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
                         Events.eventRfid(3, code);
                         Events.eventParkBegin();
                         hasBeenStopped = true;
@@ -342,7 +344,7 @@ public class TripInfo {
                         obc_io.setLcd(null, " Auto prenotata");
                         if (!forced)  { //Se non ? una chiusura forzata da remoto  apri le portiere ed abilita il motore
                             obc_io.setDoors(null, 1,"BENTORNATO");
-                            obc_io.setEngine(null, 1);
+                            //obc_io.setEngine(null, 1);
                             dlog.d(TripInfo.class.toString()+" handleCard: Pending trips. Park mode ON user returned, open car");
                         }
                         obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
@@ -398,16 +400,20 @@ public class TripInfo {
                         FRadio.savedInstance = null;
 
                         SuspendRfid(obc_io,"  Auto libera");
+                        service.removeSelfCloseTrip();
 
                         service.getHandler().sendMessage(MessageFactory.stopRemoteUpdateCycle()); 
 
                         App.pinChecked = false;
                         App.Instance.persistPinChecked();
 
+
+
                         service.sendBeacon();
                         return (MessageFactory.notifyTripEnd(this));
                     } else {
 
+                        Toast.makeText(App.Instance.getBaseContext(), "Out of Operative Area", Toast.LENGTH_SHORT).show();
                         obc_io.setLcd(null, "   FUORI AREA");
                         return null;
                     }
@@ -439,7 +445,7 @@ public class TripInfo {
 
 
         if (!App.hasNetworkConnection) {
-            dlog.e(" loadBanner: nessuna connessione");
+            dlog.w(" loadBanner: nessuna connessione");
             App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
             return;
         }
@@ -488,6 +494,8 @@ public class TripInfo {
                 while ((line = reader.readLine()) != null) {
                     builder.append(line);
                 }
+                reader.close();
+                content.close();
             } else {
 
                 dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode));
@@ -501,7 +509,7 @@ public class TripInfo {
         }
         String jsonStr = builder.toString();
         if(jsonStr.compareTo("")==0){
-            dlog.e(TripInfo.class.toString()+" loadBanner: nessuna connessione");
+            dlog.w(TripInfo.class.toString()+" loadBanner: nessuna connessione");
             App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
             return;
         }
@@ -564,6 +572,8 @@ public class TripInfo {
                 //Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
             }
             fileOutput.close();
+            inputStream.close();
+            urlConnection.disconnect();
             Image.putString(("FILENAME"),filename);
             App.Instance.BannerName.putBundle(type,Image);
             dlog.d(" loadBanner: File scaricato e creato "+filename);
@@ -627,6 +637,14 @@ public class TripInfo {
 
         CloseCorsa(carInfo);
 
+        if(App.pinChecked && App.currentTripInfo.trip.int_cleanliness==0 && App.currentTripInfo.trip.ext_cleanliness==0){
+            App.CounterCleanlines++;
+            if(App.CounterCleanlines>=5){
+                App.CounterCleanlines=0;
+                Events.eventCleanliness(0, 0);
+            }
+            App.Instance.persistCounterCleanlines();
+        }
         App.currentTripInfo = null;
 
         this.isOpen=false;
@@ -653,14 +671,8 @@ public class TripInfo {
             trip.end_lon = carInfo.longitude;
         }
 
-        DbManager dbm = App.Instance.dbManager;
-        Trips trips = dbm.getCorseDao();
-        try {
-            trips.createOrUpdate(trip);
-            dlog.d("CloseTrip: " + trip.toString());
-        } catch (SQLException e) {
-            dlog.e("Can't update trip:",e);
-        }		
+
+        UpdateCorsa();
     }
 
     //1 = PARKED , 0 = RUN
@@ -719,6 +731,9 @@ public class TripInfo {
             dlog.e("Error updating trip",e);
 
         }
+        if(App.currentTripInfo!= null && App.currentTripInfo.trip.id==trip.id){
+            App.currentTripInfo.trip=trip;
+        }
     }
 
 
@@ -730,7 +745,7 @@ public class TripInfo {
             return false;
         }
 
-        if (this.serverResult == -15) {
+        if (this.trip.recharge== -15) {
             dlog.e("CheckPin : Trip open in other car");
             return false;
         }
@@ -758,6 +773,7 @@ public class TripInfo {
         try {			
             builder.updateColumnValue("offline", true).where().idEq(trip.id);
             builder.update();
+            builder.reset();
         } catch (SQLException e) {		
             DLog.E("setTxOffline : ",e);
         }
@@ -775,7 +791,7 @@ public class TripInfo {
             builder.updateColumnValue("begin_sent", true);
             builder.updateColumnValue("remote_id", trip.remote_id).where().idEq(trip.id);
             builder.update();
-
+            builder.reset();
         } catch (SQLException e) {		
             DLog.E("setTxApertura : ",e);
         }
@@ -791,7 +807,7 @@ public class TripInfo {
         try {
             builder.updateColumnValue("end_sent", true).where().idEq(trip.id);
             builder.update();
-
+            builder.reset();
         } catch (SQLException e) {		
             DLog.E("setTxChiusura : ",e);
         }
@@ -807,6 +823,7 @@ public class TripInfo {
         try {			
             builder.updateColumnValue("warning", warning).where().idEq(trip.id);
             builder.update();
+            builder.reset();
         } catch (SQLException e) {		
             DLog.E("setWarning : ",e);
         }

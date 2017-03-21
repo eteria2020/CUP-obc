@@ -51,7 +51,8 @@ public class Events extends DbTable<Event,Integer> {
 	public static final int EVT_SHUTDOWN= 25;
 	public static final int EVT_LEASE= 26;
 	public static final int EVT_REBOOT= 27;
-	public static final int EVT_SOC    =28;
+	public static final int EVT_SOC   	 =28;
+	public static final int EVT_OUTOFAREA	=29;
 	
 	
 	
@@ -147,6 +148,10 @@ public class Events extends DbTable<Event,Integer> {
 	
 	public static void eventReady(int status) {
 		generateEvent(EVT_READY,status,null);
+	}
+
+	public static void outOfArea(Boolean status) {
+		generateEvent(EVT_OUTOFAREA,status?1:0,status?"Uscita Area Operativa":"Rientro Area Operativa");
 	}
 	
 	public static void eventGear(String position) {
@@ -266,6 +271,7 @@ public class Events extends DbTable<Event,Integer> {
 			this.create(event);
 		} catch (SQLException e) {
 			dlog.e("Error inserting evento:",e);
+
 		}
 		
 		HttpConnector http = new HttpConnector(App.Instance.getApplicationContext());
@@ -286,10 +292,12 @@ public class Events extends DbTable<Event,Integer> {
 		try {
 			Where<Event,Integer> where  = queryBuilder().orderBy("timestamp", true).where();
 			
-			where.and(
-				where.eq("sent",false),
-				where.eq("sending_error", false)
-			);
+			//where.and(
+				where.eq("sent",false);
+				//where.eq("sending_error", false)
+			//);
+
+
 			
 			
 			PreparedQuery<Event> query =  where.prepare();
@@ -331,6 +339,10 @@ public class Events extends DbTable<Event,Integer> {
 			
 			EventsConnector ec = new EventsConnector();
 			ec.event = e;
+			/*if(ec.event.id_trip==0 && ec.event.id_trip_local!=0){
+				Trips corse = App.Instance.getDbManager().getCorseDao();
+				ec.event.id_trip=corse.getRemoteIDfromLocal(ec.event.id_trip_local);
+			}*/
 			ec.returnMessageId = Connectors.MSG_EVENTS_SENT_OFFLINE;
 			http.Execute(ec);
 						
@@ -339,6 +351,8 @@ public class Events extends DbTable<Event,Integer> {
 		
 		return false;
 	}
+
+
 	
 	
 	

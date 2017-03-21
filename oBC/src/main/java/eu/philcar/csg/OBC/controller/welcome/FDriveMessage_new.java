@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.App;
@@ -73,7 +74,7 @@ public class FDriveMessage_new extends FBase {
 
 	private final static int  MSG_CLOSE_FRAGMENT  = 1;
 	private boolean login;
-	private WebView webViewBanner;
+	//private WebView webViewBanner;
 	private static Boolean handleClick=false;
 	private static CountDownTimer timer_5sec;
 
@@ -188,7 +189,7 @@ public class FDriveMessage_new extends FBase {
 		
 		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 
-		webViewBanner=(WebView) view.findViewById(R.id.bannerfsWV);
+		//webViewBanner=(WebView) view.findViewById(R.id.bannerfsWV);
 
 
 
@@ -275,6 +276,7 @@ public class FDriveMessage_new extends FBase {
 				public void onFinish() {
 					((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.INVISIBLE);
 					((View)view.findViewById(R.id.btnNext)).setVisibility(View.VISIBLE);
+					localHandler.removeMessages(MSG_CLOSE_FRAGMENT);
 					localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,10000);
 
 				}
@@ -304,11 +306,11 @@ public class FDriveMessage_new extends FBase {
 	}
 	@Override
 	public void onPause() {
+		localHandler.removeCallbacksAndMessages(null);
 		super.onPause();
-		localHandler.removeMessages(MSG_CLOSE_FRAGMENT);
 	}
 
-    private void  initWebViewBanner() {
+    /*private void  initWebViewBanner() {
 
 		File outDir = new File(App.BANNER_IMAGES_FOLDER);
 		if (!outDir.isDirectory()) {
@@ -452,7 +454,7 @@ public class FDriveMessage_new extends FBase {
 
 
 
-    }
+    }*/
 
 
 	private void updatePoiIcon(String Url) {
@@ -484,6 +486,8 @@ public class FDriveMessage_new extends FBase {
 				while ((line = reader.readLine()) != null) {
 					builder.append(line);
 				}
+				reader.close();
+				content.close();
 			} else {
 
 				Log.e(FDriveMessage_new.class.toString(), "Failed to download file");
@@ -528,6 +532,8 @@ public class FDriveMessage_new extends FBase {
 					Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
 				}
 				fileOutput.close();
+				urlConnection.disconnect();
+				inputStream.close();
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -664,6 +670,8 @@ public class FDriveMessage_new extends FBase {
 				while ((line = reader.readLine()) != null) {
 					builder.append(line);
 				}
+				reader.close();
+				content.close();
 			} else {
 
 				dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode));
@@ -745,6 +753,8 @@ public class FDriveMessage_new extends FBase {
 				//Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
 			}
 			fileOutput.close();
+			inputStream.close();
+			urlConnection.disconnect();
 			Image.putString(("FILENAME"),filename);
 			App.Instance.BannerName.putBundle(type,Image);
 			dlog.d(" loadBanner: File scaricato e creato "+filename);
@@ -771,7 +781,7 @@ public class FDriveMessage_new extends FBase {
 			if (!outDir.isDirectory()) {
 				dlog.e(FDriveMessage_new.class.toString()+" updateBanner: la cartella non esiste visualizzo offline ");
 
-				webViewBanner.setVisibility(View.INVISIBLE);
+				//webViewBanner.setVisibility(View.INVISIBLE);
 				adIV.setImageResource(R.drawable.offline_welcome);
 				adIV.setVisibility(View.VISIBLE);
 				return;
@@ -787,12 +797,12 @@ public class FDriveMessage_new extends FBase {
 						dlog.e(FDriveMessage_new.class.toString()+" updateBanner: file corrotto, elimino e visualizzo offline ");
 						ImageV.delete();
 						//initWebBanner(Banner.getString("URL",null));
-						webViewBanner.setVisibility(View.INVISIBLE);
+						//webViewBanner.setVisibility(View.INVISIBLE);
 						adIV.setImageResource(R.drawable.offline_welcome);
 						adIV.setVisibility(View.VISIBLE);
 						return;
 					}
-					webViewBanner.setVisibility(View.INVISIBLE);
+					//webViewBanner.setVisibility(View.INVISIBLE);
 					adIV.setImageBitmap(myBitmap);
 					adIV.setVisibility(View.VISIBLE);
 					adIV.invalidate();
@@ -800,14 +810,14 @@ public class FDriveMessage_new extends FBase {
 
 				}
 				dlog.e(FDriveMessage_new.class.toString()+" updateBanner: file non esiste visualizzo offline ");
-				webViewBanner.setVisibility(View.INVISIBLE);
+				//webViewBanner.setVisibility(View.INVISIBLE);
 				adIV.setImageResource(R.drawable.offline_welcome);
 				adIV.setVisibility(View.VISIBLE);
 			}catch (Exception e){
 				dlog.e(FDriveMessage_new.class.toString()+" updateBanner: eccezione in caricamento file visualizzo offline ",e);
 				e.printStackTrace();
 				//initWebBanner(Banner.getString("URL",null));
-				webViewBanner.setVisibility(View.INVISIBLE);
+				//webViewBanner.setVisibility(View.INVISIBLE);
 				adIV.setImageResource(R.drawable.offline_welcome);
 				adIV.setVisibility(View.VISIBLE);
 				return;
@@ -816,7 +826,7 @@ public class FDriveMessage_new extends FBase {
 		else{
 			dlog.e(FDriveMessage_new.class.toString()+" updateBanner: Bundle null, visualizzo offline");
 			//initWebBanner(Banner.getString("URL",null));
-			webViewBanner.setVisibility(View.INVISIBLE);
+			//webViewBanner.setVisibility(View.INVISIBLE);
 			adIV.setImageResource(R.drawable.offline_welcome);
 			adIV.setVisibility(View.VISIBLE);
 			return;
@@ -824,5 +834,10 @@ public class FDriveMessage_new extends FBase {
 
 	}
 
-
+	@Override
+	public void onDestroy() {
+		adIV=null;
+		startImages=null;
+		super.onDestroy();
+	}
 }

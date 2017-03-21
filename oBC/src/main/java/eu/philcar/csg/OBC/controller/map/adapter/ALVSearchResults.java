@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.skobbler.ngx.SKCategories.SKPOICategory;
 import com.skobbler.ngx.search.SKSearchResult;
+import com.skobbler.ngx.search.SKSearchResultParent;
 
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC.GeocodedLocation;
@@ -84,13 +85,24 @@ public class ALVSearchResults extends BaseAdapter {
 		}
 		
 		TextView addressTV = (TextView)convertView.findViewById(R.id.alvgeoAddressTV);
+		TextView parentsTV = (TextView)convertView.findViewById(R.id.alvgeoParents);
 		ImageView ivIcon = (ImageView)convertView.findViewById(R.id.ivIcon);
 		ImageButton disclosureIndicatorIB = (ImageButton)convertView.findViewById(R.id.alvgeoDisclosureIndicatorIB);
 		
 		
 		final SKSearchResult location = locations.get(position);
 
+		List<SKSearchResultParent> parents = location.getParentsList();
+		StringBuilder sb = new StringBuilder();
+		if (parents!=null && parents.size()>0) {
+			for(SKSearchResultParent p : parents) {
+				if (sb.length()>0) sb.append(",");
+				sb.append(p.getParentName());
+			}
+		}
+		
 		addressTV.setText(location.getName());
+		parentsTV.setText(sb.toString());
 		int id = getIcon(location.getCategory());
 		if (id==0)
 			return null;

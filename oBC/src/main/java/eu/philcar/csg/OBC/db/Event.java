@@ -23,7 +23,6 @@ public class Event extends DbRecord {
 	@DatabaseField	
 	public String label;
 
-	
 	@DatabaseField
 	public int intval;
 	
@@ -56,6 +55,7 @@ public class Event extends DbRecord {
 	
 	@DatabaseField
 	public boolean sending_error;
+
 
 	public String json_data;
 	

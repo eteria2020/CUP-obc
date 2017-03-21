@@ -14,6 +14,8 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +33,7 @@ public class FInstructions extends FBase {
 	
 	private DLog dlog = new DLog(this.getClass());
 	private RelativeLayout fins_right_FL;
+	private final static int  MSG_CLOSE_FRAGMENT  = 1;
 
 	public static FInstructions newInstance(boolean login) {
 		
@@ -40,7 +43,27 @@ public class FInstructions extends FBase {
 		
 		return fi;
 	}
-	
+
+	private Handler localHandler = new Handler()  {
+
+		@Override
+		public void handleMessage(Message msg) {
+
+			switch (msg.what)  {
+
+
+				case MSG_CLOSE_FRAGMENT:
+					try {
+						dlog.d("FInstruction timeout ");
+						((ABase)getActivity()).pushFragment(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true);
+					}catch(Exception e){
+						dlog.e("FInstruction : MSG_CLOSE_FRAGMENT Exception",e);
+					}
+					break;
+			}
+		}
+	};
+
 	private boolean login;
 	
 	@Override
@@ -69,6 +92,9 @@ public class FInstructions extends FBase {
 				startActivity(new Intent(getActivity(), ASOS.class));
 			}
 		});
+
+		localHandler.removeMessages(MSG_CLOSE_FRAGMENT);
+		localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,60000);
 		
 		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 		
@@ -111,39 +137,43 @@ public class FInstructions extends FBase {
 			});
 			
 		} else {
-			App.isCloseable = true;
-			
-			((AGoodbye)this.getActivity()).sendMessage(MessageFactory.sendBeacon());
-			((AGoodbye)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
-			((LinearLayout)view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
-			
-			new CountDownTimer(41000,1000) {
-				@Override
-			     public void onTick(long millisUntilFinished) {
-			    	 ((TextView)view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished/1000)+ " s");
-			     }
+			try {
+				App.isCloseable = true;
 
-				@Override
-				public void onFinish() {
-				}
+				((AGoodbye) this.getActivity()).sendMessage(MessageFactory.sendBeacon());
+				((AGoodbye) this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
+				((LinearLayout) view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
 
-			}.start();
-			
-			((TextView)view.findViewById(R.id.fins_message_TV)).setText(R.string.instruction_title_close);
-			((TextView)view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_close_1);
-			
-			// Instruction N.2 is removed and the following shifted up
-			
-			((TextView)view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_close_3);			
-			((TextView)view.findViewById(R.id.finsInstructions3TV)).setText(R.string.instruction_close_4);
-			
-			((LinearLayout)view.findViewById(R.id.fins_fourth_LL)).setVisibility(View.GONE);
-			
+				new CountDownTimer(41000, 1000) {
+					@Override
+					public void onTick(long millisUntilFinished) {
+						((TextView) view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished / 1000) + " s");
+					}
 
-			((TextView)view.findViewById(R.id.fins_message_bottom_TV)).setVisibility(View.VISIBLE);
+					@Override
+					public void onFinish() {
+					}
+
+				}.start();
+
+				((TextView) view.findViewById(R.id.fins_message_TV)).setText(R.string.instruction_title_close);
+				((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_close_1);
+
+				// Instruction N.2 is removed and the following shifted up
+
+				((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_close_3);
+				((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(R.string.instruction_close_4);
+
+				((LinearLayout) view.findViewById(R.id.fins_fourth_LL)).setVisibility(View.GONE);
+
+
+				((TextView) view.findViewById(R.id.fins_message_bottom_TV)).setVisibility(View.VISIBLE);
+			}catch(Exception e){
+				dlog.e("Exception in FInstruction wtf login is: "+login,e);
+			}
 		}
 
-		if (App.currentTripInfo.isMaintenance) {
+		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fins_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 		} else {
@@ -161,5 +191,19 @@ public class FInstructions extends FBase {
 		} else {
 			return true;
 		}
+	}
+
+	@Override
+	public void onDestroy() {
+		fins_right_FL=null;
+
+		super.onDestroy();
+	}
+
+	@Override
+	public void onPause() {
+
+		localHandler.removeCallbacksAndMessages(null);
+		super.onPause();
 	}
 }

@@ -1,11 +1,15 @@
 package eu.philcar.csg.OBC.controller.welcome;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
 import android.os.NetworkOnMainThreadException;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,7 +47,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AGoodbye;
+import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
@@ -54,30 +60,60 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.MessageFactory;
+import eu.philcar.csg.OBC.service.TripInfo;
 import okhttp3.HttpUrl;
 
 public class FGoodbye extends FBase {
 
 	private DLog dlog = new DLog(this.getClass());
-	private WebView webViewBanner;
+	//private WebView webViewBanner;
 	private ImageView adIV;
+	private static int closingTripid;
 	private static Boolean handleClick=false;
-	private static CountDownTimer timer_5sec;
+	private static CountDownTimer timer_5sec,selfclose=null;
 	private static Boolean RequestBanner=false;
+	private final static int  MSG_CLOSE_ACTIVITY  = 1;
 
 
-	private ArrayList<Bundle> endImages = new ArrayList<Bundle>();
+	private Handler localHandler = new Handler()  {
+
+		@Override
+		public void handleMessage(Message msg) {
+
+			switch (msg.what)  {
+
+
+				case MSG_CLOSE_ACTIVITY:
+					try {
+						dlog.d("FGoodbye timeout ");
+						if(getActivity()!=null)
+							if(App.currentTripInfo==null)
+								(getActivity()).finish();
+						else if(App.currentTripInfo.isOpen){
+								dlog.d("handleMessage:MSG_CLOSE_ACTIVITY Unable to close trip, restoring AmainOBC");
+								Intent i = new Intent(getActivity(), AMainOBC.class);
+								i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+								startActivity(i);
+								getActivity().finish();
+							}
+					}catch(Exception e){
+						dlog.e("FGoodbye : MSG_CLOSE_FRAGMENT Exception",e);
+					}
+					break;
+			}
+		}
+	};
 	
 	public static FGoodbye newInstance() {
 		
-		FGoodbye fw = new FGoodbye();
-		return fw;
+
+		return new FGoodbye();
 	}
 
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-
+		closingTripid=App.currentTripInfo.trip.id;
 		/*if(App.first_UP_End && App.hasNetworkConnection){
 			App.first_UP_End=false;
 
@@ -104,40 +140,46 @@ public class FGoodbye extends FBase {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
 		App.isCloseable = true;
+		App.isClosing=true;
 		dlog.d("OnCreareView FGoodbye");
-		if(App.Instance.BannerName.getBundle("END")==null&&!RequestBanner){
-			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
-			RequestBanner=true;
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						loadBanner(App.URL_AdsBuilderEnd, "END", false);        //scarico banner
-						getActivity().runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								try {
-									FGoodbye fGoodbye = (FGoodbye) getFragmentManager().findFragmentByTag(FGoodbye.class.getName());
-									if (fGoodbye != null) {
-										updateBanner("END");                            //Modifico l'IV
+		try {
+			if ((App.BannerName != null && App.BannerName.getBundle("END") == null) && !RequestBanner) {
+				//controllo se ho il banner e se non ho già iniziato a scaricarlo.
+				RequestBanner = true;
+				Thread bannerUpdate = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							loadBanner(App.URL_AdsBuilderEnd, "END", false);        //scarico banner
+							getActivity().runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									try {
+										FGoodbye fGoodbye = (FGoodbye) getFragmentManager().findFragmentByTag(FGoodbye.class.getName());
+										if (fGoodbye != null) {
+											updateBanner("END");                            //Modifico l'IV
+										}
+									} catch (Exception e) {
+										dlog.e("updateBanner: eccezione in chiamata", e);
 									}
-								} catch (Exception e) {
-									dlog.e("updateBanner: eccezione in chiamata", e);
 								}
-							}
-						});
-					}catch(Exception e){
-						dlog.e("FGoodbye: Eccezione durante l'update dell'immagine",e);
+							});
+						} catch (Exception e) {
+							dlog.e("FGoodbye: Eccezione durante l'update dell'immagine", e);
+						}
 					}
-				}
-			}).start();
+				});
+				bannerUpdate.start();
+			}
+		}catch(Exception e){
+			dlog.e("Exception while updating banner end",e);
 		}
 		dlog.d("FGoodbye: onCreateView");
 		//((AMainOBC) getActivity()).player.inizializePlayer();
 		((AGoodbye) getActivity()).player.reqSystem = true;
 		((AGoodbye) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
 		dlog.d("updateParkAreaStatus: Imposto Audio a AUDIO_SYSTEM");
-		new Thread(new Runnable() {
+		Thread playAdvice = new Thread(new Runnable() {
 			public void run() {
 				try{
 					((AGoodbye) getActivity()).player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ R.raw.alert_tts_end));
@@ -145,7 +187,8 @@ public class FGoodbye extends FBase {
 					dlog.e("Exception trying to play audio",e);
 				}
 			}
-		}).start();
+		});
+		playAdvice.start();
 
 		Bundle b = this.getArguments();
 		if (b==null || !b.containsKey("CLOSE")) {
@@ -158,13 +201,13 @@ public class FGoodbye extends FBase {
 				
 		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 	
-		((LinearLayout)view.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
+		(view.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
 
 		
 		((TextView)view.findViewById(R.id.fgodTopTV)).setTypeface(font);
 		((TextView)view.findViewById(R.id.fgod_Goodbye_Title_TV)).setTypeface(font);
 		((TextView)view.findViewById(R.id.fgodGoodbyeTV)).setTypeface(font);
-		webViewBanner = (WebView)view.findViewById(R.id.fgoodWV);
+		//webViewBanner = (WebView)view.findViewById(R.id.fgoodWV);
 		adIV=(ImageView) view.findViewById(R.id.fgoodIV);
 		timer_5sec = new CountDownTimer((5)*1000,1000) {
 			@Override
@@ -174,7 +217,7 @@ public class FGoodbye extends FBase {
 
 			@Override
 			public void onFinish() {
-				new Thread(new Runnable() {
+				Thread afterClick= new Thread(new Runnable() {
 					@Override
 					public void run() {
 						loadBanner(App.URL_AdsBuilderEnd,"END",false);
@@ -192,39 +235,48 @@ public class FGoodbye extends FBase {
 						}
 
 					}
-				}).start();
+				});
+				afterClick.start();
 			}
 		};
 		adIV.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(App.Instance.BannerName.getBundle("END")!=null){
-					if(App.Instance.BannerName.getBundle("END").getString("CLICK").compareTo("null")!=0){
+				if(App.BannerName.getBundle("END")!=null){
+					try {
+						if (App.BannerName.getBundle("END").getString("CLICK", "null").compareTo("null") != 0) {
 
-						if(!handleClick) {
-							adIV.setColorFilter(R.color.overlay_banner);
-							handleClick=true;
-							dlog.i(FDriveMessage.class.toString()+" Click su banner ");
-							new Thread(new Runnable() {
-								@Override
-								public void run() {
-
-									loadBanner(App.BannerName.getBundle("END").getString("CLICK"), "END", true);
-									getActivity().runOnUiThread(new Runnable() {
-										@Override
-										public void run() {
-											if(FGoodbye.this.isVisible()) {
-												adIV.clearColorFilter();
-												updateBanner("END");
-												timer_5sec.start();//Modifico l'IV
-												handleClick = false;
-											}
+							if (!handleClick) {
+								adIV.setColorFilter(R.color.overlay_banner);
+								handleClick = true;
+								dlog.i(FDriveMessage.class.toString() + " Click su banner ");
+								Thread onBannerClick = new Thread(new Runnable() {
+									@Override
+									public void run() {
+										try {
+											loadBanner(App.BannerName.getBundle("END").getString("CLICK"), "END", true);
+											getActivity().runOnUiThread(new Runnable() {
+												@Override
+												public void run() {
+													if (FGoodbye.this.isVisible()) {
+														adIV.clearColorFilter();
+														updateBanner("END");
+														timer_5sec.start();//Modifico l'IV
+														handleClick = false;
+													}
+												}
+											});
+										} catch (Exception e) {
+											dlog.e("Exception while updating banner", e);
 										}
-									});
 
-								}
-							}).start();
+									}
+								});
+								onBannerClick.start();
+							}
 						}
+					} catch (Exception e) {
+						dlog.e("Exception during onclick", e);
 					}
 				}
 			}
@@ -237,10 +289,12 @@ public class FGoodbye extends FBase {
 		}
 		((TextView)view.findViewById(R.id.fgodGoodbyeTV)).setText(name);
 		
-//		((AGoodbye)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
-		((LinearLayout)view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
-		
-		new CountDownTimer(41000,1000) {
+		((AGoodbye)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
+		(view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
+		final Activity activity =this.getActivity();
+		if(selfclose!=null)
+			selfclose.cancel();
+		selfclose = new CountDownTimer(41000,1000) {
 			@Override
 		     public void onTick(long millisUntilFinished) {
 		    	 ((TextView)view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished/1000)+ " s");
@@ -248,9 +302,22 @@ public class FGoodbye extends FBase {
 
 			@Override
 			public void onFinish() {
-				dlog.d(FGoodbye.class.toString()+" onFinish: finished countdown");
+				dlog.d(FGoodbye.class.toString()+" onFinish: finished countdown, ending activity");
+				if(getActivity()==null)
+					return;
+				try {
+					wait(2000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				if(App.currentTripInfo!=null && App.currentTripInfo.trip.id==closingTripid) {
+					((AGoodbye) activity).sendMessage(MessageFactory.scheduleSelfCloseTrip(1));
+				}
+				localHandler.removeMessages(MSG_CLOSE_ACTIVITY);
+				localHandler.sendEmptyMessageDelayed(MSG_CLOSE_ACTIVITY,1000);
 
-			}
+				}
+
 
 		}.start();
 		dlog.d("FGoodbye: starting countdown");
@@ -266,6 +333,25 @@ public class FGoodbye extends FBase {
 
 
 		//App.Instance.BannerName.clear();
+
+		if(App.currentTripInfo.isBonusEnabled){
+			(view.findViewById(R.id.fgodTopTV)).setVisibility(View.GONE);
+			((TextView)view.findViewById(R.id.fgodInstructionTV)).setText(R.string.instruction_close_4);
+			(view.findViewById(R.id.fgodBonusLL)).setVisibility(View.VISIBLE);
+			((TextView)view.findViewById(R.id.fgodBonusTV)).setText(R.string.bonus_message_poi);
+		}
+		else{
+			(view.findViewById(R.id.fgodTopTV)).setVisibility(View.VISIBLE);
+			((TextView)view.findViewById(R.id.fgodInstructionTV)).setText(R.string.goodbye_instructions);
+			((TextView)view.findViewById(R.id.fgodInstructionTV)).setTextSize(24f);
+			((TextView)view.findViewById(R.id.fgodTopTV)).setTextSize(35f);
+			(view.findViewById(R.id.fgodBonusLL)).setVisibility(View.GONE);
+
+			((TextView)view.findViewById(R.id.fgodBonusTV)).setText("");
+
+		}
+
+
 		updateBanner("END");
 		return view;
 	}
@@ -288,24 +374,28 @@ public class FGoodbye extends FBase {
 
 	}
 
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
 
 	public void loadBanner(String Url, String type, Boolean isClick) {
 
 		File outDir = new File(App.BANNER_IMAGES_FOLDER);
-		if (!outDir.isDirectory()) {
-			outDir.mkdir();
+		if (outDir.mkdir()) {
+			dlog.d("Banner directory created");
 		}
 
 
 
 		if (!App.hasNetworkConnection) {
 			dlog.e(" loadBanner: nessuna connessione");
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 		}
 		StringBuilder  builder = new StringBuilder();
-		List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
-		HttpResponse response=null;
+		List<NameValuePair> paramsList = new ArrayList<>();
+		HttpResponse response;
 		if(!isClick) {
 
 
@@ -320,11 +410,11 @@ public class FGoodbye extends FBase {
 			paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));//"ED93107"));//App.CarPlate));
 		}
 		try {
-			if (App.BannerName.getBundle(type) != null )
-				paramsList.add(new BasicNameValuePair("index", App.Instance.BannerName.getBundle(type).getString("INDEX",null)));
+			if (App.BannerName!=null && App.BannerName.getBundle(type) != null )
+				paramsList.add(new BasicNameValuePair("index", App.BannerName.getBundle(type).getString("INDEX",null)));
 
-			if (App.BannerName.getBundle(type) != null )
-				paramsList.add(new BasicNameValuePair("end", App.Instance.BannerName.getBundle(type).getString("END",null)));
+			if (App.BannerName!=null && App.BannerName.getBundle(type) != null )
+				paramsList.add(new BasicNameValuePair("end", App.BannerName.getBundle(type).getString("END",null)));
 
 
 
@@ -348,26 +438,28 @@ public class FGoodbye extends FBase {
 				while ((line = reader.readLine()) != null) {
 					builder.append(line);
 				}
+				reader.close();
+				content.close();
 			} else {
 
 				dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode));
-				App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+				App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 				return;
 			}
 		}catch (Exception e){
 			dlog.e(" loadBanner: eccezione in connessione ",e);
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 		}
 		String jsonStr = builder.toString();
 		if(jsonStr.compareTo("")==0){
 			dlog.e(" loadBanner: nessuna connessione");
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 		}
 
 		DLog.D(" loadBanner: risposta "+jsonStr);
-		File file = new File(outDir, "placeholder.lol");;
+		File file = new File(outDir, "placeholder.lol");
 
 		try {
 			JSONObject json = new JSONObject(jsonStr);
@@ -390,7 +482,7 @@ public class FGoodbye extends FBase {
 			if (jsonObject.has("END"))
 				Image.putString(("END"), jsonObject.getString("END"));
 
-			App.Instance.BannerName.putBundle(type,Image);
+			App.BannerName.putBundle(type,Image);
 
 			//ricavo nome file
 			URL urlImg = new URL(Image.getString("URL"));
@@ -402,7 +494,7 @@ public class FGoodbye extends FBase {
 
 			if(file.exists()){
 				Image.putString(("FILENAME"),filename);
-				App.Instance.BannerName.putBundle(type,Image);
+				App.BannerName.putBundle(type,Image);
 				dlog.i(" loadBanner: file già esistente: "+filename);
 				return;
 			}
@@ -429,13 +521,14 @@ public class FGoodbye extends FBase {
 			}
 			fileOutput.close();
 			Image.putString(("FILENAME"),filename);
-			App.Instance.BannerName.putBundle(type,Image);
+			App.BannerName.putBundle(type,Image);
 			dlog.d(" loadBanner: File scaricato e creato "+filename);
-
+			urlConnection.disconnect();
+			inputStream.close();
 
 		} catch (Exception e) {
 			if(file.exists()) file.delete();
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			dlog.e(" loadBanner: eccezione in creazione e download file ",e);
 
 			e.printStackTrace();
@@ -448,7 +541,7 @@ public class FGoodbye extends FBase {
 	private void updateBanner(String type){
 
 		File ImageV;
-		Bundle Banner = App.Instance.BannerName.getBundle(type);
+		Bundle Banner = App.BannerName.getBundle(type);
 		if(Banner!=null){
 			ImageV=new File(App.BANNER_IMAGES_FOLDER,Banner.getString("FILENAME",null));
 
@@ -461,12 +554,13 @@ public class FGoodbye extends FBase {
 						dlog.e(FGoodbye.class.toString()+" updateBanner: file corrotto, elimino e visualizzo offline ");
 						ImageV.delete();
 						//initWebBanner(Banner.getString("URL",null));
-						webViewBanner.setVisibility(View.INVISIBLE);
+						//webViewBanner.setVisibility(View.INVISIBLE);
 						adIV.setImageResource(R.drawable.offline_goodbye);
 						adIV.setVisibility(View.VISIBLE);
 						return;
 					}
-					webViewBanner.setVisibility(View.INVISIBLE);
+					//webViewBanner.setVisibility(View.INVISIBLE);
+
 					adIV.setImageBitmap(myBitmap);
 					adIV.setVisibility(View.VISIBLE);
 					adIV.invalidate();
@@ -477,7 +571,7 @@ public class FGoodbye extends FBase {
 				dlog.e(FGoodbye.class.toString()+" updateBanner: eccezione in caricamento file visualizzo offline ",e);
 				e.printStackTrace();
 				//initWebBanner(Banner.getString("URL",null));
-				webViewBanner.setVisibility(View.INVISIBLE);
+				//webViewBanner.setVisibility(View.INVISIBLE);
 				adIV.setImageResource(R.drawable.offline_goodbye);
 				adIV.setVisibility(View.VISIBLE);
 				return;
@@ -486,7 +580,7 @@ public class FGoodbye extends FBase {
 		else{
 			dlog.e(FGoodbye.class.toString()+" updateBanner: Bundle null, visualizzo offline");
 			//initWebBanner(Banner.getString("URL",null));
-			webViewBanner.setVisibility(View.INVISIBLE);
+			//webViewBanner.setVisibility(View.INVISIBLE);
 			adIV.setImageResource(R.drawable.offline_goodbye);
 			adIV.setVisibility(View.VISIBLE);
 			return;
@@ -494,4 +588,22 @@ public class FGoodbye extends FBase {
 
 	}
 
+	@Override
+	public void onDestroy() {
+		try{
+			localHandler.removeCallbacksAndMessages(null);
+			adIV=null;
+			timer_5sec.cancel();
+			handleClick=null;
+			RequestBanner=null;
+			if(selfclose!=null)
+				selfclose.cancel();
+
+		}catch(Exception e){
+			dlog.e("Exception while cleaning memory",e);
+		}finally {
+
+			super.onDestroy();
+		}
+	}
 }

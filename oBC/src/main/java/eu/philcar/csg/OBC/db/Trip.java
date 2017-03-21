@@ -61,7 +61,7 @@ public class Trip  extends DbRecord {
 		public Date recharge_time;
 		
 		@DatabaseField
-		public int  recharge;
+		public int  recharge; //initially unused now used to store server result to deny trip if rebooted
 	
 		@DatabaseField
 		public boolean begin_sent;
@@ -88,19 +88,21 @@ public class Trip  extends DbRecord {
 		public int n_pin;
 		
 		@DatabaseField 
-		public int id_parent;		
-		
-		
+		public int id_parent;
+
+		/*@DatabaseField
+		public int done_cleanliness;*/
+
+
 //		@DatabaseField
 //		public boolean sospeso;
 		
 		public String toString() {
-			return String.format("Trip { Id:%d , RId:%d \n Tms begin:%d , Tms end:%d \n TX 1 : %b , TX 2  : %b , n_pin : %d }", id,remote_id,begin_timestamp, end_timestamp, begin_sent, end_sent,n_pin, id_parent);
+			return String.format("Trip { Id:%d , RId:%d \n Tms begin:%d , Tms end:%d \n TX 1 : %b , TX 2  : %b , n_pin : %d , id_parent : %d }", id,remote_id,begin_timestamp, end_timestamp, begin_sent, end_sent,n_pin, id_parent);
 		}
 		
 		public long getMinutiDurata() {
-			long mins = (System.currentTimeMillis() - begin_time.getTime())/60000;
 			
-			return mins;
+			return (System.currentTimeMillis() - begin_time.getTime())/60000;
 		}
 }

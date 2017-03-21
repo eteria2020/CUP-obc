@@ -28,7 +28,7 @@ public class DLog
         if(App.saveLog)
         Log4j.error(nMessage,tr);
     }
-    
+
     public static final void W(String nMessage) {
         Log.w(LOGTAG, nMessage);
         if(App.saveLog)
@@ -46,16 +46,16 @@ public class DLog
         if(App.saveLog)
         Log4j.info(nMessage);
     }
-    
-    
+
+
     private String logtag = "OBC";
     private Logger log4j;
-    
+
     public DLog( Class<?> cls) {
     	 log4j = LoggerFactory.getLogger(cls);
     	 logtag = "OBC-"+ cls.getSimpleName();
     }
-    
+
     public  final void e(String nMessage) {
         Log.e(logtag, nMessage);
         if(App.saveLog)
@@ -67,7 +67,7 @@ public class DLog
         if(App.saveLog)
         log4j.error(nMessage,tr);
     }
-    
+
     public  final void w(String nMessage) {
         Log.w(logtag, nMessage);
         if(App.saveLog)
@@ -85,9 +85,9 @@ public class DLog
         if(App.saveLog)
         log4j.info(nMessage);
     }
-    
-    
-    
 
-    
+
+
+
+
 }

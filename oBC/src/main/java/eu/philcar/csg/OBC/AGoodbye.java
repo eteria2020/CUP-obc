@@ -24,9 +24,9 @@ public class AGoodbye extends ABase {
 	private DLog dlog = new DLog(this.getClass());
 	private final boolean SKIP_DAMAGES = true;
 	
-	public static String JUMP_TO_END = "JUMP_TO_END";
+	public static final String JUMP_TO_END = "JUMP_TO_END";
 
-	public static String EUTHANASIA = "I_WANT_TO_DIE";
+	public static final String EUTHANASIA = "I_WANT_TO_DIE";
 	public AudioPlayer player;
 	
 	
@@ -43,7 +43,7 @@ public class AGoodbye extends ABase {
 		}
 
 		//System.gc();
-		dlog.d("AGoodbye: onCreate");
+		dlog.d("AGoodbye: onCreate extra: "+ getIntent().getBooleanExtra(EUTHANASIA,true) );
 
 		setContentView(R.layout.a_base);
 		player = new AudioPlayer(this);
@@ -53,17 +53,18 @@ public class AGoodbye extends ABase {
 		serviceConnector = new ServiceConnector(this, serviceHandler);
 		
 		
-		if (savedInstanceState == null) {
+		/*if (savedInstanceState == null) {
 			
 
-		}
+		}*/
 	}
 	
 	@Override
 	protected void onResume() {				
 		super.onResume();
-		
-		serviceConnector.connect();
+		App.setForegroundActivity(this);
+		if (!serviceConnector.isConnected())
+			serviceConnector.connect();
 		
 	}
 		
@@ -73,7 +74,8 @@ public class AGoodbye extends ABase {
 	protected void onPause() {
 		
 		super.onPause();
-		
+
+		App.setForegroundActivity("Pause");
 		serviceConnector.unregister();
 		serviceConnector.disconnect();
 	}
@@ -96,10 +98,25 @@ public class AGoodbye extends ABase {
 		 @Override
 		 public void handleMessage(Message msg) {
 			FPark fPark;
+
+			 if(! App.isForegroundActivity(AGoodbye.this)) {
+				 DLog.W(AGoodbye.class.getName() + " MSG to non foreground activity. ignoring");
+				 //AGoodbye.this.finish();
+				 return;
+			 }
+			 if(App.currentTripInfo==null){
+
+				 DLog.W(AGoodbye.class.getName() + " no trip found wrong foreground activity restarting AWelcome");
+				 Intent i = new Intent(AGoodbye.this, AWelcome.class);
+				 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				 startActivity(i);
+				 AGoodbye.this.finish();
+				 return;
+			 }
 			switch (msg.what) {
 			
 			case ObcService.MSG_CLIENT_REGISTER:
-				DLog.E(AGoodbye.class.getName() + ": MSG_CLIENT_REGISTER");
+				DLog.D(AGoodbye.class.getName() + ": MSG_CLIENT_REGISTER");
 				
 				// Since this is the first fragment, we need to use the "add" method to show it to the user, and not the "replace"
 				FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -136,7 +153,7 @@ public class AGoodbye extends ABase {
 				
 			case ObcService.MSG_IO_RFID:
 				
-				DLog.E(AMainOBC.class.getName() + ": MSG_IO_RFID");
+				DLog.D(AMainOBC.class.getName() + ": MSG_IO_RFID");
 				break;
 				
 			
@@ -148,6 +165,7 @@ public class AGoodbye extends ABase {
 				Intent i = new Intent(AGoodbye.this, AWelcome.class);
 				i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(i);
+				AGoodbye.this.finish();
 	
 				break;					
 				
@@ -179,7 +197,12 @@ public class AGoodbye extends ABase {
 		 }
 	};
 
-
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		App.isClosing=false;
+		player = null;
+	}
 
 	@Override
 	public int getActivityUID() {

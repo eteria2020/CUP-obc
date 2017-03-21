@@ -4,6 +4,8 @@ import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.helpers.DLog;
+
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ public class FNumber extends FBase implements OnClickListener {
 	}
 	
 	private Button b1,b2,b3,b4,b5,b6,b7,b8,b9,b0;
+	private DLog dlog = new DLog(this.getClass());
 	private FrameLayout fchn_right_FL;
 	private TextView numberTV;
 	
@@ -84,7 +87,7 @@ public class FNumber extends FBase implements OnClickListener {
 		b9.setOnClickListener(this);
 		b0.setOnClickListener(this);
 
-		if (App.currentTripInfo.isMaintenance) {
+		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fchn_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 		} else {
@@ -129,6 +132,7 @@ public class FNumber extends FBase implements OnClickListener {
 			}
 			
 			if (App.currentTripInfo !=null && App.currentTripInfo.customer !=null) {
+				dlog.d("User Change phone number from "+App.currentTripInfo.customer.mobile+" to "+phoneNumber);
 				App.currentTripInfo.customer.mobile = phoneNumber;
 			}
 			((ABase)getActivity()).popFragment();

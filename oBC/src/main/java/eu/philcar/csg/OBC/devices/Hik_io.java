@@ -354,6 +354,7 @@ public class Hik_io implements LowLevelInterface {
 	@Override
 	public void setEngine(Messenger replyTo, int status) {
 		dlog.d("setEngine :" + status );
+
 		int ctl = (status==0?LeaseInfoItaly.LEASE_CTL_DISABLE_POWER:LeaseInfoItaly.LEASE_CTL_ENABLE_POWER);
 		if (mLeaseManagerItaly!=null) {
 			if (mLeaseManagerItaly.SetPowerStatus(ctl))
@@ -531,7 +532,7 @@ public class Hik_io implements LowLevelInterface {
 			
 		case AUDIO_SYSTEM:
 			mAudioManager.audioSetChannel(AudioInfo.HIK_AUDIO_CHANNEL_ARM);
-			mAudioManager.audioSetVol(20);
+			mAudioManager.audioSetVol(15);
 			mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
 			dlog.d("HIK Audio channel : SYSTEM");
 			break;

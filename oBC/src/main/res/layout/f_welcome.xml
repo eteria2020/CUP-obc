@@ -105,8 +105,19 @@
 			android:src="@drawable/sel_button_fr"
 			android:contentDescription="@string/content_description"
 			android:background="@null" />
-        
-    </LinearLayout>
+
+		<ImageButton
+			android:id="@+id/fwelchineseIB"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginLeft="16dp"
+			android:src="@drawable/sel_button_zh"
+			android:contentDescription="@string/content_description"
+			android:background="@null"
+			android:visibility="gone" />
+
+	</LinearLayout>
     <LinearLayout android:id="@+id/fwelBannerLL" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/fwel_logo_FL" android:layout_centerHorizontal="true" android:layout_marginTop="80dp" android:orientation="vertical"
 		android:visibility="gone">
         <TextView android:id="@+id/tvCarPlate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ED06218" android:textAppearance="?android:attr/textAppearanceLarge" android:textSize="96sp"/>

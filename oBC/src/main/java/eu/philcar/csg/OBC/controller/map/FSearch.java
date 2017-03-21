@@ -10,6 +10,7 @@ import com.skobbler.ngx.search.SKSearchResult.SKSearchResultType;
 
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.ASOS;
+import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
@@ -67,7 +68,7 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 	private CustomKeyboard mCustomKeyboard;
 	private SkobblerSearch sks;
 	private RelativeLayout fpca_right_RL;
-	
+
 	private ATGeocodingRequest atRequest;
 	private ALVSearchResults adapter;
 	
@@ -173,7 +174,7 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 		
 		sks.SearchCity(defaultCity);
 
-		if (App.currentTripInfo.isMaintenance) {
+		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fpca_right_RL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 		} else {
@@ -301,7 +302,7 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 		case R.id.btnGo:
 			//int i =3/0; crash test
 			navigateTo(searchSteps.getParent());
-																	//SystemControl.doReboot(); DEVELOP ONLY!!!!
+														//SystemControl.doReboot(); DEVELOP ONLY!!!!
 			break;
 			
 		}
@@ -515,9 +516,10 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 	
 	private void navigateTo(SKSearchResult result) {
 
-		dlog.d("navigateTo: set destination to "+ result.toString());
+
 		
-		if (result!=null) {		
+		if (result!=null) {
+			dlog.d("navigateTo: set destination to "+ result.toString());
 			Location point = new Location("");
 			point.setLatitude(result.getLocation().getLatitude());
 			point.setLongitude(result.getLocation().getLongitude());
@@ -640,6 +642,29 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 		
 	}
 
-
-
+	@Override
+	public void onDestroy() {
+		resultsLV=null;
+		rootView=null;
+		adapter=null;
+		backIB=null;
+		mCustomKeyboard=null;
+		sosB=null;
+		fpca_right_RL=null;
+		searchB=null;
+		gotoTV=null;
+		btnGo=null;
+		btnSearch1=null;
+		btnSearch1=null;
+		btnSearch3=null;
+		llRow1=null;
+		llRow2=null;
+		llRow3=null;
+		resultsLV=null;
+		resultsRL=null;
+		resultsTV=null;
+		sks=null;
+		searchHandler=null;
+		super.onDestroy();
+	}
 }

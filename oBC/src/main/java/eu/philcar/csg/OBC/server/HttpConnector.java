@@ -43,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.helpers.DLog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -190,6 +191,7 @@ public class HttpConnector {
 		         while ((line=bf.readLine())!=null) {
 		           outStr += line;
 		         }
+				bf.close();
 			} catch (UnsupportedEncodingException e) {
 				dlog.e("DeGzip",e);;
 
@@ -292,7 +294,7 @@ public class HttpConnector {
 				
 				case 200:
 					HttpEntity entity = response.getEntity();
-					logtxt.append("- Content length: " + entity.getContentLength());
+					logtxt.append("- Content length: ").append( entity.getContentLength());
 					
 					Header encoding = entity.getContentEncoding();
 					
@@ -309,7 +311,7 @@ public class HttpConnector {
 					
 					if (entity != null) {
 						responseBody = EntityUtils.toString(entity);
-						logtxt.append(" Response body length: " + responseBody.length() );
+						logtxt.append(" Response body length: ").append(responseBody.length() );
 					}
 					break;
 
@@ -325,14 +327,15 @@ public class HttpConnector {
 	 	    } catch (java.net.UnknownHostException e) {
 	 	    	App.networkExceptions++;
 	 	    	if(App.networkExceptions%100==0) {
-	 	    		dlog.e("Network exceptions: "+ App.networkExceptions);
+	 	    		dlog.e("Network exceptions: "+ App.networkExceptions,e);
 	 	    	}
 	 	    } catch (IOException e) {
 	 	    	App.networkExceptions++;
 	 	    	if(App.networkExceptions%100==0) {
 	 	    		dlog.e("Network exceptions: "+ App.networkExceptions);	
 	 	    	}
-	 	    	dlog.e("Http IOException");
+				SystemControl.Reset3G(null);
+	 	    	dlog.e("Http IOException",e);
 	 	    } catch (Exception e) {
 	 	    	dlog.e("Http Unexpected exception",e);
 	 	    }
@@ -402,14 +405,16 @@ public class HttpConnector {
 							break;
 		 	        } 
 
-		 	        
+
 		 	    } catch (ClientProtocolException e) {
 		 	    	DLog.E(e.toString());
 		 	    } catch (IOException e) {
 		 	    	DLog.E(e.toString());
 		 	    } catch (Exception e) {
 		 	    	DLog.E("Http Unexpected exception",e);
-		 	    }
+		 	    }finally {
+					httpclient.getConnectionManager().shutdown();
+				}
 		 		
 		 		return responseBody;
 		 		

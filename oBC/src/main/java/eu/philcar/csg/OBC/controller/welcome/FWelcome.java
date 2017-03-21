@@ -54,6 +54,7 @@ public class FWelcome extends FBase {
 	private static ImageButton fwelItalianIB;
 	private static ImageButton fwelEnglishIB;
 	private static ImageButton fwelFrenchIB;
+	private static ImageButton fwelChineseIB;
 	private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm", Locale.getDefault());
 	
 	private int logoTaps =0;
@@ -97,7 +98,14 @@ public class FWelcome extends FBase {
 				nextPage();
 			}
 		});
-		
+		((ImageButton)view.findViewById(R.id.fwelchineseIB)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((ABase)getActivity()).setChinseseLanguage();
+				nextPage();
+
+			}
+		});
 		
 		// Count  taps for service login dialog  
 		((ImageView)view.findViewById(R.id.fwelLogoIV)).setOnClickListener(new OnClickListener() {
@@ -250,15 +258,15 @@ public class FWelcome extends FBase {
 
 
 		welcomeLL.setVisibility(View.VISIBLE);
-		welcomeLL.invalidate();
 		flagsLL.setVisibility(View.VISIBLE);
-		flagsLL.invalidate();
-		//fwelItalianIB.setVisibility(View.VISIBLE);
-		//fwelEnglishIB.setVisibility(View.VISIBLE);
-		//fwelFrenchIB.setVisibility(View.VISIBLE);
+		fwelItalianIB.setVisibility(View.VISIBLE);
+		fwelEnglishIB.setVisibility(View.VISIBLE);
+		fwelFrenchIB.setVisibility(View.VISIBLE);
 
 		bannerLL.setVisibility(View.INVISIBLE);
+		flagsLL.invalidate();
 
+		welcomeLL.invalidate();
 		if(App.reservation!=null) {
 			if (App.reservation.isMaintenance()) {
 				fwcm_whole_RL.setBackgroundColor(getResources().getColor(R.color.background_red));
@@ -318,6 +326,14 @@ public class FWelcome extends FBase {
         	}
         }
 	};
-	
-	
+
+	@Override
+	public void onDestroy() {
+		bannerLL=null;
+		flagsLL=null;
+		fwelEnglishIB=null;
+		fwelFrenchIB=null;
+		fwelItalianIB=null;
+		super.onDestroy();
+	}
 }

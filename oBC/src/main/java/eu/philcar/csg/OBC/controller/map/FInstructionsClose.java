@@ -87,7 +87,7 @@ public class FInstructionsClose extends FBase implements OnClickListener {
 		End=(Button)view.findViewById(R.id.fmenEndRentIB);
 		((Button)view.findViewById(R.id.fmenEndRentIB)).setOnClickListener(this);
 
-		if (App.currentTripInfo.isMaintenance) {
+		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fins_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 		} else {

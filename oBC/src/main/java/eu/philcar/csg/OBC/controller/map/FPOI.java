@@ -131,7 +131,7 @@ public class FPOI extends FBase implements OnClickListener, ALVFuelStationsDeleg
 		sosB.setOnClickListener(this);
 		backIB.setOnClickListener(this);
 
-		if (App.currentTripInfo.isMaintenance) {
+		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fpoi_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 		} else {

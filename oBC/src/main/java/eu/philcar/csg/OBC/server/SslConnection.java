@@ -125,7 +125,7 @@ public class SslConnection {
 
 				
 			}
-		
+
 			urlConnection.setRequestMethod("GET");
 			urlConnection.setConnectTimeout(3000);
 			urlConnection.setReadTimeout(3000);
@@ -140,9 +140,10 @@ public class SslConnection {
 			String line;
 			StringBuilder content = new StringBuilder();
 			while ((line = bufferedReader.readLine()) != null) {
-				content.append(line + "\n");
+				content.append(line).append("\n");
 			}
-			bufferedReader.close();	
+			bufferedReader.close();
+			urlConnection.disconnect();
 			
 			return content.toString();
 			

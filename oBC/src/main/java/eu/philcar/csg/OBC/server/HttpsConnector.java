@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.zip.GZIPInputStream;
 
+import eu.philcar.csg.OBC.SystemControl;
 import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.Credentials;
@@ -296,6 +297,7 @@ public class HttpsConnector {
 			} catch (IOException e) {
 				response.body().close();
 				dlog.e("Getting responseBody",e);
+				 SystemControl.Reset3G(null);
 				return null;
 			}
 	    	 

@@ -164,6 +164,8 @@ public class SystemControl {
 	
 	private static int countFailedTests=0;
 	public static boolean hasNetworkConnection(Context ctx) {
+		if (ctx==null)
+			return false;
 	    ConnectivityManager connectivityManager  = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 	    
@@ -258,7 +260,8 @@ public class SystemControl {
 		            urlc.setRequestProperty("Connection", "close");
 		            urlc.setConnectTimeout(1500); 
 		            urlc.connect();
-		            msg.arg1=1;		            
+		            msg.arg1=1;
+					urlc.disconnect();
 		        } catch (IOException e) {
 		        	msg.arg1=0;		            
 		        }
@@ -304,10 +307,16 @@ public class SystemControl {
 
 	public static void doReboot() {
 		//If there is another reboot in progress not older than 6 hour : ignore
+
 		if (System.currentTimeMillis() - rebootInProgress>21600000) {
 			Thread th = new Thread(new Reboot());
 			th.start();
 		} else {
+			if(System.currentTimeMillis() - rebootInProgress<0 && System.currentTimeMillis()-App.AppStartupTime.getTime()>3600000) { //if date is 01/01/2000 reboot every hour
+				Thread th = new Thread(new Reboot());
+				th.start();
+			}
+			else
 			DLog.D(SystemControl.class.toString()+" Last Reboot within 6 hour, wait");
 		}
 	}

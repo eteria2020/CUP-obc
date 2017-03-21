@@ -113,7 +113,7 @@ public class FPin extends FBase implements OnClickListener {
 
 
 
-			if (App.currentTripInfo.isMaintenance) {
+			if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 				fpinRightFrame.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 			} else {
@@ -191,15 +191,39 @@ public class FPin extends FBase implements OnClickListener {
 				}, 2000);
 				
 			} else {
-				
-				((AWelcome)getActivity()).sendMessage(MessageFactory.checkPin(pin));
-				
-				if (App.currentTripInfo.serverResult != -15) {
-					pinChecked(App.currentTripInfo.CheckPin(pin));
-				} else {
-					progressDF.dismiss();
-					messageTV.setText("Risulta una corsa ancora aperta su un altro veicolo. Contattare il call center per informazioni");
-					return;
+				try {
+
+					((AWelcome) getActivity()).sendMessage(MessageFactory.checkPin(pin));
+
+					if (App.currentTripInfo.trip.recharge != -15) {
+						pinChecked(App.currentTripInfo.CheckPin(pin));
+					} else {
+						progressDF.dismiss();
+						messageTV.setText(R.string.other_trip_message);
+						return;
+					}
+				}catch(Exception e){
+					dlog.e("Exception while checking the pin resetting view");
+					disableUI();
+
+					messageTV.setText(R.string.pin_wrong);
+
+					pin = "";
+
+					Handler h = new Handler();
+					h.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							p1.setImageResource(R.drawable.img_pin_empty);
+							p2.setImageResource(R.drawable.img_pin_empty);
+							p3.setImageResource(R.drawable.img_pin_empty);
+							p4.setImageResource(R.drawable.img_pin_empty);
+
+							messageTV.setText(R.string.pin_type);
+
+							enableUI();
+						}
+					}, 1000);
 				}
 			}
 			
@@ -257,7 +281,7 @@ public class FPin extends FBase implements OnClickListener {
 			h.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					((ABase)getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
+					((ABase)getActivity()).pushFragmentnoBack(FInstructions.newInstance(true), FInstructions.class.getName(), true);
 				}
 			}, 1000);
 			

@@ -166,5 +166,9 @@ public class Customer extends DbRecord {
 		
 		
 	}
-	
+
+
+	public Boolean checkAdmin(){
+		return info_display.compareTo("sharengo")==0;
+	}
 }

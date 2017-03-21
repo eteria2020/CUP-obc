@@ -8,7 +8,7 @@
 
    <string name="back_to_navigation">Procedi e torna alla navigazione</string>
    <string name="button_call">Prenota chiamata assistenza</string>
-   <string name="button_break">SOSTA\no TERMINA</string>
+   <string name="button_break">SOSTA o\nTERMINA</string>
    <string name="button_close">Chiudi</string>
    <string name="button_navigator">NAVIGATORE</string>
    <string name="button_radio">RADIO</string>
@@ -96,9 +96,10 @@
 	<string name="instruction_close_1">Raccogli le tue cose. Hai chiuso luci e finestrini?</string>
 	<string name="instruction_close_2">Premi il pulsante N sul cruscotto</string>
 	<string name="instruction_close_3">Tira il freno a mano</string>
-	<string name="instruction_close_4">Scendi. Le porte si chiuderanno automaticamente nel tempo indicato a destra</string>
+	<string name="instruction_close_4">Puoi scendere. Le porte si chiuderanno automaticamente nel tempo indicato sotto</string>
 	<string name="instruction_close_4_note">Se cambiassi idea lascia chiudere le porte ed apri una nuova sessione di noleggio</string>
 	<string name="instruction_close_5">Attenzione una vettura non correttamente chiusa pu&#242; comportare per te inutili costi e penali</string>
+	<string name="bonus_message_poi">Congratulazioni!\nNei prossimi giorni, dopo aver pagato questa corsa, ti verrà accreditato un bonus per aver parcheggiato questa macchina vicino ad una stazione di ricartica</string>
 
 	<string name="self_close_message">Chiusura \n portiere</string>
 
@@ -117,6 +118,7 @@
 	<string name="menu_refuel">Fai rifornimento</string>
 	<string name="menu_refuel_off">Fai rifornimento (disabilitato)</string>
 	<string name="menu_refuel_shutdown_engine">Fai rifornimento (spegni prima il motore)</string>
+	<string name="menu_park_mode_started">Per riprendere il noleggio usa il comando APRI PORTE sul telefono o passa la tua Card per abilitare il motore</string>
 	<string name="menu_park_mode_resume">Riprendi il noleggio</string>
 	<string name="menu_park_mode_resume_shutdown_engine">Riprendi il noleggio (spegni prima il motore)</string>
 
@@ -129,7 +131,7 @@
 
 	<string name="push_to_cancel">Premi per\nannullare</string>
 
-	<string name="goodbye_instructions">Puoi scendere. Le porte si chiuderanno automaticamente nel tempo indicato a destra.\n\nSe cambiassi idea  esci, lascia chiudere le porte e apri una nuova sessione di noleggio</string>
+	<string name="goodbye_instructions">Puoi scendere. Le porte si chiuderanno automaticamente nel tempo indicato sotto.\n\nSe cambiassi idea  esci, lascia chiudere le porte e apri una nuova sessione di noleggio</string>
 
 	<string name="milan">Milano</string>
 	<string name="minutes_saved">Minuti guadagnati&#58;</string>
@@ -196,7 +198,8 @@
 
 
 	<string name="refuel_title">Ricarica vettura</string>
-	<string name="refueling_done">Rifornimento completato&#33;</string>
+	<string name="refueling_done">Ricarica completata! \nProcedi alla schermata successiva per riprendere la tua corsa\nRicordari di rimettere il cavo nel bagagliaio</string>
+	<string name="refuel_customer">Prima di partire controlla di aver staccato dalla torretta e rimesso nel bagagliaio il cavo della ricarica!</string>
 
 	<string name="search">Cerca</string>
 	<string name="select_a_destination">Selezionare una meta di interesse</string>
@@ -213,6 +216,13 @@
 
 	<string name="alert_20km">L’autonomia dell’auto, per come la stai utilizzando, potrebbe ora essere inferiore ai 20 km. Tienine conto.</string>
 	<string name="alert_5km">L’autonomia dell’auto, per come la stai utilizzando, è di circa 5 km. Ti invitiamo a chiudere la corsa per non incorrere in penali.</string>
+	<string name="alert_bonus">Da questo momento, se lascerai l’auto vicino ad una stazione di ricarica indicata sul navigatore, riceverai 5 minuti bonus sul tuo profilo.</string>
+	<string name="alert_bonus_title">BONUS</string>
+	<string name="alert_warning_title">ATTENZIONE</string>
+
+
+	<string name="poi_bonus_title">STAZIONE DI RICARICA</string>
+	<string name="poi_bonus_body">Parcheggia l’auto qui vicino per ricevere un BONUS di 5 minuti sul tuo profilo</string>
 
 	<string name="welcome">Benvenuto</string>
 

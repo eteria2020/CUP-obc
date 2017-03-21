@@ -134,7 +134,7 @@ public class AdvertisementService extends IntentService {
 			if (sharedPreferences != null) {
 				Editor editor = sharedPreferences.edit();
 				editor.putLong(App.KEY_LastAdvertisementListDownloaded, System.currentTimeMillis());
-				editor.commit();
+				editor.apply();
 			}
 			
 			// Remove unused banners

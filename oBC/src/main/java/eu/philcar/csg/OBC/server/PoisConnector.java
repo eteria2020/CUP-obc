@@ -90,17 +90,20 @@ public class PoisConnector implements RemoteEntityInterface {
 				// if (!clienti.isPresent(id, tms)) {
 				Poi c = new Poi();
 				c.id = id;
-				c.tipo = jobj.getString("type");
-				c.codice= jobj.getString("code");
-				c.via = jobj.getString("address");
-				c.citta = jobj.getString("town");
-				c.cap = jobj.getString("zip_code");
-				c.provincia =  jobj.getString("province");
-				c.attivo = true;
+				c.type = jobj.getString("type");
+				c.brand= "";
+				c.code= jobj.getString("code");
+				//c.type_group = jobj.getString("type_group");
+				c.address = jobj.getString("address");
+				c.town = jobj.getString("town").toLowerCase();
+				c.type_group ="";
+				c.zip = jobj.getString("zip_code");
+				c.province =  jobj.getString("province");
 				c.lon = jobj.getDouble("lon");
 				c.lat = jobj.getDouble("lat");
-				c.aggiornamento = jobj.getLong("update");
-				
+				c.update = jobj.getLong("update");
+				c.attivo = true;
+
 				try {
 					pois.createOrUpdate(c);
 				} catch (SQLException e) {
@@ -136,7 +139,7 @@ public class PoisConnector implements RemoteEntityInterface {
 			
 			if (lastUpdate > 0) {
 				list = new ArrayList<NameValuePair>();
-				list.add(new BasicNameValuePair("aggiornamento", "" + lastUpdate));
+				list.add(new BasicNameValuePair("lastupdate", "" + lastUpdate));
 			}
 			
 			return list;

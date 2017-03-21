@@ -6,6 +6,7 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.helpers.DLog;
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.FragmentManager.BackStackEntry;
 import android.content.Context;
@@ -13,6 +14,12 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+
+import com.skobbler.ngx.SKMaps;
+import com.skobbler.ngx.SKMapsInitSettings;
+import com.skobbler.ngx.map.SKMapViewStyle;
+import com.skobbler.ngx.navigation.SKAdvisorSettings;
+import com.skobbler.ngx.routing.SKRouteManager;
 
 public abstract class ABase extends Activity {
 
@@ -83,6 +90,30 @@ public abstract class ABase extends Activity {
 	public void setEnglishLanguage() {
 		saveLanguage("en");
 		changeLanguage("en");
+		SKMapsInitSettings initSettings = new SKMapsInitSettings();
+
+		initSettings.setConnectivityMode(SKMaps.CONNECTIVITY_MODE_OFFLINE);
+		initSettings.setMapsPath("/sdcard/SKMaps/");
+		initSettings.setMapResourcesPaths("/sdcard/SKMaps/", new SKMapViewStyle("/sdcard/SKMaps/daystyle/","daystyle.json"));
+		initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
+
+
+		initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_LIGHT);
+
+
+		SKAdvisorSettings advisorSettings = new SKAdvisorSettings();
+		advisorSettings.setLanguage(SKAdvisorSettings.SKAdvisorLanguage.LANGUAGE_EN);
+		advisorSettings.setAdvisorConfigPath("/sdcard/SKMaps/Advisor");
+		advisorSettings.setResourcePath("/sdcard/SKMaps/Advisor/Languages");
+		advisorSettings.setAdvisorVoice("en");
+		advisorSettings.setAdvisorType( SKAdvisorSettings.SKAdvisorType.TEXT_TO_SPEECH);
+		initSettings.setAdvisorSettings(advisorSettings);
+
+		SKMapViewStyle style = new SKMapViewStyle("/sdcard/skmaps/daystyle/","daystyle.json");
+		initSettings.setCurrentMapViewStyle(style);
+
+
+		SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
 	}
 	
 	/**
@@ -91,13 +122,90 @@ public abstract class ABase extends Activity {
 	public void setItalianLanguage() {
 		saveLanguage("it");
 		changeLanguage("it");
+		SKMapsInitSettings initSettings = new SKMapsInitSettings();
+
+		initSettings.setConnectivityMode(SKMaps.CONNECTIVITY_MODE_OFFLINE);
+		initSettings.setMapsPath("/sdcard/SKMaps/");
+		initSettings.setMapResourcesPaths("/sdcard/SKMaps/", new SKMapViewStyle("/sdcard/SKMaps/daystyle/","daystyle.json"));
+		initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
+
+
+		initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_LIGHT);
+
+
+		SKAdvisorSettings advisorSettings = new SKAdvisorSettings();
+		advisorSettings.setLanguage(SKAdvisorSettings.SKAdvisorLanguage.LANGUAGE_IT);
+		advisorSettings.setAdvisorConfigPath("/sdcard/SKMaps/Advisor");
+		advisorSettings.setResourcePath("/sdcard/SKMaps/Advisor/Languages");
+		advisorSettings.setAdvisorVoice("it");
+		advisorSettings.setAdvisorType( SKAdvisorSettings.SKAdvisorType.TEXT_TO_SPEECH);
+		initSettings.setAdvisorSettings(advisorSettings);
+
+		SKMapViewStyle style = new SKMapViewStyle("/sdcard/skmaps/daystyle/","daystyle.json");
+		initSettings.setCurrentMapViewStyle(style);
+
+
+		SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
 	}
 
 	public void setFrenchLanguage() {
 		saveLanguage("fr");
 		changeLanguage("fr");
+		SKMapsInitSettings initSettings = new SKMapsInitSettings();
+
+		initSettings.setConnectivityMode(SKMaps.CONNECTIVITY_MODE_OFFLINE);
+		initSettings.setMapsPath("/sdcard/SKMaps/");
+		initSettings.setMapResourcesPaths("/sdcard/SKMaps/", new SKMapViewStyle("/sdcard/SKMaps/daystyle/","daystyle.json"));
+		initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
+
+
+		initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_LIGHT);
+
+
+		SKAdvisorSettings advisorSettings = new SKAdvisorSettings();
+		advisorSettings.setLanguage(SKAdvisorSettings.SKAdvisorLanguage.LANGUAGE_FR);
+		advisorSettings.setAdvisorConfigPath("/sdcard/SKMaps/Advisor");
+		advisorSettings.setResourcePath("/sdcard/SKMaps/Advisor/Languages");
+		advisorSettings.setAdvisorVoice("fr");
+		advisorSettings.setAdvisorType( SKAdvisorSettings.SKAdvisorType.TEXT_TO_SPEECH);
+		initSettings.setAdvisorSettings(advisorSettings);
+
+		SKMapViewStyle style = new SKMapViewStyle("/sdcard/skmaps/daystyle/","daystyle.json");
+		initSettings.setCurrentMapViewStyle(style);
+
+
+		SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
 	}
-	
+
+	public void setChinseseLanguage() {
+		saveLanguage("zh");
+		changeLanguage("zh");
+		SKMapsInitSettings initSettings = new SKMapsInitSettings();
+
+		initSettings.setConnectivityMode(SKMaps.CONNECTIVITY_MODE_OFFLINE);
+		initSettings.setMapsPath("/sdcard/SKMaps/");
+		initSettings.setMapResourcesPaths("/sdcard/SKMaps/", new SKMapViewStyle("/sdcard/SKMaps/daystyle/","daystyle.json"));
+		initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
+
+
+		initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_LIGHT);
+
+
+		SKAdvisorSettings advisorSettings = new SKAdvisorSettings();
+		advisorSettings.setLanguage(SKAdvisorSettings.SKAdvisorLanguage.LANGUAGE_EN);
+		advisorSettings.setAdvisorConfigPath("/sdcard/SKMaps/Advisor");
+		advisorSettings.setResourcePath("/sdcard/SKMaps/Advisor/Languages");
+		advisorSettings.setAdvisorVoice("en");
+		advisorSettings.setAdvisorType( SKAdvisorSettings.SKAdvisorType.TEXT_TO_SPEECH);
+		initSettings.setAdvisorSettings(advisorSettings);
+
+		SKMapViewStyle style = new SKMapViewStyle("/sdcard/skmaps/daystyle/","daystyle.json");
+		initSettings.setCurrentMapViewStyle(style);
+
+
+		SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
+	}
+
 	/**
 	 * Use this method to push (and display) a new fragment (i.e., like [UINavigationController pushViewController:animated]).
 	 * Note that "fragment" must inherits from FBase.
@@ -119,6 +227,27 @@ public abstract class ABase extends Activity {
 		transaction.commit();
 	}
 
+	/**
+	 * Use this method to push (and display) a new fragment (i.e., like [UINavigationController pushViewController:animated]).
+	 * Note that "fragment" must inherits from FBase.
+	 *
+	 * @param fragment		A fragment (which inherits from FBase) that will be displayed
+	 * @param fragmentName The name associated with the transaction (e.g., [YourClassHere].class.getName()). If the back button won't be used, then this parameter will be removed before release but until then you should stick with it.
+	 * @param animated		Self-explanatory
+	 */
+	public void pushFragmentnoBack(FBase fragment, String fragmentName, boolean animated) {
+
+		//getFragmentManager().popBackStack();
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+
+		if (animated) {
+			transaction.setCustomAnimations(R.animator.slide_in_right, R.animator.slide_out_left, R.animator.slide_in_left, R.animator.slide_out_right);
+		}
+		transaction.add(getPlaceholderResource(), fragment, fragmentName);
+		transaction.disallowAddToBackStack();
+		transaction.commit();
+	}
 	/**
 	 * Use this method to pop the fragment until the fragment name, in not present push (and display) a new fragment (i.e., like [UINavigationController pushViewController:animated]).
 	 * Note that "fragment" must inherits from FBase.
@@ -232,7 +361,7 @@ public abstract class ABase extends Activity {
 		SharedPreferences sp = getSharedPreferences(getResources().getString(R.string.app_name), Context.MODE_PRIVATE);
 		Editor edit = sp.edit();
 		edit.putString("language", locale);
-		edit.commit();
+		edit.apply();
 	}
 	
 	private void changeLanguage(String locale) {

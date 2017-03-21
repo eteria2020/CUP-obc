@@ -91,7 +91,7 @@ public class FDriveMessage extends FBase {
 
 		}.start();
 
-		if (App.currentTripInfo.isMaintenance) {
+		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fchn_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
 		} else {

@@ -117,7 +117,7 @@ public class Customers extends DbTable<Customer,Integer> {
 			List<String> codes = new ArrayList<String>();
 			
 			for(Customer c : list) {
-				codes.add(new String(c.card_code));
+				codes.add(c.card_code);
 			}
 			return codes;
 			
