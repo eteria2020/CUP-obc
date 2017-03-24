@@ -660,7 +660,6 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 		llRow1=null;
 		llRow2=null;
 		llRow3=null;
-		resultsLV=null;
 		resultsRL=null;
 		resultsTV=null;
 		sks=null;

@@ -430,7 +430,7 @@ public class App extends Application {
 
 
 	
-	public static TripInfo  currentTripInfo;	
+	public static TripInfo currentTripInfo;
 	
 	public static Reservation reservation;
 	

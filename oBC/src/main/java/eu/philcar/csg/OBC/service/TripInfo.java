@@ -435,6 +435,12 @@ public class TripInfo {
         return null;
     }
 
+    @Override
+    public String toString() {
+
+        return this.trip.toString();
+    }
+
     public void loadBanner(String Url, String type, Boolean isClick) {
 
         File outDir = new File(App.BANNER_IMAGES_FOLDER);
@@ -629,6 +635,7 @@ public class TripInfo {
 
         App.currentTripInfo = this;
 
+        dlog.d("OpenTrip: "+this.toString());
         return (trip!=null);
 
     }
@@ -731,7 +738,7 @@ public class TripInfo {
             dlog.e("Error updating trip",e);
 
         }
-        if(App.currentTripInfo!= null && App.currentTripInfo.trip.id==trip.id){
+        if(App.currentTripInfo!= null &&App.currentTripInfo.trip!=null && App.currentTripInfo.trip.id==trip.id){
             if(App.currentTripInfo.trip.remote_id==0)
                 App.currentTripInfo.trip.remote_id=trip.remote_id;
         }

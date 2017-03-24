@@ -245,7 +245,7 @@ public class ServiceTestActivity extends Activity {
 		((TextView)findViewById(R.id.tvSpeed)).setText(""+carInfo.speed);
 		((TextView)findViewById(R.id.tvFuelLevel)).setText(""+carInfo.bmsSOC);
 		((TextView)findViewById(R.id.tvTarga)).setText(""+carInfo.id);
-		
+		cellsVoltage=cellsVoltage.concat("outAmp: "+ carInfo.outAmp +"A\n");
 		((TextView)findViewById(R.id.tvQuadro)).setText((carInfo.isKeyOn>0)?"ON":"OFF");
 		((TextView)findViewById(R.id.tvFW)).setText(carInfo.fw_version);
 		//((TextView)findViewById(R.id.tvAvolt)).setText(""+carInfo.analogVoltage);

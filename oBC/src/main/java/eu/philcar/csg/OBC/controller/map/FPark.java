@@ -89,7 +89,11 @@ public class FPark extends FBase implements OnClickListener {
 		case R.id.fmenBackIB:
 			//((ABase)getActivity()).popFragment();
 			((AMainOBC)getActivity()).setParkModeStarted(false);
-			((ABase)getActivity()).popTillFragment(FMap.class.getName());
+			try {
+				((ABase)getActivity()).popTillFragment(FMap.class.getName());
+			} catch (Exception e) {
+				dlog.d("Exception while popping fragment");
+			}
 			((ABase)getActivity()).pushFragment(FMap.newInstance(), FMap.class.getName(), true);
 			stopSelfClose(rootView);
 			break;			

@@ -185,8 +185,12 @@ public class FPOI extends FBase implements OnClickListener, ALVFuelStationsDeleg
 			break;
 		
 		case R.id.fpoiDisclosureIndicatorIB:
-			
-			((ABase)getActivity()).popTillFragment(FMap.class.getName());
+
+			try {
+				((ABase)getActivity()).popTillFragment(FMap.class.getName());
+			}  catch (Exception e) {
+				dlog.d("Exception while popping fragment");
+			}
 			break;
 			
 		}
@@ -196,7 +200,11 @@ public class FPOI extends FBase implements OnClickListener, ALVFuelStationsDeleg
 	public void onRowSelected(int position) {
 		
 		if (!App.isNavigatorEnabled) {
-			((ABase)getActivity()).popTillFragment(FDriving.class.getName());
+			try {
+				((ABase)getActivity()).popTillFragment(FDriving.class.getName());
+			} catch (Exception e) {
+				dlog.d("Exception while popping fragment");
+			}
 			return;
 		}
 		
@@ -208,8 +216,12 @@ public class FPOI extends FBase implements OnClickListener, ALVFuelStationsDeleg
 			((AMainOBC)getActivity()).setFuelStation(fs);
 			((AMainOBC)getActivity()).setEndingPosition(fs.location);
 			((AMainOBC)getActivity()).setCurrentRouting(null);
-			
-			((ABase)getActivity()).popTillFragment(FMap.class.getName());
+
+			try {
+				((ABase)getActivity()).popTillFragment(FMap.class.getName());
+			} catch (Exception e) {
+				dlog.d("Exception while popping fragment");
+			}
 		}
 	}
 
@@ -218,7 +230,11 @@ public class FPOI extends FBase implements OnClickListener, ALVFuelStationsDeleg
 	public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 		
 		if (!App.isNavigatorEnabled) {
-			((ABase)getActivity()).popTillFragment(FDriving.class.getName());
+			try {
+				((ABase)getActivity()).popTillFragment(FDriving.class.getName());
+			} catch (Exception e) {
+				dlog.d("Exception while popping fragment");
+			}
 			return;
 		}
 		
@@ -230,8 +246,12 @@ public class FPOI extends FBase implements OnClickListener, ALVFuelStationsDeleg
 			((AMainOBC)getActivity()).setFuelStation(fs);
 			((AMainOBC)getActivity()).setEndingPosition(fs.location);
 			((AMainOBC)getActivity()).setCurrentRouting(null);
-			
-			((ABase)getActivity()).popTillFragment(FMap.class.getName());
+
+			try {
+				((ABase)getActivity()).popTillFragment(FMap.class.getName());
+			} catch (Exception e) {
+				dlog.d("Exception while popping fragment");
+			}
 		}
 	}
 	

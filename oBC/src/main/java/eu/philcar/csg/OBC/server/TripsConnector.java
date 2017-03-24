@@ -193,6 +193,7 @@ public class TripsConnector implements RemoteEntityInterface {
 				default:
 					tripInfo.trip.warning="FAIL";
 					tripInfo.setWarning("FAIL");
+					tripInfo.trip.begin_sent = false;
 				}
 
 				tripInfo.UpdateCorsa();

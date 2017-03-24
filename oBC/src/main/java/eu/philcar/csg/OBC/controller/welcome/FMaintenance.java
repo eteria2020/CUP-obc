@@ -37,18 +37,20 @@ import android.widget.Toast;
 public class FMaintenance extends FBase {
 
 	private DLog dlog = new DLog(this.getClass());
-	public static FMaintenance Instance;
+
+	public  static FMaintenance Instance;
+
 
 	public static FMaintenance newInstance() {
 		return new FMaintenance();
 	}
-
-	public FMaintenance(){
+	public FMaintenance() {
 		Instance = this;
+
 	}
 
 	private  View view;
-
+	private AlertDialog  dialog;
 
 
 	private void askPin() {
@@ -64,7 +66,28 @@ public class FMaintenance extends FBase {
 		builder.setView(input);
 
 		// Set up the buttons
-		builder.setPositiveButton("OK",null);
+		builder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				String pwd =  input.getText().toString();
+				int npwd=0;
+
+				if (App.currentTripInfo!=null && App.currentTripInfo.customer!=null) {
+					npwd = App.currentTripInfo.customer.checkPin(pwd);
+				}
+
+				if (npwd>0) {
+					Events.Maintenance("Enter");
+					dlog.d("Entering FMaintenance");
+					dialog.dismiss();
+				} else {
+					input.setText("");
+					Toast.makeText(FMaintenance.this.getActivity(), "PIN errato", Toast.LENGTH_SHORT).show();;
+					dlog.d("Wrong pin");
+					Events.Maintenance("Wrong pin");
+				}
+			}
+		});
 
 
 		builder.setNegativeButton("Salta pagina", new DialogInterface.OnClickListener() {
@@ -78,40 +101,17 @@ public class FMaintenance extends FBase {
 		});
 
 		builder.setCancelable(false);
-		final AlertDialog  d = builder.create();
-		d.setCanceledOnTouchOutside(false);
-		d.setOnShowListener(new OnShowListener() {
+		dialog = builder.create();
+		dialog.setCanceledOnTouchOutside(false);
+		dialog.setOnShowListener(new OnShowListener() {
 
 			@Override
 			public void onShow(DialogInterface dialog) {
-				Button b = d.getButton(AlertDialog.BUTTON_POSITIVE);
-				final DialogInterface d = dialog;
-				b.setOnClickListener( new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						String pwd =  input.getText().toString();
-						int npwd=0;
 
-						if (App.currentTripInfo!=null && App.currentTripInfo.customer!=null) {
-							npwd = App.currentTripInfo.customer.checkPin(pwd);
-						}
-
-						if (npwd>0) {
-							Events.Maintenance("Enter");
-							dlog.d("Entering FMaintenance");
-							d.dismiss();
-						} else {
-							input.setText("");
-							Toast.makeText(FMaintenance.this.getActivity(), "PIN errato", Toast.LENGTH_SHORT).show();;
-							dlog.d("Wrong pin");
-							Events.Maintenance("Wrong pin");
-						}
-					}
-				});
 			}
 
 		});
-		d.show();
+		dialog.show();
 		dlog.d("FMaintenance asking pin");
 	}
 
@@ -191,11 +191,7 @@ public class FMaintenance extends FBase {
 		}
 	}
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		Instance=null;
-	}
+
 
 	@Override
 	public boolean handleBackButton() {
@@ -204,5 +200,12 @@ public class FMaintenance extends FBase {
 
 	public void handleCarInfo(CarInfo carinfo) {
 		update(carinfo);
+	}
+
+	@Override
+	public void onDestroy() {
+		Instance=null;
+		dialog.dismiss();
+		super.onDestroy();
 	}
 }

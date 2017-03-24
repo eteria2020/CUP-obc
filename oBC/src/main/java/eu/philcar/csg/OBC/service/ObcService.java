@@ -179,7 +179,6 @@ public class ObcService extends Service {
     private ArrayList<Messenger> clients = new ArrayList<Messenger>();
 
     private boolean isStarted;
-    private long lastValidSOC = 0;
     private boolean isStopRequested = false;
 
 
@@ -490,11 +489,11 @@ public class ObcService extends Service {
                     carInfo.lowCells = lowCellNumber;
                     carInfo.currVoltage = (float) Math.round(currVolt * 100) / 100f;
 
-                    if (carInfo.currVoltage <= 0 || carInfo.outAmp>=25 ){
-
-                            carInfo.setBatteryLevel(Math.min(carInfo.batteryLevel,Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS)));
-                            dlog.d("virtualBMSUpdateScheduler: value null ignoring data.");
-                            return;
+                    if (carInfo.currVoltage <= 0 || carInfo.outAmp>= 25){
+                        carInfo.setBatteryLevel((Math.min(carInfo.batteryLevel,Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS))));
+                        dlog.d("virtualBMSUpdateScheduler: value "+ (carInfo.currVoltage<=0?"packVoltage null":"outAmp greater than 25")+" ignoring virtual data.");
+                        dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.Instance.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
+                        return;
                     }
 
                     if (carInfo.bmsSOC >= 100 || carInfo.bmsSOC_GPRS >= 100) {
@@ -536,18 +535,19 @@ public class ObcService extends Service {
 
 
             int intCount = 0, extCount = 0;
-            Location lastIntGpslocation = new Location(LocationManager.GPS_PROVIDER);
-            Location lastExtGpslocation = new Location(LocationManager.GPS_PROVIDER);
+            Location lastIntGpsLocation = new Location(LocationManager.GPS_PROVIDER);
+            Location lastExtGpsLocation = new Location(LocationManager.GPS_PROVIDER);
 
             @Override
             public void run() {
                 try {
+                    dlog.d("gpsCheckeScheduler: lastIntGpsLocation: "+ lastIntGpsLocation +" lastExtGpsLocation: "+ lastExtGpsLocation +" newIntGpslocation: "+carInfo.intGpsLocation + " newExtGpslocation "+carInfo.extGpsLocation + " UseExternalGPS: "+App.UseExternalGPS);
 
 
                     if (!App.UseExternalGPS) {
 
-                        if ((carInfo.intGpslocation.getLongitude() >= 18.53 || carInfo.intGpslocation.getLongitude() <= 6.63 || carInfo.intGpslocation.getLatitude() >= 47.10 || carInfo.intGpslocation.getLatitude() <= 36.64) ||
-                                (carInfo.intGpslocation.getLongitude() == 0 || carInfo.intGpslocation.getLongitude() == 0 || carInfo.intGpslocation.getLatitude() == 0 || carInfo.intGpslocation.getLatitude() == 0)) {
+                        if ((carInfo.intGpsLocation.getLongitude() >= 18.53 || carInfo.intGpsLocation.getLongitude() <= 6.63 || carInfo.intGpsLocation.getLatitude() >= 47.10 || carInfo.intGpsLocation.getLatitude() <= 36.64) ||
+                                (carInfo.intGpsLocation.getLongitude() == 0 || carInfo.intGpsLocation.getLongitude() == 0 || carInfo.intGpsLocation.getLatitude() == 0 || carInfo.intGpsLocation.getLatitude() == 0)) {
                             App.Instance.setUseExternalGps(true);
                             dlog.d("GpsCheckeScheduler: setUseExternalGps(true) IntGpsLocation out from Italy or location 0.0");
                             sendBeacon();//update remoto per aggiornare int/ext
@@ -555,7 +555,7 @@ public class ObcService extends Service {
                             return;
                         }
 
-                        if (carInfo.intGpslocation.getLatitude() == lastIntGpslocation.getLatitude() && carInfo.intGpslocation.getLongitude() == lastIntGpslocation.getLongitude()) {
+                        if (carInfo.intGpsLocation.getLatitude() == lastIntGpsLocation.getLatitude() && carInfo.intGpsLocation.getLongitude() == lastIntGpsLocation.getLongitude()) {
                             intCount++;
                             if (intCount >= 3) {
                                 App.Instance.setUseExternalGps(true);
@@ -566,19 +566,19 @@ public class ObcService extends Service {
                             return;
                         } else {
                             intCount = 0;
-                            lastIntGpslocation = carInfo.intGpslocation;
+                            lastIntGpsLocation = carInfo.intGpsLocation;
                         }
                     } else {
 
-                        if ((carInfo.extGpslocation.getLongitude() >= 18.53 || carInfo.extGpslocation.getLongitude() <= 6.63 || carInfo.extGpslocation.getLatitude() >= 47.10 || carInfo.extGpslocation.getLatitude() <= 36.64) ||
-                                (carInfo.extGpslocation.getLatitude() == 0 || carInfo.extGpslocation.getLatitude() == 0 || carInfo.extGpslocation.getLongitude() == 0 || carInfo.extGpslocation.getLongitude() == 0)) {
+                        if ((carInfo.extGpsLocation.getLongitude() >= 18.53 || carInfo.extGpsLocation.getLongitude() <= 6.63 || carInfo.extGpsLocation.getLatitude() >= 47.10 || carInfo.extGpsLocation.getLatitude() <= 36.64) ||
+                                (carInfo.extGpsLocation.getLatitude() == 0 || carInfo.extGpsLocation.getLatitude() == 0 || carInfo.extGpsLocation.getLongitude() == 0 || carInfo.extGpsLocation.getLongitude() == 0)) {
                             App.Instance.setUseExternalGps(false);
                             dlog.d("GpsCheckeScheduler: setUseExternalGps(false) ExtGpsLocation out from Italy or location 0.0");
                             sendBeacon();
                             extCount = 0;
                             return;
                         }
-                        if (carInfo.extGpslocation.getLatitude() == lastExtGpslocation.getLatitude() && carInfo.extGpslocation.getLongitude() == lastExtGpslocation.getLongitude()) {
+                        if (carInfo.extGpsLocation.getLatitude() == lastExtGpsLocation.getLatitude() && carInfo.extGpsLocation.getLongitude() == lastExtGpsLocation.getLongitude()) {
                             extCount++;
                             if (extCount >= 3) {
                                 App.Instance.setUseExternalGps(false);
@@ -589,7 +589,7 @@ public class ObcService extends Service {
                             return;
                         } else {
                             extCount = 0;
-                            lastExtGpslocation = carInfo.extGpslocation;
+                            lastExtGpsLocation = carInfo.extGpsLocation;
                         }
 
                     }
@@ -952,13 +952,13 @@ public class ObcService extends Service {
         //TODO: FORZATURA DA RIMUOVERE UNA VOLTA RISOLTO IL PROBLEMA AGGIORNAMENTO DALL AUTO
         if (false && (carInfo.keyStatus.equalsIgnoreCase("ON") || carInfo.keyStatus.equalsIgnoreCase("ACC"))) {
 
-            if (App.motoreAvviato == false) {
+            if (!App.motoreAvviato) {
                 dlog.d("set motore avviato:" + App.motoreAvviato);
                 App.motoreAvviato = true;
                 App.Instance.persistMotoreAvviato();
             }
         } else {
-            if (App.motoreAvviato == true) {
+            if (App.motoreAvviato) {
                 dlog.d("set motore avviato: " + App.motoreAvviato);
                 App.motoreAvviato = false;
                 App.Instance.persistMotoreAvviato();
@@ -975,12 +975,12 @@ public class ObcService extends Service {
 
         if (carInfo.batteryLevel != 0 && carInfo.batteryLevel <= 20 && !App.AlarmSOCSent && delta > 60 && firstSOCReceived) {
 
-            String text = String.format("%s -  %d%% SOC", App.CarPlate, carInfo.batteryLevel);
+            /*String text = String.format("%s -  %d%% SOC", App.CarPlate, carInfo.batteryLevel);
             if (App.currentTripInfo != null) {
                 text += String.format(" - Utente %s %s - Tel: %s", App.currentTripInfo.customer.name, App.currentTripInfo.customer.surname, App.currentTripInfo.customer.mobile);
             } else {
                 text += " - Macchina libera";
-            }
+            }*/
 
             //sendSMS(App.BatteryAlarmSmsNumbers,text);
 
@@ -2177,6 +2177,8 @@ public class ObcService extends Service {
                         }
 
                         sendBeacon();
+                        if(FMaintenance.Instance!=null)
+                            FMaintenance.Instance.update(carInfo);
                     }
                     break;
                 case ObcService.MSG_CAR_START_CHARGING:
@@ -2190,6 +2192,8 @@ public class ObcService extends Service {
                     //Fan-out message
                     Message nmsg = Message.obtain();
                     nmsg.copyFrom(msg);
+                    if(msg.obj instanceof Location)
+                        dlog.d("Location Changed "+((Location)msg.obj).getLongitude()+" "+((Location)msg.obj).getLatitude());
                     sendAll(nmsg);
                     break;
                 case MSG_DEBUG_CARD:

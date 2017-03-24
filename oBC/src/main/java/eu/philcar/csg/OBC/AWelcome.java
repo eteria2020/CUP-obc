@@ -175,7 +175,11 @@ public class AWelcome extends ABase {
 			case ObcService.MSG_TRIP_END:
 				try {
 					popTillFragment(FWelcome.class.getName());
-				}catch(Exception e){
+				}catch (PopTillException ex){
+					dlog.e("AWelcome: Exception during popTillFragment refreshing activity ",ex);
+					AWelcome.this.finish();
+				}
+				catch(Exception e){
 					DLog.E(AWelcome.class.getName() + "AWelcome: Exception during popTillFragment",e);
 				}
 

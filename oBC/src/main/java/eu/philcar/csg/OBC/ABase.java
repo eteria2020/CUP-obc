@@ -298,12 +298,18 @@ public abstract class ABase extends Activity {
 	/**
 	 * Use this method to pop back until the custom fragment is reached.
 	 */
-	public void popTillFragment(String fragmentName) {
+	public class PopTillException extends Exception {
+		public PopTillException(String message) {
+			super(message);
+		}
+	}
+	public void popTillFragment(String fragmentName) throws PopTillException{
 		
 		try {
 		getFragmentManager().popBackStackImmediate(fragmentName, 0);
 		} catch (Exception e) {
 			DLog.E("popTillFragment :",e);
+			throw new PopTillException("Reset activity, unable to pop back stack");
 		}
 		
 		int entryCount = getFragmentManager().getBackStackEntryCount();

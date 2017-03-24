@@ -175,6 +175,7 @@ public class FMap extends FBase implements OnClickListener {
 	private static boolean animToggle=true, animFull=false ;
 	private int playing=0;//0:no anim 1:anim3g 2:animArea 3:alertAnimation
 	private List<String> animQueue =new ArrayList<String>();
+	private long updateArea=0;
 	private CarInfo localCarInfo;
 
 	private static SKCoordinate calloutCoordinate=null;
@@ -842,7 +843,7 @@ public class FMap extends FBase implements OnClickListener {
 		panelNavMenu=null;
 		panelRealReach=null;
 		panels=null;
-		panels= new ArrayList<View>();
+		panels = new ArrayList<View>();
 		fmapAlarm=null;
 		fmapRange=null;
 		tvRange=null;
@@ -1022,14 +1023,19 @@ public class FMap extends FBase implements OnClickListener {
 		//dlog.d(FMap.class.toString()+"updateParkAreaStatus: "+String.valueOf(isInside));
 
 		if (isInside) {
-			if(animQueue.contains("area")){
-				animQueue.remove("area");
+			if(updateArea==0)
+				updateArea=System.currentTimeMillis();
+			if(System.currentTimeMillis()-updateArea>=10000){
+				if(animQueue.contains("area")){
+					animQueue.remove("area");
+				}
+				if(lastInside!=0 && lastInside!=1)
+					Events.outOfArea(false);
+				lastInside=0;
 			}
-			if(lastInside!=0 && lastInside!=1)
-				Events.outOfArea(false);
-			lastInside=0;
 
 		} else {
+			updateArea=0;
 			if(!animQueue.contains("area")){
 				animQueue.add("area");
 			}
@@ -1223,7 +1229,7 @@ public class FMap extends FBase implements OnClickListener {
 			rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
 			fmapAlarm.setVisibility(View.INVISIBLE);
 			fmapRange.setVisibility(View.VISIBLE);
-			tvRange.setText( carInfo.rangeKm + " Km");
+			tvRange.setText((SOC>=50?SOC:SOC-10) + " Km");
 		}
 
 		range = carInfo.rangeKm;
@@ -2348,15 +2354,18 @@ public class FMap extends FBase implements OnClickListener {
     }
 
     private void hideLeftPanel() {
+		try {
+			for (View p : panels) {
+				if (p.getVisibility() == View.VISIBLE)
+					p.setVisibility(View.INVISIBLE);
+			}
 
-    	for(View p : panels) {
-    		if (p.getVisibility()==View.VISIBLE)
-    			p.setVisibility(View.INVISIBLE);
-    	}
-
-    	//rootView.findViewById(R.id.fmapLeftBorderIV).setVisibility(View.VISIBLE);
-    	//rootView.findViewById(R.id.fmapLeftBorderIV).animate().translationX(0);
-    }
+			//rootView.findViewById(R.id.fmapLeftBorderIV).setVisibility(View.VISIBLE);
+			//rootView.findViewById(R.id.fmapLeftBorderIV).animate().translationX(0);
+		}catch(Exception e) {
+			dlog.e("Exception while hiding left panels",e);
+		}
+	}
 
 
 	private void centerMap(Location position) {
@@ -3654,6 +3663,7 @@ public class FMap extends FBase implements OnClickListener {
 		if(status>0){
 			if(!animQueue.contains("bonus")){
 				animQueue.add("bonus");
+				drawChargingStation();
 				dlog.d("Stating bonus anim");
 
 			}

@@ -89,9 +89,9 @@ public class CarInfo {
 
     public Location location;
 
-    public Location intGpslocation = new Location(LocationManager.GPS_PROVIDER);
-    public Location extGpslocation = new Location(LocationManager.GPS_PROVIDER);
-    ;
+    public Location intGpsLocation = new Location(LocationManager.GPS_PROVIDER);
+    public Location extGpsLocation = new Location(LocationManager.GPS_PROVIDER);
+
 
     public double longitude;
     public double latitude;
@@ -157,6 +157,7 @@ public class CarInfo {
         }
 
         if (loc != null) {
+
             location = loc;
             long a=loc.getTime();
             String time = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS").format(location.getTime());
@@ -293,15 +294,15 @@ public class CarInfo {
                     try {
                         jo = new JSONObject(j);
 
-                        extGpslocation.setLatitude(jo.getDouble("lat"));
-                        extGpslocation.setLongitude(jo.getDouble("lon"));
-                        extGpslocation.setAccuracy((float) jo.getDouble("acc"));
-                        extGpslocation.setSpeed((float) jo.getDouble("spd"));
-                        extGpslocation.setTime(jo.getLong("ts"));
-                        extGpslocation.setBearing((float) jo.getDouble("head"));
+                        extGpsLocation.setLatitude(jo.getDouble("lat"));
+                        extGpsLocation.setLongitude(jo.getDouble("lon"));
+                        extGpsLocation.setAccuracy((float) jo.getDouble("acc"));
+                        extGpsLocation.setSpeed((float) jo.getDouble("spd"));
+                        extGpsLocation.setTime(jo.getLong("ts"));
+                        extGpsLocation.setBearing((float) jo.getDouble("head"));
 
                         if (App.UseExternalGPS) {
-                            setLocation(extGpslocation);
+                            setLocation(extGpsLocation);
                         }
 
                     } catch (JSONException e) {
@@ -499,16 +500,16 @@ public class CarInfo {
                     try {
                         jo = new JSONObject(j);
 
-                        extGpslocation.setLatitude(jo.getDouble("lat"));
-                        extGpslocation.setLongitude(jo.getDouble("lon"));
-                        extGpslocation.setAccuracy((float) jo.getDouble("acc"));
-                        extGpslocation.setSpeed((float) jo.getDouble("spd"));
-                        extGpslocation.setTime(jo.getLong("ts"));
-                        extGpslocation.setBearing((float) jo.getDouble("head"));
+                        extGpsLocation.setLatitude(jo.getDouble("lat"));
+                        extGpsLocation.setLongitude(jo.getDouble("lon"));
+                        extGpsLocation.setAccuracy((float) jo.getDouble("acc"));
+                        extGpsLocation.setSpeed((float) jo.getDouble("spd"));
+                        extGpsLocation.setTime(jo.getLong("ts"));
+                        extGpsLocation.setBearing((float) jo.getDouble("head"));
 
                         if (App.UseExternalGPS) {
                             hasChanged = true;
-                            setLocation(extGpslocation);
+                            setLocation(extGpsLocation);
                         }
 
                     } catch (JSONException e) {
@@ -731,16 +732,16 @@ public class CarInfo {
             }
 
 
-            if (intGpslocation != null) {
-                jw.name("int_lon").value(gpsRound(intGpslocation.getLongitude()));
-                jw.name("int_lat").value(gpsRound(intGpslocation.getLatitude()));
-                jw.name("int_time").value(intGpslocation.getTime());
+            if (intGpsLocation != null) {
+                jw.name("int_lon").value(gpsRound(intGpsLocation.getLongitude()));
+                jw.name("int_lat").value(gpsRound(intGpsLocation.getLatitude()));
+                jw.name("int_time").value(intGpsLocation.getTime());
             }
 
-            if (extGpslocation != null) {
-                jw.name("ext_lon").value(gpsRound(extGpslocation.getLongitude()));
-                jw.name("ext_lat").value(gpsRound(extGpslocation.getLatitude()));
-                jw.name("ext_time").value(extGpslocation.getTime());
+            if (extGpsLocation != null) {
+                jw.name("ext_lon").value(gpsRound(extGpsLocation.getLongitude()));
+                jw.name("ext_lat").value(gpsRound(extGpsLocation.getLatitude()));
+                jw.name("ext_time").value(extGpsLocation.getTime());
             }
 
 
@@ -829,16 +830,16 @@ public class CarInfo {
             }
 
 
-            if (intGpslocation != null) {
-                jw.name("int_lon").value(gpsRound(intGpslocation.getLongitude()));
-                jw.name("int_lat").value(gpsRound(intGpslocation.getLatitude()));
-                jw.name("int_time").value(intGpslocation.getTime());
+            if (intGpsLocation != null) {
+                jw.name("int_lon").value(gpsRound(intGpsLocation.getLongitude()));
+                jw.name("int_lat").value(gpsRound(intGpsLocation.getLatitude()));
+                jw.name("int_time").value(intGpsLocation.getTime());
             }
 
-            if (extGpslocation != null) {
-                jw.name("ext_lon").value(gpsRound(extGpslocation.getLongitude()));
-                jw.name("ext_lat").value(gpsRound(extGpslocation.getLatitude()));
-                jw.name("ext_time").value(extGpslocation.getTime());
+            if (extGpsLocation != null) {
+                jw.name("ext_lon").value(gpsRound(extGpsLocation.getLongitude()));
+                jw.name("ext_lat").value(gpsRound(extGpsLocation.getLatitude()));
+                jw.name("ext_time").value(extGpsLocation.getTime());
             }
 
 
@@ -937,7 +938,7 @@ public class CarInfo {
 
         public void onLocationChanged(Location loc) {
 
-            intGpslocation = loc;
+            intGpsLocation = loc;
 
             if (!App.UseExternalGPS) {
                 setLocation(loc);

@@ -89,6 +89,7 @@ public class FHome extends FBase implements OnClickListener {
     private Uri uri;
     private int  lastInside=0;//0:no anim 1:anim3g 2:animArea 3:animBoth
     private static Boolean RequestBanner=false;
+    private long updateArea=0;
 
     private static Boolean handleClick=false;
 
@@ -336,7 +337,7 @@ public class FHome extends FBase implements OnClickListener {
     public void onPause() {
         super.onPause();
         //actualAnim=0;
-        lastInside=1;
+        //lastInside=1;
         seenA=false;
         seenB=false;
         try{
@@ -461,14 +462,19 @@ public class FHome extends FBase implements OnClickListener {
         //rotationAngle =0;
 
         if (isInside) {
-            if(animQueue.contains("area")){
-                animQueue.remove("area");
+            if(updateArea==0)
+                updateArea=System.currentTimeMillis();
+            if(System.currentTimeMillis()-updateArea>=10000){
+                if(animQueue.contains("area")){
+                    animQueue.remove("area");
+                }
+                if(lastInside!=0 && lastInside!=1)
+                    Events.outOfArea(false);
+                lastInside=0;
             }
-            if(lastInside!=0)
-                //Events.outOfArea(false);
-            lastInside=0;
 
         } else {
+            updateArea=0;
             if(!animQueue.contains("area")){
                 animQueue.add("area");
             }
@@ -556,8 +562,8 @@ public class FHome extends FBase implements OnClickListener {
             fmapRange.setVisibility(View.GONE);
         } else {
             fmapAlarm.setVisibility(View.GONE);
+            tvRange.setText((SOC>=50?SOC:SOC-10) + " Km");
             fmapRange.setVisibility(View.VISIBLE);
-            tvRange.setText(carInfo.rangeKm + " Km");
         }
 
 

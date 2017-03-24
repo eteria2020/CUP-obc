@@ -185,7 +185,7 @@ public class FWelcome extends FBase {
 	private void nextPage() {
 		// if the charge mode is active go to Maintenance page for resetting it.
 		// We assume that if the car is in charging mode no one but the admins can get in
-		if (App.Charging) {
+		if (true){//App.Charging) {
 			((ABase)getActivity()).pushFragment(FMaintenance.newInstance(), FMaintenance.class.getName(), true);
 			DLog.D("Request FMaintenance");
 		} else
