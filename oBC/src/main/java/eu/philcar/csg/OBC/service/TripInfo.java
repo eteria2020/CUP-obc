@@ -732,7 +732,8 @@ public class TripInfo {
 
         }
         if(App.currentTripInfo!= null && App.currentTripInfo.trip.id==trip.id){
-            App.currentTripInfo.trip=trip;
+            if(App.currentTripInfo.trip.remote_id==0)
+                App.currentTripInfo.trip.remote_id=trip.remote_id;
         }
     }
 

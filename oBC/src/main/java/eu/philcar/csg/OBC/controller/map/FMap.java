@@ -842,6 +842,7 @@ public class FMap extends FBase implements OnClickListener {
 		panelNavMenu=null;
 		panelRealReach=null;
 		panels=null;
+		panels= new ArrayList<View>();
 		fmapAlarm=null;
 		fmapRange=null;
 		tvRange=null;

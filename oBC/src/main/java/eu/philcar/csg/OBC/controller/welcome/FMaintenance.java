@@ -37,11 +37,15 @@ import android.widget.Toast;
 public class FMaintenance extends FBase {
 
 	private DLog dlog = new DLog(this.getClass());
+	public static FMaintenance Instance;
 
 	public static FMaintenance newInstance() {
 		return new FMaintenance();
 	}
 
+	public FMaintenance(){
+		Instance = this;
+	}
 
 	private  View view;
 
@@ -170,7 +174,7 @@ public class FMaintenance extends FBase {
 	}
 
 
-	private void update(CarInfo carinfo) {
+	public void update(CarInfo carinfo) {
 		if(!FMaintenance.this.isVisible()){
 			return;
 		}
@@ -185,6 +189,12 @@ public class FMaintenance extends FBase {
 			else
 				((TextView)view.findViewById(R.id.tvEndCharging)).setText("Auto non in ricarica");
 		}
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		Instance=null;
 	}
 
 	@Override

@@ -17,6 +17,7 @@ import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.AMainOBC;
+import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.SystemControl;
@@ -460,6 +461,7 @@ public class ObcService extends Service {
                     boolean cellLow = false;
                     String lowCellNumber = " ";
                     String cellsVoltage = "";
+                    boolean bmsError;
 
                     carInfo.cellVoltageValue = getCellVoltages();
                     carInfo.bmsSOC = getSOCValue();
@@ -468,9 +470,15 @@ public class ObcService extends Service {
                     carInfo.minVoltage = carInfo.cellVoltageValue[22] == 0 ? 2.8f : 2.5f;
                     carInfo.batteryType = carInfo.cellVoltageValue[22] == 0 ? "DFD" : "HNLD";
 
-
+                    bmsError=false;
                     for (int i = 0; i < carInfo.cellVoltageValue.length; i++) {
-                        currVolt += carInfo.cellVoltageValue[i];    //		battery cell voltages
+                        if(i<20 && carInfo.cellVoltageValue[i]<1) {
+                            currVolt=0;
+                            bmsError=true;
+                        }
+                        if(!bmsError)
+                            currVolt += carInfo.cellVoltageValue[i];    //		battery cell voltages
+
                         cellsVoltage = cellsVoltage.concat(" " + carInfo.cellVoltageValue[i]);
                         if (carInfo.cellVoltageValue[i] < carInfo.minVoltage && carInfo.cellVoltageValue[i] != 0) {
                             cellLow = true;
@@ -482,15 +490,12 @@ public class ObcService extends Service {
                     carInfo.lowCells = lowCellNumber;
                     carInfo.currVoltage = (float) Math.round(currVolt * 100) / 100f;
 
-                    if (carInfo.currVoltage <= 0 ){
-                        if (lastValidSOC - System.currentTimeMillis() < 60000 * 10) {
-                            carInfo.setBatteryLevel(Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS));
+                    if (carInfo.currVoltage <= 0 || carInfo.outAmp>=25 ){
+
+                            carInfo.setBatteryLevel(Math.min(carInfo.batteryLevel,Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS)));
                             dlog.d("virtualBMSUpdateScheduler: value null ignoring data.");
                             return;
-                        }
                     }
-                    else
-                    lastValidSOC = System.currentTimeMillis();
 
                     if (carInfo.bmsSOC >= 100 || carInfo.bmsSOC_GPRS >= 100) {
                         if (!carInfo.Charging || (carInfo.currVoltage > App.getMax_voltage())) {
@@ -553,9 +558,9 @@ public class ObcService extends Service {
                         if (carInfo.intGpslocation.getLatitude() == lastIntGpslocation.getLatitude() && carInfo.intGpslocation.getLongitude() == lastIntGpslocation.getLongitude()) {
                             intCount++;
                             if (intCount >= 3) {
-                                intCount = 0;
                                 App.Instance.setUseExternalGps(true);
                                 dlog.d("GpsCheckeScheduler: setUseExternalGps(true) same coordinate for " + intCount + " times");
+                                intCount = 0;
                                 sendBeacon();
                             }
                             return;
@@ -576,9 +581,9 @@ public class ObcService extends Service {
                         if (carInfo.extGpslocation.getLatitude() == lastExtGpslocation.getLatitude() && carInfo.extGpslocation.getLongitude() == lastExtGpslocation.getLongitude()) {
                             extCount++;
                             if (extCount >= 3) {
-                                extCount = 0;
                                 App.Instance.setUseExternalGps(false);
                                 dlog.d("GpsCheckeScheduler: setUseExternalGps(false) same coordinate for " + intCount + " times");
+                                extCount = 0;
                                 sendBeacon();
                             }
                             return;
@@ -595,7 +600,7 @@ public class ObcService extends Service {
                 }
             }
 
-        }, 2, 2, TimeUnit.MINUTES);
+        }, 40, 40, TimeUnit.SECONDS);
 
 
         //Register receiver for battery data
@@ -2157,6 +2162,8 @@ public class ObcService extends Service {
                     if (!carInfo.chargingPlug && App.Charging) {
                         App.Charging = false;
                         App.Instance.persistCharging();
+                        if(FMaintenance.Instance!=null)
+                            FMaintenance.Instance.update(carInfo);
                         if (Math.max(carInfo.bmsSOC, carInfo.bmsSOC_GPRS) == 100) {
                             if (carInfo.maxAmpere != 0)
                                 carInfo.maxAmpere = (carInfo.maxAmpere + carInfo.currentAmpere) / 2;

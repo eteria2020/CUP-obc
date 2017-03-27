@@ -120,8 +120,17 @@ public class AMainOBC extends ABase implements LocationListener {
 	private LocationManager locationManager;
 
 
+	public void setInsideParkingArea(boolean insideParkingArea) {
+		if(System.currentTimeMillis() - lastIsInsideParkingAreaTs >=10000){
+			lastIsInsideParkingArea=this.isInsideParkingArea;
+			lastIsInsideParkingAreaTs=System.currentTimeMillis();
+		}
+		this.isInsideParkingArea = insideParkingArea;
+	}
 
 	private boolean isInsideParkingArea = true;
+	private boolean lastIsInsideParkingArea = isInsideParkingArea;
+	private long lastIsInsideParkingAreaTs =System.currentTimeMillis();
 	private float rotationToParkingArea = 0.0f;
 
 	private AdvertisementReceiver advertisementReceiver;
@@ -489,13 +498,13 @@ public class AMainOBC extends ABase implements LocationListener {
 
 
 			if (currentPosition == null || App.checkParkArea(currentPosition.getLatitude(), currentPosition.getLongitude())) {
-				isInsideParkingArea = true;
+				setInsideParkingArea(true);
 				rotationToParkingArea = 0.0f;
 				DLog.D(AMainOBC.class.toString() + " onLocationChanged: " + String.valueOf(isInsideParkingArea) + String.valueOf(currentPosition.getLatitude()) + " : " + String.valueOf(currentPosition.getLongitude()));
 
 			} else {
 
-				isInsideParkingArea = false;
+				setInsideParkingArea(false);
 				DLog.D(AMainOBC.class.toString() + " onLocationChanged: " + String.valueOf(isInsideParkingArea) + String.valueOf(currentPosition.getLatitude()) + " : " + String.valueOf(currentPosition.getLongitude()));
 
 				// Replace this three lines with the ones commented below
@@ -510,7 +519,7 @@ public class AMainOBC extends ABase implements LocationListener {
 
 			}
 
-			if (App.isNavigatorEnabled) {
+			if (App.isNavigatorEnabled && isInsideParkingArea==lastIsInsideParkingArea) {
 
 				FMap fMap = (FMap) getFragmentManager().findFragmentByTag(FMap.class.getName());
 

@@ -133,10 +133,10 @@ public class CarInfo {
         }*/
         dlog.d("setBatteryLevel: first "+this.batteryLevel +" target: "+batteryLevel);
 
-        if (Math.abs(this.batteryLevel - batteryLevel) >= 5) {
+        if (this.batteryLevel - batteryLevel>= 5) {
             this.batteryLevel = (Math.round(this.batteryLevel > batteryLevel ? this.batteryLevel - 5 : this.batteryLevel + 5));
         } else
-            this.batteryLevel = (Math.round(SOCR));
+            this.batteryLevel = (Math.round(batteryLevel));
 
         //this.batteryLevel=20;//FOR DEVELOP PURPOSE
 
