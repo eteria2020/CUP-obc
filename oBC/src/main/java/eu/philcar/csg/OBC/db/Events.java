@@ -53,6 +53,7 @@ public class Events extends DbTable<Event,Integer> {
 	public static final int EVT_REBOOT= 27;
 	public static final int EVT_SOC   	 =28;
 	public static final int EVT_OUTOFAREA	=29;
+	public static final int EVT_MENU_CLICK	=30;
 	
 	
 	
@@ -152,6 +153,10 @@ public class Events extends DbTable<Event,Integer> {
 
 	public static void outOfArea(Boolean status) {
 		generateEvent(EVT_OUTOFAREA,status?1:0,status?"Uscita Area Operativa":"Rientro Area Operativa");
+	}
+
+	public static void menuclick(String clicked) {
+		generateEvent(EVT_OUTOFAREA,0,"Click on "+clicked);
 	}
 	
 	public static void eventGear(String position) {

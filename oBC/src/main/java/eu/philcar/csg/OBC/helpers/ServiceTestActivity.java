@@ -222,6 +222,7 @@ public class ServiceTestActivity extends Activity {
 		}
 
 		cellsVoltage=cellsVoltage.concat("Battery type: "+ carInfo.batteryType+"\n");
+		cellsVoltage=cellsVoltage.concat("Low voltage cells : "+ carInfo.isCellLowVoltage +" ("+ carInfo.lowCells +")\n");
 		cellsVoltage=cellsVoltage.concat("V100%: "+ App.getMax_voltage()+"V\n");
 		cellsVoltage=cellsVoltage.concat("VBATT: "+ carInfo.currVoltage+"V\n");
 
@@ -230,9 +231,9 @@ public class ServiceTestActivity extends Activity {
 		cellsVoltage=cellsVoltage.concat("SOC: "+ carInfo.bmsSOC +"%\n");
 		cellsVoltage=cellsVoltage.concat("SOC_GPRS: "+ carInfo.bmsSOC_GPRS +"%\n");
 		cellsVoltage=cellsVoltage.concat("SOC2: "+ carInfo.virtualSOC +"%\n");
-		cellsVoltage=cellsVoltage.concat("Low voltage cells : "+ carInfo.isCellLowVoltage +" ("+ carInfo.lowCells +")\n");
 		cellsVoltage=cellsVoltage.concat("SOCR : "+ carInfo.SOCR +"\n");
 		cellsVoltage=cellsVoltage.concat("SOCAdmin: "+ carInfo.batteryLevel +"%\n");
+		cellsVoltage=cellsVoltage.concat("outAmp: "+ carInfo.outAmp +"A\n");
 		//cellsVoltage=cellsVoltage.concat("CurrentValue: "+ carInfo.current +"A\n");
 
 		
@@ -244,7 +245,7 @@ public class ServiceTestActivity extends Activity {
 		((TextView)findViewById(R.id.tvSpeed)).setText(""+carInfo.speed);
 		((TextView)findViewById(R.id.tvFuelLevel)).setText(""+carInfo.bmsSOC);
 		((TextView)findViewById(R.id.tvTarga)).setText(""+carInfo.id);
-		
+		cellsVoltage=cellsVoltage.concat("outAmp: "+ carInfo.outAmp +"A\n");
 		((TextView)findViewById(R.id.tvQuadro)).setText((carInfo.isKeyOn>0)?"ON":"OFF");
 		((TextView)findViewById(R.id.tvFW)).setText(carInfo.fw_version);
 		//((TextView)findViewById(R.id.tvAvolt)).setText(""+carInfo.analogVoltage);
@@ -352,7 +353,6 @@ public class ServiceTestActivity extends Activity {
 			findViewById(R.id.MotorLL).setVisibility(View.VISIBLE);
 			findViewById(R.id.ServerLL).setVisibility(View.VISIBLE);
 			findViewById(R.id.LogLL).setVisibility(View.VISIBLE);
-			findViewById(R.id.TestLeaseLL).setVisibility(View.VISIBLE);
 
 
 			((Button) findViewById(R.id.btnOpen)).setOnClickListener(new OnClickListener() {
@@ -440,14 +440,6 @@ public class ServiceTestActivity extends Activity {
 			});
 
 
-			((Button) findViewById(R.id.btnTestLease)).setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View arg0) {
-					askLeaseCard();
-				}
-
-			});
 
 
 		} else {
@@ -456,7 +448,7 @@ public class ServiceTestActivity extends Activity {
 			findViewById(R.id.MotorLL).setVisibility(View.GONE);
 			findViewById(R.id.ServerLL).setVisibility(View.GONE);
 			findViewById(R.id.LogLL).setVisibility(View.GONE);
-			findViewById(R.id.TestLeaseLL).setVisibility(View.GONE);
+			findViewById(R.id.TestLeaseLL).setVisibility(View.VISIBLE);
 		}
 
     	
@@ -618,6 +610,15 @@ public class ServiceTestActivity extends Activity {
 				startActivity(startMain);
 
 			}
+		});
+
+		((Button) findViewById(R.id.btnTestLease)).setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				askLeaseCard();
+			}
+
 		});
 
 

@@ -225,8 +225,8 @@
         android:orientation="vertical"
         android:layout_alignLeft="@+id/ShowBodyLL"
         android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@+id/BodyLL"
-        android:layout_toStartOf="@+id/BodyLL">
+        android:layout_toStartOf="@+id/BodyLL"
+        android:layout_alignRight="@+id/LedsLL">
 
         <TextView
             android:layout_width="match_parent"

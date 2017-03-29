@@ -30,71 +30,71 @@ public interface LowLevelInterface {
 
 
 	
-	public void init();
-	
-	public void init(boolean bond);	
-	
-	public void close();
-	
-	
-	public void btSend(byte data[]);
-	
-	public void btSend(ObcCommand cmd) ;
-	
-	public void btSend(String cmd) ;	
-	
-	public void Ping(Messenger replyTo, Message timeout);
-	
-	public void setCarPlate(Messenger replyTo, String plate);
-	
-	public void setDisplayStatus(Messenger replyTo, boolean on);
-	
-	public void setLed(Messenger replyTo, int led, int state);
-	
-	
-	public void setDoors(Messenger replyTo, int state, String message);
-	
-	public void setEngine(Messenger replyTo, int state) ;
+void init();
 
-	
-	public void setLcd(Messenger replyTo, String txt) ;
-	
-	
-	public void setTag(Messenger replyTo, String code) ;
-	
-	
-	public void setCharger(Messenger replyTo, int state);
-	
-	public void setReservation(Reservation r) ;
-	
-	public void RequestWhitelistUpload() ;
-	
-	public void setSecondaryGPS(long period);
-	
-	public long lastContactDelay() ;
+void init(boolean bond);
 
-	public float getCellVoltageValue(int index);
+void close();
 
-	public int getSOCValue();
 
-	public int getPackCurrentValue();
+void btSend(byte data[]);
 
-	void addAdminCard(List<String> cards);
-	void addAdminCard(String card);
-	void delAdminCard(String card);
-	void resetAdminCards();
+void btSend(ObcCommand cmd) ;
 
-	void setForcedLedBlink(boolean status);
+void btSend(String cmd) ;
 
-	void setAudioChannel(int channel);
-	void SetRadioChannel(String Band, int freq);
-	void SetRadioVolume(int vol);
+void Ping(Messenger replyTo, Message timeout);
 
-	void SetSeek(int direction, boolean auto);
-	
-	void enableWatchdog(int secs);
-	void disableWatchdog();
-	
+void setCarPlate(Messenger replyTo, String plate);
+
+void setDisplayStatus(Messenger replyTo, boolean on);
+
+void setLed(Messenger replyTo, int led, int state);
+
+
+void setDoors(Messenger replyTo, int state, String message);
+
+void setEngine(Messenger replyTo, int state) ;
+
+
+void setLcd(Messenger replyTo, String txt) ;
+
+
+void setTag(Messenger replyTo, String code) ;
+
+
+void setCharger(Messenger replyTo, int state);
+
+void setReservation(Reservation r) ;
+
+void RequestWhitelistUpload() ;
+
+void setSecondaryGPS(long period);
+
+long lastContactDelay() ;
+
+float getCellVoltageValue(int index);
+
+int getSOCValue();
+
+int getPackCurrentValue();
+
+void addAdminCard(List<String> cards);
+void addAdminCard(String card);
+void delAdminCard(String card);
+void resetAdminCards();
+
+void setForcedLedBlink(boolean status);
+
+void setAudioChannel(int channel);
+void SetRadioChannel(String Band, int freq);
+void SetRadioVolume(int vol);
+
+void SetSeek(int direction, boolean auto);
+
+void enableWatchdog(int secs);
+void disableWatchdog();
+
 	
 	
 	

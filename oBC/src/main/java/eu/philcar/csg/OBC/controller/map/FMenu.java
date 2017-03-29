@@ -9,6 +9,7 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.controller.welcome.FDamages;
+import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
@@ -127,7 +128,7 @@ public class FMenu extends FBase implements OnClickListener {
 		case R.id.fmenEndRentIB:
 		case R.id.fmenEndRentTV:
 			if (activity!=null && activity.checkisInsideParkingArea()) {
-
+				Events.menuclick("END RENT");
 				FMap.timer_2min.cancel();
 				FMap.timer_5sec.cancel();
 				dlog.d("Banner: end rent stopping update, start countdown");
@@ -164,10 +165,16 @@ public class FMenu extends FBase implements OnClickListener {
 				startSelfClose(rootView);
 				(rootView.findViewById(R.id.llCancel)).animate().alpha(0.25f);
 				(rootView.findViewById(R.id.tvPushToCancel)).setVisibility(View.VISIBLE);
+				Events.menuclick("PAUSE RENT");
 			} else {
+				Events.menuclick("RESUME RENT");
 				stopSelfClose(rootView);
 				//((ABase)getActivity()).popFragment();
-				((ABase)getActivity()).popTillFragment(FMap.class.getName());
+				try {
+					((ABase)getActivity()).popTillFragment(FMap.class.getName());
+				} catch (Exception e) {
+					dlog.d("Exception while popping fragment");
+				}
 			}
 			
 			break;
@@ -183,7 +190,11 @@ public class FMenu extends FBase implements OnClickListener {
 			
 		case R.id.fmenBackIB:
 			//((ABase)getActivity()).popFragment();
-			((ABase)getActivity()).popTillFragment(FMap.class.getName());
+			try {
+				((ABase)getActivity()).popTillFragment(FMap.class.getName());
+			} catch (Exception e) {
+				dlog.d("Exception while popping fragment");
+			}
 			stopSelfClose(rootView);
 			break;
 

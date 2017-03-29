@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Android-OBC.iml" filepath="$PROJECT_DIR$/Android-OBC.iml" />
-      <module fileurl="file://$PROJECT_DIR$/OBC.iml" filepath="$PROJECT_DIR$/OBC.iml" />
       <module fileurl="file://$PROJECT_DIR$/oBC/oBC.iml" filepath="$PROJECT_DIR$/oBC/oBC.iml" />
+      <module fileurl="file://$PROJECT_DIR$/obc.iml" filepath="$PROJECT_DIR$/obc.iml" />
       <module fileurl="file://$PROJECT_DIR$/sDKTools/sDKTools.iml" filepath="$PROJECT_DIR$/sDKTools/sDKTools.iml" />
     </modules>
   </component>

@@ -184,9 +184,17 @@ public class FPinCode extends FBase implements OnClickListener {
 				((AMainOBC)getActivity()).setCurrentRouting(null);
 				
 				if (App.isNavigatorEnabled) {
-					((ABase)getActivity()).popTillFragment(FMap.class.getName());
+					try {
+						((ABase)getActivity()).popTillFragment(FMap.class.getName());
+					} catch (Exception e) {
+						dlog.d("Exception while popping fragment");
+					}
 				} else {
-					((ABase)getActivity()).popTillFragment(FDriving.class.getName());
+					try {
+						((ABase)getActivity()).popTillFragment(FDriving.class.getName());
+					} catch (Exception e) {
+						dlog.d("Exception while popping fragment");
+					}
 					return;
 				}
 			}

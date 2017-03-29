@@ -216,7 +216,7 @@ public class Trips extends DbTable<Trip,Integer> {
 		} catch (SQLException e) {
 			dlog.e("Begin corsa",e);			
 		}
-		
+		dlog.d("Begin: "+corsaAperta.toString());
 		return corsaAperta;
 	}
 	

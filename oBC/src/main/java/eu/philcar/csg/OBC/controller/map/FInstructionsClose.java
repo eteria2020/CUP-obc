@@ -167,8 +167,12 @@ public class FInstructionsClose extends FBase implements OnClickListener {
 			
 		case R.id.fmenBackIB:
 			//((ABase)getActivity()).popFragment();
-			((ABase)getActivity()).popTillFragment(FHome.class.getName());
-			
+			try {
+				((ABase)getActivity()).popTillFragment(FHome.class.getName());
+			} catch (Exception e) {
+				dlog.d("Exception while popping fragment");
+			}
+
 			break;			
 			
 	}
