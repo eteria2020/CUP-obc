@@ -1023,16 +1023,14 @@ public class FMap extends FBase implements OnClickListener {
 		//dlog.d(FMap.class.toString()+"updateParkAreaStatus: "+String.valueOf(isInside));
 
 		if (isInside) {
-			if(updateArea==0)
-				updateArea=System.currentTimeMillis();
-			if(System.currentTimeMillis()-updateArea>=10000){
+
 				if(animQueue.contains("area")){
 					animQueue.remove("area");
 				}
 				if(lastInside!=0 && lastInside!=1)
 					Events.outOfArea(false);
 				lastInside=0;
-			}
+
 
 		} else {
 			updateArea=0;

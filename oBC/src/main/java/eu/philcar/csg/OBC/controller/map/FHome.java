@@ -462,16 +462,14 @@ public class FHome extends FBase implements OnClickListener {
         //rotationAngle =0;
 
         if (isInside) {
-            if(updateArea==0)
-                updateArea=System.currentTimeMillis();
-            if(System.currentTimeMillis()-updateArea>=10000){
+
                 if(animQueue.contains("area")){
                     animQueue.remove("area");
                 }
                 if(lastInside!=0 && lastInside!=1)
                     Events.outOfArea(false);
                 lastInside=0;
-            }
+
 
         } else {
             updateArea=0;
