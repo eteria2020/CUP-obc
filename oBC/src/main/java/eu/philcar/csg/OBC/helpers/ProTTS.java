@@ -174,12 +174,18 @@ public class ProTTS implements TextToSpeech.OnInitListener{
     public void onInit(int status) {
         if(status != TextToSpeech.ERROR) {
             if (((ABase)context).getActivityLocale().equalsIgnoreCase("it")) {
+                player.setPitch(0.85f);
+                player.setSpeechRate(1.15f);
                 player.setLanguage(Locale.ITALIAN);
             } else if (((ABase)context).getActivityLocale().equalsIgnoreCase("en")) {
+                player.setPitch(0.7f);
+                player.setSpeechRate(0.9f);
                 player.setLanguage(Locale.ENGLISH);
             }
             else {
                 player.setLanguage(Locale.FRENCH);
+                player.setPitch(0.9f);
+                player.setSpeechRate(0.4f);
             }
 
             utteranceListener = new UtteranceProgressListener() {

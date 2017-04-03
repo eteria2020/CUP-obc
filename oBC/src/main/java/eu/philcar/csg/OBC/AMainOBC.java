@@ -487,7 +487,7 @@ public class AMainOBC extends ABase implements LocationListener {
 			return;
 		}*/
 
-		if( System.currentTimeMillis() - lastUpdate.getTime() <10000) {
+		if( System.currentTimeMillis() - lastUpdate.getTime() <5000) {
 			return;
 		}else {
 			lastUpdate = new Date();

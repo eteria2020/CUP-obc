@@ -22,7 +22,7 @@ public class StubActivity extends Activity {
 	public void onCreate(Bundle b){
 	    super.onCreate(b);
 		DLog.D("StubActivity onCreate");
-	    
+
 	    if (Debug.ON || App.Instance.isConfigMode()) { 	    
 	    	startActivity(new Intent(this, ServiceTestActivity.class));
 	    } else {

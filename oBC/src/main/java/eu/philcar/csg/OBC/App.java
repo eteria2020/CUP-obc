@@ -925,44 +925,44 @@ public void loadRadioSetup() {
 		super.onCreate();
 		
 
-		
+
 
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		StatusPrinter.print(lc);
-		
+
 		//SystemControl.InsertAPN(this, "");
-		
+
         FontsOverride.setDefaultFont(this, "DEFAULT", "interstateregular.ttf");
         FontsOverride.setDefaultFont(this, "MONOSPACE", "interstateregular.ttf");
         FontsOverride.setDefaultFont(this, "SERIF", "interstateregular.ttf");
         FontsOverride.setDefaultFont(this, "SANS_SERIF", "interstateregular.ttf");
-		
+
         if(Debug.IGNORE_HARDWARE) {
-        	
+
         	preferences = this.getSharedPreferences(COMMON_PREFERENCES, Context.MODE_PRIVATE);
-        	
+
         	loadPreferences();
-        	
+
         	File f = new File("/sdcard/csg/ads/");
     	    if (!f.exists()) {
     	    	f.mkdirs();
     	    }
-        	
+
         	return;
         }
-        
 
-        
+
+
 		SslConnection.init(this);
-		
 
 
-      
-        
-        
-		
+
+
+
+
+
 		dlog.d("App starting");
-		dlog.i("MANUFACTURER: " +Build.MANUFACTURER);		
+		dlog.i("MANUFACTURER: " +Build.MANUFACTURER);
 		dlog.i("DEVICE: " +Build.DEVICE);
 		dlog.i("MODEL: " +Build.MODEL);
 		dlog.i("ID: " +Build.DISPLAY);
@@ -976,25 +976,25 @@ public void loadRadioSetup() {
 			skmaps.renameTo(new File ("skmaps.old"));
 		}
 		*/
-		
+
 		SKPrepareMapTextureListener skListener = new SKPrepareMapTextureListener() {
 
 			@Override
 			public void onMapTexturesPrepared(boolean arg0) {
-				
+
 				SKMaps.getInstance().setApiKey("c9ad8a7f8cccd97a7cd5dfc09213ed7f7abbd71321be48985014a14909a67c24");
-				
+
 				SKMapsInitSettings initSettings = new SKMapsInitSettings();
-				
+
 				initSettings.setConnectivityMode(SKMaps.CONNECTIVITY_MODE_OFFLINE);
 				initSettings.setMapsPath("/sdcard/SKMaps/");
 				initSettings.setMapResourcesPaths("/sdcard/SKMaps/", new SKMapViewStyle("/sdcard/SKMaps/daystyle/","daystyle.json"));
 				initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
-				
+
 
 				initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_LIGHT);
 
-				
+
 				SKAdvisorSettings advisorSettings = new SKAdvisorSettings();
 				advisorSettings.setLanguage(SKAdvisorSettings.SKAdvisorLanguage.LANGUAGE_IT);
 				advisorSettings.setAdvisorConfigPath("/sdcard/SKMaps/Advisor");
@@ -1002,19 +1002,19 @@ public void loadRadioSetup() {
 				advisorSettings.setAdvisorVoice("it");
 				advisorSettings.setAdvisorType( SKAdvisorSettings.SKAdvisorType.TEXT_TO_SPEECH);
 				initSettings.setAdvisorSettings(advisorSettings);
-				
-				SKMapViewStyle style = new SKMapViewStyle("/sdcard/skmaps/daystyle/","daystyle.json");				
+
+				SKMapViewStyle style = new SKMapViewStyle("/sdcard/skmaps/daystyle/","daystyle.json");
 				initSettings.setCurrentMapViewStyle(style);
-				
+
 
 				SKMaps.getInstance().initializeSKMaps(App.this, initSettings);
-				
+
 				if (!new File("/sdcard/SKMaps/Maps/v1/20150413/meta/").exists()) {
 	                SKVersioningManager manager = SKVersioningManager.getInstance();
 	                boolean updated = manager.updateMapsVersion(20150413);
 				}
-				
-				
+
+
 				SKPackage[] packages = SKPackageManager.getInstance().getInstalledPackages();
 				if (packages==null || packages.length==0) {
 					int i1 = SKPackageManager.getInstance().addOfflinePackage("/sdcard/skpackages/", "ITREG09");
@@ -1022,37 +1022,37 @@ public void loadRadioSetup() {
 					packages = SKPackageManager.getInstance().getInstalledPackages();
 				}
 
-				
-				
+
+
 				String xmlurl = SKPackageManager.getInstance().getMapsXMLPathForVersion(1);
 				SKPackageURLInfo skinfo = SKPackageManager.getInstance().getURLInfoForPackageWithCode("IT",false);
 				String mapURL = skinfo.getMapURL();
 				String nameBrowserFilesURL = skinfo.getNameBrowserFilesURL();
-				
+
 			}
-			
+
 		};
 
 
 		CanManager= CANManager.get(Instance);
-		
-		if (new File("/sdcard/SKMaps/").exists()) { 
+
+		if (new File("/sdcard/SKMaps/").exists()) {
 			skListener.onMapTexturesPrepared(false);
 		} else {
 			final SKPrepareMapTextureThread prepThread = new SKPrepareMapTextureThread(this, "/sdcard/SKMaps", "SKMapsFull_IT.zip", skListener);
 			prepThread.start();
-		
+
 			Toast.makeText(this, "Preparazione mappe in corso", Toast.LENGTH_LONG).show();
-		
+
 			try {
 				Thread.sleep(10000);
 			} catch (InterruptedException e2) {
 				e2.printStackTrace();
 			}
 		}
-		
 
-		
+
+
 		/*
 		Beacon b = Beacon.newBuilder()
 				.setTarga("DEMO123")
@@ -1060,13 +1060,13 @@ public void loadRadioSetup() {
 				.setBatteryLevel(100)
 				.setLatitude(30.4)
 				.setLongitude(12.2)
-				
+
 				.build();
-	
-		
+
+
 		byte[] msg = b.toByteArray();
 		*/
-		
+
 		initPhase2();
 }
 
@@ -1117,7 +1117,7 @@ private Handler searchHandler = new Handler() {
 		 
 	 }
 };
-	
+
 private void  initPhase2() {		
 	
 		//SkobblerSearch sks = new SkobblerSearch();

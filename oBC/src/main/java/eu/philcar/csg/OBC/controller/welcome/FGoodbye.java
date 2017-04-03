@@ -77,6 +77,7 @@ public class FGoodbye extends FBase {
 	private final static int  MSG_PLAY_ADVICE  = 2;
 
 	private ProTTS tts;
+	private static boolean played=false;
 
 	private Handler localHandler = new Handler()  {
 
@@ -354,8 +355,11 @@ public class FGoodbye extends FBase {
 
 
 		updateBanner("END");
-		localHandler.removeMessages(MSG_PLAY_ADVICE);
-		localHandler.sendEmptyMessageDelayed(MSG_PLAY_ADVICE,1000);
+		if(!played) {
+			played = true;
+			localHandler.removeMessages(MSG_PLAY_ADVICE);
+			localHandler.sendEmptyMessageDelayed(MSG_PLAY_ADVICE, 1000);
+		}
 		return view;
 	}
 
@@ -599,6 +603,7 @@ public class FGoodbye extends FBase {
 			timer_5sec.cancel();
 			handleClick=null;
 			RequestBanner=null;
+			played=false;
 			if(selfclose!=null)
 				selfclose.cancel();
 
