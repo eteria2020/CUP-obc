@@ -224,5 +224,6 @@
     <string name="menu_rent_end_time_startup_app">Fin louer  - indisponible : l\'application est encore en démarrage, s\'il vous plaît patienter.</string>
     <string name="navigation_active_error">Arrêtez la navigation avant d\'aller à la maison</string>
     <string name="other_trip_message">Vous avez déjà un voyage ouvert.Veuillez contacter le centre d\'appels pour plus d\'informations</string>
+    <string name="alert_area">Attention, le véhicule est hors de la zone opérationnelle, il ne sera pas possible de fermer le voyage</string>
 
 </resources>

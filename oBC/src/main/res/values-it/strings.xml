@@ -2,4 +2,235 @@
 <resources>
     <string name="navigation_active_error">Si prega di fermare la navigazione prima di andare sulla home</string>
     <string name="other_trip_message">Risulta una corsa già aperta, contatta il servizio clienti per maggiori informazioni</string>
+    <string name="Acra_message">Invio report errore</string>
+    <string name="address">Indirizzo</string>
+    <string name="housenumber">Civico</string>
+    <string name="app_name">OBC</string>
+    <string name="are_you_drunk">Hai bevuto alcolici?</string>
+
+    <string name="back_to_navigation">Procedi e torna alla navigazione</string>
+    <string name="button_call">Prenota chiamata assistenza</string>
+    <string name="button_break">SOSTA o\nTERMINA</string>
+    <string name="button_close">Chiudi</string>
+    <string name="button_navigator">NAVIGATORE</string>
+    <string name="button_radio">RADIO</string>
+    <string name="button_points">PUNTI</string>
+    <string name="button_recharge">PUNTO RICARICA</string>
+    <string name="button_search">CERCA</string>
+    <string name="button_home">MENU</string>
+    <string name="button_park">SOSTA</string>
+    <string name="button_end">TERMINA</string>
+
+    <string name="call_book">Prenota la chiamata o inserisci nuovo numero</string>
+    <string name="call_dealt_old">Chiamata al centro assistenza inoltrata</string>
+    <string name="call_dealt">Richiesta inoltrata al centro assistenza,verrete richiamati sul numero specificato</string>
+    <string name="car_cleanliness_inside">Pulizia veicolo <font style="color:#feef79"><b>interno</b></font></string>
+    <string name="car_cleanliness_outside">Pulizia veicolo <font style="color:#feef79"><b>esterno</b></font></string>
+    <string name="car_cleanliness_state">Segnala lo stato del veicolo</string>
+    <string name="change">Specifica numero</string>
+    <string name="checking_pin">Controllo PIN</string>
+    <string name="city">Citt&#224;</string>
+    <string name="content_description">Uovo di Pasqua</string>
+
+    <string name="damage_observed">danno verificato</string>
+    <string name="damages_observed">danni verificati</string>
+
+    <string name="error_empty_address">Il campo Indirizzo non pu&#242; essere vuoto</string>
+    <string name="error_empty_city">Il campo Citt&#224; non pu&#242; essere vuoto</string>
+    <string name="error_http_code_failure">Connession fallita con risposta HTTP</string>
+    <string name="error_malformed_url">URL errato nella richiesta</string>
+    <string name="error_parsing_invalid_type">Tipo non valido nell\'indirizzo</string>
+    <string name="error_parsing_missing_address">Parametro-address non trovato</string>
+    <string name="error_parsing_missing_geometry">Parametro-geometry non trovato</string>
+    <string name="error_parsing_missing_latitude">Parametro-latitude non trovato</string>
+    <string name="error_parsing_missing_location">Parametro-location non trovato</string>
+    <string name="error_parsing_missing_longitude">Parametro-longitudine non trovato</string>
+    <string name="error_parsing_missing_results">Parametro-results non trovato</string>
+    <string name="error_parsing_missing_status">Parametro-status non trovato</string>
+    <string name="error_parsing_missing_types">Parametro-types non trovato</string>
+    <string name="error_parsing_response_not_json">La risposta del server non &#232; un JSON</string>
+    <string name="error_parsing_result_not_json">Uno dei results non &#232; un JSON</string>
+    <string name="error_unable_to_close_buffer_reader">Impossibile chiudere il buffer di lettura dopo aver ricevuto la risposta del server</string>
+    <string name="error_unable_to_get_request_response">Impossibile leggere la risposta della richiesta</string>
+    <string name="error_unable_to_open_connection">Connessione assente</string>
+    <string name="error_unable_to_read_message_content">Impossibile leggere il contenuto del messaggio</string>
+    <string name="error_unable_to_read_server_response">Impossibile leggere la risposta del server</string>
+
+    <string name="fuel_stations">Distributori</string>
+    <string name="fuel_station_list">Elenco distributori</string>
+    <string name="find_destination">Trova destinazione</string>
+    <string name="fuel_status_one_quarter">Livello carburante superiore al 25&#37;&#58; <b>rifornimento disabilitato</b></string>
+    <string name="fuel_status_pin_card">A rifornimento concluso, premere Avanti</string>
+    <string name="fuel_status_show_pin">Livello di energia</string>
+
+    <string name="go_to_map_or_back">Vai alla mappa o torna all\'elenco mete</string>
+    <string name="goodbye">Arrivederci</string>
+
+    <string name="search_title">Ricerca indirizzo</string>
+    <string name="hint_housenumber">Scrivi un civico</string>
+    <string name="hint_address">Scrivi un indirizzo</string>
+    <string name="hint_city">Scrivi una citt&#224;</string>
+
+    <string name="instruction_title">Per iniziare ad utilizzare l\'auto</string>
+
+    <string name="instruction_start_1">Controlla che il grande pulsante rosso posto fra i sedili sia alzato</string>
+    <string name="instruction_start_2">Gira la chiave</string>
+    <string name="instruction_start_3">Attendi la scritta Ready sul cruscotto</string>
+    <string name="instruction_start_4">Schiaccia il bottone D o R</string>
+
+    <string name="instruction_damages">Vedi danni sull\'auto?</string>
+    <string name="instruction_dirty"> E\' sporca?</string>
+
+    <string name="priority_lanes_title">Per iniziare ad utilizzare l\'auto</string>
+    <string name="attention">Attenzione:</string>
+    <string name="priority_lanes">Questo veicolo NON può viaggiare sulle corsie preferenziali</string>
+
+    <string name="instruction_title_preclose">PRIMA DI METTERE IN SOSTA O CHIUDERE IL NOLEGGIO:</string>
+    <string name="instruction_preclose_1">METTI IN FOLLE (TASTO N)</string>
+    <string name="instruction_preclose_2">SPEGNI LE LUCI</string>
+    <string name="instruction_preclose_3">TIRA IL FRENO A MANO</string>
+    <string name="instruction_preclose_4">CHIUDI I FINESTRINI</string>
+    <string name="instruction_preclose_5">SPEGNI IL QUADRO GIRANDO LA CHIAVE (LA CHIAVE RESTA INSERITA)</string>
+
+
+
+    <string name="instruction_title_close">Ecco come lasciare la vettura</string>
+    <string name="instruction_close_1">Raccogli le tue cose. Hai chiuso luci e finestrini?</string>
+    <string name="instruction_close_2">Premi il pulsante N sul cruscotto</string>
+    <string name="instruction_close_3">Tira il freno a mano</string>
+    <string name="instruction_close_4">Puoi scendere. Le porte si chiuderanno automaticamente nel tempo indicato sotto</string>
+    <string name="instruction_close_4_note">Se cambiassi idea lascia chiudere le porte ed apri una nuova sessione di noleggio</string>
+    <string name="instruction_close_5">Attenzione una vettura non correttamente chiusa pu&#242; comportare per te inutili costi e penali</string>
+    <string name="bonus_message_poi">Congratulazioni!\nNei prossimi giorni, dopo aver pagato questa corsa, ti verrà accreditato un bonus per aver parcheggiato questa macchina vicino ad una stazione di ricartica</string>
+
+    <string name="self_close_message">Chiusura \n portiere</string>
+
+
+    <string name="loading">Carico</string>
+
+    <string name="menu_rent_end"><b>TERMINA NOLEGGIO</b> - <u>Prima</u> controlla di non lasciare cose a bordo, togli le tue cose dal bagagliaio, chiudi luci e finestrini e spegni il quadro girando la chiave</string>
+    <string name="menu_rent_end_off"><b>TERMINA NOLEGGIO</b> - <u>Prima</u> controlla di non lasciare cose a bordo, togli le tue cose dal bagagliaio, chiudi luci e finestrini e spegni il quadro girando la chiave(disabilitato)</string>
+    <string name="menu_rent_end_outside_park_area"><b>TERMINA NOLEGGIO</b> - Non disponibile: sei al di fuori dell’area di parcheggio. Rientra nell’area autorizzata per chiudere la corsa.</string>
+    <string name="menu_rent_end_shutdown_engine"><b>TERMINA NOLEGGIO</b> - <u>Prima</u> controlla di non lasciare cose a bordo, togli le tue cose dal bagagliaio, chiudi luci e finestrini e spegni il quadro girando la chiave(spegni prima il motore)</string>
+
+    <string name="inside_area">Interno</string>
+    <string name="outside_area">Fuori\narea</string>
+
+
+    <string name="menu_refuel">Fai rifornimento</string>
+    <string name="menu_refuel_off">Fai rifornimento (disabilitato)</string>
+    <string name="menu_refuel_shutdown_engine">Fai rifornimento (spegni prima il motore)</string>
+    <string name="menu_park_mode_started">Per riprendere il noleggio usa il comando APRI PORTE sul telefono o passa la tua Card per abilitare il motore</string>
+    <string name="menu_park_mode_resume">Riprendi il noleggio</string>
+    <string name="menu_park_mode_resume_shutdown_engine">Riprendi il noleggio (spegni prima il motore)</string>
+
+    <string name="menu_park_mode_suspend"><b>INIZIA LA SOSTA</b> - <u>Prima</u> controlla di non lasciare cose a bordo , togli le cose che ti servono dal bagagliaio , chiudi luci e finestrini</string>
+    <string name="menu_park_mode_suspend_off"><b>INIZIA LA SOSTA</b> - <u>Prima</u> controlla di non lasciare cose a bordo, togli le cose che ti servono dal bagagliaio , chiudi luci e finestrini (disabilitato)</string>
+
+    <string name="menu_park_mode_suspend_shutdown_engine"><b>INIZIA LA SOSTA</b> - <u>Prima</u> controlla di non lasciare cose a bordo, togli le cose che ti servono dal bagagliaio , chiudi luci e finestrini  (spegni prima il motore)</string>
+
+    <string name="menu_park_mode_suspend_instructions">SEI IN SOSTA - Ora puoi scendere. Le porte si chiuderanno automaticamente nel tempo indicato a destra.\n\nAl termine della sosta usa il comando APRI PORTE sul telefono o la tua Card per rientrare in macchina</string>
+
+    <string name="push_to_cancel">Premi per\nannullare</string>
+
+    <string name="goodbye_instructions">Puoi scendere. Le porte si chiuderanno automaticamente nel tempo indicato sotto.\n\nSe cambiassi idea  esci, lascia chiudere le porte e apri una nuova sessione di noleggio</string>
+
+    <string name="milan">Milano</string>
+    <string name="minutes_saved">Minuti guadagnati&#58;</string>
+    <string name="mu_distance_kilometers">Km</string>
+    <string name="mu_distance_meters">m</string>
+    <string name="mu_distance_time">min</string>
+
+    <string name="navigation_start">Inizia navigazione</string>
+    <string name="navigation_stop">Ferma navigazione</string>
+    <string name="navigator_almost_there">Sei quasi arrivato</string>
+    <string name="navigator_continue">Continua</string>
+    <string name="navigator_continue_onto">Continua lungo</string>
+    <string name="navigator_finish">Destinazione raggiunta</string>
+    <string name="navigator_get_ready_to">Preparati per</string>
+    <string name="navigator_left">sinistra</string>
+    <string name="navigator_right">destra</string>
+    <string name="navigator_sharp_left">sinistra, curva brusca</string>
+    <string name="navigator_sharp_right">destra, curva brusca</string>
+    <string name="navigator_slight_left">sinistra, curva leggera</string>
+    <string name="navigator_slight_right">destra, curva leggera</string>
+    <string name="navigator_stopover">Sosta lungo</string>
+    <string name="navigator_turn">girare a</string>
+    <string name="navigator_turn_onto_it">lungo</string>
+    <string name="navigator_turn_onto_en"></string>
+    <string name="navigator_uturn">Appena possibile fare inversione</string>
+    <string name="navigator_range">Autonomia</string>
+    <string name="navigator_stop">Ferma navigatore</string>
+    <string name="navigator_2d3d">2D//3D</string>
+    <string name="navigator_zoom">Zoom</string>
+    <string name="navigator_go">VAI</string>
+    <string name="hint_navigator">Inserisci qualche carattere e clicca il tasto con la lente per scegliere la destinazione</string>
+
+    <string name="new_damage">Nuovi danni&#63;</string>
+    <string name="new_damage2">Dove&#63;</string>
+    <string name="no">No</string>
+    <string name="no_results">Nessun risultato trovato</string>
+    <string name="gotoCity"> Vai al centro città</string>
+    <string name="gotoStreet">Vai al centro dalla via</string>
+
+    <string name="number_0">0</string>
+    <string name="number_1">1</string>
+    <string name="number_2">2</string>
+    <string name="number_3">3</string>
+    <string name="number_4">4</string>
+    <string name="number_5">5</string>
+    <string name="number_6">6</string>
+    <string name="number_7">7</string>
+    <string name="number_8">8</string>
+    <string name="number_9">9</string>
+    <string name="number_invalid">Formato numero errato</string>
+    <string name="number_type_new">Inserisci un nuovo numero</string>
+
+    <string name="pin">PIN&#58;</string>
+    <string name="pin_card"><b>PIN</b> carta</string>
+    <string name="pin_message">Digita il PIN di 4 cifre che ti abilita al noleggio</string>
+    <string name="pin_right"><b>PIN</b> corretto</string>
+    <string name="pin_type">Digitare <b>PIN</b></string>
+    <string name="pin_wrong"><b>PIN</b> errato, prova di nuovo</string>
+    <string name="points_of_interest">Punti di interesse</string>
+    <string name="pin_FAQ_Title">Dove trovo il PIN?</string>
+    <string name="pin_FAQ_1">Sul sito Sharengo.it fai login e trovi nella colonna a sinistra il PIN.</string>
+    <string name="pin_FAQ_2">Sul sito mobile.sharengo.it fai login, clicca sul tuo nome e trovi il PIN.</string>
+    <string name="pin_FAQ_3">Sull \'App fai il login, clicca su Profilo utente, scorri fino alla sezione PIN.</string>
+
+
+    <string name="refuel_title">Ricarica vettura</string>
+    <string name="refueling_done">Ricarica completata! \nProcedi alla schermata successiva per riprendere la tua corsa\nRicordari di rimettere il cavo nel bagagliaio</string>
+    <string name="refuel_customer">Prima di partire controlla di aver staccato dalla torretta e rimesso nel bagagliaio il cavo della ricarica!</string>
+
+    <string name="search">Cerca</string>
+    <string name="select_a_destination">Selezionare una meta di interesse</string>
+    <string name="select_fuel_station">Seleziona distributore</string>
+    <string name="select_travel_path">Selezionare itinerario</string>
+    <string name="show_pin">Visualizza <b>PIN</b></string>
+    <string name="sos">SOS</string>
+    <string name="plate">TARGA:</string>
+
+    <string name="text_view_are_there_new_damages">Nuovi danni&#63;</string>
+    <string name="text_view_call_message">Prenota la chiamata oppure inserisci un nuovo numero</string>
+    <string name="text_view_set_a_choice">Imposta una scelta</string>
+    <string name="thank_for_choosing">Grazie per aver scelto</string>
+
+    <string name="alert_20km">L’autonomia dell’auto, per come la stai utilizzando, potrebbe ora essere inferiore ai 20 km. Tienine conto.</string>
+    <string name="alert_5km">L’autonomia dell’auto, per come la stai utilizzando, è di circa 5 km. Ti invitiamo a chiudere la corsa per non incorrere in penali.</string>
+    <string name="alert_bonus">Da questo momento, se lascerai l’auto vicino ad una stazione di ricarica indicata sul navigatore, riceverai 5 minuti bonus sul tuo profilo.</string>
+    <string name="alert_bonus_title">BONUS</string>
+    <string name="alert_warning_title">ATTENZIONE</string>
+
+
+    <string name="poi_bonus_title">STAZIONE DI RICARICA</string>
+    <string name="poi_bonus_body">Parcheggia l’auto qui vicino per ricevere un BONUS di 5 minuti sul tuo profilo</string>
+
+    <string name="welcome">Benvenuto</string>
+
+    <string name="yes">S&#236;</string>
+
+    <string name="menu_rent_end_time_startup_app"><b>TERMINA NOLEGGIO</b> - Non disponibile : L\'applicazione è ancora in avvio, Attendere prego.</string>
+    <string name="alert_area">Attenzione, veicolo fuori dell\'area  di servizio, non sarà possibile chiudere la corsa</string>
+
 </resources>

@@ -32,6 +32,7 @@ import eu.philcar.csg.OBC.devices.Hik_io;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
+import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.server.AdminsConnector;
 import eu.philcar.csg.OBC.server.CallCenterConnector;
@@ -201,7 +202,7 @@ public class ObcService extends Service {
     ScheduledExecutorService serverUpdateScheduler;
     ScheduledExecutorService tripUpdateScheduler;
     ScheduledExecutorService tripPoiUpdateScheduler;
-    ScheduledExecutorService virtualBMSUpdateScheduler;
+        ScheduledExecutorService virtualBMSUpdateScheduler;
     ScheduledExecutorService gpsCheckeScheduler;
 
 
@@ -1532,7 +1533,7 @@ public class ObcService extends Service {
 
             }
 
-        }, 0, 20, TimeUnit.SECONDS);
+        }, 0, 60, TimeUnit.SECONDS);
 
         dlog.d("Started remote Update Cycle");
     }
@@ -1729,6 +1730,7 @@ public class ObcService extends Service {
                     }
                 }
                 dlog.d("Excecuting scheduled reboot");
+                Events.Reboot("Scheduled reboot");
                 SystemControl.doReboot();
             }
             SystemControl.ResycNTP();
@@ -2112,8 +2114,10 @@ public class ObcService extends Service {
                     obc_io.SetRadioVolume(vol);
 
                     try {
-                        if (msg.arg1 == 0)
+                        if (msg.arg1 == 0) {
                             AudioPlayer.Instance.lastAudioState = msg.arg1;
+                            ProTTS.lastAudioState = msg.arg1;
+                        }
                     } catch (Exception e) {
 
                     }
@@ -2129,16 +2133,20 @@ public class ObcService extends Service {
                     obc_io.setAudioChannel(msg.arg1);
                     try {
 
-                        if (!AudioPlayer.Instance.reqSystem)                    //controllo se la richiesta non parte da audio player
+                        if (!AudioPlayer.Instance.reqSystem && !ProTTS.reqSystem) {               //controllo se la richiesta non parte da audio player
                             AudioPlayer.Instance.lastAudioState = msg.arg1;
+                            ProTTS.lastAudioState=msg.arg1;
+                        }
 
                         if (msg.arg1 == 2)
                             AudioPlayer.Instance.isSystem = true;            //controllo se è stato impostato System
                         else
                             AudioPlayer.Instance.isSystem = false;
 
-                        if (AudioPlayer.Instance.reqSystem)                    //se c'era la richiesta la tolgo
+                        if (AudioPlayer.Instance.reqSystem || ProTTS.reqSystem) {                    //se c'era la richiesta la tolgo
                             AudioPlayer.Instance.reqSystem = false;
+                            ProTTS.reqSystem=false;
+                        }
 
                     } catch (Exception e) {
 

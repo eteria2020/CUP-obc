@@ -92,6 +92,8 @@ public class Events extends DbTable<Event,Integer> {
 		labels.put(EVT_LEASE, "LEASE");
 		labels.put(EVT_REBOOT, "REBOOT");
 		labels.put(EVT_SOC, "SOC");
+		labels.put(EVT_OUTOFAREA, "AREA");
+		labels.put(EVT_MENU_CLICK, "MENU_CLICK");
 
 		
 		
@@ -156,7 +158,7 @@ public class Events extends DbTable<Event,Integer> {
 	}
 
 	public static void menuclick(String clicked) {
-		generateEvent(EVT_OUTOFAREA,0,"Click on "+clicked);
+		generateEvent(EVT_MENU_CLICK,0,"Click on "+clicked);
 	}
 	
 	public static void eventGear(String position) {
@@ -223,8 +225,8 @@ public class Events extends DbTable<Event,Integer> {
 	public static void Shutdown() {
 		generateEvent(EVT_SHUTDOWN,0,null);
 	}
-	public static void Reboot() {
-		generateEvent(EVT_REBOOT,0,null);
+	public static void Reboot(String text) {
+		generateEvent(EVT_REBOOT,0,text);
 	}
 	
 	public static void LeaseInfo(int status,int card) {		

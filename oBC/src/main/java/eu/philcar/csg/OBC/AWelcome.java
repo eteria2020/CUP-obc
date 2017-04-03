@@ -1,6 +1,5 @@
 package eu.philcar.csg.OBC;
 
-import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
 import eu.philcar.csg.OBC.controller.welcome.FWelcome;
 import eu.philcar.csg.OBC.helpers.DLog;
@@ -18,7 +17,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.provider.Settings;
 
 @SuppressWarnings("deprecation")
 @SuppressLint({ "HandlerLeak", "Wakelock" })
@@ -28,7 +26,8 @@ public class AWelcome extends ABase {
 	
 	private ServiceConnector serviceConnector;
 	
-	WakeLock screenLock;	
+	WakeLock screenLock;
+	private CarInfo localCarInfo =null;
 
 	private final int MSG_RELEASE_SCREEN = 10001;
 	
@@ -192,6 +191,9 @@ public class AWelcome extends ABase {
 				break;
 
 			case ObcService.MSG_CAR_INFO:
+				if (msg.obj!=null &&  msg.obj instanceof CarInfo) {
+					localCarInfo = (CarInfo)msg.obj;
+				}
 				FWelcome fWelcome = (FWelcome)getFragmentManager().findFragmentByTag(FWelcome.class.getName());
 				if (fWelcome != null) {
 					fWelcome.setCarPlate(App.CarPlate);
@@ -220,7 +222,11 @@ public class AWelcome extends ABase {
 		 }
 	};
 	
-	
+
+	public CarInfo getLocalCarInfo(){
+		return localCarInfo;
+	}
+
 	@Override
 	public int getActivityUID() {
 		return App.AWELCOME_UID;

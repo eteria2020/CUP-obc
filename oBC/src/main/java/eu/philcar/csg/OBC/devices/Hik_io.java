@@ -48,9 +48,11 @@ import com.Hik.Mercury.SDK.Radio.RadioObserver;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.SystemControl;
+import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.helpers.Converts;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
+import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.Reservation;
 import eu.philcar.csg.OBC.db.Events;
@@ -525,14 +527,20 @@ public class Hik_io implements LowLevelInterface {
 
 		case AUDIO_RADIO:
 			mAudioManager.audioSetChannel(AudioInfo.HIK_AUDIO_CHANNEL_RADIO);
-			mAudioManager.audioSetVol(20);
+			if (AudioPlayer.Instance.reqSystem || ProTTS.reqSystem)
+				mAudioManager.audioSetVol(lastVolumeValue);
+			else
+				mAudioManager.audioSetVol(15);
 			mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
 			dlog.d("HIK Audio channel : RADIO");
 			break;
 			
 		case AUDIO_SYSTEM:
 			mAudioManager.audioSetChannel(AudioInfo.HIK_AUDIO_CHANNEL_ARM);
-			mAudioManager.audioSetVol(15);
+			if (AudioPlayer.Instance.reqSystem || ProTTS.reqSystem)
+				mAudioManager.audioSetVol(lastVolumeValue);
+			else
+				mAudioManager.audioSetVol(15);
 			mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
 			dlog.d("HIK Audio channel : SYSTEM");
 			break;
@@ -1316,6 +1324,7 @@ public class Hik_io implements LowLevelInterface {
 	    
 	    
 	    private AudioObr mAudioObserver = new AudioObr();
+		private int lastVolumeValue=20;
 	    
 	    private class AudioObr extends AudioObserver {
 	    	
@@ -1329,6 +1338,9 @@ public class Hik_io implements LowLevelInterface {
 		    		b.putInt("volume", (int)((double)volume*coeff));
 		    		obcService.notifyRadioInfo(b);	   
 		    		dlog.d("Radio: Volume change = " + volume);
+					if (!AudioPlayer.Instance.reqSystem && !ProTTS.reqSystem)
+						lastVolumeValue=volume;
+
 	    		}
 	    	}
 	    	

@@ -96,6 +96,22 @@
             android:layout_marginBottom="25dp"
             android:textColor="@color/text_green"
             android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnCarUpdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Refresh Data"
+            android:textSize="20sp"
+            android:layout_above="@+id/fins_bottom_V"
+            android:layout_alignLeft="@+id/tvEndCharging"
+            android:layout_alignStart="@+id/tvEndCharging"
+            android:layout_gravity="left|bottom"
+            android:background="@drawable/sel_button_fuel_station"
+            android:layout_marginBottom="25dp"
+            android:textColor="@color/text_green"
+            android:textStyle="bold"
+            android:layout_marginLeft="75dp" />
     </FrameLayout>
 
     <FrameLayout

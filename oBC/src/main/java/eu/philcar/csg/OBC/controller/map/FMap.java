@@ -129,6 +129,7 @@ import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
+import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.service.MessageFactory;
@@ -208,7 +209,7 @@ public class FMap extends FBase implements OnClickListener {
 
 
 
-    private TextToSpeech tts;
+    private ProTTS tts;
 	private UtteranceProgressListener utteranceListener;
 
 	private boolean navigatorAT;
@@ -330,50 +331,9 @@ public class FMap extends FBase implements OnClickListener {
 
 
 
-		if (tts != null) {
-			tts.stop();
-			tts.shutdown();
-		}
 
-		tts = new TextToSpeech(getActivity(), new TextToSpeech.OnInitListener() {
-			@Override
-		    public void onInit(int status) {
-				if(status != TextToSpeech.ERROR) {
-					if (((ABase)getActivity()).getActivityLocale().equalsIgnoreCase("it")) {
-						tts.setLanguage(Locale.ITALIAN);
-					} else {
-						tts.setLanguage(Locale.ENGLISH);
-					}
-				}
-		    }
 
-		});
-		//TTS completation listener
-		utteranceListener = new UtteranceProgressListener() {
-			@Override
-			public void onStart(String utteranceId) {
-				if(AMainOBC.player.isBusy()) {
-					dlog.d("Player is Busy pausing advice");
-					AMainOBC.player.pausePlayer();
-				}
-			}
-
-			@Override
-			public void onDone(String utteranceId) {
-
-				if(AMainOBC.player.isBusy()) {
-					dlog.d("Player is Busy resuming advice");
-					AMainOBC.player.resumePlayer();
-				}
-			}
-
-			@Override
-			public void onError(String utteranceId) {
-
-			}
-		};
-
-		tts.setOnUtteranceProgressListener(utteranceListener);
+		tts=new ProTTS(getActivity());
 
 
 		//seen=false;
@@ -825,8 +785,8 @@ public class FMap extends FBase implements OnClickListener {
 		firstLaunch=true;
 		drawCharging=true;
 		if (tts!=null) {
-			tts.stop();
 			tts.shutdown();
+			tts=null;
 		}
 
 	}
@@ -1047,19 +1007,7 @@ public class FMap extends FBase implements OnClickListener {
 
 
 					//((AMainOBC) getActivity()).player.inizializePlayer();
-					AMainOBC.player.reqSystem = true;
-					((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
-					dlog.d("updateParkAreaStatus: Imposto Audio a AUDIO_SYSTEM");
-					new Thread(new Runnable() {
-						public void run() {
-							try {
-								Events.outOfArea(true);
-								AMainOBC.player.waitToPlayFile(uri);
-							} catch (Exception e) {
-								dlog.e("Exception trying to play audio", e);
-							}
-						}
-					}).start();
+				queueTTS(getActivity().getResources().getString(R.string.alert_area));
 				}
 			else{
 				if(lastInside==1){
@@ -1151,19 +1099,7 @@ public class FMap extends FBase implements OnClickListener {
 				((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_5km);
 				localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
 				//((AMainOBC) getActivity()).player.inizializePlayer();
-				((AMainOBC) getActivity()).player.reqSystem = true;
-				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
-				dlog.d("updateCarInfo: Imposto Audio a AUDIO_SYSTEM");
-				new Thread(new Runnable() {
-					public void run() {
-						try{
-						((AMainOBC) getActivity()).player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ R.raw.alert_tts_5km));
-						}catch(Exception e){
-							dlog.e("Exception trying to play audio",e);
-						}
-
-					}
-				}).start();
+				queueTTS(getActivity().getResources().getString(R.string.alert_5km));
 			}
 		}else
 			if(SOC<=30) {
@@ -1196,18 +1132,7 @@ public class FMap extends FBase implements OnClickListener {
 					//(rootView.findViewById(R.id.fmapAlertSOCFL)).invalidate(); testinva
 
 					//((AMainOBC) getActivity()).player.inizializePlayer();
-					((AMainOBC) getActivity()).player.reqSystem = true;
-					((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
-					dlog.d("updateCarInfo: Imposto Audio a AUDIO_SYSTEM");
-					new Thread(new Runnable() {
-						public void run() {
-							try{
-							((AMainOBC) getActivity()).player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/" + R.raw.alert_tts_20km));
-							}catch(Exception e){
-								dlog.e("Exception trying to play audio",e);
-							}
-						}
-					}).start();
+					queueTTS(getActivity().getResources().getString(R.string.alert_20km));
 				}
 			}
 
@@ -1304,7 +1229,13 @@ public class FMap extends FBase implements OnClickListener {
 
 		case R.id.fmapSearchB://Search
 			if (!navigationActive)
-				((ABase)getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
+
+				//((ABase)getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
+
+					queueTTS(getResources().getString(R.string.alert_20km));
+
+					queueTTS(getResources().getString(R.string.alert_5km));
+
 				/*((AMainOBC) getActivity()).player.reqSystem = true;
 				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
 				dlog.d("updateCarInfo: Imposto Audio a AUDIO_SYSTEM");
@@ -2784,10 +2715,8 @@ public class FMap extends FBase implements OnClickListener {
 		@Override
 		public void onSignalNewAdviceWithInstruction(String arg0) {
 			dlog.d("ADVICE STRING:" +  arg0);
-			HashMap<String, String> map = new HashMap<String, String>();
-			map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, arg0);
-				tts.speak(arg0, 0,map);
-			map.clear();
+				tts.postpone();
+				tts.speak(arg0,TextToSpeech.QUEUE_FLUSH);
 
 		}
 
@@ -3674,6 +3603,14 @@ public class FMap extends FBase implements OnClickListener {
 				animQueue.remove("bonus");
 			}
 		}
+	}
+
+	private void queueTTS(String text){
+		ProTTS.reqSystem = true;
+		((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
+		tts.speak(text);
+		dlog.d("queueTTS: leggo " +text);
+
 	}
 
 }

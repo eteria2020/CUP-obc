@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.text.Html;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -39,7 +40,7 @@ public class FMaintenance extends FBase {
 	private DLog dlog = new DLog(this.getClass());
 
 	public  static FMaintenance Instance;
-
+	private Handler handler = new Handler();
 
 	public static FMaintenance newInstance() {
 		return new FMaintenance();
@@ -119,7 +120,7 @@ public class FMaintenance extends FBase {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		Events.Maintenance("Show");
 		askPin();
-
+		((AWelcome)getActivity()).sendMessage(MessageFactory.requestCarInfo());
 		view = inflater.inflate(R.layout.f_maintenance, container, false);
 
 		((View)view.findViewById(R.id.finsNextIB)).setVisibility(View.INVISIBLE);
@@ -128,7 +129,7 @@ public class FMaintenance extends FBase {
 		((Button)view.findViewById(R.id.finsNextIB)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
+				((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
 
 				if(App.Charging) {
 					dlog.d("Skipped FMaintenance");
@@ -146,6 +147,19 @@ public class FMaintenance extends FBase {
 				((AWelcome)getActivity()).sendMessage(MessageFactory.sendEndCharging());
 				Events.Maintenance("EndCharging");
 				((TextView)view.findViewById(R.id.tvEndCharging)).setText("Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.");
+
+			}
+		});
+
+		((Button)view.findViewById(R.id.btnCarUpdate)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dlog.d("Pushed CarUpdate");
+				try {
+					update(((AWelcome) getActivity()).getLocalCarInfo());
+				}catch (Exception e){
+					dlog.e("Exception while updating LocalCarInfo",e);
+				}
 
 			}
 		});
@@ -170,6 +184,16 @@ public class FMaintenance extends FBase {
 
 		}.start();
 
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					update(((AWelcome) getActivity()).getLocalCarInfo());
+				}catch (Exception e){
+					dlog.e("Exception while updating LocalCarInfo",e);
+				}
+			}
+		},500);
 		return view;
 	}
 
@@ -187,7 +211,7 @@ public class FMaintenance extends FBase {
 			if (carinfo.chargingPlug)
 				((TextView)view.findViewById(R.id.tvEndCharging)).setText("IMPOSSIBILE TERMINARE RICARCA: spina ancora inserita");
 			else
-				((TextView)view.findViewById(R.id.tvEndCharging)).setText("Auto non in ricarica");
+				((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
 		}
 	}
 
@@ -199,7 +223,15 @@ public class FMaintenance extends FBase {
 	}
 
 	public void handleCarInfo(CarInfo carinfo) {
-		update(carinfo);
+
+			update(carinfo);
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		Instance=null;
+		dialog.dismiss();
 	}
 
 	@Override

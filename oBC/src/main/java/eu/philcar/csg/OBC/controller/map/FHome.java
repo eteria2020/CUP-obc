@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -32,6 +33,7 @@ import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.CarInfo;
 
@@ -46,6 +48,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -87,12 +91,13 @@ public class FHome extends FBase implements OnClickListener {
 
     private List<String> animQueue =new ArrayList<String>();
     private Uri uri;
-    private int  lastInside=0;//0:no anim 1:anim3g 2:animArea 3:animBoth
+    private static int  lastInside=0;//0:no anim 1:anim3g 2:animArea 3:animBoth
     private static Boolean RequestBanner=false;
     private long updateArea=0;
 
     private static Boolean handleClick=false;
 
+    private ProTTS tts;
 
     public FHome() {
         Instance = this;
@@ -141,6 +146,12 @@ public class FHome extends FBase implements OnClickListener {
         }*/
 
         uri = Uri.parse("android.resource://eu.philcar.csg.OBC/"+R.raw.out_operative_area_tts);
+
+
+
+
+        tts=new ProTTS(getActivity());
+
 
         ((Button) view.findViewById(R.id.fmapSOSB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapSearchB)).setOnClickListener(this);
@@ -486,19 +497,8 @@ public class FHome extends FBase implements OnClickListener {
 
 
                 //((AMainOBC) getActivity()).player.inizializePlayer();
-                AMainOBC.player.reqSystem = true;
-                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
-                dlog.d("updateParkAreaStatus: Imposto Audio a AUDIO_SYSTEM");
-                new Thread(new Runnable() {
-                    public void run() {
-                        try {
-                            //Events.outOfArea(true);
-                            AMainOBC.player.waitToPlayFile(uri);
-                        } catch (Exception e) {
-                            dlog.e("Exception trying to play audio", e);
-                        }
-                    }
-                }).start();
+                queueTTS(getActivity().getResources().getString(R.string.alert_area));
+
             }
             else{
                 if(lastInside==1){
@@ -966,6 +966,14 @@ public class FHome extends FBase implements OnClickListener {
         }catch(Exception e){
             dlog.e("Exception tryng to start timer",e);
         }
+
+    }
+
+    private void queueTTS(String text){
+        ProTTS.reqSystem = true;
+        ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
+        tts.speak(text);
+        dlog.d("queueTTS: leggo " +text);
 
     }
 

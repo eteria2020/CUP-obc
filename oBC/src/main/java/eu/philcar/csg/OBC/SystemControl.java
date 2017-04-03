@@ -326,7 +326,7 @@ public class SystemControl {
 			try {
 
 				DLog.D(SystemControl.class.toString()+" begin reboot");
-				Events.Reboot();
+				Events.Reboot("No 3G Reboot");
 
 				Thread.sleep(50000);
 				if(App.currentTripInfo==null || !App.currentTripInfo.isOpen) {

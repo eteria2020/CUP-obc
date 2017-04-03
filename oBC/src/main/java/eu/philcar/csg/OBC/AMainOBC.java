@@ -835,6 +835,7 @@ public class AMainOBC extends ABase implements LocationListener {
 	}
 
 	public void setAudioSystem(int mode){
+		dlog.d("setAudioSystem " +mode +" reqSystem is: "+player.reqSystem);
 		this.sendMessage(MessageFactory.AudioChannel(mode));
 	}
 

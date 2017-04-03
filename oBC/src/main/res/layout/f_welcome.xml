@@ -115,7 +115,7 @@
 			android:src="@drawable/sel_button_zh"
 			android:contentDescription="@string/content_description"
 			android:background="@null"
-			android:visibility="visible" />
+			android:visibility="gone" />
 
 	</LinearLayout>
     <LinearLayout android:id="@+id/fwelBannerLL" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/fwel_logo_FL" android:layout_centerHorizontal="true" android:layout_marginTop="80dp" android:orientation="vertical"

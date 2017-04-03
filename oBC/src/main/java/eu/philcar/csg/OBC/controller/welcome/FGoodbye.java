@@ -58,6 +58,7 @@ import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.BannerJsInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
+import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.MessageFactory;
 import eu.philcar.csg.OBC.service.TripInfo;
@@ -74,6 +75,7 @@ public class FGoodbye extends FBase {
 	private static Boolean RequestBanner=false;
 	private final static int  MSG_CLOSE_ACTIVITY  = 1;
 
+	private ProTTS tts;
 
 	private Handler localHandler = new Handler()  {
 
@@ -176,19 +178,7 @@ public class FGoodbye extends FBase {
 		}
 		dlog.d("FGoodbye: onCreateView");
 		//((AMainOBC) getActivity()).player.inizializePlayer();
-		((AGoodbye) getActivity()).player.reqSystem = true;
-		((AGoodbye) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
-		dlog.d("updateParkAreaStatus: Imposto Audio a AUDIO_SYSTEM");
-		Thread playAdvice = new Thread(new Runnable() {
-			public void run() {
-				try{
-					((AGoodbye) getActivity()).player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ R.raw.alert_tts_end));
-				}catch(Exception e){
-					dlog.e("Exception trying to play audio",e);
-				}
-			}
-		});
-		playAdvice.start();
+		queueTTS(getActivity().getResources().getString(R.string.alert_area));
 
 		Bundle b = this.getArguments();
 		if (b==null || !b.containsKey("CLOSE")) {
@@ -203,6 +193,8 @@ public class FGoodbye extends FBase {
 	
 		(view.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
 
+
+		tts=new ProTTS(getActivity());
 		
 		((TextView)view.findViewById(R.id.fgodTopTV)).setTypeface(font);
 		((TextView)view.findViewById(R.id.fgod_Goodbye_Title_TV)).setTypeface(font);
@@ -605,5 +597,13 @@ public class FGoodbye extends FBase {
 
 			super.onDestroy();
 		}
+	}
+
+	private void queueTTS(String text){
+		ProTTS.reqSystem = true;
+		((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
+		tts.speak(text);
+		dlog.d("queueTTS: leggo " +text);
+
 	}
 }

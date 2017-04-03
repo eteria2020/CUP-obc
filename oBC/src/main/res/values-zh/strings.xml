@@ -228,5 +228,6 @@
     <string name="menu_rent_end_time_startup_app"><b>结束租赁</b>- 不可用：L \'APP仍在启动，请稍候。</string>
     <string name="navigation_active_error">请在回家前，停止导航</string>
     <string name="navigator_slight_right">向右稍转</string>
+    <string name="alert_area">请注意，车辆在工作区域外，不可能关闭旅程</string>
 
 </resources>
