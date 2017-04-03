@@ -970,10 +970,17 @@ public class FHome extends FBase implements OnClickListener {
     }
 
     private void queueTTS(String text){
-        ProTTS.reqSystem = true;
-        ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
-        tts.speak(text);
-        dlog.d("queueTTS: leggo " +text);
+        try{
+            if(!ProTTS.reqSystem) {
+                ProTTS.reqSystem = true;
+                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
+            }
+            tts.speak(text);
+            dlog.d("queueTTS: leggo " +text);
+
+        }catch (Exception e){
+            dlog.e("queueTTS exception while start speak",e);
+        }
 
     }
 

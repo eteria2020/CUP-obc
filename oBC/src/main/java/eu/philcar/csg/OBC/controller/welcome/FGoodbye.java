@@ -74,6 +74,7 @@ public class FGoodbye extends FBase {
 	private static CountDownTimer timer_5sec,selfclose=null;
 	private static Boolean RequestBanner=false;
 	private final static int  MSG_CLOSE_ACTIVITY  = 1;
+	private final static int  MSG_PLAY_ADVICE  = 2;
 
 	private ProTTS tts;
 
@@ -91,13 +92,20 @@ public class FGoodbye extends FBase {
 						if(getActivity()!=null)
 							if(App.currentTripInfo==null)
 								(getActivity()).finish();
-						else if(App.currentTripInfo.isOpen){
+							else if(App.currentTripInfo.isOpen){
 								dlog.d("handleMessage:MSG_CLOSE_ACTIVITY Unable to close trip, restoring AmainOBC");
 								Intent i = new Intent(getActivity(), AMainOBC.class);
 								i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 								startActivity(i);
 								getActivity().finish();
 							}
+					}catch(Exception e){
+						dlog.e("FGoodbye : MSG_CLOSE_FRAGMENT Exception",e);
+					}
+					break;
+				case MSG_PLAY_ADVICE:
+					try {
+						queueTTS(getResources().getString(R.string.alert_key));
 					}catch(Exception e){
 						dlog.e("FGoodbye : MSG_CLOSE_FRAGMENT Exception",e);
 					}
@@ -178,7 +186,7 @@ public class FGoodbye extends FBase {
 		}
 		dlog.d("FGoodbye: onCreateView");
 		//((AMainOBC) getActivity()).player.inizializePlayer();
-		queueTTS(getActivity().getResources().getString(R.string.alert_area));
+		//getActivity().getResources().getString(R.string.alert_key));
 
 		Bundle b = this.getArguments();
 		if (b==null || !b.containsKey("CLOSE")) {
@@ -195,6 +203,7 @@ public class FGoodbye extends FBase {
 
 
 		tts=new ProTTS(getActivity());
+
 		
 		((TextView)view.findViewById(R.id.fgodTopTV)).setTypeface(font);
 		((TextView)view.findViewById(R.id.fgod_Goodbye_Title_TV)).setTypeface(font);
@@ -345,6 +354,8 @@ public class FGoodbye extends FBase {
 
 
 		updateBanner("END");
+		localHandler.removeMessages(MSG_PLAY_ADVICE);
+		localHandler.sendEmptyMessageDelayed(MSG_PLAY_ADVICE,1000);
 		return view;
 	}
 
@@ -600,10 +611,17 @@ public class FGoodbye extends FBase {
 	}
 
 	private void queueTTS(String text){
-		ProTTS.reqSystem = true;
-		((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
-		tts.speak(text);
-		dlog.d("queueTTS: leggo " +text);
+		try {
+
+			if(!ProTTS.reqSystem) {
+				ProTTS.reqSystem = true;
+				((AGoodbye) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
+			}
+			tts.speak(text);
+			dlog.d("queueTTS: leggo " + text);
+		}catch (Exception e){
+			dlog.e("queueTTS exception while start speak",e);
+		}
 
 	}
 }

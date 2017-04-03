@@ -225,5 +225,6 @@
     <string name="navigation_active_error">Arrêtez la navigation avant d\'aller à la maison</string>
     <string name="other_trip_message">Vous avez déjà un voyage ouvert.Veuillez contacter le centre d\'appels pour plus d\'informations</string>
     <string name="alert_area">Attention, le véhicule est hors de la zone opérationnelle, il ne sera pas possible de fermer le voyage</string>
+    <string name="alert_key">N\'oubliez pas d\'éteindre le tableau de bord en tournant la clé avant de quitter la voiture</string>
 
 </resources>

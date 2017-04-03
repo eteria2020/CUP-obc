@@ -1230,11 +1230,11 @@ public class FMap extends FBase implements OnClickListener {
 		case R.id.fmapSearchB://Search
 			if (!navigationActive)
 
-				//((ABase)getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
+				((ABase)getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
 
-					queueTTS(getResources().getString(R.string.alert_20km));
+					//queueTTS(getResources().getString(R.string.alert_20km));
 
-					queueTTS(getResources().getString(R.string.alert_5km));
+					//queueTTS(getResources().getString(R.string.alert_5km));
 
 				/*((AMainOBC) getActivity()).player.reqSystem = true;
 				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
@@ -3606,10 +3606,17 @@ public class FMap extends FBase implements OnClickListener {
 	}
 
 	private void queueTTS(String text){
-		ProTTS.reqSystem = true;
-		((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
-		tts.speak(text);
-		dlog.d("queueTTS: leggo " +text);
+		try{
+			if(!ProTTS.reqSystem) {
+				ProTTS.reqSystem = true;
+				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
+			}
+			tts.speak(text);
+			dlog.d("queueTTS: leggo " +text);
+
+		}catch (Exception e){
+			dlog.e("queueTTS exception while start speak",e);
+		}
 
 	}
 

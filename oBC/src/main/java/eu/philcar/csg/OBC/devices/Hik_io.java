@@ -528,9 +528,9 @@ public class Hik_io implements LowLevelInterface {
 		case AUDIO_RADIO:
 			mAudioManager.audioSetChannel(AudioInfo.HIK_AUDIO_CHANNEL_RADIO);
 			if (AudioPlayer.Instance.reqSystem || ProTTS.reqSystem)
-				mAudioManager.audioSetVol(lastVolumeValue);
-			else
 				mAudioManager.audioSetVol(15);
+			else
+				mAudioManager.audioSetVol(lastVolumeValue);
 			mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
 			dlog.d("HIK Audio channel : RADIO");
 			break;
@@ -538,9 +538,9 @@ public class Hik_io implements LowLevelInterface {
 		case AUDIO_SYSTEM:
 			mAudioManager.audioSetChannel(AudioInfo.HIK_AUDIO_CHANNEL_ARM);
 			if (AudioPlayer.Instance.reqSystem || ProTTS.reqSystem)
-				mAudioManager.audioSetVol(lastVolumeValue);
-			else
 				mAudioManager.audioSetVol(15);
+			else
+				mAudioManager.audioSetVol(lastVolumeValue);
 			mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
 			dlog.d("HIK Audio channel : SYSTEM");
 			break;
@@ -1338,7 +1338,6 @@ public class Hik_io implements LowLevelInterface {
 		    		b.putInt("volume", (int)((double)volume*coeff));
 		    		obcService.notifyRadioInfo(b);	   
 		    		dlog.d("Radio: Volume change = " + volume);
-					if (!AudioPlayer.Instance.reqSystem && !ProTTS.reqSystem)
 						lastVolumeValue=volume;
 
 	    		}

@@ -91,8 +91,12 @@ public class ProTTS implements TextToSpeech.OnInitListener{
 
     public void speak(final String text) {
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Thread.currentThread().setName("ProTTS");
 
-                try{
+                try {
                    /* if(playing.size()>0){
                         for(String s : playing){
                             if(s.compareTo(text)==0){
@@ -104,18 +108,27 @@ public class ProTTS implements TextToSpeech.OnInitListener{
                     //playing.add(text);
                     HashMap<String, String> map = new HashMap<String, String>();
                     map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, text);
+                    playing.add(text);
+                    Thread.sleep(1500);
                     //player.setDataSource(context,uri);
-                    player.speak(text,TextToSpeech.QUEUE_ADD,map);
+                    player.setPitch(0.85f);
+                    player.setSpeechRate(1.15f);
+                    player.speak(text, TextToSpeech.QUEUE_ADD, map);
                     map.clear();
-                    dlog.d("speak: riproduco "+text);
+                    dlog.d("speak: riproduco " + text);
                 } catch (Exception e) {
-                     dlog.e("speak: Eccezione in play tts",e);
+                    dlog.e("speak: Eccezione in play tts", e);
                 }
-
+            }
+        }).start();
 
     }
     public void speak(final String text,final int queueMode) {
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Thread.currentThread().setName("ProTTS");
                 try{
                    /* if(playing.size()>0){
                         for(String s : playing){
@@ -128,7 +141,7 @@ public class ProTTS implements TextToSpeech.OnInitListener{
                     //playing.add(text);
                     HashMap<String, String> map = new HashMap<String, String>();
                     map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, text);
-                    Thread.sleep(2000);
+                    Thread.sleep(300);
                     //player.setDataSource(context,uri);
                     player.speak(text,queueMode,map);
                     map.clear();
@@ -136,7 +149,8 @@ public class ProTTS implements TextToSpeech.OnInitListener{
                 } catch (Exception e) {
                     dlog.e("speak: Eccezione in play tts",e);
                 }
-
+    }
+}).start();
 
     }
     public void reset() {
@@ -169,18 +183,25 @@ public class ProTTS implements TextToSpeech.OnInitListener{
             }
 
             utteranceListener = new UtteranceProgressListener() {
+                private final Context Context =context;
                 @Override
                 public void onStart(String utteranceId) {
                         dlog.d("Player is Busy pausing advice");
-                    Toast.makeText(context,"start",Toast.LENGTH_SHORT).show();
-                        AMainOBC.player.pausePlayer();
+                    //Toast.makeText(context,"start",Toast.LENGTH_SHORT).show();
+                        //AMainOBC.player.pausePlayer();
 
                 }
 
                 @Override
                 public void onDone(String utteranceId) {
-                    Toast.makeText(context,"done",Toast.LENGTH_SHORT).show();
-                    ((AMainOBC)context).setAudioSystem(lastAudioState);
+                    // Toast.makeText(context,"done",Toast.LENGTH_SHORT).show();
+                    try {
+                        playing.remove(utteranceId);
+                        if(playing.size()==0)
+                            ((AMainOBC) Context).setAudioSystem(lastAudioState);
+                    }catch (Exception e){
+                        dlog.e("ProTTS: Exception while executing onDone operation ",e);
+                    }
                 }
 
                 @Override
@@ -189,7 +210,6 @@ public class ProTTS implements TextToSpeech.OnInitListener{
                 }
             };
 
-            Toast.makeText(context,"init",Toast.LENGTH_SHORT).show();
             player.setOnUtteranceProgressListener(utteranceListener);
             ready=true;
         }else
