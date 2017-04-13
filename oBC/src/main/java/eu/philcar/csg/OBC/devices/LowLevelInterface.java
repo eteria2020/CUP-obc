@@ -86,7 +86,7 @@ void resetAdminCards();
 
 void setForcedLedBlink(boolean status);
 
-void setAudioChannel(int channel);
+void setAudioChannel(int channel, int volume);
 void SetRadioChannel(String Band, int freq);
 void SetRadioVolume(int vol);
 

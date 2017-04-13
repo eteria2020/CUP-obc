@@ -127,6 +127,7 @@ import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
+import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
@@ -210,6 +211,7 @@ public class FMap extends FBase implements OnClickListener {
 
 
     private ProTTS tts;
+	private AudioPlayer player;
 	private UtteranceProgressListener utteranceListener;
 
 	private boolean navigatorAT;
@@ -258,7 +260,7 @@ public class FMap extends FBase implements OnClickListener {
 
     	super.onCreate(savedInstanceState);
 		context=getActivity();
-
+		player=new AudioPlayer(getActivity());
         App.isCloseable = false;
 
 
@@ -312,7 +314,7 @@ public class FMap extends FBase implements OnClickListener {
 			}).start();
 		}
 
-		uri = Uri.parse("android.resource://eu.philcar.csg.OBC/"+ R.raw.out_operative_area_tts);//avviso sonoro
+		//uri = Uri.parse("android.resource://eu.philcar.csg.OBC/"+ R.raw.out_operative_area_tts_it);//avviso sonoro
 
 
 
@@ -1007,7 +1009,10 @@ public class FMap extends FBase implements OnClickListener {
 
 
 					//((AMainOBC) getActivity()).player.inizializePlayer();
-				queueTTS(getActivity().getResources().getString(R.string.alert_area));
+				if(App.USE_TTS_ALERT)
+					queueTTS(getActivity().getResources().getString(R.string.alert_area));
+				else
+					playAlertAdvice(R.raw.out_operative_area_tts," alert area");
 				}
 			else{
 				if(lastInside==1){
@@ -1099,7 +1104,10 @@ public class FMap extends FBase implements OnClickListener {
 				((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_5km);
 				localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
 				//((AMainOBC) getActivity()).player.inizializePlayer();
-				queueTTS(getActivity().getResources().getString(R.string.alert_5km));
+				if(App.USE_TTS_ALERT)
+					queueTTS(getActivity().getResources().getString(R.string.alert_5km));
+				else
+					playAlertAdvice(R.raw.alert_tts_5km," alert 5km");
 			}
 		}else
 			if(SOC<=30) {
@@ -1132,7 +1140,10 @@ public class FMap extends FBase implements OnClickListener {
 					//(rootView.findViewById(R.id.fmapAlertSOCFL)).invalidate(); testinva
 
 					//((AMainOBC) getActivity()).player.inizializePlayer();
-					queueTTS(getActivity().getResources().getString(R.string.alert_20km));
+					if(App.USE_TTS_ALERT)
+						queueTTS(getActivity().getResources().getString(R.string.alert_20km));
+					else
+						playAlertAdvice(R.raw.alert_tts_20km," alert 20km");
 				}
 			}
 
@@ -1230,9 +1241,11 @@ public class FMap extends FBase implements OnClickListener {
 		case R.id.fmapSearchB://Search
 			if (!navigationActive)
 
-				((ABase)getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
+				//((ABase)getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
 
 					//queueTTS(getResources().getString(R.string.alert_20km));
+					playAlertAdvice(R.raw.alert_tts_5km," alert 5km");
+					tts.speak("boia deh se non funziona piango, ue ue ue");
 
 					//queueTTS(getResources().getString(R.string.alert_5km));
 
@@ -1242,7 +1255,7 @@ public class FMap extends FBase implements OnClickListener {
 				new Thread(new Runnable() {
 					public void run() {
 						try{
-							((AMainOBC) getActivity()).player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ R.raw.alert_tts_5km));
+							((AMainOBC) getActivity()).player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ R.raw.alert_tts_5km_it));
 						}catch(Exception e){
 							dlog.e("Exception trying to play audio",e);
 						}
@@ -1817,7 +1830,7 @@ public class FMap extends FBase implements OnClickListener {
 
 			dlog.d("startRouteNavigation: Imposto Audio a AUDIO_SYSTEM");
 			if(getActivity()!=null)
-				((AMainOBC) getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_SYSTEM));
+				((AMainOBC) getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_SYSTEM,15));
 			else
 				dlog.w("startRouteNavigation: getActivity null!!!");
 
@@ -2715,7 +2728,7 @@ public class FMap extends FBase implements OnClickListener {
 		@Override
 		public void onSignalNewAdviceWithInstruction(String arg0) {
 			dlog.d("ADVICE STRING:" +  arg0);
-				tts.postpone();
+				//tts.postpone();
 				tts.speak(arg0,TextToSpeech.QUEUE_FLUSH);
 
 		}
@@ -2780,13 +2793,13 @@ public class FMap extends FBase implements OnClickListener {
 		public void onNavigationStarted() {
 			DLog.D("Start");
 			navigationActive = true;
-			((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_SYSTEM));
+			((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_SYSTEM,15));
 		}
 
 		@Override
 		public void onNavigationEnded() {
 			navigationActive = false;
-			((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE));
+			((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,-1));
 
 		}
 
@@ -3608,14 +3621,29 @@ public class FMap extends FBase implements OnClickListener {
 	private void queueTTS(String text){
 		try{
 			if(!ProTTS.reqSystem) {
-				ProTTS.reqSystem = true;
-				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
+				ProTTS.askForSystem();
+				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
 			}
 			tts.speak(text);
 			dlog.d("queueTTS: leggo " +text);
 
 		}catch (Exception e){
 			dlog.e("queueTTS exception while start speak",e);
+		}
+
+	}
+
+	private void playAlertAdvice(int resID,String name){
+		try{
+			if(!AudioPlayer.reqSystem) {
+				AudioPlayer.askForSystem();
+				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
+			}
+			player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ resID));
+			dlog.d("playAlertAdvice: play " +name);
+
+		}catch (Exception e){
+			dlog.e("playAlertAdvice exception while start speak",e);
 		}
 
 	}

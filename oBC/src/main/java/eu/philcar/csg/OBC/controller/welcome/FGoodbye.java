@@ -55,6 +55,7 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.controller.map.FMap;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
+import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.helpers.BannerJsInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
@@ -77,6 +78,7 @@ public class FGoodbye extends FBase {
 	private final static int  MSG_PLAY_ADVICE  = 2;
 
 	private ProTTS tts;
+	private AudioPlayer player;
 	private static boolean played=false;
 
 	private Handler localHandler = new Handler()  {
@@ -106,7 +108,10 @@ public class FGoodbye extends FBase {
 					break;
 				case MSG_PLAY_ADVICE:
 					try {
-						queueTTS(getResources().getString(R.string.alert_key));
+						if(App.USE_TTS_ALERT)
+							queueTTS(getResources().getString(R.string.alert_key));
+						else
+							playAlertAdvice(R.raw.alert_tts_end," alert end key");
 					}catch(Exception e){
 						dlog.e("FGoodbye : MSG_CLOSE_FRAGMENT Exception",e);
 					}
@@ -204,6 +209,7 @@ public class FGoodbye extends FBase {
 
 
 		tts=new ProTTS(getActivity());
+		player=new AudioPlayer(getActivity());
 
 		
 		((TextView)view.findViewById(R.id.fgodTopTV)).setTypeface(font);
@@ -619,13 +625,27 @@ public class FGoodbye extends FBase {
 		try {
 
 			if(!ProTTS.reqSystem) {
-				ProTTS.reqSystem = true;
-				((AGoodbye) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
+				ProTTS.askForSystem();
+				((AGoodbye) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
 			}
 			tts.speak(text);
 			dlog.d("queueTTS: leggo " + text);
 		}catch (Exception e){
 			dlog.e("queueTTS exception while start speak",e);
+		}
+
+	}
+	private void playAlertAdvice(int resID,String name){
+		try{
+			if(!AudioPlayer.reqSystem) {
+				AudioPlayer.askForSystem();
+				((AGoodbye) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
+			}
+			player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ resID));
+			dlog.d("playAlertAdvice: play " +name);
+
+		}catch (Exception e){
+			dlog.e("playAlertAdvice exception while start speak",e);
 		}
 
 	}

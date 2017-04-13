@@ -150,7 +150,7 @@ public class FMenu extends FBase implements OnClickListener {
 			FMap.timer_2min.cancel();
 			FMap.timer_5sec.cancel();
 			FMap.firstRun=true;
-			((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE));
+			((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,-1));
 			dlog.d("Banner: pause rent stopping update");
 			boolean startParkingMode = (App.getParkModeStarted() == null);
 			((AMainOBC)getActivity()).setParkModeStarted( startParkingMode );

@@ -24,7 +24,7 @@ public class SystemControl {
 	
 	private static DLog dlog = new DLog(SystemControl.class);
 	
-	public static int InsertAPN(Context ctx, String name){      
+	public static int InsertAPN(Context ctx, String name){
 
 	    //Set the URIs and variables
 	    int id = -1;
@@ -86,8 +86,8 @@ public class SystemControl {
 	           String numeric = apu.getString(index);
 
 	           //Assign them to the ContentValue object
-	           values.put("name", "Vodafone IT"); //the method parameter
-	           values.put("apn", "web.omnitel.it");                 
+	           values.put("name", name); //the method parameter
+	           values.put("apn", "web.omnitel.it");
 	           values.put("type", "default,supl");
 	           values.put("proxy", "");
 	           values.put("port", "");

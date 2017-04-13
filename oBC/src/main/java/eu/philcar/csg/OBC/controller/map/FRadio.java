@@ -272,7 +272,7 @@ public class FRadio  extends FBase {
 	}
 	
 	private void requestVolume(int volume) {
-		((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_RADIO));
+		((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_RADIO,volume));
 		Message msg = MessageFactory.RadioVolume(volume);	
 		((AMainOBC) getActivity()).sendMessage(msg);
 	}

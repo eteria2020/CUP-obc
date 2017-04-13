@@ -226,7 +226,7 @@ public class Events extends DbTable<Event,Integer> {
 		generateEvent(EVT_SHUTDOWN,0,null);
 	}
 	public static void Reboot(String text) {
-		generateEvent(EVT_REBOOT,0,text);
+		generateEvent(EVT_REBOOT,0,text+" " +App.sw_Version);
 	}
 	
 	public static void LeaseInfo(int status,int card) {		

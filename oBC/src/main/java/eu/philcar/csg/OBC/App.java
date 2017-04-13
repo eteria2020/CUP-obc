@@ -316,6 +316,8 @@ public class App extends Application {
 	public static final int AMAINOBC_UID = 0x0100;
 	public static final int AGOODBYE_UID = 0x1000;
 	public static final int AFAQ_UID	 = 0x0011;
+
+	public static final boolean USE_TTS_ALERT=false;
 	
 	
 	public static String URL_Area;
@@ -386,7 +388,7 @@ public class App extends Application {
 	private static final String  KEY_IsAskClose = "is_ask_close";
 	private static final String  KEY_IdAskClose = "id_ask_close";
 	private static final String  KEY_CounterCleanliness = "Cleanliness";
-	
+
 	
 	public static final String  KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
 	
@@ -475,6 +477,8 @@ public class App extends Application {
 	public static final String  POI_POSITION_FOLDER ="/sdcard/csg/PoisPos/";
 	public static final String BANNER_IMAGES_FOLDER ="/sdcard/csg/BannerImages/";
 	public static final String END_IMAGES_FOLDER ="/sdcard/csg/BannerImages/";
+	public static final String SM_SCRIPT_PATH = "/sdcard/csg";
+	public static final String SM_SCRIPT_NAME= "sm_watchdog.sh";
 	
 	private final String  CONFIG_FILE ="/sdcard/csg/config";
 	private final String  STOP_FILE ="/sdcard/csg/stop";
@@ -1163,6 +1167,13 @@ private void  initPhase2() {
 		} catch (Exception e){
 			dlog.e("Failed reading IMEI ",e);
 		}
+
+	/*try {
+		SystemControl.InsertAPN(this,"Vodafone IT");
+		dlog.d("Inserted APN  ");
+	} catch (Exception e){
+		dlog.e("Failed Inserting APN ",e);
+	}*/
 		
 		File DataPath = new File(APP_DATA_PATH);
 		DataPath.mkdirs();

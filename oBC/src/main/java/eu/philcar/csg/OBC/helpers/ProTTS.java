@@ -25,10 +25,11 @@ public class ProTTS implements TextToSpeech.OnInitListener{
 
     private TextToSpeech player;
     private UtteranceProgressListener utteranceListener;
-    private ArrayList<String> playing =new ArrayList<>();
+    private static ArrayList<String> playing =new ArrayList<>();
 
     public static int lastAudioState = 0;
     public static boolean reqSystem=false;
+    public static boolean ignoreVolume=false;
 
 
 
@@ -86,6 +87,11 @@ public class ProTTS implements TextToSpeech.OnInitListener{
 
     public boolean isReady() {
         return ready;
+    }
+
+    public static void askForSystem(){
+        reqSystem=true;
+        ignoreVolume=true;
     }
 
 
@@ -193,8 +199,9 @@ public class ProTTS implements TextToSpeech.OnInitListener{
                 @Override
                 public void onStart(String utteranceId) {
                         dlog.d("Player is Busy pausing advice");
-                    //Toast.makeText(context,"start",Toast.LENGTH_SHORT).show();
-                        //AMainOBC.player.pausePlayer();
+
+                    if(AudioPlayer.isBusy())
+                       AudioPlayer.pausePlayer();
 
                 }
 
@@ -203,8 +210,8 @@ public class ProTTS implements TextToSpeech.OnInitListener{
                     // Toast.makeText(context,"done",Toast.LENGTH_SHORT).show();
                     try {
                         playing.remove(utteranceId);
-                        if(playing.size()==0)
-                            ((AMainOBC) Context).setAudioSystem(lastAudioState);
+                        if(playing.size()==0 && AudioPlayer.getQueue()==0)
+                            ((AMainOBC) Context).setAudioSystem(lastAudioState,-1);
                     }catch (Exception e){
                         dlog.e("ProTTS: Exception while executing onDone operation ",e);
                     }
@@ -212,7 +219,13 @@ public class ProTTS implements TextToSpeech.OnInitListener{
 
                 @Override
                 public void onError(String utteranceId) {
-
+                    try {
+                        playing.remove(utteranceId);
+                        if(getQueue()==0 && AudioPlayer.getQueue()==0)
+                            ((AMainOBC) Context).setAudioSystem(lastAudioState,-1);
+                    }catch (Exception e){
+                        dlog.e("ProTTS: Exception while executing onDone operation ",e);
+                    }
                 }
             };
 
@@ -227,5 +240,9 @@ public class ProTTS implements TextToSpeech.OnInitListener{
         if(!player.isSpeaking())
             return;
         player.stop();
+    }
+
+    public static int getQueue(){
+        return playing.size();
     }
 }

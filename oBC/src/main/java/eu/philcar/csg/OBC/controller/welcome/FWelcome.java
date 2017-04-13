@@ -261,7 +261,7 @@ public class FWelcome extends FBase {
 		flagsLL.setVisibility(View.VISIBLE);
 		fwelItalianIB.setVisibility(View.VISIBLE);
 		fwelEnglishIB.setVisibility(View.VISIBLE);
-		fwelFrenchIB.setVisibility(View.VISIBLE);
+		//fwelFrenchIB.setVisibility(View.VISIBLE);
 
 		bannerLL.setVisibility(View.INVISIBLE);
 		flagsLL.invalidate();

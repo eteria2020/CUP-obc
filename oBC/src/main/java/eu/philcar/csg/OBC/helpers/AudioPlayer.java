@@ -17,33 +17,179 @@ import eu.philcar.csg.OBC.AMainOBC;
 public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener{
 
 
-    private static MediaPlayer player;
-    private static int queue=0;
-    private static final String TAG = "AudioPlayer";
-    private boolean isBusy=false; //indicate if the player is busy
-    public int lastAudioState = 0,actualAudioState = 1;
-    public boolean isSystem = false;    //flag per il via libera alla riproduzione
-    public boolean reqSystem = false;  //flag per salvare il valore precedente di canale audio
-    private static Uri playing=null;
-
-    private Context context;
-    public static AudioPlayer Instance;
+    private final Context context;
     private DLog dlog = new DLog(this.getClass());
+    private static MediaPlayer player;
+
+    private static int queue=0;
+    private static Uri playing=null;
+    private static boolean isBusy=false; //indicate if the player is busy
+
+    public static int lastAudioState = 0;
+    public static boolean isSystem = false;    //flag per il via libera alla riproduzione
+    public static boolean reqSystem=false;
+    public static boolean ignoreVolume=false;
+
 
 
 
     public AudioPlayer(Context context) {
         this.context=context;
-        Instance = this;
+        inizializePlayer(false);
+    }
+    private void inizializePlayer(boolean forced) {
+        if(player == null|| forced) {
+
+            player = new MediaPlayer();
+            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            player.setOnCompletionListener(this);
+            player.setOnErrorListener(this);
+        }
 
     }
-    public void inizializePlayer() {
-        player = new MediaPlayer();
-        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        player.setOnCompletionListener(this);
-        player.setOnErrorListener(this);
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        playing=null;
+        queue--;
+        reset();
+        isBusy = false;
+        if(queue<=0&&ProTTS.getQueue()==0) {
+            queue=0;
+            if (context instanceof AMainOBC)
+                ((AMainOBC) context).setAudioSystem(lastAudioState, -1);
+            else if (context instanceof AGoodbye)
+                ((AGoodbye) context).setAudioSystem(lastAudioState, -1);
+        }
+
 
     }
+
+    @Override
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+        queue--;
+        playing=null;
+        reset();
+        isBusy = false;
+        if(queue<=0&&ProTTS.getQueue()==0) {
+            queue=0;
+            if (context instanceof AMainOBC)
+                ((AMainOBC) context).setAudioSystem(lastAudioState, -1);
+            else if (context instanceof AGoodbye)
+                ((AGoodbye) context).setAudioSystem(lastAudioState, -1);
+        }
+        return true; //error was handled
+    }
+
+    public void waitToPlayFile(Uri uri) {
+        int tries=0;
+        try {
+            queue++;
+            while(isBusy){
+                if(playing.compareTo(uri)==0)
+                    return;
+                Thread.sleep(2000);
+                tries++;
+                if(tries>15){
+                    reset();
+                    isBusy=false;
+                    if(context instanceof AMainOBC)
+                        ((AMainOBC)context).setAudioSystem(lastAudioState,-1);
+                    else if (context instanceof AGoodbye)
+                        ((AGoodbye)context).setAudioSystem(lastAudioState,-1);
+
+
+                    dlog.d("waitToPlayFile: reset and abort");
+                    return;
+                }
+                dlog.d("waitToPlayFile: aspetto da "+(tries*2) +"s queue is "+queue);
+
+            }
+            isBusy=true;
+            player.reset();
+            try {
+                playing=uri;
+                player.setDataSource(context,uri);
+                dlog.d("waitToPlayFile: riproduco ");
+            } catch (IllegalStateException ile) {
+                try{
+                    player.reset();
+                    playing=uri;
+                    player.setDataSource(context,uri);}
+                catch(Exception e){
+                    queue--;
+                    isBusy=false;
+                    inizializePlayer(true);
+                    //handling end track operation
+                    if(queue<=0&&ProTTS.getQueue()==0) {
+                        queue=0;
+                        if (context instanceof AMainOBC)
+                            ((AMainOBC) context).setAudioSystem(lastAudioState, -1);
+                        else if (context instanceof AGoodbye)
+                            ((AGoodbye) context).setAudioSystem(lastAudioState, -1);
+                    }
+                    dlog.e("waitToPlayFile: deep Exception ");
+                    return;
+                }
+            }
+            Thread.sleep(2000);
+            //player.setDataSource(context,uri);
+            player.prepare();
+            player.start();
+        } catch (Exception e) {
+            dlog.e("Eccezione in play file",e);
+        }
+    }
+
+    public void reset() {
+
+        playing=null;
+
+        if (player != null) {
+            try {
+                player.reset();
+                //player.setOnCompletionListener(this);
+                //player.setOnErrorListener(this);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        else{
+            inizializePlayer(false);
+        }
+    }
+
+    public static void askForSystem(){
+        reqSystem=true;
+        ignoreVolume=true;
+    }
+
+    public static void pausePlayer(){
+        try {
+            if(player.isPlaying())
+                player.pause();
+        }catch(Exception e){
+            DLog.E("Exception while pausing player",e);
+        }
+    }
+
+
+    public static boolean isBusy(){
+        return isBusy;
+    }
+
+
+    public static void resumePlayer(){
+        try {
+            player.start();
+        }catch(Exception e){
+            DLog.E("Exception while resuming player",e);
+        }
+    }
+
+
+
+
 
 
     public void playFile(String filePath) {
@@ -86,122 +232,9 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
             dlog.e("Eccezione in play file",e);
         }
     }
-    public void pausePlayer(){
-        try {
-            player.pause();
-        }catch(Exception e){
-            dlog.e("Exception while pausing player",e);
-        }
+
+
+    public static int getQueue() {
+        return queue;
     }
-
-
-    public boolean isBusy(){
-        return isBusy;
-    }
-
-
-    public void resumePlayer(){
-        try {
-            player.start();
-        }catch(Exception e){
-            dlog.e("Exception while resuming player",e);
-        }
-    }
-
-
-    public void waitToPlayFile(Uri uri) {
-        int tries=0;
-        try {
-            queue++;
-            while(isBusy){
-                if(playing.compareTo(uri)==0)
-                    return;
-                Thread.sleep(2000);
-                tries++;
-                if(tries>15){
-                    reset();
-                    if(context instanceof AMainOBC)
-                        ((AMainOBC)context).setAudioSystem(lastAudioState);
-                    else if (context instanceof AGoodbye)
-                        ((AGoodbye)context).setAudioSystem(lastAudioState);
-
-
-                    dlog.d("waitToPlayFile: reset and abort");
-                    return;
-                }
-                dlog.d("waitToPlayFile: aspetto da "+(tries*2) +"s queue is "+queue);
-
-            }
-            isBusy=true;
-            player.reset();
-            try {
-                playing=uri;
-                player.setDataSource(context,uri);
-                dlog.d("waitToPlayFile: riproduco ");
-            } catch (IllegalStateException ile) {
-                try{
-                player.reset();
-                    isBusy=true;
-                    playing=uri;
-                    player.setDataSource(context,uri);}
-                catch(Exception e){
-                    isBusy=false;
-                    dlog.e("waitToPlayFile: deep Exception ");
-                }
-            }
-            Thread.sleep(2000);
-            //player.setDataSource(context,uri);
-            player.prepare();
-            player.start();
-        } catch (Exception e) {
-            dlog.e("Eccezione in play file",e);
-        }
-    }
-    public void reset() {
-
-        playing=null;
-
-        if (player != null) {
-            try {
-                player.reset();
-                //player.setOnCompletionListener(this);
-                //player.setOnErrorListener(this);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-        isBusy = false;
-    }
-
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        queue--;
-        reset();
-        isBusy = false;
-        if(context instanceof AMainOBC)
-            ((AMainOBC)context).setAudioSystem(lastAudioState);
-        else if (context instanceof AGoodbye)
-            ((AGoodbye)context).setAudioSystem(lastAudioState);
-
-
-    }
-
-    @Override
-    public boolean onError(MediaPlayer mp, int what, int extra) {
-        queue--;
-        reset();
-        isBusy = false;
-        if(context instanceof AMainOBC)
-            ((AMainOBC)context).setAudioSystem(lastAudioState);
-        else if (context instanceof AGoodbye)
-            ((AGoodbye)context).setAudioSystem(lastAudioState);
-        return true; //error was handled
-    }
-
-
-
-
-
-
-
 }

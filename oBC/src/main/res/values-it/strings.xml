@@ -231,7 +231,7 @@
     <string name="yes">S&#236;</string>
 
     <string name="menu_rent_end_time_startup_app"><b>TERMINA NOLEGGIO</b> - Non disponibile : L\'applicazione è ancora in avvio, Attendere prego.</string>
-    <string name="alert_area">Attenzione, veicolo fuori dell\'area  di servizio, non sarà possibile chiudere la corsa</string>
-    <string name="alert_key">ricorda di spengere il quadro girando la chiave prima di uscire dall\'auto</string>
+    <string name="alert_area">Attenzione, veicolo fuori dall\'area  di servizio, non sarà possibile chiudere la corsa</string>
+    <string name="alert_key">ricorda di spegnere il quadro girando la chiave prima di uscire dall\'auto</string>
 
 </resources>

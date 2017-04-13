@@ -9,7 +9,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -32,6 +31,7 @@ import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
+import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.UrlTools;
@@ -48,8 +48,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.speech.tts.TextToSpeech;
-import android.speech.tts.UtteranceProgressListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -98,6 +96,7 @@ public class FHome extends FBase implements OnClickListener {
     private static Boolean handleClick=false;
 
     private ProTTS tts;
+    private AudioPlayer player;
 
     public FHome() {
         Instance = this;
@@ -109,6 +108,7 @@ public class FHome extends FBase implements OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        player=new AudioPlayer(getActivity());
 
         App.isCloseable = false;
     }
@@ -145,7 +145,7 @@ public class FHome extends FBase implements OnClickListener {
             }).start();
         }*/
 
-        uri = Uri.parse("android.resource://eu.philcar.csg.OBC/"+R.raw.out_operative_area_tts);
+        //uri = Uri.parse("android.resource://eu.philcar.csg.OBC/"+R.raw.out_operative_area_tts_it);
 
 
 
@@ -497,7 +497,10 @@ public class FHome extends FBase implements OnClickListener {
 
 
                 //((AMainOBC) getActivity()).player.inizializePlayer();
-                queueTTS(getActivity().getResources().getString(R.string.alert_area));
+                if(App.USE_TTS_ALERT)
+                    queueTTS(getActivity().getResources().getString(R.string.alert_area));
+                else
+                    playAlertAdvice(R.raw.out_operative_area_tts," alert area");
 
             }
             else{
@@ -575,7 +578,7 @@ public class FHome extends FBase implements OnClickListener {
         if(status>0){
             if(!animQueue.contains("bonus")){
                 if(App.DefaultCity.toLowerCase().equals("milano")) {
-                    AMainOBC.player.reqSystem = true;
+                   // AMainOBC.player.reqSystem = true;
 
                 }
                 animQueue.add("bonus");
@@ -972,8 +975,8 @@ public class FHome extends FBase implements OnClickListener {
     private void queueTTS(String text){
         try{
             if(!ProTTS.reqSystem) {
-                ProTTS.reqSystem = true;
-                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
+                ProTTS.askForSystem();
+                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
             }
             tts.speak(text);
             dlog.d("queueTTS: leggo " +text);
@@ -984,4 +987,18 @@ public class FHome extends FBase implements OnClickListener {
 
     }
 
+    private void playAlertAdvice(int resID,String name){
+        try{
+            if(!AudioPlayer.reqSystem) {
+                AudioPlayer.askForSystem();
+                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
+            }
+            player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ resID));
+            dlog.d("playAlertAdvice: play " +name);
+
+        }catch (Exception e){
+            dlog.e("playAlertAdvice exception while start speak",e);
+        }
+
+    }
 }

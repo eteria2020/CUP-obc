@@ -26,6 +26,7 @@ import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
+import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.service.AdvertisementService;
 import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.service.MessageFactory;
@@ -57,7 +58,8 @@ public class AMainOBC extends ABase implements LocationListener {
 	public final static int  MSG_UPDATE_DATE = 11;
 
 	public static AudioPlayer player;
-	//private Boolean firstUpCharging=true;
+	private ProTTS tts;
+	private Boolean firstUpCharging=true;
 
 
 	private final static int MIN_MOVE_TOL = 1; // meters
@@ -154,7 +156,7 @@ public class AMainOBC extends ABase implements LocationListener {
 		super.onCreate(savedInstanceState);
 		dlog.d("AMainOBC onCreate");
 		player = new AudioPlayer(this);
-		player.inizializePlayer();
+		tts=new ProTTS(this);
 
 		setContentView(R.layout.a_base);
 
@@ -763,20 +765,14 @@ public class AMainOBC extends ABase implements LocationListener {
 			case ObcService.MSG_TRIP_NEAR_POI:
 				App.currentTripInfo.isBonusEnabled=msg.arg1>0;
 
-				/*if(firstUpCharging) {
+				if(firstUpCharging) {
 					firstUpCharging=false;
-					setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
-					dlog.d("updateParkAreaStatus: Imposto Audio a AUDIO_SYSTEM");
-					new Thread(new Runnable() {
-						public void run() {
-							try {
-								player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/" + R.raw.tts_advise_charging_bonus));
-							} catch (Exception e) {
-								dlog.e("Exception trying to play audio", e);
-							}
-						}
-					}).start();
-				}*/
+					if(App.USE_TTS_ALERT)
+						queueTTS(getResources().getString(R.string.alert_bonus));
+					else
+						playAlertAdvice(R.raw.alert_tts_bonus_charging," alert bonus charging");
+
+				}
 
 				fMenu = (FMenu)getFragmentManager().findFragmentByTag(FMenu.class.getName());
 				if (fMenu != null) {
@@ -800,6 +796,36 @@ public class AMainOBC extends ABase implements LocationListener {
 			 }
 		 }
 	};
+
+	private void queueTTS(String text){
+		try{
+			if(!ProTTS.reqSystem) {
+				ProTTS.askForSystem();
+				setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
+			}
+			tts.speak(text);
+			dlog.d("queueTTS: leggo " +text);
+
+		}catch (Exception e){
+			dlog.e("queueTTS exception while start speak",e);
+		}
+
+	}
+
+	private void playAlertAdvice(int resID,String name){
+		try{
+			if(!AudioPlayer.reqSystem) {
+				AudioPlayer.askForSystem();
+				setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
+			}
+			player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ resID));
+			dlog.d("playAlertAdvice: play " +name);
+
+		}catch (Exception e){
+			dlog.e("playAlertAdvice exception while start speak",e);
+		}
+
+	}
 
 	@Override
 	public int getActivityUID() {
@@ -834,9 +860,9 @@ public class AMainOBC extends ABase implements LocationListener {
 		}
 	}
 
-	public void setAudioSystem(int mode){
-		dlog.d("setAudioSystem " +mode +" reqSystem is: "+player.reqSystem);
-		this.sendMessage(MessageFactory.AudioChannel(mode));
+	public void setAudioSystem(int mode, int volume){
+		dlog.d("setAudioSystem " +mode +" TTSreqSystem is: "+ProTTS.reqSystem+" AudioPlayerReqSystem is: "+AudioPlayer.reqSystem);
+		this.sendMessage(MessageFactory.AudioChannel(mode, volume));
 	}
 
 	public void calloutShowCode(View arg0) {//SHAME ON ME---btw prendo la view salvata per impostare il code del poi relativo al callout

@@ -2037,7 +2037,7 @@ public class ObcService extends Service {
                     dlog.d("RECEIVED MSG_TRIP_SELFCLOSE  arg1=" + msg.arg1);
                     if (App.currentTripInfo != null && App.currentTripInfo.isOpen && ((App.getParkModeStarted() == null && App.isCloseable) || App.getParkModeStarted() != null)) {
 
-                        localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE));
+                        localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,1));
                         Events.selfCloseTrip(App.currentTripInfo.trip.remote_id, msg.arg1);
 
 
@@ -2115,7 +2115,7 @@ public class ObcService extends Service {
 
                     try {
                         if (msg.arg1 == 0) {
-                            AudioPlayer.Instance.lastAudioState = msg.arg1;
+                            AudioPlayer.lastAudioState = msg.arg1;
                             ProTTS.lastAudioState = msg.arg1;
                         }
                     } catch (Exception e) {
@@ -2130,26 +2130,24 @@ public class ObcService extends Service {
                     break;
 
                 case MSG_AUDIO_CHANNEL:
-                    obc_io.setAudioChannel(msg.arg1);
+                    obc_io.setAudioChannel(msg.arg1, msg.arg2);
                     try {
 
-                        if (!AudioPlayer.Instance.reqSystem && !ProTTS.reqSystem) {               //controllo se la richiesta non parte da audio player
-                            AudioPlayer.Instance.lastAudioState = msg.arg1;
+                        if (!AudioPlayer.reqSystem && !ProTTS.reqSystem) {               //controllo se la richiesta non parte da audio player
+                            AudioPlayer.lastAudioState = msg.arg1;
                             ProTTS.lastAudioState=msg.arg1;
                         }
 
-                        if (msg.arg1 == 2)
-                            AudioPlayer.Instance.isSystem = true;            //controllo se è stato impostato System
-                        else
-                            AudioPlayer.Instance.isSystem = false;
+                        //controllo se è stato impostato System
+                        AudioPlayer.isSystem = msg.arg1 == 2;
 
-                        if (AudioPlayer.Instance.reqSystem || ProTTS.reqSystem) {                    //se c'era la richiesta la tolgo
-                            AudioPlayer.Instance.reqSystem = false;
+                        if (AudioPlayer.reqSystem || ProTTS.reqSystem) {                    //se c'era la richiesta la tolgo
+                            AudioPlayer.reqSystem = false;
                             ProTTS.reqSystem=false;
                         }
 
                     } catch (Exception e) {
-
+                            dlog.e("Exception while cleaning player state",e);
                     }
 
                     break;

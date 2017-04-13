@@ -220,9 +220,10 @@ public class MessageFactory {
 		return msg;
 	}
 	
-	public static Message AudioChannel(int channel)  {
+	public static Message AudioChannel(int channel,int volume)  {
 		Message msg  =  Message.obtain(null, ObcService.MSG_AUDIO_CHANNEL);			
 		msg.arg1 = channel;
+		msg.arg2=volume;
 		return msg;
 	}
 	

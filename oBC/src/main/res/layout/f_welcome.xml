@@ -104,7 +104,8 @@
 			android:layout_marginLeft="16dp"
 			android:src="@drawable/sel_button_fr"
 			android:contentDescription="@string/content_description"
-			android:background="@null" />
+			android:background="@null"
+			android:visibility="gone" />
 
 		<ImageButton
 			android:id="@+id/fwelchineseIB"

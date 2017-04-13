@@ -27,7 +27,6 @@ public class AGoodbye extends ABase {
 	public static final String JUMP_TO_END = "JUMP_TO_END";
 
 	public static final String EUTHANASIA = "I_WANT_TO_DIE";
-	public AudioPlayer player;
 	
 	
 	private ServiceConnector serviceConnector;
@@ -46,8 +45,6 @@ public class AGoodbye extends ABase {
 		dlog.d("AGoodbye: onCreate extra: "+ getIntent().getBooleanExtra(EUTHANASIA,true) );
 
 		setContentView(R.layout.a_base);
-		player = new AudioPlayer(this);
-		player.inizializePlayer();
 		
 		
 		serviceConnector = new ServiceConnector(this, serviceHandler);
@@ -90,8 +87,8 @@ public class AGoodbye extends ABase {
 		serviceConnector.send(msg);
 	}
 
-	public void setAudioSystem(int mode){
-		this.sendMessage(MessageFactory.AudioChannel(mode));
+	public void setAudioSystem(int mode, int volume){
+		this.sendMessage(MessageFactory.AudioChannel(mode, volume));
 	}
 	
 	private  Handler serviceHandler = new Handler() {
@@ -201,7 +198,6 @@ public class AGoodbye extends ABase {
 	protected void onDestroy() {
 		super.onDestroy();
 		App.isClosing=false;
-		player = null;
 	}
 
 	@Override
