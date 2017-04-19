@@ -81,64 +81,69 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
         return true; //error was handled
     }
 
-    public void waitToPlayFile(Uri uri) {
-        int tries=0;
-        try {
-            queue++;
-            while(isBusy){
-                if(playing.compareTo(uri)==0)
-                    return;
-                Thread.sleep(2000);
-                tries++;
-                if(tries>15){
-                    reset();
-                    isBusy=false;
-                    if(context instanceof AMainOBC)
-                        ((AMainOBC)context).setAudioSystem(lastAudioState,-1);
-                    else if (context instanceof AGoodbye)
-                        ((AGoodbye)context).setAudioSystem(lastAudioState,-1);
+    public void waitToPlayFile(final Uri uri) {
+        new Thread() {
+            public void run() {
+                Thread.currentThread().setName("Audio Player");
+                int tries = 0;
+                try {
+                    queue++;
+                    while (isBusy) {
+                        if (playing.compareTo(uri) == 0)
+                            return;
+                        Thread.sleep(2000);
+                        tries++;
+                        if (tries > 15) {
+                            reset();
+                            isBusy = false;
+                            if (context instanceof AMainOBC)
+                                ((AMainOBC) context).setAudioSystem(lastAudioState, -1);
+                            else if (context instanceof AGoodbye)
+                                ((AGoodbye) context).setAudioSystem(lastAudioState, -1);
 
 
-                    dlog.d("waitToPlayFile: reset and abort");
-                    return;
-                }
-                dlog.d("waitToPlayFile: aspetto da "+(tries*2) +"s queue is "+queue);
+                            dlog.d("waitToPlayFile: reset and abort");
+                            return;
+                        }
+                        dlog.d("waitToPlayFile: aspetto da " + (tries * 2) + "s queue is " + queue);
 
-            }
-            isBusy=true;
-            player.reset();
-            try {
-                playing=uri;
-                player.setDataSource(context,uri);
-                dlog.d("waitToPlayFile: riproduco ");
-            } catch (IllegalStateException ile) {
-                try{
-                    player.reset();
-                    playing=uri;
-                    player.setDataSource(context,uri);}
-                catch(Exception e){
-                    queue--;
-                    isBusy=false;
-                    inizializePlayer(true);
-                    //handling end track operation
-                    if(queue<=0&&ProTTS.getQueue()==0) {
-                        queue=0;
-                        if (context instanceof AMainOBC)
-                            ((AMainOBC) context).setAudioSystem(lastAudioState, -1);
-                        else if (context instanceof AGoodbye)
-                            ((AGoodbye) context).setAudioSystem(lastAudioState, -1);
                     }
-                    dlog.e("waitToPlayFile: deep Exception ");
-                    return;
+                    isBusy = true;
+                    player.reset();
+                    try {
+                        playing = uri;
+                        player.setDataSource(context, uri);
+                        dlog.d("waitToPlayFile: riproduco ");
+                    } catch (IllegalStateException ile) {
+                        try {
+                            player.reset();
+                            playing = uri;
+                            player.setDataSource(context, uri);
+                        } catch (Exception e) {
+                            queue--;
+                            isBusy = false;
+                            inizializePlayer(true);
+                            //handling end track operation
+                            if (queue <= 0 && ProTTS.getQueue() == 0) {
+                                queue = 0;
+                                if (context instanceof AMainOBC)
+                                    ((AMainOBC) context).setAudioSystem(lastAudioState, -1);
+                                else if (context instanceof AGoodbye)
+                                    ((AGoodbye) context).setAudioSystem(lastAudioState, -1);
+                            }
+                            dlog.e("waitToPlayFile: deep Exception ");
+                            return;
+                        }
+                    }
+                    Thread.sleep(2500);
+                    //player.setDataSource(context,uri);
+                    player.prepare();
+                    player.start();
+                } catch (Exception e) {
+                    dlog.e("Eccezione in play file", e);
                 }
             }
-            Thread.sleep(2000);
-            //player.setDataSource(context,uri);
-            player.prepare();
-            player.start();
-        } catch (Exception e) {
-            dlog.e("Eccezione in play file",e);
-        }
+        }.start();
     }
 
     public void reset() {

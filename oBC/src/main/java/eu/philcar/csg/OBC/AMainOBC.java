@@ -502,12 +502,12 @@ public class AMainOBC extends ABase implements LocationListener {
 			if (currentPosition == null || App.checkParkArea(currentPosition.getLatitude(), currentPosition.getLongitude())) {
 				setInsideParkingArea(true);
 				rotationToParkingArea = 0.0f;
-				DLog.D(AMainOBC.class.toString() + " onLocationChanged: " + String.valueOf(isInsideParkingArea) + String.valueOf(currentPosition.getLatitude()) + " : " + String.valueOf(currentPosition.getLongitude()));
+				//DLog.D(AMainOBC.class.toString() + " onLocationChanged: " + String.valueOf(isInsideParkingArea) + String.valueOf(currentPosition.getLatitude()) + " : " + String.valueOf(currentPosition.getLongitude()));
 
 			} else {
 
 				setInsideParkingArea(false);
-				DLog.D(AMainOBC.class.toString() + " onLocationChanged: " + String.valueOf(isInsideParkingArea) + String.valueOf(currentPosition.getLatitude()) + " : " + String.valueOf(currentPosition.getLongitude()));
+				//DLog.D(AMainOBC.class.toString() + " onLocationChanged: " + String.valueOf(isInsideParkingArea) + String.valueOf(currentPosition.getLatitude()) + " : " + String.valueOf(currentPosition.getLongitude()));
 
 				// Replace this three lines with the ones commented below
 			

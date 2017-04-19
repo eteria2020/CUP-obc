@@ -231,6 +231,7 @@ public class App extends Application {
 			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
 			URL_Clienti = "https://corestage.sharengo.it:8123/whitelist";
 			URL_Commands = "http://corestage.sharengo.it/api/get_commands.php?";
+			//URL_Corse = "http://corestage.sharengo.it/api/pushcorsa-convenzioni.php?";
 			URL_Corse = "http://corestage.sharengo.it/api/pushcorsa.php?";
 			URL_Eventi = "http://corestage.sharengo.it/api/pushevent.php?";
 			URL_Pois = "http://corestage.sharengo.it/api/get_pois.php?";

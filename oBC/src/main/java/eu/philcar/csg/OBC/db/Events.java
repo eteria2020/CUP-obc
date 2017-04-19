@@ -299,10 +299,11 @@ public class Events extends DbTable<Event,Integer> {
 		try {
 			Where<Event,Integer> where  = queryBuilder().orderBy("timestamp", true).where();
 			
-			//where.and(
-				where.eq("sent",false);
+			where.and(
+				where.eq("sent",false),
 				//where.eq("sending_error", false)
-			//);
+				where.ge("timestamp",(System.currentTimeMillis()/1000-60*60*24*7))
+			);
 
 
 			

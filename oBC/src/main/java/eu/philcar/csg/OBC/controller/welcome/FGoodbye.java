@@ -96,14 +96,20 @@ public class FGoodbye extends FBase {
 							if(App.currentTripInfo==null)
 								(getActivity()).finish();
 							else if(App.currentTripInfo.isOpen){
-								dlog.d("handleMessage:MSG_CLOSE_ACTIVITY Unable to close trip, restoring AmainOBC");
-								Intent i = new Intent(getActivity(), AMainOBC.class);
+								dlog.d("handleMessage:MSG_CLOSE_ACTIVITY Unable to close trip, retry close trip");
+								if ( App.currentTripInfo.trip.id == closingTripid) {
+									((AGoodbye) getActivity()).sendMessage(MessageFactory.forceCloseTrip());
+								}
+								localHandler.removeMessages(MSG_CLOSE_ACTIVITY);
+								localHandler.sendEmptyMessageDelayed(MSG_CLOSE_ACTIVITY, 10000);
+
+								/*Intent i = new Intent(getActivity(), AMainOBC.class);
 								i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 								startActivity(i);
-								getActivity().finish();
+								getActivity().finish();*/
 							}
 					}catch(Exception e){
-						dlog.e("FGoodbye : MSG_CLOSE_FRAGMENT Exception",e);
+						dlog.e("FGoodbye : MSG_CLOSE_ACTIVITY Exception",e);
 					}
 					break;
 				case MSG_PLAY_ADVICE:
@@ -310,19 +316,26 @@ public class FGoodbye extends FBase {
 
 			@Override
 			public void onFinish() {
-				dlog.d(FGoodbye.class.toString()+" onFinish: finished countdown, ending activity");
-				if(getActivity()==null)
-					return;
 				try {
-					wait(2000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+					((TextView)view.findViewById(R.id.tvCountdown)).setText("0 s");
+					dlog.d(FGoodbye.class.toString() + " onFinish: finished countdown, ending activity");
+					if (getActivity() == null ||App.currentTripInfo == null ) {
+						dlog.d(" onFinish: no activity return");
+						return;
+					}
+					try {
+						wait(2000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					if (App.currentTripInfo != null && App.currentTripInfo.trip.id == closingTripid) {
+						((AGoodbye) activity).sendMessage(MessageFactory.forceCloseTrip());
+					}
+					localHandler.removeMessages(MSG_CLOSE_ACTIVITY);
+					localHandler.sendEmptyMessageDelayed(MSG_CLOSE_ACTIVITY, 10000);
+				}catch (Exception e){
+					dlog.e("Exception while forcing trip close",e);
 				}
-				if(App.currentTripInfo!=null && App.currentTripInfo.trip.id==closingTripid) {
-					((AGoodbye) activity).sendMessage(MessageFactory.scheduleSelfCloseTrip(1));
-				}
-				localHandler.removeMessages(MSG_CLOSE_ACTIVITY);
-				localHandler.sendEmptyMessageDelayed(MSG_CLOSE_ACTIVITY,1000);
 
 				}
 

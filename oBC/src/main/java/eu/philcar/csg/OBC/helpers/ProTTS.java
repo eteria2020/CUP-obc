@@ -211,7 +211,10 @@ public class ProTTS implements TextToSpeech.OnInitListener{
                     try {
                         playing.remove(utteranceId);
                         if(playing.size()==0 && AudioPlayer.getQueue()==0)
-                            ((AMainOBC) Context).setAudioSystem(lastAudioState,-1);
+                            if(Context instanceof AMainOBC)
+                                ((AMainOBC) Context).setAudioSystem(lastAudioState,-1);
+                            else if (Context instanceof AGoodbye)
+                                ((AGoodbye) Context).setAudioSystem(lastAudioState,-1);
                     }catch (Exception e){
                         dlog.e("ProTTS: Exception while executing onDone operation ",e);
                     }
@@ -222,7 +225,10 @@ public class ProTTS implements TextToSpeech.OnInitListener{
                     try {
                         playing.remove(utteranceId);
                         if(getQueue()==0 && AudioPlayer.getQueue()==0)
-                            ((AMainOBC) Context).setAudioSystem(lastAudioState,-1);
+                            if(Context instanceof AMainOBC)
+                                ((AMainOBC) Context).setAudioSystem(lastAudioState,-1);
+                            else if (Context instanceof AGoodbye)
+                                ((AGoodbye) Context).setAudioSystem(lastAudioState,-1);
                     }catch (Exception e){
                         dlog.e("ProTTS: Exception while executing onDone operation ",e);
                     }

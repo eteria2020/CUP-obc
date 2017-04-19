@@ -141,16 +141,16 @@ public class AGoodbye extends ABase {
 				break;
 				
 			case ObcService.MSG_CMD_TIMEOUT:
-				DLog.E(AMainOBC.class.getName() + ": MSG_CMD_TIMEOUT");
+				dlog.d(": MSG_CMD_TIMEOUT");
 				break;
 			
 			case ObcService.MSG_PING:
-				DLog.E(AMainOBC.class.getName() + ": MSG_PING");
+				dlog.d(": MSG_PING");
 				break;
 				
 			case ObcService.MSG_IO_RFID:
-				
-				DLog.D(AMainOBC.class.getName() + ": MSG_IO_RFID");
+
+				dlog.d(": MSG_IO_RFID");
 				break;
 				
 			

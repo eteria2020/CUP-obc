@@ -132,6 +132,7 @@ public class ObcService extends Service {
     public static final int MSG_TRIP_PARK_CARD_BEGIN = 54;
     public static final int MSG_TRIP_PARK_CARD_END = 55;
     public static final int MSG_TRIP_SELFCLOSE = 56;
+    public static final int MSG_TRIP_CLOSE_FORCED = 500;
     public static final int MSG_TRIP_SCHEDULE_SELFCLOSE = 57;
     public static final int MSG_TRIP_SENDBEACON = 58;
     public static final int MSG_TRIP_NEAR_POI = 59;
@@ -1225,6 +1226,7 @@ public class ObcService extends Service {
                     if (App.currentTripInfo != null) {
                         boolean forced = (cmd.txtarg1 == null || cmd.txtarg1.isEmpty());
                         dlog.d(ObcService.class.toString() + " executeServerCommands: CLOSE_TRIP forced : " + forced);
+                        localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,1));
                         this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
                     } else
                         dlog.w(ObcService.class.toString() + " executeServerCommands: CLOSE_TRIP ignored since there is a no open trip");
@@ -1648,7 +1650,12 @@ public class ObcService extends Service {
                 dlog.d("Restarting welcome");
                 //Intent i  = new Intent(ObcService.this, ServiceTestActivity.class);
                 Intent i = new Intent(ObcService.this, AWelcome.class);
-                scheduleSelfCloseTrip(180,true);
+                try {
+                    if (tripInfo!=null && tripInfo.trip!=null && tripInfo.trip.n_pin <= 0)
+                        scheduleSelfCloseTrip(300, true);
+                }catch (Exception e){
+                    dlog.e("checkAndRestartUI: null trip",e);
+                }
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
             }
@@ -2047,6 +2054,20 @@ public class ObcService extends Service {
                     }
                     break;
 
+                case MSG_TRIP_CLOSE_FORCED:
+                    dlog.d("RECEIVED MSG_TRIP_CLOSE_FORCED ");
+                    if (App.currentTripInfo != null && App.currentTripInfo.isOpen ) {
+
+                        localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,1));
+                        Events.selfCloseTrip(App.currentTripInfo.trip.remote_id, 0);
+
+
+                        ObcService.this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, true);
+                    } else {
+                        dlog.d("MSG_TRIP_SELFCLOSE discarded");
+                    }
+                    break;
+
                 case MSG_TRIP_SCHEDULE_SELFCLOSE:
                     removeSelfCloseTrip();
                     if (msg.arg1 > 0) {
@@ -2198,8 +2219,8 @@ public class ObcService extends Service {
                     //Fan-out message
                     Message nmsg = Message.obtain();
                     nmsg.copyFrom(msg);
-                    if(msg.obj instanceof Location)
-                        dlog.d("Location Changed "+((Location)msg.obj).getLongitude()+" "+((Location)msg.obj).getLatitude());
+                    //if(msg.obj instanceof Location)
+                        //dlog.d("Location Changed "+((Location)msg.obj).getLongitude()+" "+((Location)msg.obj).getLatitude());
                     sendAll(nmsg);
                     break;
                 case MSG_DEBUG_CARD:

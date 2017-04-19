@@ -17,10 +17,10 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public  static final String DATABASE_NAME = "/sdcard/csg/sharengo.db";
 
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 	private static DbManager instance = null;
 
-	private final Class<?> tables[] = { Customers.GetRecordClass() , Trips.GetRecordClass(), Events.GetRecordClass(), Pois.GetRecordClass() };
+	private final Class<?> tables[] = { Customers.GetRecordClass() ,BusinessEmployees.GetRecordClass(), Trips.GetRecordClass(), Events.GetRecordClass(), Pois.GetRecordClass() };
 
 
 	public static  DbManager getInstance(Context context) {
@@ -66,7 +66,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 				updateFromVersion1(database, connectionSource, oldVersion, newVersion);// poi variable lenght
 				break;
 			case 3:
-				//updateFromVersion3(database, connectionSource, oldVersion, newVersion);//added column to trips
+				updateFromVersion3(database, connectionSource, oldVersion, newVersion);//added business customer
 				break;
 
 			default:
@@ -95,14 +95,29 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 			TableUtils.createTable(connectionSource, Pois.GetRecordClass());
 
 
-			DLog.D("Upgrade to Db versione 2 sucessfull");
+			DLog.D("Upgrade to Db versione "+(oldVersion+1)+" sucessfull");
 
 		}catch (Exception e) {
-			DLog.E("Upgrade to Db versione 2 failed",e);
+			DLog.E("Upgrade to Db versione "+(oldVersion+1)+" failed",e);
 		}
 		onUpgrade(db, connectionSource, oldVersion + 1, newVersion);
 	}
-	@SuppressWarnings("unchecked")
+
+	private void updateFromVersion3(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
+		try {
+
+			TableUtils.createTable(connectionSource, BusinessEmployees.GetRecordClass());
+
+			DLog.D("Upgrade to DB version "+(oldVersion+1)+" successful");
+
+		}catch (Exception e) {
+			DLog.E("Upgrade to DB version "+(oldVersion+1)+" failed", e);
+		}
+		onUpgrade(database, connectionSource, oldVersion + 1, newVersion);
+	}
+
+
+	/*@SuppressWarnings("unchecked")
 	private void updateFromVersion3(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
 		try {
 
@@ -117,7 +132,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 			DLog.E("Upgrade to Db versione 4 failed",e);
 		}
 		onUpgrade(db, connectionSource, oldVersion + 1, newVersion);
-	}
+	}*/
 
 	/*private void updateFromVersion2(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
 		try {

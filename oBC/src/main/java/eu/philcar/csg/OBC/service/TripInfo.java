@@ -274,7 +274,7 @@ public class TripInfo {
                 http.Execute(cc);
 
                 // Prepara un messaggio ritardato che chiude l'auto se non viene abilitata la trip entro un timeout
-                service.scheduleSelfCloseTrip(180,true);
+                service.scheduleSelfCloseTrip(300,true);
 
                 service.getHandler().sendMessage(MessageFactory.RadioVolume(1));
                 service.getHandler().sendMessage(MessageFactory.RadioVolume(0));
@@ -371,6 +371,7 @@ public class TripInfo {
 
                     if (! App.isCloseable && !forced) {
                         obc_io.setLcd(null, "CHIUDERE CORSA");
+                        dlog.d("handleCard: corsa non chiudibile");
                         return null;
                     }
                     if (service.checkParkArea() || forced) {

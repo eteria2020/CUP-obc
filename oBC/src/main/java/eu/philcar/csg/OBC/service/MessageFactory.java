@@ -190,6 +190,11 @@ public class MessageFactory {
 		msg.arg1 = seconds;
 		return msg;	
 	}
+
+	public static Message forceCloseTrip() {
+		Message msg  =  Message.obtain(null, ObcService.MSG_TRIP_CLOSE_FORCED);
+		return msg;
+	}
 	
 	
 	public static Message notifyCarInfoUpdate(CarInfo carInfo) {
