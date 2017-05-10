@@ -117,7 +117,7 @@ import android.widget.Toast;
 
 @ReportsCrashes(
         formKey = "", // This is required for backward compatibility but not used
-        formUri = "http://core.sharengo.it/api/post_crashreport.php",
+		formUri = "http://core.sharengo.it/api/post_crashreport.php",
         mode = ReportingInteractionMode.SILENT, 
         customReportContent = {APP_VERSION_CODE , APP_VERSION_NAME,/* SETTINGS_GLOBAL,*/ AVAILABLE_MEM_SIZE, CUSTOM_DATA, STACK_TRACE, USER_APP_START_DATE ,LOGCAT/*, DEVICE_ID, SHARED_PREFERENCES*/ },
         reportType=org.acra.sender.HttpSender.Type.JSON,
@@ -825,6 +825,20 @@ public void loadRadioSetup() {
 		return "";
 		
 	}
+
+	public void loadMaxVoltage() {
+
+			try {
+				max_voltage = preferences.getFloat(KEY_MaxVoltage,83);
+				max_voltage=(max_voltage > 85f || max_voltage < 80f ? 83f : max_voltage); //controllo bontà maxVoltage
+			} catch (Exception e) {
+				dlog.e("Loading max voltage",e);
+			}
+
+
+
+	}
+
 	
 	
 	public void SaveDefaultCity(String city) {
@@ -1390,7 +1404,8 @@ private void  initPhase2() {
 		Editor editor = preferences.edit();
 		editor.putFloat(KEY_MaxVoltage, vMax);
 		editor.apply();
-		loadPreferences();
+		//loadPreferences();
+		loadMaxVoltage();
 
 	}
 

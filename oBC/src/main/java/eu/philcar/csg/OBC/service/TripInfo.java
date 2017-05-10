@@ -679,6 +679,7 @@ public class TripInfo {
             trip.end_lon = carInfo.longitude;
         }
 
+        dlog.d("CloseCorsa: closing trip"+trip.toString());
 
         UpdateCorsa();
     }
@@ -734,14 +735,17 @@ public class TripInfo {
     public void UpdateCorsa() {
         Trips trips = App.Instance.dbManager.getCorseDao();
         try {
+            dlog.d("UpdateCorsa: updating trip "+trip.toString());
             trips.createOrUpdate(trip);
         } catch (SQLException e) {
             dlog.e("Error updating trip",e);
 
         }
         if(App.currentTripInfo!= null &&App.currentTripInfo.trip!=null && App.currentTripInfo.trip.id==trip.id){
-            if(App.currentTripInfo.trip.remote_id==0)
-                App.currentTripInfo.trip.remote_id=trip.remote_id;
+            if(App.currentTripInfo.trip.remote_id==0) {
+                App.currentTripInfo.trip.remote_id = trip.remote_id;
+                dlog.d("UpdateCorsa: update current trip "+App.currentTripInfo.trip.toString()+" to trip "+trip.toString());
+            }
         }
     }
 

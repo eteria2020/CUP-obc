@@ -138,7 +138,7 @@ public class CarInfo {
         } else
             this.batteryLevel = (Math.round(batteryLevel));
 
-        //this.batteryLevel=20;//FOR DEVELOP PURPOSE
+        //this.batteryLevel=99;//FOR DEVELOP PURPOSE
 
         App.Instance.setBatteryLevel(this.batteryLevel);
         dlog.d("setBatteryLevel: result "+this.batteryLevel);

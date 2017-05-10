@@ -230,6 +230,7 @@
     <string name="other_trip_message">You already have an open trip.Please contact the call center for information</string>
     <string name="alert_area">Attention please, the vehicle is out of the operative area, it won\'t be possible close the trip</string>
     <string name="alert_key">remember to turn off the dashboard by turning the key before leaving the car</string>
+    <string name="alert_bonus_park">From this moment you can earn 5 minutes bonus by leaving this car to be recharged in one of the car parks shown on the map</string>
 
 
 </resources>

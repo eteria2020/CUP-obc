@@ -230,5 +230,6 @@
     <string name="navigator_slight_right">向右稍转</string>
     <string name="alert_area">请注意，车辆在工作区域外，不可能关闭旅程</string>
     <string name="alert_key">记得在离开车前转动钥匙关闭仪表板</string>
+    <string name="alert_bonus_park">从现在开始，您可以通过将这辆汽车在地图上显示的停车场之一中收取5分钟的奖金</string>
 
 </resources>

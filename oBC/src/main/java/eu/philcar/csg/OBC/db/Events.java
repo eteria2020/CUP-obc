@@ -302,7 +302,7 @@ public class Events extends DbTable<Event,Integer> {
 			where.and(
 				where.eq("sent",false),
 				//where.eq("sending_error", false)
-				where.ge("timestamp",(System.currentTimeMillis()/1000-60*60*24*7))
+				where.ge("timestamp",((System.currentTimeMillis()/1000)-60*60*24*7))
 			);
 
 

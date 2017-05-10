@@ -3506,6 +3506,9 @@ public class FMap extends FBase implements OnClickListener {
 				case 3:
 					App.Instance.SaveDefaultCity("Roma");
 					break;
+				case 4:
+					App.Instance.SaveDefaultCity("Modena");
+					break;
 			}
 		}
 
@@ -3557,7 +3560,7 @@ public class FMap extends FBase implements OnClickListener {
 
 				if (customView.findViewById(R.id.customView_poi) != null) {
 
-					((ImageView) (customView.findViewById(R.id.customView_poi))).setImageResource(R.drawable.pois_icon);
+					((ImageView) (customView.findViewById(R.id.customView_poi))).setImageResource(R.drawable.poi_bonus);
 
 					//((ImageView) (customView.findViewById(R.id.customView_poi))).invalidate(); testinva
 					annotationView.setView(customView.findViewById(R.id.customView_poi));
@@ -3590,14 +3593,14 @@ public class FMap extends FBase implements OnClickListener {
 
 
 		if(drawCharging) {
-			rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
-			localHandler.sendEmptyMessageDelayed(MSG_CLOSE_SOC_ALERT, 60000);
-			((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_bonus_title);
-			((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_bonus);
+			//rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+			//localHandler.sendEmptyMessageDelayed(MSG_CLOSE_SOC_ALERT, 60000);
+			//((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_bonus_title);
+			//((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_bonus);
 			drawCharging=false;
 			firstUpReceived=true;
 			drawChargingStation();
-			dlog.d("Displayed bonus popup");
+			dlog.d("Displayed bonus poi");
 
 		}
 		if(status>0){

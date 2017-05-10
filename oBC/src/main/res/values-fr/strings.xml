@@ -226,5 +226,6 @@
     <string name="other_trip_message">Vous avez déjà un voyage ouvert.Veuillez contacter le centre d\'appels pour plus d\'informations</string>
     <string name="alert_area">Attention, le véhicule est hors de la zone opérationnelle, il ne sera pas possible de fermer le voyage</string>
     <string name="alert_key">N\'oubliez pas d\'éteindre le tableau de bord en tournant la clé avant de quitter la voiture</string>
+    <string name="alert_bonus_park">Désormais, vous pouvez gagner 5 minutes de bonus en laissant cette voiture être rechargée dans l\'un des parkings indiqués sur la carte</string>
 
 </resources>

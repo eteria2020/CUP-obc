@@ -470,6 +470,7 @@ public class ObcService extends Service {
 
                     carInfo.minVoltage = carInfo.cellVoltageValue[22] == 0 ? 2.8f : 2.5f;
                     carInfo.batteryType = carInfo.cellVoltageValue[22] == 0 ? "DFD" : "HNLD";
+                    App.Instance.setMaxVoltage(carInfo.batteryType.equalsIgnoreCase("HNLD")?82:83);
 
                     bmsError=false;
                     for (int i = 0; i < carInfo.cellVoltageValue.length; i++) {
@@ -500,7 +501,7 @@ public class ObcService extends Service {
 
                     if (carInfo.bmsSOC >= 100 || carInfo.bmsSOC_GPRS >= 100) {
                         if (!carInfo.Charging || (carInfo.currVoltage > App.getMax_voltage())) {
-                            App.Instance.setMaxVoltage(carInfo.currVoltage > 85f || carInfo.currVoltage < 80f ? 83f : carInfo.currVoltage);
+                            //App.Instance.setMaxVoltage(carInfo.currVoltage > 85f || carInfo.currVoltage < 80f ? 83f : carInfo.currVoltage);
                             dlog.d("virtualBMSUpdateScheduler: set maxVoltage to " + App.getMax_voltage() + "% bmsSOC: " + carInfo.bmsSOC + " % bmsSOC_GPRS: " + carInfo.bmsSOC_GPRS + "% currVoltage " + carInfo.currVoltage + "% Charging: " + carInfo.Charging);
                             carInfo.Charging = true;
                         }

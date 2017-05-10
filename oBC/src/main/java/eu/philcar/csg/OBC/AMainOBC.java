@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -769,8 +768,16 @@ public class AMainOBC extends ABase implements LocationListener {
 					firstUpCharging=false;
 					if(App.USE_TTS_ALERT)
 						queueTTS(getResources().getString(R.string.alert_bonus));
-					else
-						playAlertAdvice(R.raw.alert_tts_bonus_charging," alert bonus charging");
+					else {
+						switch (App.DefaultCity.toLowerCase()){
+							case "milano":
+								playAlertAdvice(R.raw.alert_tts_bonus_park, " alert bonus park");
+								break;
+							case "firenze":
+								playAlertAdvice(R.raw.alert_tts_bonus_park, " alert bonus park");
+								break;
+						}
+					}
 
 				}
 

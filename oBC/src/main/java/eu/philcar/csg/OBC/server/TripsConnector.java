@@ -142,7 +142,7 @@ public class TripsConnector implements RemoteEntityInterface {
 			int result = jobj.getInt("result");
 			String caption = jobj.getString("message");
 
-			dlog.i("DecodeJson: result " + result);
+			dlog.i("DecodeJson: result " + result + " from trip: "+tripInfo.trip.toString());
 			dlog.i("DecodeJson: caption " + (caption!=null?caption:"NULL"));
 			
 			tripInfo.trip.recharge = result; //server result
