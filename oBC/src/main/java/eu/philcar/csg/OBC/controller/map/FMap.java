@@ -1240,28 +1240,8 @@ public class FMap extends FBase implements OnClickListener {
 
 		case R.id.fmapSearchB://Search
 			if (!navigationActive)
+				((ABase)getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
 
-				//((ABase)getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
-
-					//queueTTS(getResources().getString(R.string.alert_20km));
-					playAlertAdvice(R.raw.alert_tts_5km," alert 5km");
-					tts.speak("boia deh se non funziona piango, ue ue ue");
-
-					//queueTTS(getResources().getString(R.string.alert_5km));
-
-				/*((AMainOBC) getActivity()).player.reqSystem = true;
-				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM);
-				dlog.d("updateCarInfo: Imposto Audio a AUDIO_SYSTEM");
-				new Thread(new Runnable() {
-					public void run() {
-						try{
-							((AMainOBC) getActivity()).player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ R.raw.alert_tts_5km_it));
-						}catch(Exception e){
-							dlog.e("Exception trying to play audio",e);
-						}
-
-					}
-				}).start();*/
 			break;
 
 		case R.id.fmapHomeB:
