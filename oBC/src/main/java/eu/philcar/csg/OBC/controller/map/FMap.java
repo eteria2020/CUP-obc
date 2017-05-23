@@ -1241,7 +1241,6 @@ public class FMap extends FBase implements OnClickListener {
 		case R.id.fmapSearchB://Search
 			if (!navigationActive)
 				((ABase)getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
-
 			break;
 
 		case R.id.fmapHomeB:

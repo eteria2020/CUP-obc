@@ -510,7 +510,8 @@ public class ObcService extends Service {
                     }
                     carInfo.virtualSOC = (carInfo.cellVoltageValue[22] == 0 ? ((float) Math.round((100 - 90 * (App.Instance.getMax_voltage() - currVolt) / 12) * 10) / 10f) : ((float) Math.round((100 - 90 * (App.Instance.getMax_voltage() - 3 - currVolt) / 9.5) * 10) / 10f));//DFD:H
 
-                    carInfo.SOCR = carInfo.bmsSOC == carInfo.bmsSOC_GPRS ? Math.min(Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS), carInfo.virtualSOC) : carInfo.virtualSOC;
+                    carInfo.SOCR = carInfo.bmsSOC == carInfo.bmsSOC_GPRS ? Math.min(Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS), carInfo.virtualSOC) : //true
+                 /*false*/      carInfo.bmsSOC==0 || carInfo.bmsSOC_GPRS==0?Math.min(Math.max(carInfo.bmsSOC_GPRS,carInfo.bmsSOC),carInfo.virtualSOC):Math.min(Math.max(carInfo.bmsSOC_GPRS,carInfo.bmsSOC),carInfo.virtualSOC);
                     if ((carInfo.isCellLowVoltage) || carInfo.currVoltage <= 67f) {
 
                         carInfo.SOCR = Math.min(carInfo.virtualSOC, 0f);
@@ -532,7 +533,7 @@ public class ObcService extends Service {
                 }
             }
 
-        }, 10, 120, TimeUnit.SECONDS);
+        }, 15, 120, TimeUnit.SECONDS);
 
         gpsCheckeScheduler.scheduleAtFixedRate(new Runnable() {
 

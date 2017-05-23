@@ -989,7 +989,7 @@ public class Hik_io implements LowLevelInterface {
 		            b.putString("VIN", vinCode);
 		            obcService.notifyCarInfo(b);
 		            
-		            dlog.i("onVinCodeChange(vinCode):" + vinCode );
+		            //dlog.i("onVinCodeChange(vinCode):" + vinCode );
 	    	 }
 	    	
 	    	
