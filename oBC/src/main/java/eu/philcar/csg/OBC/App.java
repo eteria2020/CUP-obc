@@ -70,7 +70,6 @@ import eu.philcar.csg.OBC.server.AreaConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.server.SslConnection;
 import eu.philcar.csg.OBC.service.AdvertisementService;
-import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.ParkMode;
 import eu.philcar.csg.OBC.service.Reservation;
@@ -104,6 +103,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.telephony.SmsManager;
@@ -389,6 +389,7 @@ public class App extends Application {
 	private static final String  KEY_IsAskClose = "is_ask_close";
 	private static final String  KEY_IdAskClose = "id_ask_close";
 	private static final String  KEY_CounterCleanliness = "Cleanliness";
+	private static final String  KEY_TimeZone = "time_zone";
 
 	
 	public static final String  KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
@@ -415,6 +416,8 @@ public class App extends Application {
 	public static double chargingAmp;
 	public static double currentAmp;
 	public static double maxAmp;
+
+	private static long shutdownTimer=0;
 
 
 	public static float max_voltage=83f;
@@ -466,6 +469,7 @@ public class App extends Application {
 	public static int      BatteryShutdownLevel = 0;
 	public static int	   FleetId = 0;
 	public static int	   ServerIP = 0;
+	public static String timeZone;
 	
 	public static boolean hasNetworkConnection=false;
 	public static Date    lastNetworkOn = new Date();
@@ -493,7 +497,9 @@ public class App extends Application {
 	
 	private static String foregroundActivity="";
 	private static boolean loaded=false;
-	
+	public static long serverTime=0;
+	public static long serverTimeElapsed=0;
+
 	private SensorManager sensorManager;
 	private Sensor        motionDetector;
 	
@@ -503,6 +509,7 @@ public class App extends Application {
 	public CANManager CanManager;
 	
 	private ABase mCurrentActivity = null;
+	public static long lastConnReset =0;
 	public static Date update_Poi = new Date();
 	public static Date update_StartImages = new Date();
 	public static Date update_EndImages = new Date();
@@ -638,6 +645,13 @@ public class App extends Application {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_ServerIP, ServerIP);
+			e.apply();
+		}
+	}
+	public void persistTimeZone() {
+		if (this.preferences != null ) {
+			Editor e = this.preferences.edit();
+			e.putString(KEY_TimeZone, timeZone);
 			e.apply();
 		}
 	}
@@ -1501,8 +1515,12 @@ private void  initPhase2() {
 				} else if (key.equalsIgnoreCase("ServerIP")) {
 					ServerIP = jo.getInt(key);
 					persistServerIP();
+				} else if (key.equalsIgnoreCase("TimeZone")) {
+					timeZone = jo.getString(key);
+					persistTimeZone();
 				};
 			}
+			loadPreferences();
 		} catch (JSONException e) {
 			dlog.e("Parsing setConfig :",e);			
 		}
@@ -1684,6 +1702,7 @@ private void  initPhase2() {
 		CounterCleanlines=preferences.getInt(KEY_CounterCleanliness,0);
 
 		ServerIP = preferences.getInt(KEY_ServerIP, 0);
+		timeZone = preferences.getString(KEY_TimeZone,"Europe/Rome");
 		saveLog = preferences.getBoolean(KEY_PersistLog, true);
 		try {
 		askClose.putInt("id",preferences.getInt(KEY_IdAskClose,0));
@@ -2111,5 +2130,24 @@ private void  initPhase2() {
 	    } else {
 	    	Log.e(App.class.getCanonicalName(), "App: no advertisement update required");
 	    }
+	}
+
+	public static boolean startShutdownTimer(){
+		if(shutdownTimer==0) {
+			Events.StartShutdown();
+			shutdownTimer = SystemClock.elapsedRealtime();
+		}
+		if (SystemClock.elapsedRealtime() - shutdownTimer > 60 * 60 * 1000) {
+			shutdownTimer=0;
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	public static void stopShutdownTimer(){
+		shutdownTimer=0;
+		Events.StopShutdown();
 	}
 }

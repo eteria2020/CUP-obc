@@ -68,7 +68,7 @@ public class CarInfo {
 
 
     public float[] cellVoltageValue = new float[24];
-    public float minVoltage = 2.5f;
+    public float minVoltage = 2.6f;
     public String batteryType = "", lowCells = "";
     public Boolean isCellLowVoltage = false;
     public Boolean Charging = false;
@@ -91,6 +91,7 @@ public class CarInfo {
 
     public Location intGpsLocation = new Location(LocationManager.GPS_PROVIDER);
     public Location extGpsLocation = new Location(LocationManager.GPS_PROVIDER);
+    public Location ntwkLocation = new Location(LocationManager.NETWORK_PROVIDER);
 
 
     public double longitude;
@@ -131,6 +132,8 @@ public class CarInfo {
             this.batteryLevel=batteryLevel;
             return;
         }*/
+        if(batteryLevel>100)
+            batteryLevel=100;
         dlog.d("setBatteryLevel: first "+this.batteryLevel +" target: "+batteryLevel);
 
         if (this.batteryLevel - batteryLevel>= 5) {

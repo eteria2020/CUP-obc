@@ -141,6 +141,7 @@ public class HttpsConnector {
 			
 			if (this.entity.getDirection()==RemoteEntityInterface.eDirection.DOWNLOAD) {			
 				DownloadJson(URL,HttpMethod,this.entity.GetParams());
+				//updateTime();
 				EntityId = this.entity.DecodeJson(responseBody);
 			} else {
 				String data = this.entity.EncodeJson();
@@ -297,7 +298,11 @@ public class HttpsConnector {
 			} catch (IOException e) {
 				response.body().close();
 				dlog.e("Getting responseBody",e);
-				 SystemControl.Reset3G(null);
+				 if(System.currentTimeMillis()-App.lastConnReset>10*60*1000) {
+					 App.lastConnReset=System.currentTimeMillis();
+					 dlog.d("Reset 3g Connection exception");
+					 SystemControl.Reset3G(null);
+				 }
 				return null;
 			}
 	    	 
@@ -378,7 +383,20 @@ public class HttpsConnector {
 		 		
 		 	}
 
-	
+	void updateTime(){
+		if (responseBody == null || responseBody.isEmpty()) {
+			dlog.e("Empty response");
+			return ;
+		}
+
+		final JSONArray  jArray;
+		try {
+			jArray = new JSONArray(responseBody);
+		} catch (JSONException e) {
+			dlog.e("Errore estraendo array json", e);
+			return ;
+		}
+	}
 
 }
 }

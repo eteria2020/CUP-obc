@@ -29,6 +29,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.entity.HttpEntityWrapper;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -139,6 +140,7 @@ public class HttpConnector {
 			
 			if (this.entity.getDirection()==RemoteEntityInterface.eDirection.DOWNLOAD) {			
 				DownloadJson(URL,HttpMethod,this.entity.GetParams());
+				//updateTime(responseBody);
 				EntityId = this.entity.DecodeJson(responseBody);
 			} else {
 				String data = this.entity.EncodeJson();
@@ -334,8 +336,12 @@ public class HttpConnector {
 	 	    	if(App.networkExceptions%100==0) {
 	 	    		dlog.e("Network exceptions: "+ App.networkExceptions);	
 	 	    	}
-				SystemControl.Reset3G(null);
 	 	    	dlog.e("Http IOException",e);
+				if(System.currentTimeMillis()-App.lastConnReset>10*60*1000) {
+					App.lastConnReset=System.currentTimeMillis();
+					dlog.d("Reset 3g Connection exception");
+					SystemControl.Reset3G(null);
+				}
 	 	    } catch (Exception e) {
 	 	    	dlog.e("Http Unexpected exception",e);
 	 	    }

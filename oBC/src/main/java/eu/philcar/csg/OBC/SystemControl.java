@@ -294,7 +294,7 @@ public class SystemControl {
 			Events.Shutdown();
 			Runtime rt = Runtime.getRuntime();
 			try {
-				Thread.sleep(30000);
+				Thread.sleep(60000);
 				rt.exec(new String[]{"/system/xbin/su","-c", "reboot -p"});
 			} catch (IOException | InterruptedException e) {
 				dlog.e("Shutdown",e);				

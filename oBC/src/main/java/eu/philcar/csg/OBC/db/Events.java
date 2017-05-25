@@ -223,7 +223,15 @@ public class Events extends DbTable<Event,Integer> {
 	}
 	
 	public static void Shutdown() {
-		generateEvent(EVT_SHUTDOWN,0,null);
+		generateEvent(EVT_SHUTDOWN,0,"Shutting Down");
+	}
+
+	public static void StartShutdown() {
+		generateEvent(EVT_SHUTDOWN,0,"Start Shutdown timer");
+	}
+
+	public static void StopShutdown() {
+		generateEvent(EVT_SHUTDOWN,0,"Stop Shutdown timer");
 	}
 	public static void Reboot(String text) {
 		generateEvent(EVT_REBOOT,0,text+" " +App.sw_Version);

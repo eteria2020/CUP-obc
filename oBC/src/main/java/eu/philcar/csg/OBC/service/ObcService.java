@@ -2,9 +2,13 @@ package eu.philcar.csg.OBC.service;
 
 
 import java.io.File;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -71,6 +75,8 @@ import android.os.Messenger;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.RemoteException;
+import android.os.SystemClock;
+import android.provider.Settings;
 import android.telephony.SmsManager;
 
 public class ObcService extends Service {
@@ -204,7 +210,8 @@ public class ObcService extends Service {
     ScheduledExecutorService tripUpdateScheduler;
     ScheduledExecutorService tripPoiUpdateScheduler;
         ScheduledExecutorService virtualBMSUpdateScheduler;
-    ScheduledExecutorService gpsCheckeScheduler;
+    ScheduledExecutorService gpsCheckScheduler;
+    ScheduledExecutorService timeCheckScheduler;
 
 
     private LocationManager locationManager;
@@ -384,7 +391,9 @@ public class ObcService extends Service {
         //Start scheduler for CAN query
         virtualBMSUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
         //Start scheduler for GPS query
-        gpsCheckeScheduler = Executors.newSingleThreadScheduledExecutor();
+        gpsCheckScheduler = Executors.newSingleThreadScheduledExecutor();
+        //Start schedule for time sync
+        timeCheckScheduler = Executors.newSingleThreadScheduledExecutor();
 
         // Start internal loop with period of  10 sec
 
@@ -393,6 +402,7 @@ public class ObcService extends Service {
             private boolean _secondRun = false;
             private int minutePrescaler = 0;
             private int threeminutePrescaler = 0;
+            private int notifiesPrescaler = 0;
 
             @Override
             public void run() {
@@ -402,7 +412,8 @@ public class ObcService extends Service {
                     if (WITH_UDPSERVER && WITH_UDPQUERY)
                         udpServer.sendQuery();
                     //If HTTP query is enabled schedule an HTTP notifies download
-                    if (WITH_HTTP_NOTIFIES) {
+                    if (WITH_HTTP_NOTIFIES&& notifiesPrescaler++>4) {
+                        notifiesPrescaler=0;
                         HttpConnector http = new HttpConnector(ObcService.this);
                         http.SetHandler(localHandler);
                         NotifiesConnector nc = new NotifiesConnector();
@@ -462,19 +473,24 @@ public class ObcService extends Service {
                     boolean cellLow = false;
                     String lowCellNumber = " ";
                     String cellsVoltage = "";
-                    boolean bmsError;
+                    boolean bmsError=false;
 
+                    //retrieve all can data
                     carInfo.cellVoltageValue = getCellVoltages();
                     carInfo.bmsSOC = getSOCValue();
                     carInfo.outAmp = getCurrentValue();
 
+                    //type of battery
+                    //if(carInfo.minVoltage==2.6f || carInfo.batteryType.equalsIgnoreCase("")) {
+
                     carInfo.minVoltage = carInfo.cellVoltageValue[22] == 0 ? 2.8f : 2.5f;
                     carInfo.batteryType = carInfo.cellVoltageValue[22] == 0 ? "DFD" : "HNLD";
+                    //}
                     App.Instance.setMaxVoltage(carInfo.batteryType.equalsIgnoreCase("HNLD")?82:83);
 
-                    bmsError=false;
+                    //voltage sum
                     for (int i = 0; i < carInfo.cellVoltageValue.length; i++) {
-                        if(i<20 && carInfo.cellVoltageValue[i]<1) {
+                        if(i<(carInfo.batteryType.equalsIgnoreCase("HNLD")?24:20) && carInfo.cellVoltageValue[i]<1) {
                             currVolt=0;
                             bmsError=true;
                         }
@@ -488,18 +504,29 @@ public class ObcService extends Service {
                         }
                     }
 
+                    //fill carinfo attribute
                     carInfo.isCellLowVoltage = cellLow;
                     carInfo.lowCells = lowCellNumber;
                     carInfo.currVoltage = (float) Math.round(currVolt * 100) / 100f;
 
-                    if (carInfo.currVoltage <= 0 || carInfo.outAmp>= 25){
+
+                    //SOC2 calculation
+                    carInfo.virtualSOC = (carInfo.batteryType.equalsIgnoreCase("DFD") ? ((float) Math.round((100 - 90 * (App.getMax_voltage() - currVolt) / 12) * 10) / 10f) : ((float) Math.round((100 - 90 * (App.getMax_voltage() - currVolt) / 9.5) * 10) / 10f));//DFD:HNLD
+
+                    //SOCR calculation
+                    carInfo.SOCR = Math.abs(carInfo.bmsSOC - carInfo.bmsSOC_GPRS)<=2 ? Math.min(Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS), carInfo.virtualSOC) : //true
+                 /*false*/      (carInfo.bmsSOC==0 || carInfo.bmsSOC_GPRS==0)?Math.min(Math.max(carInfo.bmsSOC_GPRS,carInfo.bmsSOC),carInfo.virtualSOC):Math.min(Math.max(carInfo.bmsSOC_GPRS,carInfo.bmsSOC),carInfo.virtualSOC);
+
+                    dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
+                    //check car bms usage
+                    if (carInfo.currVoltage <= 0 || carInfo.outAmp>= 25 ){
                         carInfo.setBatteryLevel((Math.min(carInfo.batteryLevel,Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS))));
                         dlog.d("virtualBMSUpdateScheduler: value "+ (carInfo.currVoltage<=0?"packVoltage null":"outAmp greater than 25")+" ignoring virtual data.");
-                        dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.Instance.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
+                        dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
                         return;
                     }
 
-                    if (carInfo.bmsSOC >= 100 || carInfo.bmsSOC_GPRS >= 100) {
+                    /*if (carInfo.bmsSOC >= 100 || carInfo.bmsSOC_GPRS >= 100) {
                         if (!carInfo.Charging || (carInfo.currVoltage > App.getMax_voltage())) {
                             //App.Instance.setMaxVoltage(carInfo.currVoltage > 85f || carInfo.currVoltage < 80f ? 83f : carInfo.currVoltage);
                             dlog.d("virtualBMSUpdateScheduler: set maxVoltage to " + App.getMax_voltage() + "% bmsSOC: " + carInfo.bmsSOC + " % bmsSOC_GPRS: " + carInfo.bmsSOC_GPRS + "% currVoltage " + carInfo.currVoltage + "% Charging: " + carInfo.Charging);
@@ -507,11 +534,9 @@ public class ObcService extends Service {
                         }
                     } else {
                         carInfo.Charging = false;
-                    }
-                    carInfo.virtualSOC = (carInfo.cellVoltageValue[22] == 0 ? ((float) Math.round((100 - 90 * (App.Instance.getMax_voltage() - currVolt) / 12) * 10) / 10f) : ((float) Math.round((100 - 90 * (App.Instance.getMax_voltage() - 3 - currVolt) / 9.5) * 10) / 10f));//DFD:H
+                    }*/
 
-                    carInfo.SOCR = carInfo.bmsSOC == carInfo.bmsSOC_GPRS ? Math.min(Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS), carInfo.virtualSOC) : //true
-                 /*false*/      carInfo.bmsSOC==0 || carInfo.bmsSOC_GPRS==0?Math.min(Math.max(carInfo.bmsSOC_GPRS,carInfo.bmsSOC),carInfo.virtualSOC):Math.min(Math.max(carInfo.bmsSOC_GPRS,carInfo.bmsSOC),carInfo.virtualSOC);
+                    //set SOCR value
                     if ((carInfo.isCellLowVoltage) || carInfo.currVoltage <= 67f) {
 
                         carInfo.SOCR = Math.min(carInfo.virtualSOC, 0f);
@@ -525,7 +550,7 @@ public class ObcService extends Service {
                     sendAll(msg);*/
 
 
-                    dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.Instance.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
+
 
 
                 } catch (Exception e) {
@@ -535,7 +560,7 @@ public class ObcService extends Service {
 
         }, 15, 120, TimeUnit.SECONDS);
 
-        gpsCheckeScheduler.scheduleAtFixedRate(new Runnable() {
+        gpsCheckScheduler.scheduleAtFixedRate(new Runnable() {
 
 
             int intCount = 0, extCount = 0;
@@ -545,7 +570,7 @@ public class ObcService extends Service {
             @Override
             public void run() {
                 try {
-                    dlog.d("gpsCheckeScheduler: lastIntGpsLocation: "+ lastIntGpsLocation +" lastExtGpsLocation: "+ lastExtGpsLocation +" newIntGpslocation: "+carInfo.intGpsLocation + " newExtGpslocation "+carInfo.extGpsLocation + " UseExternalGPS: "+App.UseExternalGPS);
+                    dlog.d("gpsCheckScheduler: lastIntGpsLocation: "+ lastIntGpsLocation +" lastExtGpsLocation: "+ lastExtGpsLocation +" newIntGpslocation: "+carInfo.intGpsLocation + " newExtGpslocation "+carInfo.extGpsLocation + " UseExternalGPS: "+App.UseExternalGPS);
 
 
                     if (!App.UseExternalGPS) {
@@ -600,11 +625,44 @@ public class ObcService extends Service {
 
 
                 } catch (Exception e) {
-                    dlog.e("gpsCheckeScheduler error", e);
+                    dlog.e("gpsCheckScheduler error", e);
                 }
             }
 
         }, 40, 40, TimeUnit.SECONDS);
+
+
+        timeCheckScheduler.scheduleAtFixedRate(new Runnable() {
+
+
+            private  SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault());
+            @Override
+            public void run() {
+                Runtime rt = Runtime.getRuntime();
+                try {
+                    Date gps_time= new Date(carInfo.intGpsLocation.getTime()+ SystemClock.elapsedRealtime()-carInfo.intGpsLocation.getElapsedRealtimeNanos()/1000000);
+                    Date android_time= new Date(System.currentTimeMillis());
+
+                    if(carInfo.intGpsLocation.getTime()>1234567890000L) {
+                        if(android_time.getTime()<1234567890000L) {
+                            dlog.d("timeCheckScheduler: imposto ora gps "+gps_time.toString()+ "ora android: "+android_time.toString());
+                            rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(gps_time) + ";\n"}); //
+                        }
+
+                    }
+                    dlog.d("timeCheckScheduler: rawGpsTime: "+ new Date(carInfo.intGpsLocation.getTime()).toString() +" elapsed: "+(System.currentTimeMillis()-(carInfo.intGpsLocation.getElapsedRealtimeNanos()/1000000))+" android time: "+android_time.toString()+" full gps time: "+gps_time.toString());
+
+                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time_zone 0"}); //date -s 20120423.130000
+                    AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                    am.setTimeZone(App.timeZone);
+
+
+                } catch (Exception e) {
+                    dlog.e("timeCheckScheduler error", e);
+                }
+            }
+
+        }, 3, 20, TimeUnit.MINUTES);
 
 
         //Register receiver for battery data
@@ -662,8 +720,10 @@ public class ObcService extends Service {
             serverUpdateScheduler.shutdown();
         if (virtualBMSUpdateScheduler != null)
             virtualBMSUpdateScheduler.shutdown();
-        if (gpsCheckeScheduler != null)
-            gpsCheckeScheduler.shutdown();
+        if (gpsCheckScheduler != null)
+            gpsCheckScheduler.shutdown();
+        if (timeCheckScheduler != null)
+            timeCheckScheduler.shutdown();
 
         stopRemoteUpdateCycle();
         stopRemotePoiCheckCycle();
@@ -1000,10 +1060,13 @@ public class ObcService extends Service {
                 App.BatteryShutdownLevel > 0 &&
                 carInfo.batteryLevel <= App.BatteryShutdownLevel &&
                 !carInfo.chargingPlug) {
-            dlog.d("Shutdown because of battery: " + carInfo.batteryLevel);
-            obc_io.disableWatchdog();
-            SystemControl.doShutdown();
-        }
+            if(App.startShutdownTimer()){
+                dlog.d("Shutdown because of battery: " + carInfo.batteryLevel);
+                obc_io.disableWatchdog();
+                SystemControl.doShutdown();
+            }
+        }else
+        App.stopShutdownTimer();
 
         //TODO: ottimizzare con invio messaggio solo se dati effettivamente cambiati.
         Message msg = MessageFactory.notifyCarInfoUpdate(carInfo);
@@ -2243,6 +2306,26 @@ public class ObcService extends Service {
         }
     };
 
+    /**
+     * retreive only the first cell greater than 0
+     * @return
+     */
+    public float[] getGreaterCellVoltages() {
+
+        ArrayList<Float> values =new ArrayList<>();
+        for (int i = 0; i < 24; i++) {
+            if(obc_io.getCellVoltageValue(i)==0)
+                break;
+            values.add(obc_io.getCellVoltageValue(i));
+        }
+
+        float[] finalValues =new float[values.size()];
+
+        for(int i=0; i<values.size();i++)
+            finalValues[i]=values.get(i);
+
+        return finalValues;
+    }
 
     public float[] getCellVoltages() {
 
