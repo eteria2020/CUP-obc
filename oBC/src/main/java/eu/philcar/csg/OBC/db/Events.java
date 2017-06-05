@@ -9,6 +9,7 @@ import java.util.Map;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.SystemClock;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -54,10 +55,13 @@ public class Events extends DbTable<Event,Integer> {
 	public static final int EVT_SOC   	 =28;
 	public static final int EVT_OUTOFAREA	=29;
 	public static final int EVT_MENU_CLICK	=30;
+	public static final int EVT_CAN_ANOMALIES	=31;
 	
 	
 	
-	private Map<Integer,String> labels = new HashMap<Integer,String>();	
+	private Map<Integer,String> labels = new HashMap<Integer,String>();
+
+	public static long lastCanAnomalies=0;
 	
 	private DLog dlog = new DLog(this.getClass());
 	
@@ -94,6 +98,7 @@ public class Events extends DbTable<Event,Integer> {
 		labels.put(EVT_SOC, "SOC");
 		labels.put(EVT_OUTOFAREA, "AREA");
 		labels.put(EVT_MENU_CLICK, "MENU_CLICK");
+		labels.put(EVT_CAN_ANOMALIES, "CAN_ANOMALIES");
 
 		
 		
@@ -236,6 +241,14 @@ public class Events extends DbTable<Event,Integer> {
 	public static void Reboot(String text) {
 		generateEvent(EVT_REBOOT,0,text+" " +App.sw_Version);
 	}
+
+
+	public static void CanAnomalies(String text) {
+		if(SystemClock.elapsedRealtime()-lastCanAnomalies>60*60*1000) {
+			lastCanAnomalies=SystemClock.elapsedRealtime();
+			generateEvent(EVT_CAN_ANOMALIES, 0, text);
+		}
+	}
 	
 	public static void LeaseInfo(int status,int card) {		
 		String Hex=Integer.toHexString(card);
@@ -369,7 +382,7 @@ public class Events extends DbTable<Event,Integer> {
 	}
 
 
-	
+
 	
 	
 }

@@ -1055,8 +1055,7 @@ public class Hik_io implements LowLevelInterface {
 				b.putInt("WARN_INDEX", warningIndex);
 				b.putInt("WARN_STATUS", warningStatus);			
 				obcService.notifyCarInfo(b);
-	            dlog.i("onMotorWarningStatusChange(warningIndex, warningStatus):("
-	                    + warningIndex + "," + warningStatus + ")");
+	            //dlog.i("onMotorWarningStatusChange(warningIndex, warningStatus):("+ warningIndex + "," + warningStatus + ")");
 	        }
 
 	        @Override

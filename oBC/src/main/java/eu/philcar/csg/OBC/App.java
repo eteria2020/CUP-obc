@@ -390,6 +390,7 @@ public class App extends Application {
 	private static final String  KEY_IdAskClose = "id_ask_close";
 	private static final String  KEY_CounterCleanliness = "Cleanliness";
 	private static final String  KEY_TimeZone = "time_zone";
+	private static final String  KEY_NewBatteryShutdownLevel = "new_battery_shutdown_level";
 
 	
 	public static final String  KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
@@ -628,7 +629,7 @@ public class App extends Application {
 	public void persistBatteryShutdownLevel() {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
-			e.putInt(KEY_BatteryShutdownLevel, BatteryShutdownLevel);
+			e.putInt(KEY_NewBatteryShutdownLevel, BatteryShutdownLevel);
 			e.apply();
 		}		
 		
@@ -1506,7 +1507,7 @@ private void  initPhase2() {
 				} else if (key.equalsIgnoreCase("Watchdog")) {
 					Watchdog = jo.getInt(key);
 					persistWatchdog();
-				} else if (key.equalsIgnoreCase("BatteryShutdownLevel")) {
+				} else if (key.equalsIgnoreCase("NewBatteryShutdownLevel")) {
 					BatteryShutdownLevel = jo.getInt(key);
 					persistBatteryShutdownLevel();
 				} else if (key.equalsIgnoreCase("FleetId")) {
@@ -1696,7 +1697,7 @@ private void  initPhase2() {
 		
 		Watchdog = preferences.getInt(KEY_Watchdog, 0);
 		
-		BatteryShutdownLevel = preferences.getInt(KEY_BatteryShutdownLevel, 0);
+		BatteryShutdownLevel = preferences.getInt(KEY_NewBatteryShutdownLevel, 0);
 
 		FleetId = preferences.getInt(KEY_FleetId, 0);
 		CounterCleanlines=preferences.getInt(KEY_CounterCleanliness,0);
@@ -2137,7 +2138,7 @@ private void  initPhase2() {
 			Events.StartShutdown();
 			shutdownTimer = SystemClock.elapsedRealtime();
 		}
-		if (SystemClock.elapsedRealtime() - shutdownTimer > 60 * 60 * 1000) {
+		if (SystemClock.elapsedRealtime() - shutdownTimer >3*60 * 60 * 1000) {
 			shutdownTimer=0;
 			return true;
 		}
@@ -2147,7 +2148,9 @@ private void  initPhase2() {
 	}
 
 	public static void stopShutdownTimer(){
-		shutdownTimer=0;
-		Events.StopShutdown();
+		if(shutdownTimer!=0){
+			shutdownTimer = 0;
+			Events.StopShutdown();
+		}
 	}
 }

@@ -394,6 +394,7 @@ public class TripInfo {
 
                         http = new HttpConnector(service);
                         http.SetHandler(service.getPrivateHandler());
+                        dlog.d("Sending close trip");
                         http.Execute(cc);
 
                         service.setDisplayStatus(false,15);

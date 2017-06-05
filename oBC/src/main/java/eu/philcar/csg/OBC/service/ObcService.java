@@ -2,13 +2,11 @@ package eu.philcar.csg.OBC.service;
 
 
 import java.io.File;
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -76,7 +74,6 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.RemoteException;
 import android.os.SystemClock;
-import android.provider.Settings;
 import android.telephony.SmsManager;
 
 public class ObcService extends Service {
@@ -209,7 +206,7 @@ public class ObcService extends Service {
     ScheduledExecutorService serverUpdateScheduler;
     ScheduledExecutorService tripUpdateScheduler;
     ScheduledExecutorService tripPoiUpdateScheduler;
-        ScheduledExecutorService virtualBMSUpdateScheduler;
+    ScheduledExecutorService virtualBMSUpdateScheduler;
     ScheduledExecutorService gpsCheckScheduler;
     ScheduledExecutorService timeCheckScheduler;
 
@@ -464,6 +461,8 @@ public class ObcService extends Service {
 
         virtualBMSUpdateScheduler.scheduleAtFixedRate(new Runnable() {
 
+            int canAmpAnomalies =0, canVoltAnomalies=0, canBmsAnomalies=0;
+
 
             @Override
             public void run() {
@@ -473,12 +472,18 @@ public class ObcService extends Service {
                     boolean cellLow = false;
                     String lowCellNumber = " ";
                     String cellsVoltage = "";
-                    boolean bmsError=false;
+                    boolean bmsError = false;
 
                     //retrieve all can data
                     carInfo.cellVoltageValue = getCellVoltages();
                     carInfo.bmsSOC = getSOCValue();
                     carInfo.outAmp = getCurrentValue();
+                    if( carInfo.outAmp==350){
+                        if(canAmpAnomalies++>3){
+                            canAmpAnomalies =0;
+                            Events.CanAnomalies("350 Amp");
+                        }
+                    }
 
                     //type of battery
                     //if(carInfo.minVoltage==2.6f || carInfo.batteryType.equalsIgnoreCase("")) {
@@ -486,15 +491,15 @@ public class ObcService extends Service {
                     carInfo.minVoltage = carInfo.cellVoltageValue[22] == 0 ? 2.8f : 2.5f;
                     carInfo.batteryType = carInfo.cellVoltageValue[22] == 0 ? "DFD" : "HNLD";
                     //}
-                    App.Instance.setMaxVoltage(carInfo.batteryType.equalsIgnoreCase("HNLD")?82:83);
+                    App.Instance.setMaxVoltage(carInfo.batteryType.equalsIgnoreCase("HNLD") ? 82 : 83);
 
                     //voltage sum
                     for (int i = 0; i < carInfo.cellVoltageValue.length; i++) {
-                        if(i<(carInfo.batteryType.equalsIgnoreCase("HNLD")?24:20) && carInfo.cellVoltageValue[i]<1) {
-                            currVolt=0;
-                            bmsError=true;
+                        if (i < (carInfo.batteryType.equalsIgnoreCase("HNLD") ? 24 : 20) && carInfo.cellVoltageValue[i] < 1) {
+                            currVolt = 0;
+                            bmsError = true;
                         }
-                        if(!bmsError)
+                        if (!bmsError)
                             currVolt += carInfo.cellVoltageValue[i];    //		battery cell voltages
 
                         cellsVoltage = cellsVoltage.concat(" " + carInfo.cellVoltageValue[i]);
@@ -510,16 +515,36 @@ public class ObcService extends Service {
                     carInfo.currVoltage = (float) Math.round(currVolt * 100) / 100f;
 
 
+                    if( carInfo.currVoltage==350){
+                        if(canVoltAnomalies++>3){
+                            canVoltAnomalies =0;
+                            Events.CanAnomalies("0 CellsVolt");
+                        }
+                    }
+
+
                     //SOC2 calculation
                     carInfo.virtualSOC = (carInfo.batteryType.equalsIgnoreCase("DFD") ? ((float) Math.round((100 - 90 * (App.getMax_voltage() - currVolt) / 12) * 10) / 10f) : ((float) Math.round((100 - 90 * (App.getMax_voltage() - currVolt) / 9.5) * 10) / 10f));//DFD:HNLD
 
                     //SOCR calculation
-                    carInfo.SOCR = Math.abs(carInfo.bmsSOC - carInfo.bmsSOC_GPRS)<=2 ? Math.min(Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS), carInfo.virtualSOC) : //true
-                 /*false*/      (carInfo.bmsSOC==0 || carInfo.bmsSOC_GPRS==0)?Math.min(Math.max(carInfo.bmsSOC_GPRS,carInfo.bmsSOC),carInfo.virtualSOC):Math.min(Math.max(carInfo.bmsSOC_GPRS,carInfo.bmsSOC),carInfo.virtualSOC);
+                    if (Math.abs(carInfo.bmsSOC - carInfo.bmsSOC_GPRS) <= 2) {
+                        if((carInfo.bmsSOC==0 || carInfo.bmsSOC_GPRS==0)&&carInfo.currVoltage!=0){ if( carInfo.currVoltage==350){
+                            if(canBmsAnomalies++>3){
+                                canBmsAnomalies =0;
+                                Events.CanAnomalies("0 BMS");
+                            }
+                        }
+                            carInfo.SOCR = carInfo.virtualSOC;
+                        }else {
+                            carInfo.SOCR = Math.min(Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS), carInfo.virtualSOC);
+                        }
+                    } else{
+                        carInfo.SOCR = (carInfo.bmsSOC == 0 || carInfo.bmsSOC_GPRS == 0) ? Math.min(Math.max(carInfo.bmsSOC_GPRS, carInfo.bmsSOC), carInfo.virtualSOC) : Math.min(Math.max(carInfo.bmsSOC_GPRS, carInfo.bmsSOC), carInfo.virtualSOC);
+            }
 
                     dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
                     //check car bms usage
-                    if (carInfo.currVoltage <= 0 || carInfo.outAmp>= 25 ){
+                    if (carInfo.currVoltage <= 0 || (carInfo.outAmp>= 25 && carInfo.outAmp!=350)){
                         carInfo.setBatteryLevel((Math.min(carInfo.batteryLevel,Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS))));
                         dlog.d("virtualBMSUpdateScheduler: value "+ (carInfo.currVoltage<=0?"packVoltage null":"outAmp greater than 25")+" ignoring virtual data.");
                         dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
@@ -1054,12 +1079,7 @@ public class ObcService extends Service {
         }
 
         //If there is no open trip, at lest 3min after boot, no demo kit , battery level < BatteryShutdownLevel% , and no charge plug : do android shutdown.
-        if (!this.tripInfo.isOpen &&
-                App.getAppRunningSeconds() > 180 &&
-                carInfo.batteryLevel != 0 &&
-                App.BatteryShutdownLevel > 0 &&
-                carInfo.batteryLevel <= App.BatteryShutdownLevel &&
-                !carInfo.chargingPlug) {
+        if (!this.tripInfo.isOpen && App.getAppRunningSeconds() > 30 && carInfo.batteryLevel != 0 && App.BatteryShutdownLevel > 0 && carInfo.batteryLevel <= App.BatteryShutdownLevel && !carInfo.chargingPlug) {
             if(App.startShutdownTimer()){
                 dlog.d("Shutdown because of battery: " + carInfo.batteryLevel);
                 obc_io.disableWatchdog();
@@ -1822,7 +1842,7 @@ public class ObcService extends Service {
         @Override
         public void onReceive(Context c, Intent i) {
             boolean status = SystemControl.hasNetworkConnection(ObcService.this);
-            dlog.d("Broadcast CONNECTIVITY_CHANGE" + i.getAction() + status);
+            dlog.d("Broadcast CONNECTIVITY_CHANGE " + i.getAction() + status);
             setNetworkConnectionStatus(status);
         }
 

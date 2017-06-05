@@ -60,14 +60,11 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 			case 1:
 				updateFromVersion1(database, connectionSource, oldVersion, newVersion);//Change poi Name value
-				break;
 
 			case 2:
 				updateFromVersion1(database, connectionSource, oldVersion, newVersion);// poi variable lenght
-				break;
 			case 3:
 				updateFromVersion3(database, connectionSource, oldVersion, newVersion);//added business customer
-				break;
 
 			default:
 				// no updates needed
@@ -100,7 +97,6 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 		}catch (Exception e) {
 			DLog.E("Upgrade to Db versione "+(oldVersion+1)+" failed",e);
 		}
-		onUpgrade(db, connectionSource, oldVersion + 1, newVersion);
 	}
 
 	private void updateFromVersion3(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
@@ -113,7 +109,6 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 		}catch (Exception e) {
 			DLog.E("Upgrade to DB version "+(oldVersion+1)+" failed", e);
 		}
-		onUpgrade(database, connectionSource, oldVersion + 1, newVersion);
 	}
 
 

@@ -30,6 +30,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -271,6 +272,7 @@ public class FMap extends FBase implements OnClickListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		View view = inflater.inflate(R.layout.f_map, container, false);
+
 		dlog.d("OnCreareView FMap");
 		rootView = view;
 		if(App.Instance.BannerName.getBundle("CAR")==null&&!RequestBanner){          //App.Instance.BannerName.getBundle("CAR")==null&&

@@ -72,6 +72,7 @@ public class HttpsConnector {
 	
 	public static final int METHOD_GET  = 0;
 	public static final int METHOD_POST = 1;
+	private static int exceptionCount=0;
 	
 	public final boolean AUTH_ENABLED = false;
 	public final String  AUTH_USER = "";
@@ -285,24 +286,26 @@ public class HttpsConnector {
 	 	    	if(App.networkExceptions%100==0) {
 	 	    		dlog.e("getting http/s",e);
 	 	    		dlog.e("Network exception: "+ App.networkExceptions);
-	 	    	}				
+	 	    	}
+				 if(System.currentTimeMillis()-App.lastConnReset>10*60*1000 && exceptionCount++<15) {
+					 exceptionCount=0;
+					 App.lastConnReset=System.currentTimeMillis();
+					 dlog.d("Reset 3g Connection exception");
+					 SystemControl.Reset3G(null);
+				 }
 				return null;
 			}
 	    	
 	    	 try {
 	    		if (response.code()==200)  {
 	    			responseBody = response.body().string();
+					exceptionCount=0;
 	    		} else {
 	    			dlog.e("HTTP ERROR : " + response.code());
 	    		}
 			} catch (IOException e) {
 				response.body().close();
 				dlog.e("Getting responseBody",e);
-				 if(System.currentTimeMillis()-App.lastConnReset>10*60*1000) {
-					 App.lastConnReset=System.currentTimeMillis();
-					 dlog.d("Reset 3g Connection exception");
-					 SystemControl.Reset3G(null);
-				 }
 				return null;
 			}
 	    	 

@@ -59,6 +59,7 @@ public class HttpConnector {
 	
 	public static final int METHOD_GET  = 0;
 	public static final int METHOD_POST = 1;
+	private static int exceptionCount=0;
 	
 	public final boolean AUTH_ENABLED = false;
 	public final String  AUTH_USER = "";
@@ -295,6 +296,7 @@ public class HttpConnector {
 				switch (responseCode) {
 				
 				case 200:
+					exceptionCount=0;
 					HttpEntity entity = response.getEntity();
 					logtxt.append("- Content length: ").append( entity.getContentLength());
 					
@@ -337,7 +339,8 @@ public class HttpConnector {
 	 	    		dlog.e("Network exceptions: "+ App.networkExceptions);	
 	 	    	}
 	 	    	dlog.e("Http IOException",e);
-				if(System.currentTimeMillis()-App.lastConnReset>10*60*1000) {
+				if(System.currentTimeMillis()-App.lastConnReset>10*60*1000 && exceptionCount++<15) {
+					exceptionCount=0;
 					App.lastConnReset=System.currentTimeMillis();
 					dlog.d("Reset 3g Connection exception");
 					SystemControl.Reset3G(null);

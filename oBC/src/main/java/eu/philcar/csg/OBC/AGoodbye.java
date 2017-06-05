@@ -164,8 +164,19 @@ public class AGoodbye extends ABase {
 				startActivity(i);
 				AGoodbye.this.finish();
 	
-				break;					
-				
+				break;
+
+			case ObcService.MSG_TRIP_BEGIN:
+
+				dlog.d("WTF STATE restoring AGoodbye");
+
+				Intent in = new Intent(AGoodbye.this, AWelcome.class);
+				in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(in);
+				AGoodbye.this.finish();
+
+				break;
+
 			case ObcService.MSG_CUSTOMER_INFO:
 				
 
