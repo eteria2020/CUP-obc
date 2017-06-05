@@ -415,6 +415,7 @@ public class ObcService extends Service {
                         http.SetHandler(localHandler);
                         NotifiesConnector nc = new NotifiesConnector();
                         nc.setTarga(App.CarPlate);
+                        //nc.setBeacon(carInfo.getJson(true));
                         http.Execute(nc);
                     }
 
@@ -1079,14 +1080,14 @@ public class ObcService extends Service {
         }
 
         //If there is no open trip, at lest 3min after boot, no demo kit , battery level < BatteryShutdownLevel% , and no charge plug : do android shutdown.
-        if (!this.tripInfo.isOpen && App.getAppRunningSeconds() > 30 && carInfo.batteryLevel != 0 && App.BatteryShutdownLevel > 0 && carInfo.batteryLevel <= App.BatteryShutdownLevel && !carInfo.chargingPlug) {
+        /*if (false && !this.tripInfo.isOpen && App.getAppRunningSeconds() > 30 && carInfo.batteryLevel != 0 && App.BatteryShutdownLevel > 0 && carInfo.batteryLevel <= App.BatteryShutdownLevel && !carInfo.chargingPlug) {
             if(App.startShutdownTimer()){
                 dlog.d("Shutdown because of battery: " + carInfo.batteryLevel);
                 obc_io.disableWatchdog();
                 SystemControl.doShutdown();
             }
         }else
-        App.stopShutdownTimer();
+        App.stopShutdownTimer();*/
 
         //TODO: ottimizzare con invio messaggio solo se dati effettivamente cambiati.
         Message msg = MessageFactory.notifyCarInfoUpdate(carInfo);
@@ -1620,7 +1621,7 @@ public class ObcService extends Service {
 
             }
 
-        }, 0, 60, TimeUnit.SECONDS);
+        }, 0, 30, TimeUnit.SECONDS);
 
         dlog.d("Started remote Update Cycle");
     }
