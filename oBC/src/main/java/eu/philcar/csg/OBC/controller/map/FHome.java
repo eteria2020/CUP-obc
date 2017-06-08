@@ -391,6 +391,10 @@ public class FHome extends FBase implements OnClickListener {
     public void onDetach() {
         super.onDetach();
 
+        if (tts!=null) {
+            tts.shutdown();
+            tts=null;
+        }
 
     }
 

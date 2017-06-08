@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="eu.philcar.csg.OBC"
 
-	android:versionCode="113"
-	android:versionName="0.105.6-1" >
+	android:versionCode="114"
+	android:versionName="0.105.7bis" >
 
 		<uses-sdk
 		android:minSdkVersion="15"

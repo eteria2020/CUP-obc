@@ -248,6 +248,7 @@ public class AMainOBC extends ABase implements LocationListener {
 		//locationManager.removeUpdates(this);
 	}
 
+
 	@Override
 	protected void onDestroy() {
 
@@ -258,6 +259,10 @@ public class AMainOBC extends ABase implements LocationListener {
 			serviceConnector.disconnect();
 		}
 
+		if (tts!=null) {
+			tts.shutdown();
+			tts=null;
+		}
 		unregisterReceiver(advertisementReceiver);
 	}
 

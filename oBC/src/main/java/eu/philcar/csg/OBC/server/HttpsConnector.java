@@ -287,7 +287,7 @@ public class HttpsConnector {
 	 	    		dlog.e("getting http/s",e);
 	 	    		dlog.e("Network exception: "+ App.networkExceptions);
 	 	    	}
-				 if(System.currentTimeMillis()-App.lastConnReset>10*60*1000 && exceptionCount++<15) {
+				 if(System.currentTimeMillis()-App.lastConnReset>10*60*1000 && exceptionCount++>15) {
 					 exceptionCount=0;
 					 App.lastConnReset=System.currentTimeMillis();
 					 dlog.d("Reset 3g Connection exception");

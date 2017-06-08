@@ -615,6 +615,16 @@ public class FGoodbye extends FBase {
 	}
 
 	@Override
+	public void onDetach() {
+		super.onDetach();
+
+		if (tts!=null) {
+			tts.shutdown();
+			tts=null;
+		}
+	}
+
+	@Override
 	public void onDestroy() {
 		try{
 			localHandler.removeCallbacksAndMessages(null);

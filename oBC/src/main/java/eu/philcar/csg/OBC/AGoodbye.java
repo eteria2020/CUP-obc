@@ -168,12 +168,7 @@ public class AGoodbye extends ABase {
 
 			case ObcService.MSG_TRIP_BEGIN:
 
-				dlog.d("WTF STATE restoring AGoodbye");
-
-				Intent in = new Intent(AGoodbye.this, AWelcome.class);
-				in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(in);
-				AGoodbye.this.finish();
+				//NON PRENDERE COME VALIDOP QUESTO EVENTO VIENE GENERATO ANCHE A CORSA GIà APERTA
 
 				break;
 
