@@ -83,13 +83,13 @@ public class ObcService extends Service {
 
 
     //BUILD OPTIONS
-    public static final boolean WITH_UDPSERVER = true;
+    public static final boolean WITH_UDPSERVER = false;
     public static final boolean WITH_UDPQUERY = false;
     public static final boolean WITH_AUTORESET3G = true;
     public static final boolean WITH_OUTOFORDER_WATCHDOG = true;
 
 
-    public static boolean WITH_HTTP_NOTIFIES = true;
+    public static final boolean WITH_HTTP_NOTIFIES = true;
 
     public static boolean WITH_ZMQNOTIFY = false;
     public static boolean WITH_ZMQREQREP = false;
@@ -261,11 +261,11 @@ public class ObcService extends Service {
 
         if (App.Instance.loadZmqDisabledConfig()) {
             this.WITH_ZMQNOTIFY = false;
-            this.WITH_HTTP_NOTIFIES = true;
+            //this.WITH_HTTP_NOTIFIES = true;
             dlog.d("** Notify protocol: HTTP");
         } else {
             this.WITH_ZMQNOTIFY = true;
-            this.WITH_HTTP_NOTIFIES = false;
+           // this.WITH_HTTP_NOTIFIES = true;
             dlog.d("** Notify protocol: ZMQ");
         }
 
@@ -409,13 +409,13 @@ public class ObcService extends Service {
                     if (WITH_UDPSERVER && WITH_UDPQUERY)
                         udpServer.sendQuery();
                     //If HTTP query is enabled schedule an HTTP notifies download
-                    if (WITH_HTTP_NOTIFIES&& notifiesPrescaler++>4) {
+                    if (WITH_HTTP_NOTIFIES&& notifiesPrescaler++>4 && tripInfo != null && tripInfo.isOpen && (App.parkMode == null || !App.parkMode.isOn()) ) {
                         notifiesPrescaler=0;
                         HttpConnector http = new HttpConnector(ObcService.this);
                         http.SetHandler(localHandler);
                         NotifiesConnector nc = new NotifiesConnector();
                         nc.setTarga(App.CarPlate);
-                        //nc.setBeacon(carInfo.getJson(true));
+                        nc.setBeacon(carInfo.getJson(false));
                         http.Execute(nc);
                     }
 
@@ -655,7 +655,7 @@ public class ObcService extends Service {
                 }
             }
 
-        }, 40, 40, TimeUnit.SECONDS);
+        }, 40, 300, TimeUnit.SECONDS);
 
 
         timeCheckScheduler.scheduleAtFixedRate(new Runnable() {
@@ -878,7 +878,7 @@ public class ObcService extends Service {
             dlog.e("sendAll, Message==null");
             return;
         }
-
+//TODO change with foreach
 
         if (msg.what != ObcService.MSG_CAR_INFO &&
                 msg.what != ObcService.MSG_RADIO_SEEK_INFO)
@@ -1316,7 +1316,6 @@ public class ObcService extends Service {
                         this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
                     } else
                         dlog.w(ObcService.class.toString() + " executeServerCommands: CLOSE_TRIP ignored since there is a no open trip");
-
                     break;
 
                 case "RESEND_TRIP":

@@ -561,7 +561,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		}
 
-		if((new Date().getTime()- App.update_Poi.getTime())>600000 && App.hasNetworkConnection && !App.first_UP_poi) {    //3600000 = 1 ora
+		if((new Date().getTime()- App.update_Poi.getTime())>3*60*60*1000 && App.hasNetworkConnection && !App.first_UP_poi) {    //3600000 = 1 ora
 
 
 			new Thread(new Runnable() {
@@ -1370,7 +1370,7 @@ public class FMap extends FBase implements OnClickListener {
 
 	}
 	private boolean drawPOIS() {
-
+//TODO visualizzare solo un 30% dei poi
 		if(mapView==null || getActivity()==null) {
 			dlog.d(" drawPois: mapViw null or contemporary called, or activity null");
 			return false;

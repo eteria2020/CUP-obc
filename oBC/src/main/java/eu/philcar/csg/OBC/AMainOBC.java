@@ -638,7 +638,7 @@ public class AMainOBC extends ABase implements LocationListener {
 				break;
 
 			case ObcService.MSG_PING:
-				DLog.E(AMainOBC.class.getName() + ": MSG_PING");
+				DLog.D(AMainOBC.class.getName() + ": MSG_PING");
 				break;
 
 			case ObcService.MSG_IO_RFID:
