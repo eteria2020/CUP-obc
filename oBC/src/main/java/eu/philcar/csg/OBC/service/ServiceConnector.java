@@ -18,6 +18,7 @@ public class ServiceConnector {
 	private String name;
 	private Messenger localMessenger = null;
 	private Messenger serviceMessenger = null;
+	private int type;
 	
 	public ServiceConnector(Context ctx, Handler handler) {
 		this(ctx,handler,null);
@@ -46,10 +47,21 @@ public class ServiceConnector {
 		}
 	}
 	
-	
+
 	public void connect() {
 		if (context != null) {
 			context.bindService(new Intent(context,ObcService.class),mConnection,Context.BIND_AUTO_CREATE);
+			DLog.I("Requested service connection");
+		} else {
+			DLog.E("Requested service connection failed. Context null ");
+		}
+	}
+
+
+	public void connect(int type) {
+		if (context != null) {
+			context.bindService(new Intent(context,ObcService.class),mConnection,Context.BIND_AUTO_CREATE);
+			this.type=type;
 			DLog.I("Requested service connection");
 		} else {
 			DLog.E("Requested service connection failed. Context null ");
@@ -61,6 +73,7 @@ public class ServiceConnector {
 			try {
 				Message msg = Message.obtain(null, ObcService.MSG_CLIENT_UNREGISTER);
 				msg.replyTo = localMessenger;
+				msg.arg1=type;
 				serviceMessenger.send(msg);
 				DLog.I("Requested service unregistration");
 			} catch (RemoteException e) {
@@ -74,6 +87,12 @@ public class ServiceConnector {
 	public void disconnect() {
 		if (context != null) {
 			try {
+
+				Message msg = Message.obtain(null, ObcService.MSG_CLIENT_UNREGISTER);
+				msg.replyTo = localMessenger;
+				msg.arg1=type;
+				serviceMessenger.send(msg);
+
 				context.unbindService(mConnection);
 				DLog.I("Requested unbinding");
 			} catch (Exception e) {
@@ -115,7 +134,7 @@ public class ServiceConnector {
 				//Register client in service
 				Message msg =ObcService.obtainRegistrationMessage(ServiceConnector.this.name); 
 				msg.replyTo = localMessenger;
-				
+				msg.arg1=type;
 				serviceMessenger.send(msg);
 				
 				

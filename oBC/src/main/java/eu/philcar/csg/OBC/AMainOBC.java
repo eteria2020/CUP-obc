@@ -23,6 +23,7 @@ import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.db.Pois;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
+import eu.philcar.csg.OBC.helpers.Clients;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
@@ -222,7 +223,7 @@ public class AMainOBC extends ABase implements LocationListener {
 
 		App.setForegroundActivity(this);
 
-		serviceConnector.connect();
+		serviceConnector.connect(Clients.Main);
 
 		if (App.parkMode.isOn() && !App.motoreAvviato && App.getParkModeStarted() != null) {
 			pushFragment(FMenu.newInstance(), FMenu.class.getName(), false);

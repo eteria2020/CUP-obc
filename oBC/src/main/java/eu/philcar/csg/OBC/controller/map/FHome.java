@@ -42,6 +42,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -156,6 +157,7 @@ public class FHome extends FBase implements OnClickListener {
         ((Button) view.findViewById(R.id.fmapSOSB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapSearchB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapRadioB)).setOnClickListener(this);
+        ((Button) view.findViewById(R.id.fmapMusicB)).setOnClickListener(this);
         //((Button) view.findViewById(R.id.fmapFuelStationsB)).setOnClickListener(this); rimosso su richiesta mkt
         ((Button) view.findViewById(R.id.fmapCancelB)).setOnClickListener(this);
 
@@ -429,6 +431,18 @@ public class FHome extends FBase implements OnClickListener {
 
             case R.id.fmapNavigationB://Deprecated
 
+
+                break;
+
+            case R.id.fmapMusicB:
+
+
+                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_AUX,-1);
+
+                /*final Resources res = this.getResources();
+                final int id = Resources.getSystem().getIdentifier(
+                        "config_ntpServer", "string","android");
+                final String defaultServer = res.getString(id);*/
 
                 break;
             case R.id.fmapLeftBorderIV://Banner

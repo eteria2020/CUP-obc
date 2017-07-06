@@ -1,7 +1,13 @@
 package eu.philcar.csg.OBC.service;
 
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,6 +38,7 @@ import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Pois;
 import eu.philcar.csg.OBC.devices.Hik_io;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
+import eu.philcar.csg.OBC.helpers.Clients;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
@@ -181,7 +188,7 @@ public class ObcService extends Service {
 
     Messenger messenger = null;
 
-    private ArrayList<Messenger> clients = new ArrayList<Messenger>();
+    private ArrayList<Clients> clients = new ArrayList<Clients>();
 
     private boolean isStarted;
     private boolean isStopRequested = false;
@@ -660,27 +667,55 @@ public class ObcService extends Service {
 
         timeCheckScheduler.scheduleAtFixedRate(new Runnable() {
 
+            private int lastResponseCode;
 
             private  SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault());
             @Override
             public void run() {
+
+                long sharengoTime=0;
+                long fix =SystemClock.elapsedRealtime();
+                try {
+                    sharengoTime = Long.parseLong(doGet(App.URL_Time));
+                }catch (Exception e){
+                    dlog.e("Exception while retreiving sharengoTime",e);
+                }
+
+
                 Runtime rt = Runtime.getRuntime();
                 try {
-                    Date gps_time= new Date(carInfo.intGpsLocation.getTime()+ SystemClock.elapsedRealtime()-carInfo.intGpsLocation.getElapsedRealtimeNanos()/1000000);
-                    Date android_time= new Date(System.currentTimeMillis());
+                    Date sharengo_time=null;
+                    if(lastResponseCode==200) {
+                        sharengo_time = new Date(sharengoTime*1000 + SystemClock.elapsedRealtime() - fix);
+                    }
+                        Date gps_time = new Date(carInfo.intGpsLocation.getTime() + SystemClock.elapsedRealtime() - carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000);
+                        Date android_time = new Date(System.currentTimeMillis());
 
-                    if(carInfo.intGpsLocation.getTime()>1234567890000L) {
-                        if(android_time.getTime()<1234567890000L) {
+
+
+                    if(sharengo_time!=null && sharengo_time.getTime() > 1234567890000L){
+
+                        dlog.d("timeCheckScheduler: imposto ora Sharengo "+sharengo_time.toString()+ "ora android: "+android_time.toString());
+                        rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(sharengo_time) + ";\n"}); //
+                        rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
+
+                    }else if(carInfo.intGpsLocation.getTime()>1234567890000L) {
+                        //if(android_time.getTime()<1234567890000L) {
                             dlog.d("timeCheckScheduler: imposto ora gps "+gps_time.toString()+ "ora android: "+android_time.toString());
                             rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(gps_time) + ";\n"}); //
-                        }
+                            rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
+                        //}
 
                     }
-                    dlog.d("timeCheckScheduler: rawGpsTime: "+ new Date(carInfo.intGpsLocation.getTime()).toString() +" elapsed: "+(System.currentTimeMillis()-(carInfo.intGpsLocation.getElapsedRealtimeNanos()/1000000))+" android time: "+android_time.toString()+" full gps time: "+gps_time.toString());
+                    else
+                        rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 1"}); //date -s 20120423.130000*/
+                    dlog.d("timeCheckScheduler: rawGpsTime: " + new Date(carInfo.intGpsLocation.getTime()).toString() + " elapsed: " + (System.currentTimeMillis() - (carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000)) + " android time: " + android_time.toString() + " fixed gps time: " + gps_time.toString() +" Sharengo time: "+(sharengo_time!=null?sharengo_time.toString():" response code "+lastResponseCode));
 
-                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time_zone 0"}); //date -s 20120423.130000
+                    rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time_zone 0"}); //date -s 20120423.130000
                     AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                     am.setTimeZone(App.timeZone);
+
+
 
 
                 } catch (Exception e) {
@@ -688,7 +723,74 @@ public class ObcService extends Service {
                 }
             }
 
-        }, 3, 20, TimeUnit.MINUTES);
+            public String doGet(String url) throws Exception {
+                String result = "";
+                HttpURLConnection urlConnection = null;
+                try {
+                    URL requestedUrl = new URL(url);
+                    urlConnection = (HttpURLConnection) requestedUrl.openConnection();
+
+
+
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.setRequestProperty("Accept", "application/json");
+                    urlConnection.setRequestProperty("Content-Type", "application/json");
+                    urlConnection.setConnectTimeout(5000);
+                    urlConnection.setDefaultUseCaches(false);
+                    urlConnection.setUseCaches(false);
+                    urlConnection.setAllowUserInteraction(false);
+
+
+                    urlConnection.setReadTimeout(5000);
+                    urlConnection.setDoInput(true);
+                    lastResponseCode = urlConnection.getResponseCode();
+                    if (lastResponseCode > 300) {
+                        result = urlConnection.getResponseCode() + " -> " + readFully(urlConnection.getErrorStream());
+                    } else {
+                        result = readFully(urlConnection.getInputStream());
+                    }
+                    //result = urlConnection.getResponseCode() + " -> " + IOUtil.readFully(urlConnection.getErrorStream());
+                } catch (Exception ex) {
+                    dlog.e("Exception inside APIdoGet",ex);
+                    result = "QUI: " + ex.toString();
+                } finally {
+                    if (urlConnection != null) {
+                        urlConnection.disconnect();
+                    }
+                }
+                return result;
+            }
+
+            private  String readFully(InputStream inputStream) throws IOException {
+
+                if (inputStream == null) {
+                    return "";
+                }
+
+                BufferedInputStream bufferedInputStream = null;
+                ByteArrayOutputStream byteArrayOutputStream = null;
+
+                try {
+                    bufferedInputStream = new BufferedInputStream(inputStream);
+                    byteArrayOutputStream = new ByteArrayOutputStream();
+
+                    final byte[] buffer = new byte[1024];
+                    int available = 0;
+
+                    while ((available = bufferedInputStream.read(buffer)) >= 0) {
+                        byteArrayOutputStream.write(buffer, 0, available);
+                    }
+
+                    return byteArrayOutputStream.toString();
+
+                } finally {
+                    if (bufferedInputStream != null) {
+                        bufferedInputStream.close();
+                    }
+                }
+            }
+
+        }, 1, 720, TimeUnit.MINUTES);
 
 
         //Register receiver for battery data
@@ -711,7 +813,7 @@ public class ObcService extends Service {
         }
 
         //Request an NTP resync
-        SystemControl.ResycNTP();
+        //SystemControl.ResycNTP();
 
 
         dlog.d("Service created");
@@ -873,7 +975,7 @@ public class ObcService extends Service {
 
     private void sendAll(Message msg) {
 
-
+        Message myMsg;
         if (msg == null) {
             dlog.e("sendAll, Message==null");
             return;
@@ -886,7 +988,12 @@ public class ObcService extends Service {
 
         try {
             if (clients.size() > 0)
-                clients.get(clients.size() - 1).send(msg);
+                for(Clients cliente:clients){
+                  myMsg=Message.obtain();
+                    myMsg.copyFrom(msg);
+                    cliente.getClient().send(myMsg);
+                }
+                //clients.get(clients.size() - 1).getClient().send(msg);
             else {
                 if (!_pendingUiCheck) {
                     _pendingUiCheck = true;
@@ -1825,7 +1932,7 @@ public class ObcService extends Service {
                 Events.Reboot("Scheduled reboot");
                 SystemControl.doReboot();
             }
-            SystemControl.ResycNTP();
+            //SystemControl.ResycNTP();
 
             if (gpsStatus != null) {
                 dlog.d("GPS: tff = " + gpsStatus.getTimeToFirstFix());
@@ -1944,7 +2051,7 @@ public class ObcService extends Service {
                 case MSG_CLIENT_REGISTER:
                     DLog.I("Received client registration");
                     if (msg.replyTo != null) {
-                        clients.add(msg.replyTo);
+                        clients.add(new Clients(msg.arg1, msg.replyTo));
                         try {
                             msg.replyTo.send(Message.obtain(null, MSG_CLIENT_REGISTER));
 
@@ -1972,7 +2079,7 @@ public class ObcService extends Service {
                         } catch (RemoteException e) {
                             DLog.E("Error sending to client", e);
                         }
-                        clients.remove(msg.replyTo);
+                        clients.remove(new Clients(msg.arg1,msg.replyTo));
 
                         if (clients.size() == 0 && !_pendingUiCheck) {
                             _pendingUiCheck = true;

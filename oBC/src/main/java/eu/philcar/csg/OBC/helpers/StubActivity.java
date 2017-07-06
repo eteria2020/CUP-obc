@@ -26,8 +26,8 @@ public class StubActivity extends Activity {
 	    if (Debug.ON || App.Instance.isConfigMode()) { 	    
 	    	startActivity(new Intent(this, ServiceTestActivity.class));
 	    } else {
-			DLog.D("AWelcome onCreate");
-	    	startActivity(new Intent(this,  AWelcome.class));
+			DLog.D("AWelcome onCreate Stub");
+	    	//startActivity(new Intent(this,  AWelcome.class));
 	    }
 	    	
 	    		

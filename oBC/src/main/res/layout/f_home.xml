@@ -259,7 +259,7 @@ android:visibility="visible" />
             android:layout_marginTop="55dp">
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/fmapMusicB"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
                 android:layout_alignBottom="@+id/fmapSearchB"

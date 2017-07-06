@@ -248,6 +248,7 @@ public class App extends Application {
 			URL_AdsBuilderCar = "http://manage.sharengo.it/banner2_offline.php";
 			URL_AdsBuilderStart = "http://manage.sharengo.it/banner4_offline.php";
 			URL_AdsBuilderEnd = "http://manage.sharengo.it/banner5_offline.php";
+			URL_Time = "http://corestage.sharengo.it/api/get_date.php";
 			IP_UDP_Beacon = "185.81.1.24";
 			Port_UDP_Beacon = 7600;
 		}
@@ -274,6 +275,7 @@ public class App extends Application {
 			URL_AdsBuilderCar = "http://manage.sharengo.it/banner2_offline.php";
 			URL_AdsBuilderStart = "http://manage.sharengo.it/banner4_offline.php";
 			URL_AdsBuilderEnd = "http://manage.sharengo.it/banner5_offline.php";
+			URL_Time = "http://core.sharengo.it/api/get_date.php";
 			IP_UDP_Beacon = "185.58.119.117";
 
 
@@ -343,6 +345,7 @@ public class App extends Application {
 	public static String URL_UpdateStartImages;
 	public static String URL_UpdateEndImages;
 	public static String URL_Configs;
+	public static String URL_Time;
 	
 	public static String IP_UDP_Beacon;
 	public static int    Port_UDP_Beacon;
@@ -1905,6 +1908,15 @@ private void  initPhase2() {
 	public static boolean isForegroundActivity(Activity activity) {
 		
 		if (foregroundActivity!=null && foregroundActivity.equals(activity.getClass().getName())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public static boolean isForegroundActivity(String activity) {
+
+		if (foregroundActivity!=null && foregroundActivity.equals(activity)) {
 			return true;
 		} else {
 			return false;

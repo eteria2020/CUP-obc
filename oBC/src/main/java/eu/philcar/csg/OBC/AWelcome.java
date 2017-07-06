@@ -2,7 +2,9 @@ package eu.philcar.csg.OBC;
 
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
 import eu.philcar.csg.OBC.controller.welcome.FWelcome;
+import eu.philcar.csg.OBC.helpers.Clients;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.service.MessageFactory;
 import eu.philcar.csg.OBC.service.ObcService;
@@ -104,7 +106,7 @@ public class AWelcome extends ABase {
 		App.setForegroundActivity(this);
 
 		if (!serviceConnector.isConnected())
-			serviceConnector.connect();
+			serviceConnector.connect(Clients.Welcome);
 		
 	}
 
@@ -117,9 +119,9 @@ public class AWelcome extends ABase {
 		 @Override
 		 public void handleMessage(Message msg) {
 			
-			 if (! App.isForegroundActivity(AWelcome.this)) {
+			 if (! App.isForegroundActivity(AWelcome.this)&& ! App.isForegroundActivity(ServiceTestActivity.class.getName())) {
 				 DLog.W(AWelcome.class.getName() + " MSG to non foreground activity. finish Activity");
-				 AWelcome.this.finish();
+				 //AWelcome.this.finish();
 				 return;
 			 }
 			 

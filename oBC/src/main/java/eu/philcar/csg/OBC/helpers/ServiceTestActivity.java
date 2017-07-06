@@ -332,7 +332,7 @@ public class ServiceTestActivity extends Activity {
 
 		//serviceConnector.startService();
 
-		serviceConnector.connect();
+		serviceConnector.connect(Clients.ServiceTest);
 
 
 		etPlate = (EditText) findViewById(R.id.etPlate);

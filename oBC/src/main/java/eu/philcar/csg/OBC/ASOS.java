@@ -2,6 +2,7 @@ package eu.philcar.csg.OBC;
 
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.sos.FSOS;
+import eu.philcar.csg.OBC.helpers.Clients;
 import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.ServiceConnector;
 import android.app.FragmentTransaction;
@@ -47,7 +48,7 @@ public class ASOS extends ABase {
 		
 		App.setForegroundActivity(this);
 		
-		serviceConnector.connect();
+		serviceConnector.connect(Clients.SOS);
 	}
 	
 	public void sendMessage(Message msg) {

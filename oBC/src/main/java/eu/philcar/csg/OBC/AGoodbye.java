@@ -7,6 +7,7 @@ import eu.philcar.csg.OBC.controller.welcome.FDamages;
 import eu.philcar.csg.OBC.controller.welcome.FDamagesNew;
 import eu.philcar.csg.OBC.controller.welcome.FGoodbye;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
+import eu.philcar.csg.OBC.helpers.Clients;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.StubActivity;
 import eu.philcar.csg.OBC.service.MessageFactory;
@@ -61,7 +62,7 @@ public class AGoodbye extends ABase {
 		super.onResume();
 		App.setForegroundActivity(this);
 		if (!serviceConnector.isConnected())
-			serviceConnector.connect();
+			serviceConnector.connect(Clients.Goodbye);
 		
 	}
 		
@@ -98,7 +99,13 @@ public class AGoodbye extends ABase {
 
 			 if(! App.isForegroundActivity(AGoodbye.this)) {
 				 DLog.W(AGoodbye.class.getName() + " MSG to non foreground activity. ignoring");
-				 //AGoodbye.this.finish();
+				 if(App.currentTripInfo==null) {
+					 DLog.W(AGoodbye.class.getName() + " no trip found wrong foreground activity restarting AWelcome");
+					 Intent i = new Intent(AGoodbye.this, AWelcome.class);
+					 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					 startActivity(i);
+					 AGoodbye.this.finish();
+				 }
 				 return;
 			 }
 			 if(App.currentTripInfo==null){
