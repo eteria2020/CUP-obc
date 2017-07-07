@@ -321,6 +321,8 @@ public class App extends Application {
 	public static final int AFAQ_UID	 = 0x0011;
 
 	public static final boolean USE_TTS_ALERT=false;
+
+	public static final int ConnectionTimeout=61000;
 	
 	
 	public static String URL_Area;

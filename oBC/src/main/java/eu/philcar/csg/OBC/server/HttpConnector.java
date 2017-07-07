@@ -238,9 +238,9 @@ public class HttpConnector {
 	     public String DownloadJson(String url, int method, List<NameValuePair> paramsList ) {
 	 		
 	        final HttpParams httpParams = new BasicHttpParams();
-	 	    HttpConnectionParams.setConnectionTimeout(httpParams, 30000);
+	 	    HttpConnectionParams.setConnectionTimeout(httpParams, App.ConnectionTimeout);
 	 	    HttpConnectionParams.setStaleCheckingEnabled(httpParams, true);
-	 	    HttpConnectionParams.setSoTimeout(httpParams, 20000);
+	 	    HttpConnectionParams.setSoTimeout(httpParams, App.ConnectionTimeout);
 	 	    StringBuilder logtxt=null;
 	 		DefaultHttpClient  httpclient = new DefaultHttpClient(httpParams);
 	 		

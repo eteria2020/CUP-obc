@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.acra.ACRA;
@@ -166,6 +167,7 @@ public class ObcService extends Service {
 
     public static final int MSG_AUDIO_CHANNEL = 80;
     public static final int MSG_NAVIGATE_TO = 81;
+    public static final int MSG_UPDATE_TIME = 82;
 
 
     public static final int MSG_DEBUG_CARD = 90;
@@ -216,6 +218,135 @@ public class ObcService extends Service {
     ScheduledExecutorService virtualBMSUpdateScheduler;
     ScheduledExecutorService gpsCheckScheduler;
     ScheduledExecutorService timeCheckScheduler;
+    ScheduledFuture timeCheckFuture;
+
+
+    Runnable timeCheckRunnable = new Runnable() {
+
+        private int lastResponseCode;
+
+        private  SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault());
+        @Override
+        public void run() {
+
+            long sharengoTime=0;
+            long fix =SystemClock.elapsedRealtime();
+            try {
+                sharengoTime = Long.parseLong(doGet(App.URL_Time));
+            }catch (Exception e){
+                dlog.e("Exception while retreiving sharengoTime",e);
+            }
+
+
+            Runtime rt = Runtime.getRuntime();
+            try {
+                Date sharengo_time=null;
+                if(lastResponseCode==200) {
+                    sharengo_time = new Date(sharengoTime*1000 + SystemClock.elapsedRealtime() - fix);
+                }
+                Date gps_time = new Date(carInfo.intGpsLocation.getTime() + SystemClock.elapsedRealtime() - carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000);
+                Date android_time = new Date(System.currentTimeMillis());
+
+
+
+                if(sharengo_time!=null && sharengo_time.getTime() > 1234567890000L){
+
+                    dlog.d("timeCheckScheduler: imposto ora Sharengo "+sharengo_time.toString()+ "ora android: "+android_time.toString());
+                    rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(sharengo_time) + ";\n"}); //
+                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
+
+                }else if(carInfo.intGpsLocation.getTime()>1234567890000L) {
+                    //if(android_time.getTime()<1234567890000L) {
+                    dlog.d("timeCheckScheduler: imposto ora gps "+gps_time.toString()+ "ora android: "+android_time.toString());
+                    rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(gps_time) + ";\n"}); //
+                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
+                    //}
+
+                }
+                else
+                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 1"}); //date -s 20120423.130000*/
+                dlog.d("timeCheckScheduler: rawGpsTime: " + new Date(carInfo.intGpsLocation.getTime()).toString() + " elapsed: " + (System.currentTimeMillis() - (carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000)) + " android time: " + android_time.toString() + " fixed gps time: " + gps_time.toString() +" Sharengo time: "+(sharengo_time!=null?sharengo_time.toString():" response code "+lastResponseCode));
+
+                rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time_zone 0"}); //date -s 20120423.130000
+                AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                am.setTimeZone(App.timeZone);
+
+
+
+
+            } catch (Exception e) {
+                dlog.e("timeCheckScheduler error", e);
+            }
+        }
+
+        public String doGet(String url) throws Exception {
+            String result = "";
+            HttpURLConnection urlConnection = null;
+            try {
+                URL requestedUrl = new URL(url);
+                urlConnection = (HttpURLConnection) requestedUrl.openConnection();
+
+
+
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setRequestProperty("Accept", "application/json");
+                urlConnection.setRequestProperty("Content-Type", "application/json");
+                urlConnection.setConnectTimeout(5000);
+                urlConnection.setDefaultUseCaches(false);
+                urlConnection.setUseCaches(false);
+                urlConnection.setAllowUserInteraction(false);
+
+
+                urlConnection.setReadTimeout(5000);
+                urlConnection.setDoInput(true);
+                lastResponseCode = urlConnection.getResponseCode();
+                if (lastResponseCode > 300) {
+                    result = urlConnection.getResponseCode() + " -> " + readFully(urlConnection.getErrorStream());
+                } else {
+                    result = readFully(urlConnection.getInputStream());
+                }
+                //result = urlConnection.getResponseCode() + " -> " + IOUtil.readFully(urlConnection.getErrorStream());
+            } catch (Exception ex) {
+                dlog.e("Exception inside APIdoGet",ex);
+                result = "QUI: " + ex.toString();
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+            }
+            return result;
+        }
+
+        private  String readFully(InputStream inputStream) throws IOException {
+
+            if (inputStream == null) {
+                return "";
+            }
+
+            BufferedInputStream bufferedInputStream = null;
+            ByteArrayOutputStream byteArrayOutputStream = null;
+
+            try {
+                bufferedInputStream = new BufferedInputStream(inputStream);
+                byteArrayOutputStream = new ByteArrayOutputStream();
+
+                final byte[] buffer = new byte[1024];
+                int available = 0;
+
+                while ((available = bufferedInputStream.read(buffer)) >= 0) {
+                    byteArrayOutputStream.write(buffer, 0, available);
+                }
+
+                return byteArrayOutputStream.toString();
+
+            } finally {
+                if (bufferedInputStream != null) {
+                    bufferedInputStream.close();
+                }
+            }
+        }
+
+    };
 
 
     private LocationManager locationManager;
@@ -665,132 +796,7 @@ public class ObcService extends Service {
         }, 40, 300, TimeUnit.SECONDS);
 
 
-        timeCheckScheduler.scheduleAtFixedRate(new Runnable() {
-
-            private int lastResponseCode;
-
-            private  SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault());
-            @Override
-            public void run() {
-
-                long sharengoTime=0;
-                long fix =SystemClock.elapsedRealtime();
-                try {
-                    sharengoTime = Long.parseLong(doGet(App.URL_Time));
-                }catch (Exception e){
-                    dlog.e("Exception while retreiving sharengoTime",e);
-                }
-
-
-                Runtime rt = Runtime.getRuntime();
-                try {
-                    Date sharengo_time=null;
-                    if(lastResponseCode==200) {
-                        sharengo_time = new Date(sharengoTime*1000 + SystemClock.elapsedRealtime() - fix);
-                    }
-                        Date gps_time = new Date(carInfo.intGpsLocation.getTime() + SystemClock.elapsedRealtime() - carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000);
-                        Date android_time = new Date(System.currentTimeMillis());
-
-
-
-                    if(sharengo_time!=null && sharengo_time.getTime() > 1234567890000L){
-
-                        dlog.d("timeCheckScheduler: imposto ora Sharengo "+sharengo_time.toString()+ "ora android: "+android_time.toString());
-                        rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(sharengo_time) + ";\n"}); //
-                        rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
-
-                    }else if(carInfo.intGpsLocation.getTime()>1234567890000L) {
-                        //if(android_time.getTime()<1234567890000L) {
-                            dlog.d("timeCheckScheduler: imposto ora gps "+gps_time.toString()+ "ora android: "+android_time.toString());
-                            rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(gps_time) + ";\n"}); //
-                            rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
-                        //}
-
-                    }
-                    else
-                        rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 1"}); //date -s 20120423.130000*/
-                    dlog.d("timeCheckScheduler: rawGpsTime: " + new Date(carInfo.intGpsLocation.getTime()).toString() + " elapsed: " + (System.currentTimeMillis() - (carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000)) + " android time: " + android_time.toString() + " fixed gps time: " + gps_time.toString() +" Sharengo time: "+(sharengo_time!=null?sharengo_time.toString():" response code "+lastResponseCode));
-
-                    rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time_zone 0"}); //date -s 20120423.130000
-                    AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                    am.setTimeZone(App.timeZone);
-
-
-
-
-                } catch (Exception e) {
-                    dlog.e("timeCheckScheduler error", e);
-                }
-            }
-
-            public String doGet(String url) throws Exception {
-                String result = "";
-                HttpURLConnection urlConnection = null;
-                try {
-                    URL requestedUrl = new URL(url);
-                    urlConnection = (HttpURLConnection) requestedUrl.openConnection();
-
-
-
-                    urlConnection.setRequestMethod("GET");
-                    urlConnection.setRequestProperty("Accept", "application/json");
-                    urlConnection.setRequestProperty("Content-Type", "application/json");
-                    urlConnection.setConnectTimeout(5000);
-                    urlConnection.setDefaultUseCaches(false);
-                    urlConnection.setUseCaches(false);
-                    urlConnection.setAllowUserInteraction(false);
-
-
-                    urlConnection.setReadTimeout(5000);
-                    urlConnection.setDoInput(true);
-                    lastResponseCode = urlConnection.getResponseCode();
-                    if (lastResponseCode > 300) {
-                        result = urlConnection.getResponseCode() + " -> " + readFully(urlConnection.getErrorStream());
-                    } else {
-                        result = readFully(urlConnection.getInputStream());
-                    }
-                    //result = urlConnection.getResponseCode() + " -> " + IOUtil.readFully(urlConnection.getErrorStream());
-                } catch (Exception ex) {
-                    dlog.e("Exception inside APIdoGet",ex);
-                    result = "QUI: " + ex.toString();
-                } finally {
-                    if (urlConnection != null) {
-                        urlConnection.disconnect();
-                    }
-                }
-                return result;
-            }
-
-            private  String readFully(InputStream inputStream) throws IOException {
-
-                if (inputStream == null) {
-                    return "";
-                }
-
-                BufferedInputStream bufferedInputStream = null;
-                ByteArrayOutputStream byteArrayOutputStream = null;
-
-                try {
-                    bufferedInputStream = new BufferedInputStream(inputStream);
-                    byteArrayOutputStream = new ByteArrayOutputStream();
-
-                    final byte[] buffer = new byte[1024];
-                    int available = 0;
-
-                    while ((available = bufferedInputStream.read(buffer)) >= 0) {
-                        byteArrayOutputStream.write(buffer, 0, available);
-                    }
-
-                    return byteArrayOutputStream.toString();
-
-                } finally {
-                    if (bufferedInputStream != null) {
-                        bufferedInputStream.close();
-                    }
-                }
-            }
-
-        }, 1, 720, TimeUnit.MINUTES);
+        timeCheckFuture = timeCheckScheduler.scheduleAtFixedRate(timeCheckRunnable, 1, 720, TimeUnit.MINUTES);
 
 
         //Register receiver for battery data
@@ -2326,14 +2332,14 @@ public class ObcService extends Service {
                     int vol = msg.arg1;
                     obc_io.SetRadioVolume(vol);
 
-                    try {
+                    /*try {
                         if (msg.arg1 == 0) {
                             AudioPlayer.lastAudioState = msg.arg1;
                             ProTTS.lastAudioState = msg.arg1;
                         }
                     } catch (Exception e) {
 
-                    }
+                    }*/
                     break;
 
                 case MSG_RADIO_SET_SEEK:
@@ -2424,6 +2430,12 @@ public class ObcService extends Service {
                     //Fan-out message
 
                     notifyCard((String) msg.obj, "OPEN", false);
+                    break;
+
+                case MSG_UPDATE_TIME:
+                    //Fan-out message
+
+                    timeCheckScheduler.schedule(timeCheckRunnable,0,TimeUnit.SECONDS);
                     break;
 
 
@@ -2533,6 +2545,8 @@ public class ObcService extends Service {
 
 
    }
+
+
 
 
 

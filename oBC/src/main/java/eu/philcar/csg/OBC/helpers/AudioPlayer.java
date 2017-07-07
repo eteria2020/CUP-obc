@@ -89,8 +89,10 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
                 try {
                     queue++;
                     while (isBusy) {
-                        if (playing.compareTo(uri) == 0)
+                        if (playing.compareTo(uri) == 0) {
+                            queue--;
                             return;
+                        }
                         Thread.sleep(2000);
                         tries++;
                         if (tries > 15) {

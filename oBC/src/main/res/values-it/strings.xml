@@ -234,5 +234,6 @@
     <string name="alert_area">Attenzione, veicolo fuori dall\'area  di servizio, non sarà possibile chiudere la corsa</string>
     <string name="alert_key">ricorda di spegnere il quadro girando la chiave prima di uscire dall\'auto</string>
     <string name="alert_bonus_park">Da questo momento puoi guadagnare 5 minuti bonus lasciando l’auto da ricaricare in uno dei parcheggi indicati sul navigatore</string>
+    <string name="music_hint">Collega il cavo AUX per ascoltare la musica dal tuo cellulare</string>
 
 </resources>

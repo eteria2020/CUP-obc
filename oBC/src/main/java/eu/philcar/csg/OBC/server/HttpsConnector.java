@@ -256,8 +256,8 @@ public class HttpsConnector {
 	    	 
 	    	 clientBuilder.sslSocketFactory(SslConnection.getSSLContext().getSocketFactory());
 	    	 clientBuilder.authenticator(getAuthenticator());
-	    	 clientBuilder.connectTimeout(15, TimeUnit.SECONDS);
-	    	 clientBuilder.readTimeout(15, TimeUnit.SECONDS);
+	    	 clientBuilder.connectTimeout(App.ConnectionTimeout, TimeUnit.MILLISECONDS);
+	    	 clientBuilder.readTimeout(App.ConnectionTimeout, TimeUnit.MILLISECONDS);
 	    	 OkHttpClient client = clientBuilder.build();
 	    	 
 	    	 HttpUrl url = buildQuery(urlstr,method, paramsList);

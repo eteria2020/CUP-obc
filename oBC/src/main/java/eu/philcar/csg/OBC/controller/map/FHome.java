@@ -61,6 +61,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 @SuppressLint("SimpleDateFormat")
 public class FHome extends FBase implements OnClickListener {
@@ -437,7 +438,8 @@ public class FHome extends FBase implements OnClickListener {
             case R.id.fmapMusicB:
 
 
-                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_AUX,-1);
+                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_AUX,30);
+                Toast.makeText(App.Instance.getApplicationContext(),getResources().getString(R.string.music_hint),Toast.LENGTH_LONG).show();
 
                 /*final Resources res = this.getResources();
                 final int id = Resources.getSystem().getIdentifier(
