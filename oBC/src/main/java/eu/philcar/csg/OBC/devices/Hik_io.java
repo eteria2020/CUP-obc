@@ -1054,7 +1054,7 @@ public class Hik_io implements LowLevelInterface {
 	            Bundle b = new Bundle();
 	            b.putInt("MotT",motorTemp);
 	            obcService.notifyCarInfo(b);
-	            dlog.i("onMotorTempValueChange(motorTemp):" + motorTemp );
+	            //dlog.i("onMotorTempValueChange(motorTemp):" + motorTemp );
 	        }
 
 	        @Override

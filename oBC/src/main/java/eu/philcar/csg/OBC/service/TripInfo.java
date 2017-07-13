@@ -267,8 +267,7 @@ public class TripInfo {
                 } else
                     obc_io.setLcd(null,"Errore sistema");
 
-                TripsConnector cc = new TripsConnector();
-                cc.tripInfo = this;
+                TripsConnector cc = new TripsConnector(this);
 
                 http = new HttpConnector(service);
                 http.Execute(cc);
@@ -389,8 +388,7 @@ public class TripInfo {
                         Events.eventRfid(2, code);
                         CloseTrip(carInfo);
 
-                        TripsConnector cc = new TripsConnector();
-                        cc.tripInfo = this;
+                        TripsConnector cc = new TripsConnector(this);
 
                         http = new HttpConnector(service);
                         http.SetHandler(service.getPrivateHandler());
@@ -873,9 +871,9 @@ public class TripInfo {
                 CloseCorsa(carInfo);
 
                 //.... inva la corsa incapsulandola in un oggeto tripinfo separato per evitare modifiche
-                TripsConnector cc = new TripsConnector();
-                cc.tripInfo =  new TripInfo();
-                cc.tripInfo.trip = trip;
+                TripInfo tripInfo =  new TripInfo();
+                tripInfo.trip = trip;
+                TripsConnector cc = new TripsConnector(tripInfo);
 
                 HttpConnector http = new HttpConnector(App.Instance);
                 http.SetHandler(service.getPrivateHandler());

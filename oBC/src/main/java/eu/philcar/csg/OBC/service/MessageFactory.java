@@ -285,6 +285,11 @@ public class MessageFactory {
 		msg.obj = hex;
 		return msg;
 	}
+
+	public static Message sendTimeCheck () {
+		Message msg = Message.obtain(null,ObcService.MSG_CHECK_TIME);
+		return msg;
+	}
 		
 	
 }

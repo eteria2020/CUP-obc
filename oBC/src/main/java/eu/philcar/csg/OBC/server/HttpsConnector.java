@@ -266,8 +266,11 @@ public class HttpsConnector {
 	    	 Builder builder = new Request.Builder();
 	    	 
 	    	 builder.url(url);
+			 dlog.d("HTTPS URL :" + url );
 	    	 if (method==METHOD_POST) {
 	    		 addPostBody(builder,paramsList);
+
+				 //dlog.d("HTTP post params :" + url + paramsList.toString());
 	    	 } 	    	 
 	    	 // Add pre-authorization
 	    	 String credential = Credentials.basic(App.CarPlate, App.CarPlate);

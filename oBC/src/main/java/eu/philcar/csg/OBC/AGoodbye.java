@@ -101,9 +101,11 @@ public class AGoodbye extends ABase {
 				 DLog.W(AGoodbye.class.getName() + " MSG to non foreground activity. ignoring");
 				 if(App.currentTripInfo==null) {
 					 DLog.W(AGoodbye.class.getName() + " no trip found wrong foreground activity restarting AWelcome");
-					 Intent i = new Intent(AGoodbye.this, AWelcome.class);
-					 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					 startActivity(i);
+					 if( !App.isForegroundActivity(AWelcome.class.getName()) ) {
+						 Intent i = new Intent(AGoodbye.this, AWelcome.class);
+						 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						 startActivity(i);
+					 }
 					 AGoodbye.this.finish();
 				 }
 				 return;

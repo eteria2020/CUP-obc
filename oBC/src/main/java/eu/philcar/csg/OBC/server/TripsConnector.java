@@ -24,12 +24,16 @@ import eu.philcar.csg.OBC.service.TripInfo;
 public class TripsConnector implements RemoteEntityInterface {
 
 	private DLog dlog = new DLog(this.getClass());
-	
 
-	
+
 	private static boolean busy;
 
-	public TripInfo tripInfo;
+	public final TripInfo tripInfo;
+
+
+	public TripsConnector(TripInfo tripInfo) {
+		this.tripInfo = tripInfo;
+	}
 
 	public int MsgId() {
 		if (tripInfo!=null && tripInfo.trip!=null && tripInfo.trip.offline)
@@ -69,7 +73,7 @@ public class TripsConnector implements RemoteEntityInterface {
 
 		try {
 			if (!corsa.begin_sent) {
-				dlog.d("GetParams, sending apertura");
+				dlog.d("GetParams, sending apertura tripInfo:"+tripInfo.toString());
 				list.add(new BasicNameValuePair("cmd", "1"));
 	
 				list.add(new BasicNameValuePair("id_veicolo", corsa.plate + ""));
@@ -89,7 +93,7 @@ public class TripsConnector implements RemoteEntityInterface {
 				if (corsa.id_parent!=0) list.add(new BasicNameValuePair("id_parent", corsa.id_parent+""));
 			} else if (!corsa.end_sent && corsa.end_timestamp>0) {
 				
-				dlog.d("GetParams, sending chiusura");
+				dlog.d("GetParams, sending chiusura tripInfo:"+tripInfo.toString());
 				list.add(new BasicNameValuePair("cmd", "2"));
 				list.add(new BasicNameValuePair("id", corsa.remote_id + ""));
 				list.add(new BasicNameValuePair("id_veicolo", corsa.plate + ""));

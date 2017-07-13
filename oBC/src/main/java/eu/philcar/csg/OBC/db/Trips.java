@@ -174,9 +174,9 @@ public class Trips extends DbTable<Trip,Integer> {
 			c.offline=true;
 			TripInfo t = new TripInfo();
 			t.trip = c;
-			TripsConnector cc = new TripsConnector();
-			cc.tripInfo =  new TripInfo();
-			cc.tripInfo.trip = c;
+			TripInfo tripInfo =  new TripInfo();
+			tripInfo.trip = c;
+			TripsConnector cc = new TripsConnector(tripInfo);
 			http = new HttpConnector(context);
 			http.SetHandler(handler);
 			http.Execute(cc);

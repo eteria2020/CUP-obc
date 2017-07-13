@@ -167,7 +167,7 @@ public class ObcService extends Service {
 
     public static final int MSG_AUDIO_CHANNEL = 80;
     public static final int MSG_NAVIGATE_TO = 81;
-    public static final int MSG_UPDATE_TIME = 82;
+    public static final int MSG_CHECK_TIME = 82;
 
 
     public static final int MSG_DEBUG_CARD = 90;
@@ -235,6 +235,7 @@ public class ObcService extends Service {
                 sharengoTime = Long.parseLong(doGet(App.URL_Time));
             }catch (Exception e){
                 dlog.e("Exception while retreiving sharengoTime",e);
+                lastResponseCode=0;
             }
 
 
@@ -291,13 +292,13 @@ public class ObcService extends Service {
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setRequestProperty("Accept", "application/json");
                 urlConnection.setRequestProperty("Content-Type", "application/json");
-                urlConnection.setConnectTimeout(5000);
+                urlConnection.setConnectTimeout(60000);
                 urlConnection.setDefaultUseCaches(false);
                 urlConnection.setUseCaches(false);
                 urlConnection.setAllowUserInteraction(false);
 
 
-                urlConnection.setReadTimeout(5000);
+                urlConnection.setReadTimeout(60000);
                 urlConnection.setDoInput(true);
                 lastResponseCode = urlConnection.getResponseCode();
                 if (lastResponseCode > 300) {
@@ -308,7 +309,8 @@ public class ObcService extends Service {
                 //result = urlConnection.getResponseCode() + " -> " + IOUtil.readFully(urlConnection.getErrorStream());
             } catch (Exception ex) {
                 dlog.e("Exception inside APIdoGet",ex);
-                result = "QUI: " + ex.toString();
+                lastResponseCode=0;
+                result = "0";
             } finally {
                 if (urlConnection != null) {
                     urlConnection.disconnect();
@@ -908,6 +910,10 @@ public class ObcService extends Service {
             //Dequeue eventual offline trip or events
             privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
             privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
+
+
+            //Force time check for best time
+            localHandler.sendMessage(MessageFactory.sendTimeCheck());
 
             sendBeacon();
 
@@ -1909,6 +1915,7 @@ public class ObcService extends Service {
 
     private final BroadcastReceiver AlarmReceiver = new BroadcastReceiver() {
 
+        int configScheduler=0;
         @Override
         public void onReceive(Context c, Intent i) {
 
@@ -1919,6 +1926,10 @@ public class ObcService extends Service {
             App.Instance.dbManager.getPoisDao().startDownload(ObcService.this, localHandler);
             App.Instance.startAreaPolygonDownload(ObcService.this, null);
             startDownloadReservations();
+            if(configScheduler++>5) {
+                configScheduler=0;
+                startDownloadConfigs();
+            }
 
             //Dequeue eventual offline trip or events
             privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
@@ -2432,7 +2443,7 @@ public class ObcService extends Service {
                     notifyCard((String) msg.obj, "OPEN", false);
                     break;
 
-                case MSG_UPDATE_TIME:
+                case MSG_CHECK_TIME:
                     //Fan-out message
 
                     timeCheckScheduler.schedule(timeCheckRunnable,0,TimeUnit.SECONDS);
