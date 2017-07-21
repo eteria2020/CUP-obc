@@ -256,6 +256,7 @@ public class App extends Application {
 			URL_Area = "http://core.sharengo.it/api/zone/json.php?";
 			URL_Beacon = "http://api.sharengo.it/api/pushbeacon.php?";
 			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
+
 			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
 			URL_Clienti = "https://api.sharengo.it:8123/whitelist";
 			URL_Commands = "http://core.sharengo.it/api/get_commands.php?";

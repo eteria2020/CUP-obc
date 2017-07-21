@@ -45,6 +45,8 @@ import com.Hik.Mercury.SDK.Manager.RadioManager;
 import com.Hik.Mercury.SDK.Manager.VersionManager;
 import com.Hik.Mercury.SDK.Radio.RadioInfo;
 import com.Hik.Mercury.SDK.Radio.RadioObserver;
+import com.Hik.Mercury.SDK.bluetooth.BTManager;
+import com.Hik.Mercury.SDK.bluetooth.BluetoothStateCallback;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.SystemControl;
@@ -85,6 +87,7 @@ public class Hik_io implements LowLevelInterface {
 	
 	
 	private CANManager mCANManager;
+	private BTManager mBTManager;
 	private LeaseManagerItaly mLeaseManagerItaly;
 	private LeaseManager mLeaseManager;
 	private RadioManager mRadioManager;
@@ -145,6 +148,14 @@ public class Hik_io implements LowLevelInterface {
 			App.Versions.SDK =  mCANManager.getSDKVersion();
 			SDKVersion =  App.Versions.SDK;
 			dlog.d("Initial SDK version:" + SDKVersion);
+		}
+
+		mBTManager = BTManager.get(context);
+		if(mBTManager!=null){
+			mBTManager.switchOn();
+			mBTManager.isBTConnected();
+			//mBTManager.enterPairMode();
+			mBTManager.registerAdapter(mBTObserver);
 		}
 		
 		mLeaseManagerItaly = LeaseManagerItaly.get(context);
@@ -1438,6 +1449,87 @@ public class Hik_io implements LowLevelInterface {
 	    	}
 	    	
 	    }
+
+	private BluetoothObr mBTObserver;
+
+	private class BluetoothObr extends BluetoothStateCallback{
+
+		@Override
+		public void onBluetoothSwitchStateChange(int state) throws RemoteException {
+			super.onBluetoothSwitchStateChange(state);
+		}
+
+		@Override
+		public void onBluetoothPairStateChange(int arg0) throws RemoteException {
+			super.onBluetoothPairStateChange(arg0);
+		}
+
+		@Override
+		public void onBluetoothHFPStateChange(int hfpStatus) throws RemoteException {
+			super.onBluetoothHFPStateChange(hfpStatus);
+		}
+
+		@Override
+		public void onBluetoothAVRCPStateChange(int arg0) throws RemoteException {
+			super.onBluetoothAVRCPStateChange(arg0);
+		}
+
+		@Override
+		public void onBluetoothA2DPStateChange(int arg0) throws RemoteException {
+			super.onBluetoothA2DPStateChange(arg0);
+		}
+
+		@Override
+		public void onBluetoothA2DPStreamStateChange(int arg0) throws RemoteException {
+			super.onBluetoothA2DPStreamStateChange(arg0);
+		}
+
+		@Override
+		public void onPairDevAdd(com.Hik.Mercury.SDK.bluetooth.BluetoothDevice mDevice) throws RemoteException {
+			super.onPairDevAdd(mDevice);
+		}
+
+		@Override
+		public void onMoudleNameChange(String name) throws RemoteException {
+			super.onMoudleNameChange(name);
+		}
+
+		@Override
+		public void onMyPairCodeChange(String code) throws RemoteException {
+			super.onMyPairCodeChange(code);
+		}
+
+		@Override
+		public void onPairRequset(String code, String mac) throws RemoteException {
+			super.onPairRequset(code, mac);
+			mBTManager.agreePairRequest();
+		}
+
+		@Override
+		public void onRemoteDeviceInfoReport(String mac, String name) throws RemoteException {
+			super.onRemoteDeviceInfoReport(mac, name);
+		}
+
+		@Override
+		public void onPairModeChange(boolean inPair) throws RemoteException {
+			super.onPairModeChange(inPair);
+		}
+
+		@Override
+		public void onHFPPhoneStateChange(int state) throws RemoteException {
+			super.onHFPPhoneStateChange(state);
+		}
+
+		@Override
+		public void onHFPPhoneSCOChange(int state) throws RemoteException {
+			super.onHFPPhoneSCOChange(state);
+		}
+
+		@Override
+		public void onCallingPhoneName(String name) throws RemoteException {
+			super.onCallingPhoneName(name);
+		}
+	}
 
 
 }

@@ -602,7 +602,8 @@ public class ObcService extends Service {
 
         virtualBMSUpdateScheduler.scheduleAtFixedRate(new Runnable() {
 
-            int canAmpAnomalies =0, canVoltAnomalies=0, canBmsAnomalies=0;
+            int canAmpAnomalies =0, canCellAnomalies =0, canBmsAnomalies=0, canAllAnomalies=0, countTo0=0;
+            boolean bmsSocError =false, bmsCellError=false, ampError=false;
 
 
             @Override
@@ -613,18 +614,34 @@ public class ObcService extends Service {
                     boolean cellLow = false;
                     String lowCellNumber = " ";
                     String cellsVoltage = "";
-                    boolean bmsError = false;
 
                     //retrieve all can data
                     carInfo.cellVoltageValue = getCellVoltages();
                     carInfo.bmsSOC = getSOCValue();
                     carInfo.outAmp = getCurrentValue();
-                    if( carInfo.outAmp==350){
-                        if(canAmpAnomalies++>3){
-                            canAmpAnomalies =0;
+
+                    if( carInfo.outAmp==350 || carInfo.outAmp==-1037){
+                        ampError=true;
+                        if(canAmpAnomalies++==3 ){
                             Events.CanAnomalies("350 Amp");
                         }
                     }
+                    else {
+                        ampError=false;
+                        canAmpAnomalies = 0;
+                    }
+
+                    if( carInfo.bmsSOC==0){
+                        bmsSocError=true;
+                        if(canAmpAnomalies++==3){
+                            Events.CanAnomalies("SOC 0");
+                        }
+                    }
+                    else {
+                        bmsSocError=false;
+                        canAmpAnomalies = 0;
+                    }
+
 
                     //type of battery
                     //if(carInfo.minVoltage==2.6f || carInfo.batteryType.equalsIgnoreCase("")) {
@@ -635,12 +652,14 @@ public class ObcService extends Service {
                     App.Instance.setMaxVoltage(carInfo.batteryType.equalsIgnoreCase("HNLD") ? 82 : 83);
 
                     //voltage sum
+                    bmsCellError=false;
                     for (int i = 0; i < carInfo.cellVoltageValue.length; i++) {
                         if (i < (carInfo.batteryType.equalsIgnoreCase("HNLD") ? 24 : 20) && carInfo.cellVoltageValue[i] < 1) {
                             currVolt = 0;
-                            bmsError = true;
+                            bmsCellError = true;
                         }
-                        if (!bmsError)
+
+                        if (!bmsCellError)
                             currVolt += carInfo.cellVoltageValue[i];    //		battery cell voltages
 
                         cellsVoltage = cellsVoltage.concat(" " + carInfo.cellVoltageValue[i]);
@@ -649,6 +668,10 @@ public class ObcService extends Service {
                             lowCellNumber = lowCellNumber.concat((i + 1) + " ");
                         }
                     }
+                    if(!bmsCellError && !bmsSocError && !ampError) {
+                        dlog.d("virtualBMSUpdateScheduler: reset count to 0"+bmsCellError+bmsSocError+ampError);
+                        countTo0 = 0;
+                    }
 
                     //fill carinfo attribute
                     carInfo.isCellLowVoltage = cellLow;
@@ -656,32 +679,80 @@ public class ObcService extends Service {
                     carInfo.currVoltage = (float) Math.round(currVolt * 100) / 100f;
 
 
-                    if( carInfo.currVoltage==350){
-                        if(canVoltAnomalies++>3){
-                            canVoltAnomalies =0;
+                    if( bmsCellError){
+                        if(canCellAnomalies++==3){
                             Events.CanAnomalies("0 CellsVolt");
                         }
+                    }
+                    else {
+                        canCellAnomalies = 0;
                     }
 
 
                     //SOC2 calculation
-                    carInfo.virtualSOC = (carInfo.batteryType.equalsIgnoreCase("DFD") ? ((float) Math.round((100 - 90 * (App.getMax_voltage() - currVolt) / 12) * 10) / 10f) : ((float) Math.round((100 - 90 * (App.getMax_voltage() - currVolt) / 9.5) * 10) / 10f));//DFD:HNLD
+                    if (carInfo.batteryType.equalsIgnoreCase("DFD"))
+                        carInfo.virtualSOC = ((float) Math.round((100 - 90 * (App.getMax_voltage() - currVolt) / 12) * 10) / 10f);//DFD:HNLD
+                    else
+                        carInfo.virtualSOC = ((float) Math.round((100 - 90 * (App.getMax_voltage() - currVolt) / 9.5) * 10) / 10f);//DFD:HNLD
+
+
 
                     //SOCR calculation
-                    if (Math.abs(carInfo.bmsSOC - carInfo.bmsSOC_GPRS) <= 2) {
-                        if((carInfo.bmsSOC==0 || carInfo.bmsSOC_GPRS==0)&&carInfo.currVoltage!=0){ if( carInfo.currVoltage==350){
-                            if(canBmsAnomalies++>3){
-                                canBmsAnomalies =0;
-                                Events.CanAnomalies("0 BMS");
+                    if(ampError){
+
+                        if(bmsCellError){
+
+                            if(bmsSocError){
+                                if(countTo0++<90) {
+                                    dlog.d("virtualBMSUpdateScheduler: all fault keep last valid value to 0 is "+countTo0+" times | error: "+bmsCellError+bmsSocError+ampError);
+                                    carInfo.SOCR = carInfo.batteryLevel;
+                                }
+                                else
+                                    carInfo.SOCR=0;
+
+                            }else{
+
+                                if(countTo0++<90) {
+                                    dlog.d("virtualBMSUpdateScheduler: bms cells fault using bms SOC to 0 is " + countTo0 + " times | error: " + bmsCellError + bmsSocError + ampError);
+                                    carInfo.SOCR = Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS);
+                                }
+                                else
+                                    carInfo.SOCR=0;
+
                             }
+
+                        }else if(bmsSocError){
+                            if(countTo0++<90) {
+                                dlog.d("virtualBMSUpdateScheduler: bms SOC fault using SOC2 to 0 is " + countTo0 + " times | error: " + bmsCellError + bmsSocError + ampError);
+                                carInfo.SOCR = carInfo.virtualSOC;
+                            }
+                            else
+                                carInfo.SOCR=0;
                         }
-                            carInfo.SOCR = carInfo.virtualSOC;
-                        }else {
-                            carInfo.SOCR = Math.min(Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS), carInfo.virtualSOC);
+                        dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
+
+                    }else {
+                        if (Math.abs(carInfo.bmsSOC - carInfo.bmsSOC_GPRS) <= 2) {
+                            if ((carInfo.bmsSOC == 0 || carInfo.bmsSOC_GPRS == 0) && carInfo.currVoltage != 0) { //BMS SOC 0 Voltage OK
+                                if (carInfo.bmsSOC == 0) {
+                                    if (canBmsAnomalies++ == 3) {
+                                        Events.CanAnomalies("0 BMS");
+                                    } else
+                                        canBmsAnomalies = 0;
+                                }
+                                carInfo.SOCR = carInfo.virtualSOC;
+                            } else {
+                                if ((carInfo.bmsSOC == 0 || carInfo.bmsSOC_GPRS == 0) && carInfo.currVoltage == 0) {
+                                    carInfo.SOCR = carInfo.batteryLevel;
+                                } else {
+
+                                }
+                                carInfo.SOCR = Math.min(Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS), carInfo.virtualSOC);
+                            }
+                        } else {
+                            carInfo.SOCR = (carInfo.bmsSOC == 0 || carInfo.bmsSOC_GPRS == 0) ? Math.min(Math.max(carInfo.bmsSOC_GPRS, carInfo.bmsSOC), carInfo.virtualSOC) : Math.min(Math.max(carInfo.bmsSOC_GPRS, carInfo.bmsSOC), carInfo.virtualSOC);
                         }
-                    } else{
-                        carInfo.SOCR = (carInfo.bmsSOC == 0 || carInfo.bmsSOC_GPRS == 0) ? Math.min(Math.max(carInfo.bmsSOC_GPRS, carInfo.bmsSOC), carInfo.virtualSOC) : Math.min(Math.max(carInfo.bmsSOC_GPRS, carInfo.bmsSOC), carInfo.virtualSOC);
-            }
+
 
                     dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
                     //check car bms usage
@@ -691,7 +762,7 @@ public class ObcService extends Service {
                         dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
                         return;
                     }
-
+                    }
                     /*if (carInfo.bmsSOC >= 100 || carInfo.bmsSOC_GPRS >= 100) {
                         if (!carInfo.Charging || (carInfo.currVoltage > App.getMax_voltage())) {
                             //App.Instance.setMaxVoltage(carInfo.currVoltage > 85f || carInfo.currVoltage < 80f ? 83f : carInfo.currVoltage);

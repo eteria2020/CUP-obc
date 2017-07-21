@@ -44,18 +44,18 @@ public class FWelcome extends FBase {
 		return fw;
 	}
 
-	private static RelativeLayout fwcm_whole_RL;
+	private  RelativeLayout fwcm_whole_RL;
 	private DLog dlog = new DLog(this.getClass());
-	private static LinearLayout welcomeLL;
-	private static LinearLayout bannerLL;
-	private static LinearLayout flagsLL;
-	private static TextView nameTV;
-	private static TextView tvCarPlate, tvDateTime, tvFleet;
-	private static ImageButton fwelItalianIB;
-	private static ImageButton fwelEnglishIB;
-	private static ImageButton fwelFrenchIB;
-	private static ImageButton fwelChineseIB;
-	private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm", Locale.getDefault());
+	private  LinearLayout welcomeLL;
+	private  LinearLayout bannerLL;
+	private  LinearLayout flagsLL;
+	private  TextView nameTV;
+	private  TextView tvCarPlate, tvDateTime, tvFleet;
+	private  ImageButton fwelItalianIB;
+	private  ImageButton fwelEnglishIB;
+	private  ImageButton fwelFrenchIB;
+	private  ImageButton fwelChineseIB;
+	private  SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm", Locale.getDefault());
 	
 	private int logoTaps =0;
 	private boolean isMaintenance=false;
