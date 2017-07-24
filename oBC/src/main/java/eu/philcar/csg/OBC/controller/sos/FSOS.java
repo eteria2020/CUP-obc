@@ -168,7 +168,7 @@ public class FSOS extends FBase implements OnClickListener {
 				App.isAdmin=0;
 				//TODO: use external config for password in hashed form
 				if (pwd.equals("Selip16")) App.isAdmin=1;
-				if (pwd.equals("linar16"))  App.isAdmin=2;
+				if (pwd.equals("pamal17"))  App.isAdmin=2;
 
 				if (App.isAdmin>0) {
 					Events.DiagnosticPage(App.isAdmin);

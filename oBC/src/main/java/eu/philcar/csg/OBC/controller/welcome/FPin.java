@@ -179,7 +179,7 @@ public class FPin extends FBase implements OnClickListener {
 			deleteIB.setEnabled(false);
 			deleteIB.setOnClickListener(null);
 			
-			progressDF.show(getFragmentManager(), DFProgressing.class.getName());
+			//progressDF.show(getFragmentManager(), DFProgressing.class.getName());
 			
 			if (Debug.IGNORE_HARDWARE) {
 				

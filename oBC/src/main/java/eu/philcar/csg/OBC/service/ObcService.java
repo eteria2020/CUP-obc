@@ -762,6 +762,10 @@ public class ObcService extends Service {
                         dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
                         return;
                     }
+                        if ((carInfo.isCellLowVoltage) || carInfo.currVoltage <= 67f) {
+
+                            carInfo.SOCR = Math.min(carInfo.virtualSOC, 0f);
+                        }
                     }
                     /*if (carInfo.bmsSOC >= 100 || carInfo.bmsSOC_GPRS >= 100) {
                         if (!carInfo.Charging || (carInfo.currVoltage > App.getMax_voltage())) {
@@ -774,10 +778,7 @@ public class ObcService extends Service {
                     }*/
 
                     //set SOCR value
-                    if ((carInfo.isCellLowVoltage) || carInfo.currVoltage <= 67f) {
 
-                        carInfo.SOCR = Math.min(carInfo.virtualSOC, 0f);
-                    }
                         carInfo.setBatteryLevel(Math.round(carInfo.SOCR));
 
                     //carInfo.batteryLevel=Math.min(carInfo.bmsSOC,carInfo.bmsSOC_GPRS); //PER VERSIONI NON -BMS SCOMMENTARE E COMMENTARE IF SOPRA
