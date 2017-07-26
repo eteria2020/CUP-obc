@@ -63,7 +63,7 @@ public class FPin extends FBase implements OnClickListener {
 		View view = inflater.inflate(R.layout.f_pin, container, false);
 		dlog.d("OnCreareView FPin");
 		
-		progressDF = DFProgressing.newInstance(R.string.checking_pin);
+		//progressDF = DFProgressing.newInstance(R.string.checking_pin);
 		
 		b1 = (Button)view.findViewById(R.id.fpinOneB);
 		b2 = (Button)view.findViewById(R.id.fpinTwoB);
@@ -198,12 +198,12 @@ public class FPin extends FBase implements OnClickListener {
 					if (App.currentTripInfo.trip.recharge != -15) {
 						pinChecked(App.currentTripInfo.CheckPin(pin));
 					} else {
-						progressDF.dismiss();
+						//progressDF.dismiss();
 						messageTV.setText(R.string.other_trip_message);
 						return;
 					}
 				}catch(Exception e){
-					dlog.e("Exception while checking the pin resetting view");
+					dlog.e("Exception while checking the pin resetting view",e);
 					disableUI();
 
 					messageTV.setText(R.string.pin_wrong);
@@ -259,7 +259,7 @@ public class FPin extends FBase implements OnClickListener {
 	
 	private void pinChecked(boolean valid) {
 		
-		progressDF.dismiss();
+		//progressDF.dismiss();
 		
 		boolean result;
 		if (Debug.IGNORE_HARDWARE) {
