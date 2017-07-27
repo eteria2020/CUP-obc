@@ -309,10 +309,14 @@ public class SystemControl {
 		//If there is another reboot in progress not older than 6 hour : ignore
 
 		if (System.currentTimeMillis() - rebootInProgress>21600000) {
+
+			Events.Reboot("No 3G Reboot");
 			Thread th = new Thread(new Reboot());
 			th.start();
 		} else {
 			if(System.currentTimeMillis() - rebootInProgress<0 && System.currentTimeMillis()-App.AppStartupTime.getTime()>3600000) { //if date is 01/01/2000 reboot every hour
+
+				Events.Reboot("No 3G Reboot");
 				Thread th = new Thread(new Reboot());
 				th.start();
 			}
@@ -326,7 +330,6 @@ public class SystemControl {
 			try {
 
 				DLog.D(SystemControl.class.toString()+" begin reboot");
-				Events.Reboot("No 3G Reboot");
 
 				Thread.sleep(50000);
 				if(App.currentTripInfo==null || !App.currentTripInfo.isOpen) {

@@ -698,7 +698,7 @@ public class ObcService extends Service {
 
 
                     //SOCR calculation
-                    if(ampError){
+                    if(ampError || bmsCellError || bmsSocError){
 
                         if(bmsCellError){
 
@@ -729,7 +729,10 @@ public class ObcService extends Service {
                             else
                                 carInfo.SOCR=0;
                         }
-                        dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
+                        else{
+                            carInfo.SOCR = Math.min(carInfo.bmsSOC, carInfo.virtualSOC);
+                        }
+                        dlog.d("virtualBMSUpdateScheduler:error calculation VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
 
                     }else {
                         if (Math.abs(carInfo.bmsSOC - carInfo.bmsSOC_GPRS) <= 2) {
@@ -754,7 +757,7 @@ public class ObcService extends Service {
                         }
 
 
-                    dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
+                    dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "% outAmp: "+carInfo.outAmp);
                     //check car bms usage
                     if (carInfo.currVoltage <= 0 || (carInfo.outAmp>= 25 && carInfo.outAmp!=350)){
                         carInfo.setBatteryLevel((Math.min(carInfo.batteryLevel,Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS))));
@@ -778,6 +781,7 @@ public class ObcService extends Service {
                     }*/
 
                     //set SOCR value
+                    dlog.d("virtualBMSUpdateScheduler: alarm state: amp: "+ampError +" cell: "+bmsCellError+" soc: "+bmsSocError);
 
                         carInfo.setBatteryLevel(Math.round(carInfo.SOCR));
 
@@ -2009,7 +2013,8 @@ public class ObcService extends Service {
 
             Message msg = MessageFactory.zmqRestart();
             localHandler.sendMessage(msg);
-            if(App.currentTripInfo==null && System.currentTimeMillis()- App.AppScheduledReboot.getTime()>24*60*60*1000){
+            if(App.currentTripInfo==null && System.currentTimeMillis()- App.AppScheduledReboot.getTime()>24*60*60*1000 && !startedReboot){
+                startedReboot=true;
                 if(App.reservation!=null) {
                     if (!App.reservation.isMaintenance()) {
                         dlog.d("found reservation while scheduling reboot, aborting");
@@ -2052,6 +2057,7 @@ public class ObcService extends Service {
         return localHandler;
     }
 
+    private boolean startedReboot=false;
 
     private final Handler privateHandler = new Handler() {
 
