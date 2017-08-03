@@ -100,10 +100,11 @@ public class ServiceTestActivity extends Activity {
 				}*/
 				break;
 				
-			case ObcService.MSG_CLIENT_UNREGISTER:				
+			/*case ObcService.MSG_CLIENT_UNREGISTER:
+				serviceConnector.unregister();
 				serviceConnector.disconnect();
 				ServiceTestActivity.this.finish();
-				break;
+				break;*/
 				
 			case ObcService.MSG_CMD_TIMEOUT:
 				Toast.makeText(ServiceTestActivity.this, "TIMEOUT", Toast.LENGTH_SHORT).show();

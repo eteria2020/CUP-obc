@@ -36,7 +36,7 @@ public class FPin extends FBase implements OnClickListener {
 		return fp;
 	}
 	
-	private DFProgressing progressDF;
+	//private DFProgressing progressDF;
 	
 	private Button b1,b2,b3,b4,b5,b6,b7,b8,b9,b0,sosB,faqB;
 	private ImageButton deleteIB;

@@ -627,6 +627,15 @@ public class AMainOBC extends ABase implements LocationListener {
 
 			 //onLocationChanged(l);
 
+			 if(! App.isForegroundActivity(AMainOBC.this)) {
+				 DLog.W(AMainOBC.class.getName() + " MSG to non foreground activity");
+				 if(App.currentTripInfo==null) {
+					 DLog.W(AMainOBC.class.getName() + " no trip found kill activity");
+
+					 finish();
+				 }
+				 return;
+			 }
 
 			switch (msg.what) {
 

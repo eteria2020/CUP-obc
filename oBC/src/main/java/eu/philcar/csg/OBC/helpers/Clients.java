@@ -32,6 +32,6 @@ public class Clients {
 
     @Override
     public boolean equals(Object o) {
-        return client.equals(o);
+        return o instanceof Clients && client.equals(((Clients) o).getClient());
     }
 }

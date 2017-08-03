@@ -814,7 +814,6 @@ public class ObcService extends Service {
                 try {
                     dlog.d("gpsCheckScheduler: lastIntGpsLocation: "+ lastIntGpsLocation +" lastExtGpsLocation: "+ lastExtGpsLocation +" newIntGpslocation: "+carInfo.intGpsLocation + " newExtGpslocation "+carInfo.extGpsLocation + " UseExternalGPS: "+App.UseExternalGPS);
 
-
                     if (!App.UseExternalGPS) {
 
                         if ((carInfo.intGpsLocation.getLongitude() >= 18.53 || carInfo.intGpsLocation.getLongitude() <= 6.63 || carInfo.intGpsLocation.getLatitude() >= 47.10 || carInfo.intGpsLocation.getLatitude() <= 36.64) ||
@@ -1077,6 +1076,7 @@ public class ObcService extends Service {
         try {
             if (clients.size() > 0)
                 for(Clients cliente:clients){
+                    //dlog.d("Sending to client "+cliente.getName());
                   myMsg=Message.obtain();
                     myMsg.copyFrom(msg);
                     cliente.getClient().send(myMsg);

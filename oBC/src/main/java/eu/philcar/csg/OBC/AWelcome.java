@@ -120,7 +120,7 @@ public class AWelcome extends ABase {
 		 public void handleMessage(Message msg) {
 			
 			 if (! App.isForegroundActivity(AWelcome.this)&& ! App.isForegroundActivity(ServiceTestActivity.class.getName())) {
-				 DLog.W(AWelcome.class.getName() + " MSG to non foreground activity. finish Activity");
+				 DLog.W(AWelcome.class.getName() + " MSG to non foreground activity. ");
 				 //AWelcome.this.finish();
 				 return;
 			 }
