@@ -45,6 +45,7 @@ import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.server.AdminsConnector;
+import eu.philcar.csg.OBC.server.BusinessEmployeeConnector;
 import eu.philcar.csg.OBC.server.CallCenterConnector;
 import eu.philcar.csg.OBC.server.CommandsConnector;
 import eu.philcar.csg.OBC.server.ConfigsConnector;
@@ -503,6 +504,10 @@ public class ObcService extends Service {
         //Start whitelist update
         Customers customers = App.Instance.dbManager.getClientiDao();
         customers.startWhitelistDownload(this, privateHandler);
+
+
+        //Start employee update
+        startDownloadEmployees();
 
 
         Pois pois = App.Instance.dbManager.getPoisDao();
@@ -1193,6 +1198,9 @@ public class ObcService extends Service {
 
         clienti.startWhitelistDownload(this, privateHandler);
 
+        // and update employees
+        startDownloadEmployees();
+
         //..finally update properly tripInfo opening or closing trip
         if (tripInfo == null) {
             dlog.e(ObcService.class.toString() + " notifyCard: Tripinfo NULL!");
@@ -1688,6 +1696,14 @@ public class ObcService extends Service {
     public void startDownloadCustomers() {
         Customers customers = App.Instance.dbManager.getClientiDao();
         customers.startWhitelistDownload(this, privateHandler);
+    }
+
+    public void startDownloadEmployees() {
+        DLog.D("Start downloading businesses");
+        BusinessEmployeeConnector connector = BusinessEmployeeConnector.GetDownloadConnector();
+        HttpsConnector http = new HttpsConnector(this);
+        http.SetHandler(localHandler);
+        http.Execute(connector);
     }
 
     public void startDownloadReservations() {

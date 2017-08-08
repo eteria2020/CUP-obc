@@ -4,6 +4,7 @@ public class Connectors {
 	
 	public static final int MSG_DN_CLIENTI =3;
 	public static final int MSG_DN_ADMINS =4;
+	public static final int MSG_DN_AZIENDE =1048;
 	public static final int MSG_DN_POIS =1020;
 	public static final int MSG_DN_AREAS =1021;
 	public static final int MSG_DN_CONFIGS =1022;
