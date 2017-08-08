@@ -707,8 +707,11 @@ public class ObcService extends Service {
                                     dlog.d("virtualBMSUpdateScheduler: all fault keep last valid value to 0 is "+countTo0+" times | error: "+bmsCellError+bmsSocError+ampError);
                                     carInfo.SOCR = carInfo.batteryLevel;
                                 }
-                                else
-                                    carInfo.SOCR=0;
+                                else{
+                                    obc_io.close();
+                                    obc_io.init();
+                                    carInfo.SOCR = 0;
+                                }
 
                             }else{
 
@@ -716,8 +719,11 @@ public class ObcService extends Service {
                                     dlog.d("virtualBMSUpdateScheduler: bms cells fault using bms SOC to 0 is " + countTo0 + " times | error: " + bmsCellError + bmsSocError + ampError);
                                     carInfo.SOCR = Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS);
                                 }
-                                else
-                                    carInfo.SOCR=0;
+                                else{
+                                    obc_io.close();
+                                    obc_io.init();
+                                    carInfo.SOCR = 0;
+                                }
 
                             }
 
@@ -726,8 +732,11 @@ public class ObcService extends Service {
                                 dlog.d("virtualBMSUpdateScheduler: bms SOC fault using SOC2 to 0 is " + countTo0 + " times | error: " + bmsCellError + bmsSocError + ampError);
                                 carInfo.SOCR = carInfo.virtualSOC;
                             }
-                            else
-                                carInfo.SOCR=0;
+                            else{
+                                obc_io.close();
+                                obc_io.init();
+                                carInfo.SOCR = 0;
+                            }
                         }
                         else{
                             carInfo.SOCR = Math.min(carInfo.bmsSOC, carInfo.virtualSOC);
