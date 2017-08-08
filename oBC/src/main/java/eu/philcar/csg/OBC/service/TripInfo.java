@@ -21,6 +21,8 @@ import com.j256.ormlite.stmt.UpdateBuilder;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.controller.map.FRadio;
+import eu.philcar.csg.OBC.db.BusinessEmployee;
+import eu.philcar.csg.OBC.db.BusinessEmployees;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Customers;
 import eu.philcar.csg.OBC.db.Trip;
@@ -764,6 +766,16 @@ public class TripInfo {
 
         int n_pin = customer.checkPin(pin);
         dlog.d("CheckPin : "+n_pin);
+
+        if (n_pin == Customer.N_COMPANY_PIN) {
+            DbManager dbm = App.Instance.dbManager;
+            BusinessEmployees employees = dbm.getDipendentiDao();
+            BusinessEmployee employee = employees.getBusinessEmployee(customer.id);
+            if (!customer.isCompanyPinEnabled() || !employee.isBusinessEnabled() || !employee.isWithinTimeLimits()) {
+                dlog.e("CheckPin : can't open business trip");
+                return false;
+            }
+        }
 
         if (n_pin>0) {			
             trip.n_pin=n_pin;

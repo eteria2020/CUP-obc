@@ -176,6 +176,17 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	}
 
+	public BusinessEmployees getDipendentiDao() {
+		try {
+			BusinessEmployees b = getDao(BusinessEmployee.class);
+			b.setAutoCommit(true);
+			return  b;
+		} catch (Exception e) {
+
+			DLog.E("Error getting dao dipendenti", e);
+			return null;
+		}
+	}
 
 	public  Trips getCorseDao() {
 		try {

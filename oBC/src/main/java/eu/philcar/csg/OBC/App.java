@@ -230,9 +230,10 @@ public class App extends Application {
 			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
 			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
 			URL_Clienti = "https://corestage.sharengo.it:8123/whitelist";
+			URL_Dipendenti = "https://corestage.sharengo.it:8123/business-employees";
 			URL_Commands = "http://corestage.sharengo.it/api/get_commands.php?";
 			//URL_Corse = "http://corestage.sharengo.it/api/pushcorsa-convenzioni.php?";
-			URL_Corse = "http://corestage.sharengo.it/api/pushcorsa.php?";
+			URL_Corse = "http://corestage.sharengo.it/api/pushcorsa-convenzioni.php?";
 			URL_Eventi = "http://corestage.sharengo.it/api/pushevent.php?";
 			URL_Pois = "http://corestage.sharengo.it/api/get_pois.php?";
 			URL_PoisIcons = "http://manage.sharengo.it/pois_Icon.php";
@@ -259,8 +260,9 @@ public class App extends Application {
 
 			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
 			URL_Clienti = "https://api.sharengo.it:8123/whitelist";
+			URL_Dipendenti = "https://core.sharengo.it:8123/business-employees";
 			URL_Commands = "http://core.sharengo.it/api/get_commands.php?";
-			URL_Corse =  "http://core.sharengo.it/api/pushcorsa.php?";
+			URL_Corse = "http://core.sharengo.it/api/pushcorsa-convenzioni.php?";
 			URL_Eventi = "http://core.sharengo.it/api/pushevent.php?";
 			URL_Pois = "http://core.sharengo.it/api/get_pois.php?";
 			URL_PoisIcons = "http://manage.sharengo.it/pois_Icon.php";
@@ -342,6 +344,7 @@ public class App extends Application {
 	public static String URL_Admins;
 	public static String URL_ZMQNotifier;
 	public static String URL_AdsBuilder;
+	public static String URL_Dipendenti;
 	public static String URL_AdsBuilderCar;
 	public static String URL_AdsBuilderStart;
 	public static String URL_AdsBuilderEnd;
