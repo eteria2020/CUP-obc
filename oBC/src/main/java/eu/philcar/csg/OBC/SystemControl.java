@@ -310,13 +310,13 @@ public class SystemControl {
 
 		if (System.currentTimeMillis() - rebootInProgress>21600000) {
 
-			Events.Reboot("No 3G Reboot");
+			//Events.Reboot("No 3G Reboot");
 			Thread th = new Thread(new Reboot());
 			th.start();
 		} else {
 			if(System.currentTimeMillis() - rebootInProgress<0 && System.currentTimeMillis()-App.AppStartupTime.getTime()>3600000) { //if date is 01/01/2000 reboot every hour
 
-				Events.Reboot("No 3G Reboot");
+				//Events.Reboot("No 3G Reboot");
 				Thread th = new Thread(new Reboot());
 				th.start();
 			}

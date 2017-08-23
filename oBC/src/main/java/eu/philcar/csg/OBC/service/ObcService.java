@@ -1014,6 +1014,7 @@ public class ObcService extends Service {
             setNetworkConnectionStatus(false);
             if (restart3GCount >= 8 && !this.tripInfo.isOpen) {
                 restart3GCount = 0;
+                Events.Reboot("No 3G Reboot");
                 SystemControl.doReboot();
             } else {
                 if (WITH_AUTORESET3G) {

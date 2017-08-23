@@ -2153,7 +2153,7 @@ private void  initPhase2() {
 			Events.StartShutdown();
 			shutdownTimer = SystemClock.elapsedRealtime();
 		}
-		if (SystemClock.elapsedRealtime() - shutdownTimer >3*60 * 60 * 1000) {
+		if (SystemClock.elapsedRealtime() - shutdownTimer >3*60 * 60 * 1000) { //3 ORE
 			shutdownTimer=0;
 			return true;
 		}
