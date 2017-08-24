@@ -440,7 +440,7 @@ public class TripInfo {
     @Override
     public String toString() {
 
-        return this.trip.toString();
+        return trip!=null?this.trip.toString():"";
     }
 
     public void loadBanner(String Url, String type, Boolean isClick) {
