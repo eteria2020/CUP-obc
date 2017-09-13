@@ -1,7 +1,6 @@
 package eu.philcar.csg.OBC.controller.welcome;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -10,23 +9,16 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
-import android.os.NetworkOnMainThreadException;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -37,33 +29,24 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AGoodbye;
-import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
-import eu.philcar.csg.OBC.controller.map.FMap;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
-import eu.philcar.csg.OBC.helpers.BannerJsInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.MessageFactory;
-import eu.philcar.csg.OBC.service.TripInfo;
-import okhttp3.HttpUrl;
 
 public class FGoodbye extends FBase {
 
@@ -407,7 +390,7 @@ public class FGoodbye extends FBase {
 
 	public void loadBanner(String Url, String type, Boolean isClick) {
 
-		File outDir = new File(App.BANNER_IMAGES_FOLDER);
+		File outDir = new File(App.getBannerImagesFolder());
 		if (outDir.mkdir()) {
 			dlog.d("Banner directory created");
 		}
@@ -569,7 +552,7 @@ public class FGoodbye extends FBase {
 		File ImageV;
 		Bundle Banner = App.BannerName.getBundle(type);
 		if(Banner!=null){
-			ImageV=new File(App.BANNER_IMAGES_FOLDER,Banner.getString("FILENAME",null));
+			ImageV=new File(App.getBannerImagesFolder(),Banner.getString("FILENAME",null));
 
 			try{
 				if(ImageV!=null && ImageV.exists()){

@@ -1,27 +1,28 @@
 package eu.philcar.csg.OBC.db;
 import android.content.Context;
-import java.io.File;
+
 import java.sql.SQLException;
 
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Environment;
-import ch.qos.logback.core.net.server.Client;
-import com.j256.ormlite.android.apptools.OpenHelperManager;
+
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
-import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+
+import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.helpers.DLog;
 public class DbManager extends OrmLiteSqliteOpenHelper {
 
-	public  static final String DATABASE_NAME = "/sdcard/csg/sharengo.db";
+	public static final String DB_NAME = "sharengo.db";
 
 	private static final int DATABASE_VERSION = 4;
 	private static DbManager instance = null;
 
 	private final Class<?> tables[] = { Customers.GetRecordClass() ,BusinessEmployees.GetRecordClass(), Trips.GetRecordClass(), Events.GetRecordClass(), Pois.GetRecordClass() };
 
+	public static String getDbName() {
+		return App.getAppDataPath().concat(DB_NAME);
+	}
 
 	public static  DbManager getInstance(Context context) {
 		if (instance == null)
@@ -35,8 +36,8 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 	}
 
 	public DbManager(Context context) {
-		//super(context, new File( Environment.getExternalStorageDirectory(),DATABASE_NAME).toString(), null, DATABASE_VERSION);
-		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		//super(context, new File( Environment.getExternalStorageDirectory(),DB_NAME).toString(), null, DATABASE_VERSION);
+		super(context, getDbName(), null, DATABASE_VERSION);
 	}
 
 

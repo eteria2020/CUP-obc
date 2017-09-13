@@ -101,6 +101,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -223,7 +224,7 @@ public class App extends Application {
 
 	public void initSharengo() {
 
-		if(App.Instance.ServerIP==1) { //App.Instance.ServerIP==1
+		if(App.ServerIP==1) { //App.Instance.ServerIP==1
 
 			URL_Area = "http://corestage.sharengo.it/api/zone/json.php?";
 			URL_Beacon = "http://corestage.sharengo.it/api/pushbeacon.php?";
@@ -252,6 +253,7 @@ public class App extends Application {
 			URL_Time = "http://corestage.sharengo.it/api/get_date.php";
 			IP_UDP_Beacon = "185.81.1.24";
 			Port_UDP_Beacon = 7600;
+			APP_DATA_PATH="/csg-stage/";
 		}
 		else {
 			URL_Area = "http://core.sharengo.it/api/zone/json.php?";
@@ -260,7 +262,7 @@ public class App extends Application {
 
 			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
 			URL_Clienti = "https://api.sharengo.it:8123/whitelist";
-			URL_Dipendenti = "https://core.sharengo.it:8123/business-employees";
+			URL_Dipendenti = "https://api.sharengo.it:8123/business-employees";
 			URL_Commands = "http://core.sharengo.it/api/get_commands.php?";
 			URL_Corse = "http://core.sharengo.it/api/pushcorsa-convenzioni.php?";
 			URL_Eventi = "http://core.sharengo.it/api/pushevent.php?";
@@ -284,6 +286,7 @@ public class App extends Application {
 
 			Port_UDP_Beacon = 7600;
 
+			APP_DATA_PATH="/csg/";
 
 			/*URL_Area = "http://corecina.sharengo.it/api/zone/json.php?";
 			URL_Beacon = "http://corecina.sharengo.it/api/pushbeacon.php?";
@@ -487,23 +490,20 @@ public class App extends Application {
 	public static Date    AppStartupTime = new Date(), AppScheduledReboot=new Date();
 	public static Date    lastUpdateCAN =new Date();
 	
-	public static final String APP_DATA_PATH = "/sdcard/csg/";
-	public static final String  POI_ICON_FOLDER ="/sdcard/csg/PoisIcon/";
-	public static final String  POI_POSITION_FOLDER ="/sdcard/csg/PoisPos/";
-	public static final String BANNER_IMAGES_FOLDER ="/sdcard/csg/BannerImages/";
-	public static final String END_IMAGES_FOLDER ="/sdcard/csg/BannerImages/";
-	public static final String SM_SCRIPT_PATH = "/sdcard/csg";
-	public static final String SM_SCRIPT_NAME= "sm_watchdog.sh";
+	public static String APP_DATA_PATH = "/csg/";
+	public static final String POI_ICON_FOLDER ="PoisIcon/";
+	public static final String POI_POSITION_FOLDER ="PoisPos/";
+	public static final String BANNER_IMAGES_FOLDER ="BannerImages/";
+	public static final String END_IMAGES_FOLDER ="BannerImages/";
 	
-	private final String  CONFIG_FILE ="/sdcard/csg/config";
-	private final String  STOP_FILE ="/sdcard/csg/stop";
+	private final String  CONFIG_FILE ="config";
+	private final String  STOP_FILE ="stop";
 
-	private final String  AVDPOIS_FILE ="/sdcard/csg/";
 	
-	private final String  SPLIT_TRIP_CONFIG_FILE ="/sdcard/csg/splittrip.txt";
-	private final String  DEFAULT_CITY_CONFIG_FILE = "/sdcard/csg/default_city.txt";
-	private final String  MOCKLOCATION_CONFIG_FILE ="/sdcard/csg/mockgps.txt";
-	private final String  ZMQ_DISABLE_CONFIG_FILE = "/sdcard/csg/zmq_disable.txt";
+	private final String  SPLIT_TRIP_CONFIG_FILE ="splittrip.txt";
+	private final String  DEFAULT_CITY_CONFIG_FILE = "default_city.txt";
+	private final String  MOCKLOCATION_CONFIG_FILE ="mockgps.txt";
+	private final String  ZMQ_DISABLE_CONFIG_FILE = "zmq_disable.txt";
 	
 	private static String foregroundActivity="";
 	private static boolean loaded=false;
@@ -538,8 +538,52 @@ public class App extends Application {
 	//public static final double[] polygon = new double[]{46.090560, 13.067453, 46.090560, 13.174187, 46.123334, 13.174187, 46.123334, 13.067453};		// Fagagna
 	public static final double[] polygonCenter = new double[]{45.464189, 9.191181};	// Duomo di Milano
 	//public static final double[] polygonCenter = new double[]{46.105813, 13.116209};	// Castello di villalta
-	
-	
+
+
+	public static String getAppDataPath() {
+		return Environment.getExternalStorageDirectory().getPath().concat(APP_DATA_PATH);
+	}
+
+	public static String getPoiIconFolder() {
+		return getAppDataPath().concat(POI_ICON_FOLDER);
+	}
+
+	public static String getPoiPositionFolder() {
+		return getAppDataPath().concat(POI_POSITION_FOLDER);
+	}
+
+	public static String getBannerImagesFolder() {
+		return getAppDataPath().concat(BANNER_IMAGES_FOLDER);
+	}
+
+	public static String getEndImagesFolder() {
+		return getAppDataPath().concat(END_IMAGES_FOLDER);
+	}
+
+	public String getCONFIG_FILE() {
+		return getAppDataPath().concat(CONFIG_FILE);
+	}
+
+	public String getSTOP_FILE() {
+		return getAppDataPath().concat(STOP_FILE);
+	}
+
+	public String getSPLIT_TRIP_CONFIG_FILE() {
+		return getAppDataPath().concat(SPLIT_TRIP_CONFIG_FILE);
+	}
+
+	public String getDEFAULT_CITY_CONFIG_FILE() {
+		return getAppDataPath().concat(DEFAULT_CITY_CONFIG_FILE);
+	}
+
+	public String getMOCKLOCATION_CONFIG_FILE() {
+		return getAppDataPath().concat(MOCKLOCATION_CONFIG_FILE);
+	}
+
+	public String getZMQ_DISABLE_CONFIG_FILE() {
+		return getAppDataPath().concat(ZMQ_DISABLE_CONFIG_FILE);
+	}
+
 	public void persistInSosta() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
@@ -803,13 +847,13 @@ public void loadRadioSetup() {
 	
 	
 	public boolean loadZmqDisabledConfig() {
-		File f = new File(ZMQ_DISABLE_CONFIG_FILE);
+		File f = new File(getZMQ_DISABLE_CONFIG_FILE());
 		
 		return f.exists();
 	}
 	
 	public int loadSplitTripConfig() {
-		File f = new File(SPLIT_TRIP_CONFIG_FILE);
+		File f = new File(getSPLIT_TRIP_CONFIG_FILE());
 		if (f.exists()) {
 			try {
 			    BufferedReader br = new BufferedReader(new FileReader(f));
@@ -820,7 +864,7 @@ public void loadRadioSetup() {
 			    }
 				br.close();
 			} catch (Exception e) {
-				dlog.e("Loading split trip config : " + SPLIT_TRIP_CONFIG_FILE,e);
+				dlog.e("Loading split trip config : " + getSPLIT_TRIP_CONFIG_FILE(),e);
 			}
 	    
 		}
@@ -830,7 +874,7 @@ public void loadRadioSetup() {
 	
 	
 	public String loadDefaultCity() {
-		File f = new File(DEFAULT_CITY_CONFIG_FILE);
+		File f = new File(getDEFAULT_CITY_CONFIG_FILE());
 		if (f.exists()) {
 			try {
 			    BufferedReader br = new BufferedReader(new FileReader(f));
@@ -842,7 +886,7 @@ public void loadRadioSetup() {
 			    }
 				br.close();
 			} catch (Exception e) {
-				dlog.e("Loading split trip config : " + DEFAULT_CITY_CONFIG_FILE,e);
+				dlog.e("Loading split trip config : " + getDEFAULT_CITY_CONFIG_FILE(),e);
 			}
 	    
 		}
@@ -869,7 +913,7 @@ public void loadRadioSetup() {
 		
 		App.DefaultCity = city;
 		
-		File f = new File(DEFAULT_CITY_CONFIG_FILE);
+		File f = new File(getDEFAULT_CITY_CONFIG_FILE());
 		
 		if (city==null) {
 			f.delete();
@@ -909,7 +953,7 @@ public void loadRadioSetup() {
 	}
 	
 	public void setMockLocation(double lat, double lon) {
-		File f = new File(MOCKLOCATION_CONFIG_FILE);
+		File f = new File(getMOCKLOCATION_CONFIG_FILE());
 		
 		if (lat==0 && lon==0) {
 			f.delete();
@@ -929,7 +973,7 @@ public void loadRadioSetup() {
 	}
 	
 	public void loadMockLocationConfig() {
-		File f = new File(MOCKLOCATION_CONFIG_FILE);
+		File f = new File(getMOCKLOCATION_CONFIG_FILE());
 		
 		if (f.exists()) {
 			try {
@@ -950,7 +994,7 @@ public void loadRadioSetup() {
 			    }
 			    br.close();
 			} catch (Exception e) {
-				dlog.e("Loading split trip config : " + MOCKLOCATION_CONFIG_FILE,e);
+				dlog.e("Loading split trip config : " + getMOCKLOCATION_CONFIG_FILE(),e);
 			}
 	    
 		} else {
@@ -1214,7 +1258,7 @@ private void  initPhase2() {
 		dlog.e("Failed Inserting APN ",e);
 	}*/
 		
-		File DataPath = new File(APP_DATA_PATH);
+		File DataPath = new File(getAppDataPath());
 		DataPath.mkdirs();
 		
 		preferences = this.getSharedPreferences(COMMON_PREFERENCES, Context.MODE_PRIVATE);
@@ -1632,12 +1676,12 @@ private void  initPhase2() {
 	}
 	
 	public boolean isStopped() {
-		File f = new File(STOP_FILE);
+		File f = new File(getSTOP_FILE());
 		return f.exists();
 	}
 	
 	public boolean isConfigMode() {
-		File f = new File(CONFIG_FILE);
+		File f = new File(getCONFIG_FILE());
 		if ( f.exists()  ) {
 			return true;
 		} else {
@@ -1797,7 +1841,7 @@ private void  initPhase2() {
 	
 	public void initAreaPolygon() {
 		
-		File areaFile = new File(APP_DATA_PATH,"area.json");
+		File areaFile = new File(getAppDataPath(),"area.json");
 		
 		if (!areaFile.exists()) {
 			try {

@@ -8,6 +8,7 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -60,6 +61,7 @@ public class CarInfo {
     public int isKeyOn = 0;
     public String keyStatus = "";
     public String gear = "";
+    public boolean batterySafety = false;
     public int outAmp = 0;
     public Long timestampCurrent = null;
     public Long lastForceReady=System.currentTimeMillis();
@@ -368,6 +370,15 @@ public class CarInfo {
                 if (i != outAmp) {
                     hasChanged = true;
                     outAmp = i;
+                }
+
+
+            }else if (key.equalsIgnoreCase("batterySafety")) {
+
+                bo = b.getBoolean(key);
+                if (bo != batterySafety) {
+                    hasChanged = true;
+                    batterySafety = bo;
                 }
 
 
@@ -721,6 +732,7 @@ public class CarInfo {
 
             jw.name("GPS").value(App.UseExternalGPS ? "EXT" : "INT");
             jw.name("SOC").value(batteryLevel);
+            //jw.name("batterySafety").value(batterySafety);
             jw.name("cputemp").value(App.getCpuTemp());
 
             jw.name("on_trip").value(App.currentTripInfo != null ? 1 : 0);
@@ -821,7 +833,7 @@ public class CarInfo {
 
             jw.name("GPS").value(App.UseExternalGPS ? "EXT" : "INT");
             jw.name("cputemp").value(App.getCpuTemp());
-
+            //jw.name("batterySafety").value(batterySafety);
             jw.name("on_trip").value(App.currentTripInfo != null ? 1 : 0);
 
             jw.name("closeEnabled").value(enableRemoteClose);

@@ -4,35 +4,20 @@ package eu.philcar.csg.OBC.server;
 
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.FileTools;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.os.Message;
-import android.widget.Toast;
 
 public class UploaderLog {
 
@@ -89,7 +74,7 @@ public class UploaderLog {
 					return null;
 				}
 				
-				File dbFile=  new File(DbManager.DATABASE_NAME);
+				File dbFile=  new File(DbManager.getDbName());
 				if (dbFile.length()> 10*1024*1024) {
 					dlog.e("DB file too big:" + dbFile.length());
 					return null;

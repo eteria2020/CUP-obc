@@ -2044,6 +2044,7 @@ public class ObcService extends Service {
                 if(App.reservation!=null) {
                     if (!App.reservation.isMaintenance()) {
                         dlog.d("found reservation while scheduling reboot, aborting");
+                        startedReboot=false;
                         App.AppScheduledReboot.setTime(App.AppScheduledReboot.getTime()+35*60*1000);
                         return;
                     }

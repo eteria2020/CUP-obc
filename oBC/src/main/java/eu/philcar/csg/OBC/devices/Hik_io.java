@@ -955,9 +955,9 @@ public class Hik_io implements LowLevelInterface {
 			}
 
 			@Override
-			public void onLeaseReportHeartbeat(String carId, String version)
+			public void onLeaseReportHeartbeat(String carId, String data)
 					throws RemoteException {
-				super.onLeaseReportHeartbeat(carId, version);
+				super.onLeaseReportHeartbeat(carId, data);
 				
 				resetLastContact();
 				
@@ -966,8 +966,14 @@ public class Hik_io implements LowLevelInterface {
 				
 				Bundle b = new Bundle();
 				b.putString("VIN", carId);
+				String version = data.substring(0, data.indexOf("~"));
+
 				b.putString("VER", version);
-				
+				try {
+					b.putBoolean("batterySafety", Integer.parseInt(data.substring(data.indexOf("~") + 1, data.indexOf("~") + 2))>0);
+				}catch (Exception e){
+					dlog.e("Exception handling extra data inside Heartbeat",e);
+				}
 				if (!SDKVersion.equals(version)) {
 					SDKVersion = version;
 					App.Versions.HbVer = version;
@@ -1010,7 +1016,7 @@ public class Hik_io implements LowLevelInterface {
 		            b.putString("VIN", vinCode);
 		            obcService.notifyCarInfo(b);
 		            
-		            //dlog.i("onVinCodeChange(vinCode):" + vinCode );
+		            dlog.i("onVinCodeChange(vinCode):" + vinCode );
 	    	 }
 	    	
 	    	

@@ -3,11 +3,9 @@ package eu.philcar.csg.OBC.service;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,7 +16,6 @@ import java.util.TimerTask;
 
 import com.j256.ormlite.stmt.UpdateBuilder;
 
-import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.controller.map.FRadio;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
@@ -36,19 +33,15 @@ import eu.philcar.csg.OBC.server.TripsConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.server.ReservationConnector;
 
-import android.media.audiofx.BassBoost;
 import android.os.Bundle;
 import android.os.Message;
-import android.os.NetworkOnMainThreadException;
 import android.os.PowerManager.WakeLock;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -445,7 +438,7 @@ public class TripInfo {
 
     public void loadBanner(String Url, String type, Boolean isClick) {
 
-        File outDir = new File(App.BANNER_IMAGES_FOLDER);
+        File outDir = new File(App.getBannerImagesFolder());
         if (!outDir.isDirectory()) {
             outDir.mkdir();
         }

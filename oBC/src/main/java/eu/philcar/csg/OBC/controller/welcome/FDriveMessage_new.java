@@ -14,9 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -47,16 +44,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
-import eu.philcar.csg.OBC.helpers.BannerJsInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.UrlTools;
-import okhttp3.HttpUrl;
 
 public class FDriveMessage_new extends FBase {
 	
@@ -463,12 +457,12 @@ public class FDriveMessage_new extends FBase {
 		if(startImages!=null)
 			startImages.clear();
 
-		File outDir = new File(App.BANNER_IMAGES_FOLDER);
+		File outDir = new File(App.getBannerImagesFolder());
 		if (!outDir.isDirectory()) {
 			outDir.mkdir();
 		}
 
-		Url=Url.concat("?ID=").concat(maxIconID(App.BANNER_IMAGES_FOLDER));
+		Url=Url.concat("?ID=").concat(maxIconID(App.getBannerImagesFolder()));
 		StringBuilder builder = new StringBuilder();
 		HttpClient client = new DefaultHttpClient();
 		HttpGet httpGet = new HttpGet(Url);
@@ -613,7 +607,7 @@ public class FDriveMessage_new extends FBase {
 
 	public void loadBanner(String Url, String type, Boolean isClick) {
 
-		File outDir = new File(App.BANNER_IMAGES_FOLDER);
+		File outDir = new File(App.getBannerImagesFolder());
 		if (!outDir.isDirectory()) {
 			outDir.mkdir();
 		}
@@ -777,7 +771,7 @@ public class FDriveMessage_new extends FBase {
 		File ImageV;
 		Bundle Banner = App.Instance.BannerName.getBundle(type);
 		if(Banner!=null){
-			File outDir = new File(App.BANNER_IMAGES_FOLDER);
+			File outDir = new File(App.getBannerImagesFolder());
 			if (!outDir.isDirectory()) {
 				dlog.e(FDriveMessage_new.class.toString()+" updateBanner: la cartella non esiste visualizzo offline ");
 

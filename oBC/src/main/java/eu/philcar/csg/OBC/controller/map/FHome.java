@@ -42,7 +42,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -780,7 +779,7 @@ public class FHome extends FBase implements OnClickListener {
  * */
     private void loadBanner(String Url, String type, Boolean isClick) {
 
-        File outDir = new File(App.BANNER_IMAGES_FOLDER);
+        File outDir = new File(App.getBannerImagesFolder());
         if (!outDir.isDirectory()) {
             outDir.mkdir();
         }
@@ -936,7 +935,7 @@ public class FHome extends FBase implements OnClickListener {
         File ImageV;
         Bundle Banner = App.Instance.BannerName.getBundle(type);
         if(Banner!=null){
-            ImageV=new File(App.BANNER_IMAGES_FOLDER,Banner.getString("FILENAME",null));
+            ImageV=new File(App.getBannerImagesFolder(),Banner.getString("FILENAME",null));
 
             try{
                 if(ImageV!=null && ImageV.exists()){

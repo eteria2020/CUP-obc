@@ -30,7 +30,6 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -38,7 +37,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.skobbler.ngx.SKCategories.SKPOICategory;
 import com.skobbler.ngx.SKCoordinate;
 import com.skobbler.ngx.map.SKAnimationSettings;
 import com.skobbler.ngx.map.SKAnnotation;
@@ -47,7 +45,6 @@ import com.skobbler.ngx.map.SKBoundingBox;
 import com.skobbler.ngx.map.SKCalloutView;
 import com.skobbler.ngx.map.SKCoordinateRegion;
 import com.skobbler.ngx.map.SKMapCustomPOI;
-import com.skobbler.ngx.map.SKMapCustomPOI.SKPoiType;
 import com.skobbler.ngx.map.SKMapPOI;
 import com.skobbler.ngx.map.SKMapSettings;
 import com.skobbler.ngx.map.SKMapSettings.SKMapDisplayMode;
@@ -109,9 +106,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AMainOBC;
@@ -120,10 +115,6 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
-import eu.philcar.csg.OBC.controller.map.asynctask.GHAsyncTask;
-import eu.philcar.csg.OBC.controller.map.util.GeoUtils;
-import eu.philcar.csg.OBC.db.Pois;
-import eu.philcar.csg.OBC.controller.welcome.adapter.LADamages;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
@@ -526,7 +517,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		String jsonFile = "";
 
-		File outDir = new File(App.POI_POSITION_FOLDER);
+		File outDir = new File(App.getPoiPositionFolder());
 		if (!outDir.isDirectory()) {
 			outDir.mkdir();
 		}
@@ -1408,7 +1399,7 @@ public class FMap extends FBase implements OnClickListener {
 
 
 				if (customView.findViewById(R.id.customView_poi) != null) {
-					File imgFile = new File(App.POI_ICON_FOLDER.concat(poi.getString("id_icon")).concat(".png"));
+					File imgFile = new File(App.getPoiIconFolder().concat(poi.getString("id_icon")).concat(".png"));
 					if(imgFile==null || !imgFile.exists())
 						continue;
 					myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
@@ -2888,12 +2879,12 @@ public class FMap extends FBase implements OnClickListener {
 			if (Icons != null)
 				Icons.clear();
 
-			File outDir = new File(App.POI_ICON_FOLDER);
+			File outDir = new File(App.getPoiIconFolder());
 			if (!outDir.isDirectory()) {
 				outDir.mkdir();
 			}
 
-			Url = Url.concat("?ID=").concat(maxIconID(App.POI_ICON_FOLDER));
+			Url = Url.concat("?ID=").concat(maxIconID(App.getPoiIconFolder()));
 			dlog.d("updatePoiIcon: load url"+Url);
 			StringBuilder builder = new StringBuilder();
 			HttpClient client = new DefaultHttpClient();
@@ -3012,7 +3003,7 @@ public class FMap extends FBase implements OnClickListener {
 
 			String jsonStr = "";
 
-			File outDir = new File(App.POI_POSITION_FOLDER);
+			File outDir = new File(App.getPoiPositionFolder());
 			if (!outDir.isDirectory()) {
 				outDir.mkdir();
 			}
@@ -3102,7 +3093,7 @@ public class FMap extends FBase implements OnClickListener {
 	private void parseJsonPos(String jsonStr) {
 
 
-		dlog.d(FMap.class.getName()+ " parseJsonPos: parse del json: "+jsonStr);
+		//dlog.d(FMap.class.getName()+ " parseJsonPos: parse del json: "+jsonStr);
 		if(jsonStr.equals(""))
 			return;
 
@@ -3250,7 +3241,7 @@ public class FMap extends FBase implements OnClickListener {
 
 	public void loadBanner(String Url, String type, Boolean isClick) {
 
-		File outDir = new File(App.BANNER_IMAGES_FOLDER);
+		File outDir = new File(App.getBannerImagesFolder());
 		if (!outDir.isDirectory()) {
 			outDir.mkdir();
 		}
@@ -3417,7 +3408,7 @@ public class FMap extends FBase implements OnClickListener {
 		File ImageV;
 		Bundle Banner = App.Instance.BannerName.getBundle(type);
 		if(Banner!=null){
-			ImageV=new File(App.BANNER_IMAGES_FOLDER,Banner.getString("FILENAME","nope"));
+			ImageV=new File(App.getBannerImagesFolder(),Banner.getString("FILENAME","nope"));
 
 			try{
 				if(ImageV!=null && ImageV.exists()){

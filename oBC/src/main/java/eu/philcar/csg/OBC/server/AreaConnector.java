@@ -57,7 +57,7 @@ public class AreaConnector implements RemoteEntityInterface {
 			if (responseBody==null || responseBody.isEmpty() || responseBody.trim().isEmpty()) 
 				return MsgId();
 			
-			File file = new File(App.APP_DATA_PATH,"area.json");
+			File file = new File(App.getAppDataPath(),"area.json");
 			
 			try {
 				OutputStream os = new FileOutputStream(file);
