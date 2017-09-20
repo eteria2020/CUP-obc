@@ -257,6 +257,10 @@ public class MessageFactory {
 		Message msg  =  Message.obtain(null, ObcService.MSG_ZMQ_RESTART);	
 		return msg;
 	}
+	public static Message checkLogSize() {
+		Message msg  =  Message.obtain(null, ObcService.MSG_CHECK_LOG_SIZE);
+		return msg;
+	}
 	
 	public static Message sendBeacon() {
 		Message msg  =  Message.obtain(null, ObcService.MSG_TRIP_SENDBEACON);	

@@ -60,6 +60,7 @@ import eu.philcar.csg.OBC.server.UdpServer;
 import eu.philcar.csg.OBC.server.UploaderLog;
 import eu.philcar.csg.OBC.server.ZmqRequester;
 import eu.philcar.csg.OBC.server.ZmqSubscriber;
+import eu.philcar.csg.OBC.task.LogCleanup;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -176,6 +177,7 @@ public class ObcService extends Service {
 
 
     public static final int MSG_ZMQ_RESTART = 100;
+    public static final int MSG_CHECK_LOG_SIZE = 101;
 
     public static final int SERVER_NOTIFY_RAW = 0;
     public static final int SERVER_NOTIFY_RESERVATION = 1;
@@ -913,6 +915,7 @@ public class ObcService extends Service {
         //SystemControl.ResycNTP();
 
 
+        localHandler.sendMessageDelayed(MessageFactory.checkLogSize(),3000);
         dlog.d("Service created");
         isStarted = true;
     }
@@ -2490,6 +2493,10 @@ public class ObcService extends Service {
                 case MSG_ZMQ_RESTART:
                     if (WITH_ZMQNOTIFY)
                         zmqSubscriber.Restart(localHandler);
+                    break;
+
+                case MSG_CHECK_LOG_SIZE:
+                    new LogCleanup().execute();
                     break;
 
                 case MSG_TRIP_SENDBEACON:

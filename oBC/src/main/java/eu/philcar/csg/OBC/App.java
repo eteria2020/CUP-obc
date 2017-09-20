@@ -38,7 +38,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-
 import org.slf4j.LoggerFactory;
 
 import com.Hik.Mercury.SDK.Manager.CANManager;
@@ -54,7 +53,16 @@ import com.skobbler.ngx.packages.SKPackageURLInfo;
 import com.skobbler.ngx.search.SKSearchResult;
 import com.skobbler.ngx.versioning.SKVersioningManager;
 
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.rolling.FixedWindowRollingPolicy;
+import ch.qos.logback.core.rolling.RollingFileAppender;
+import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
+import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 import ch.qos.logback.core.util.StatusPrinter;
 import eu.philcar.csg.OBC.controller.map.util.GeoUtils;
 import eu.philcar.csg.OBC.db.Trips;
@@ -491,6 +499,7 @@ public class App extends Application {
 	public static Date    lastUpdateCAN =new Date();
 	
 	public static String APP_DATA_PATH = "/csg/";
+	public static final String APP_LOG_PATH = "/logNew/";
 	public static final String POI_ICON_FOLDER ="PoisIcon/";
 	public static final String POI_POSITION_FOLDER ="PoisPos/";
 	public static final String BANNER_IMAGES_FOLDER ="BannerImages/";
@@ -542,6 +551,10 @@ public class App extends Application {
 
 	public static String getAppDataPath() {
 		return Environment.getExternalStorageDirectory().getPath().concat(APP_DATA_PATH);
+	}
+
+	public static String getAppLogPath() {
+		return  Environment.getExternalStorageDirectory().getPath().concat(APP_LOG_PATH);
 	}
 
 	public static String getPoiIconFolder() {
@@ -1017,6 +1030,7 @@ public void loadRadioSetup() {
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		StatusPrinter.print(lc);
 
+		configureLogbackDirectly(getAppLogPath(),"logtest");
 		//SystemControl.InsertAPN(this, "");
 
         FontsOverride.setDefaultFont(this, "DEFAULT", "interstateregular.ttf");
@@ -2214,5 +2228,45 @@ private void  initPhase2() {
 			shutdownTimer = 0;
 			Events.StopShutdown();
 		}
+	}
+
+	private static void configureLogbackDirectly(String log_dir, String filePrefix) {
+		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+		context.reset();
+
+
+		RollingFileAppender<ILoggingEvent> rollingFileAppender = new RollingFileAppender<ILoggingEvent>();
+		rollingFileAppender.setAppend(true);
+		rollingFileAppender.setContext(context);
+
+		TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new TimeBasedRollingPolicy<ILoggingEvent>();
+		rollingPolicy.setFileNamePattern(log_dir + "/" + filePrefix + "_%d{yyyy-MM-dd_HH:mm:ss}.%i.log.zip");
+		rollingPolicy.setMaxHistory(365);
+		rollingPolicy.setParent(rollingFileAppender);
+		rollingPolicy.setContext(context);
+
+
+		SizeAndTimeBasedFNATP<ILoggingEvent> sizeAndTimeBasedFNATP = new SizeAndTimeBasedFNATP<>();
+		sizeAndTimeBasedFNATP.setMaxFileSize("2MB");
+		sizeAndTimeBasedFNATP.setContext(context);
+		sizeAndTimeBasedFNATP.setTimeBasedRollingPolicy(rollingPolicy);
+
+		rollingPolicy.setTimeBasedFileNamingAndTriggeringPolicy(sizeAndTimeBasedFNATP);
+		rollingPolicy.start();
+		sizeAndTimeBasedFNATP.start();
+		rollingFileAppender.setRollingPolicy(rollingPolicy);
+
+		PatternLayoutEncoder encoder = new PatternLayoutEncoder();
+		encoder.setPattern("%d [%thread] %-5level %logger{36} - %msg%n");
+		encoder.setContext(context);
+		encoder.start();
+
+
+		rollingFileAppender.setEncoder(encoder);
+		rollingFileAppender.start();
+
+		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+		root.setLevel(Level.TRACE);
+		root.addAppender(rollingFileAppender);
 	}
 }
