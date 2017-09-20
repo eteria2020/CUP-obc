@@ -2240,7 +2240,7 @@ private void  initPhase2() {
 		rollingFileAppender.setContext(context);
 
 		TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new TimeBasedRollingPolicy<ILoggingEvent>();
-		rollingPolicy.setFileNamePattern(log_dir + "/" + filePrefix + "_%d{yyyy-MM-dd_HH:mm:ss}.%i.log.zip");
+		rollingPolicy.setFileNamePattern(log_dir + "/" + filePrefix + "_%d{yyyy-MM-dd_HH:mm}.%i.log.zip");
 		rollingPolicy.setMaxHistory(365);
 		rollingPolicy.setParent(rollingFileAppender);
 		rollingPolicy.setContext(context);

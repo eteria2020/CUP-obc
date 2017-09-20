@@ -18,7 +18,7 @@ import eu.philcar.csg.OBC.helpers.Logs;
 
 public class LogCleanup extends AsyncTask<Void, Void, Boolean> {
     private DLog dlog = new DLog(this.getClass());
-    private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
+    private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm", Locale.getDefault());
 
 
 
