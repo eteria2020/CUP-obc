@@ -3,6 +3,7 @@ package eu.philcar.csg.OBC.helpers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 
 /**
  * Created by Fulvio on 19/09/2017.
@@ -58,6 +59,14 @@ public class Logs{
         if(!sorted)
             sort();
         while(i++<quantity && logs.size()>0){
+            removeLog(getValidLogIndex());
+        }
+    }
+
+    public void removeFromBottom(Date time){
+        if(!sorted)
+            sort();
+        while(logs.get(getValidLogIndex()).getDate().before(time) && logs.size()>0){
             removeLog(getValidLogIndex());
         }
     }

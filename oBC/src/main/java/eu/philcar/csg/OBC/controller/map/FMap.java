@@ -767,21 +767,28 @@ public class FMap extends FBase implements OnClickListener {
 	@Override
 	public void onDetach() {
 		super.onDetach();
-		mapHolder=null;
-		statusAlertSOC=0;
+		try {
+			mapHolder = null;
+			statusAlertSOC = 0;
 
-		localHandler.removeCallbacksAndMessages(null);
-		if (currentPositionProvider!=null)
-			currentPositionProvider.stopLocationUpdates();
+			if(localHandler!=null)
+				localHandler.removeCallbacksAndMessages(null);
+			if (currentPositionProvider != null)
+				currentPositionProvider.stopLocationUpdates();
 
-		timer_2min.cancel();
-		timer_5sec.cancel();
-		firstRun=true;
-		firstLaunch=true;
-		drawCharging=true;
-		if (tts!=null) {
-			tts.shutdown();
-			tts=null;
+			if(timer_2min!=null)
+				timer_2min.cancel();
+			if(timer_5sec!=null)
+				timer_5sec.cancel();
+			firstRun = true;
+			firstLaunch = true;
+			drawCharging = true;
+			if (tts != null) {
+				tts.shutdown();
+				tts = null;
+			}
+		}catch (Exception e){
+			dlog.e("Exception while detaching FMap",e);
 		}
 
 	}
@@ -1056,22 +1063,24 @@ public class FMap extends FBase implements OnClickListener {
 	 * */
     public void updateCarInfo(CarInfo carInfo) {
 
-    	if (carInfo==null)
-    		return;
+		try {
 
-		localCarInfo=carInfo;
-		int SOC = carInfo.batteryLevel;
+			if (carInfo == null)
+				return;
 
-		// if Soc==0 means that software has just started, or it is a demo kit or we lost some connection
-		// don't show anything for now
-		if (SOC==0) {
-			fmapAlarm.setVisibility(View.INVISIBLE);
-			fmapRange.setVisibility(View.INVISIBLE);
-			return;
-		}
+			localCarInfo = carInfo;
+			int SOC = carInfo.batteryLevel;
 
-		if(FMap.this.isVisible())
-		if(SOC<15) {
+			// if Soc==0 means that software has just started, or it is a demo kit or we lost some connection
+			// don't show anything for now
+			if (SOC == 0) {
+				fmapAlarm.setVisibility(View.INVISIBLE);
+				fmapRange.setVisibility(View.INVISIBLE);
+				return;
+			}
+
+			if (FMap.this.isVisible())
+				if (SOC < 15) {
 			/*rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
 			if(!seen) {
 				//drawChargingStation();
@@ -1086,24 +1095,23 @@ public class FMap extends FBase implements OnClickListener {
 				//localHandler.sendEmptyMessageDelayed(MSG_CLOSE_SOC_ALERT, 20000);
 				//(rootView.findViewById(R.id.fmapAlertSOCFL)).invalidate();
 			}*/
-			if(statusAlertSOC<=1) {
-				dlog.d("Display popup 5km");
-				statusAlertSOC=2;
-				Events.eventSoc(SOC,"Popup 5km");
-				rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
-				rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
-				((FrameLayout) (rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_redalertbox);
-				((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
-				((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_5km);
-				localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
-				//((AMainOBC) getActivity()).player.inizializePlayer();
-				if(App.USE_TTS_ALERT)
-					queueTTS(getActivity().getResources().getString(R.string.alert_5km));
-				else
-					playAlertAdvice(R.raw.alert_tts_5km," alert 5km");
-			}
-		}else
-			if(SOC<=30) {
+					if (statusAlertSOC <= 1) {
+						dlog.d("Display popup 5km");
+						statusAlertSOC = 2;
+						Events.eventSoc(SOC, "Popup 5km");
+						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+						rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
+						((FrameLayout) (rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_redalertbox);
+						((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
+						((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_5km);
+						localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
+						//((AMainOBC) getActivity()).player.inizializePlayer();
+						if (App.USE_TTS_ALERT)
+							queueTTS(getActivity().getResources().getString(R.string.alert_5km));
+						else
+							playAlertAdvice(R.raw.alert_tts_5km, " alert 5km");
+					}
+				} else if (SOC <= 30) {
 				/*rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
 				if(!seen) {
 					//drawChargingStation();
@@ -1118,50 +1126,52 @@ public class FMap extends FBase implements OnClickListener {
 					//localHandler.sendEmptyMessageDelayed(MSG_CLOSE_SOC_ALERT, 20000);
 					//(rootView.findViewById(R.id.fmapAlertSOCFL)).invalidate();
 				}*/
-				if (statusAlertSOC <= 0) {
-					dlog.d("Display popup 20km");
+					if (statusAlertSOC <= 0) {
+						dlog.d("Display popup 20km");
 
-					statusAlertSOC = 1;
-					Events.eventSoc(SOC,"Popup 20km");
-					rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
-					rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
-					((FrameLayout) (rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_orangealertbox);
-					((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
+						statusAlertSOC = 1;
+						Events.eventSoc(SOC, "Popup 20km");
+						rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
+						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+						((FrameLayout) (rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_orangealertbox);
+						((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
 
-					((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_20km);
-					//localHandler.sendEmptyMessageDelayed(MSG_CLOSE_SOC_ALERT, 20000);
-					//(rootView.findViewById(R.id.fmapAlertSOCFL)).invalidate(); testinva
+						((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_20km);
+						//localHandler.sendEmptyMessageDelayed(MSG_CLOSE_SOC_ALERT, 20000);
+						//(rootView.findViewById(R.id.fmapAlertSOCFL)).invalidate(); testinva
 
-					//((AMainOBC) getActivity()).player.inizializePlayer();
-					if(App.USE_TTS_ALERT)
-						queueTTS(getActivity().getResources().getString(R.string.alert_20km));
-					else
-						playAlertAdvice(R.raw.alert_tts_20km," alert 20km");
+						//((AMainOBC) getActivity()).player.inizializePlayer();
+						if (App.USE_TTS_ALERT)
+							queueTTS(getActivity().getResources().getString(R.string.alert_20km));
+						else
+							playAlertAdvice(R.raw.alert_tts_20km, " alert 20km");
+					}
 				}
+
+
+			if (SOC <= 30) {
+				if (SOC > 15)
+					rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
+				else
+					rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
+				fmapAlarm.setVisibility(View.VISIBLE);
+				fmapRange.setVisibility(View.INVISIBLE);
+
+			} else {
+				//statusAlertSOC=0;  //commented to limit
+				localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
+				rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
+				fmapAlarm.setVisibility(View.INVISIBLE);
+				fmapRange.setVisibility(View.VISIBLE);
+				tvRange.setText((SOC >= 50 ? SOC : SOC - 10) + " Km");
 			}
 
+			range = carInfo.rangeKm;
+			//ShowRealReachTimed(carInfo.rangeKm,10000);
 
-
-		if (SOC<=30) {
-			if(SOC>15)
-				rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
-			else
-				rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
-			fmapAlarm.setVisibility(View.VISIBLE);
-			fmapRange.setVisibility(View.INVISIBLE);
-
-		} else {
-			//statusAlertSOC=0;  //commented to limit
-			localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
-			rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
-			fmapAlarm.setVisibility(View.INVISIBLE);
-			fmapRange.setVisibility(View.VISIBLE);
-			tvRange.setText((SOC>=50?SOC:SOC-10) + " Km");
+		}catch(Exception e){
+			dlog.e("Exception while handling carInfo",e);
 		}
-
-		range = carInfo.rangeKm;
-		//ShowRealReachTimed(carInfo.rangeKm,10000);
-
     }
 
 	/**
@@ -2923,6 +2933,8 @@ public class FMap extends FBase implements OnClickListener {
 			dlog.d("updatePoiIcon got Response: "+jsonStr);
 			parseJsonIcon(jsonStr);
 			String filename="";
+			FileOutputStream fileOutput=null;
+			InputStream inputStream=null;
 
 			for (Bundle Icon : Icons) {    //-- start loop download and save image
 				try {
@@ -2942,21 +2954,25 @@ public class FMap extends FBase implements OnClickListener {
 					if (file.createNewFile()) {
 						file.createNewFile();
 					}
-					FileOutputStream fileOutput = new FileOutputStream(file);
-					InputStream inputStream = urlConnection.getInputStream();
+					fileOutput = new FileOutputStream(file);
+					inputStream = urlConnection.getInputStream();
 					byte[] buffer = new byte[1024];
 					int bufferLength = 0;
 					while ((bufferLength = inputStream.read(buffer)) > 0) {
 						fileOutput.write(buffer, 0, bufferLength);
 					}
-					fileOutput.close();
-					inputStream.close();
+
 					urlConnection.disconnect();
 				} catch (Exception e) {
 					dlog.e("Exception while downloading image");
 					File file = new File(outDir, filename);
 					if(file.exists())
 						file.delete();
+				}finally {
+					if(fileOutput!=null)
+						fileOutput.close();
+					if(inputStream!=null)
+						inputStream.close();
 				}
 			}
 			//return filepath;

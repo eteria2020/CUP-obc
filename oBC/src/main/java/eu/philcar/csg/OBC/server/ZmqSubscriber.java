@@ -173,7 +173,7 @@ public class ZmqSubscriber {
 
 				isStarting=false;
 				dlog.e("ZMQException ",e);
-				handler.sendMessage(MessageFactory.zmqRestart());
+				handler.sendMessageDelayed(MessageFactory.zmqRestart(),5000);
 			}
 
 		}

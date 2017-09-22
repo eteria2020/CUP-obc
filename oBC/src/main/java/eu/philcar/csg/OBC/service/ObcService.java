@@ -61,6 +61,7 @@ import eu.philcar.csg.OBC.server.UploaderLog;
 import eu.philcar.csg.OBC.server.ZmqRequester;
 import eu.philcar.csg.OBC.server.ZmqSubscriber;
 import eu.philcar.csg.OBC.task.LogCleanup;
+import eu.philcar.csg.OBC.task.OldLogCleamup;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -2027,6 +2028,8 @@ public class ObcService extends Service {
 
             sendBeacon();
 
+            localHandler.sendMessage(MessageFactory.checkLogSize());
+
             App.Instance.dbManager.getClientiDao().startWhitelistDownload(ObcService.this, privateHandler);
             App.Instance.dbManager.getPoisDao().startDownload(ObcService.this, localHandler);
             App.Instance.startAreaPolygonDownload(ObcService.this, null);
@@ -2496,6 +2499,7 @@ public class ObcService extends Service {
                     break;
 
                 case MSG_CHECK_LOG_SIZE:
+                    new OldLogCleamup().execute();
                     new LogCleanup().execute();
                     break;
 

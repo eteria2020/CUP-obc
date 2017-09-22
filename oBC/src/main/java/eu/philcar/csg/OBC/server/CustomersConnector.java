@@ -37,6 +37,8 @@ public class CustomersConnector implements RemoteEntityInterface {
 		private String cardCode = null;
 		private long lastUpdate;
 		private int  receivedRecords;
+
+		private static boolean busy;
 		
 		public void setLastUpdate(long v) {
 			this.lastUpdate = v;
@@ -55,12 +57,23 @@ public class CustomersConnector implements RemoteEntityInterface {
 		}
 		
 		public String GetRemoteUrl() {
-			return App.URL_Clienti;
+			if (!App.hasNetworkConnection) {
+				dlog.w("Customers : No network");
+				return null;
+			}
+
+			if (!busy) {
+				busy=true;
+				return App.URL_Clienti;
+			} else {
+				dlog.w("Customers : busy");
+				return null;
+			}
 		}
 	
 	public int DecodeJson(String responseBody) {
 
-		
+
 		if (responseBody == null || responseBody.isEmpty()) {
 			dlog.e("Empty response");
 			return MsgId();
@@ -171,6 +184,9 @@ public class CustomersConnector implements RemoteEntityInterface {
 		dlog.d("WHITELIST PARSE: " + time +"ms for " + receivedRecords );
 
 		App.whiteListSize = customers.getSize();
+
+		busy = false;
+
 		return MsgId();
 	}
 

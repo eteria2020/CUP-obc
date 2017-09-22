@@ -18,23 +18,23 @@ import eu.philcar.csg.OBC.helpers.Logs;
 
 public class LogCleanup extends AsyncTask<Void, Void, Boolean> {
     private DLog dlog = new DLog(this.getClass());
-    private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm", Locale.getDefault());
-
+    private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH", Locale.getDefault());
+    private Logs logs=null;
 
 
     @Override
     protected Boolean doInBackground(Void... params) {
 
-        Logs logs=null;
+
         try {
             dlog.d("CheckLogSize ~ Start cleaning log");
             long logsize = FileTools.getFileSize(new File(App.getAppLogPath()));
 
             dlog.d("CheckLogSize ~ Log directory weight: "+logsize);
-            /*if(logsize<2147483648L) {
+            if(logsize<2147483648L) {
                 dlog.d("CheckLogSize ~ No need to operate");
                 return false;
-            }*/
+            }
 
 
 
@@ -98,6 +98,7 @@ public class LogCleanup extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);
+        logs = null;
         dlog.d("LogCleanup ~ finished with result: "+aBoolean);
     }
 

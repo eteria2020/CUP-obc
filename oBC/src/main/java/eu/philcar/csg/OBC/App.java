@@ -500,6 +500,7 @@ public class App extends Application {
 	
 	public static String APP_DATA_PATH = "/csg/";
 	public static final String APP_LOG_PATH = "/logNew/";
+	public static final String APP_OLD_LOG_PATH = "/log/";
 	public static final String POI_ICON_FOLDER ="PoisIcon/";
 	public static final String POI_POSITION_FOLDER ="PoisPos/";
 	public static final String BANNER_IMAGES_FOLDER ="BannerImages/";
@@ -555,6 +556,10 @@ public class App extends Application {
 
 	public static String getAppLogPath() {
 		return  Environment.getExternalStorageDirectory().getPath().concat(APP_LOG_PATH);
+	}
+
+	public static String getAppOldLogPath() {
+		return  Environment.getExternalStorageDirectory().getPath().concat(APP_OLD_LOG_PATH);
 	}
 
 	public static String getPoiIconFolder() {
@@ -2240,7 +2245,7 @@ private void  initPhase2() {
 		rollingFileAppender.setContext(context);
 
 		TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new TimeBasedRollingPolicy<ILoggingEvent>();
-		rollingPolicy.setFileNamePattern(log_dir + "/" + filePrefix + "_%d{yyyy-MM-dd_HH:mm}.%i.log.zip");
+		rollingPolicy.setFileNamePattern(log_dir + "/" + filePrefix + "_%d{yyyy-MM-dd_HH}.%i.log.zip");
 		rollingPolicy.setMaxHistory(365);
 		rollingPolicy.setParent(rollingFileAppender);
 		rollingPolicy.setContext(context);
