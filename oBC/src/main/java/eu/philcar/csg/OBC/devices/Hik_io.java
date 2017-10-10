@@ -87,7 +87,7 @@ public class Hik_io implements LowLevelInterface {
 	
 	
 	private CANManager mCANManager;
-	//private BTManager mBTManager;
+	private BTManager mBTManager;
 	private LeaseManagerItaly mLeaseManagerItaly;
 	private LeaseManager mLeaseManager;
 	private RadioManager mRadioManager;
@@ -150,13 +150,14 @@ public class Hik_io implements LowLevelInterface {
 			dlog.d("Initial SDK version:" + SDKVersion);
 		}
 
-		/*mBTManager = BTManager.get(context);
+		mBTManager = BTManager.get(context);
 		if(mBTManager!=null){
+
 			mBTManager.switchOn();
 			mBTManager.isBTConnected();
 			//mBTManager.enterPairMode();
 			mBTManager.registerAdapter(mBTObserver);
-		}*/
+		}
 		
 		mLeaseManagerItaly = LeaseManagerItaly.get(context);
 		if (mLeaseManagerItaly!=null) {
@@ -1456,7 +1457,7 @@ public class Hik_io implements LowLevelInterface {
 	    	
 	    }
 
-	/*private BluetoothObr mBTObserver;
+	private BluetoothObr mBTObserver = new BluetoothObr();
 
 	private class BluetoothObr extends BluetoothStateCallback{
 
@@ -1535,7 +1536,7 @@ public class Hik_io implements LowLevelInterface {
 		public void onCallingPhoneName(String name) throws RemoteException {
 			super.onCallingPhoneName(name);
 		}
-	}*/
+	}
 
 
 }

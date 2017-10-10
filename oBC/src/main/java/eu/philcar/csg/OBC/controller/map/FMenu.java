@@ -212,7 +212,7 @@ public class FMenu extends FBase implements OnClickListener {
 		// discovered and corrected ASAP, as not to happen again. 
 		// Anyhow, I wrote an implementation for them so as to provide some UI state that may allow the user to return into 
 		// a valid state (the only one that remains critical is (FALSE, NULL, STARTED) but again, this should never happen 
-		// so the right approach is to find out why it's happened and not to provide a valid UI for the user).
+		// so the right approach is to contains out why it's happened and not to provide a valid UI for the user).
 		
 		AMainOBC activity = (AMainOBC)getActivity();
 		if (activity == null) {
@@ -430,12 +430,18 @@ public class FMenu extends FBase implements OnClickListener {
 	}
 	
 	private void stopSelfClose(final View root) {
-		((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(0));
-		(root.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
+		try {
+			if(getActivity()!=null)
+				((AMainOBC) this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(0));
 
-		
-		if (timer!=null)
-			timer.cancel();
+			(root.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
+
+
+			if (timer != null)
+				timer.cancel();
+		}catch(Exception e){
+			dlog.e("Exception while stopping timer",e);
+		}
 	}
 
 	@Override

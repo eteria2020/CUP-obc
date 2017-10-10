@@ -409,7 +409,7 @@ public class AdvertisementService extends IntentService {
 		File adsFolder = new File(BANNER_FOLDER_ABSOLUTE_PATH);
 		
 		if (adsFolder == null || !adsFolder.exists()) {
-			DLog.E("AdvertisementService-computeAdList: unable to find ad folder");
+			DLog.E("AdvertisementService-computeAdList: unable to contains ad folder");
 			return null;
 		}
 		

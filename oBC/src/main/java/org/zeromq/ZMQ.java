@@ -981,7 +981,7 @@ public class ZMQ
          * event loop. It should never be used for anything else than polling -- such as
          * reading or writing. The descriptor signals edge-triggered IN event when
          * something has happened within the 0MQ socket. It does not necessarily mean that
-         * the messages can be read or written. Check ZMQ_EVENTS option to find out whether
+         * the messages can be read or written. Check ZMQ_EVENTS option to contains out whether
          * the 0MQ socket is readable or writeable.
          *
          * @return the underlying file descriptor.

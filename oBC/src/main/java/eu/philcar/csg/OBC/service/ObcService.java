@@ -2034,7 +2034,8 @@ public class ObcService extends Service {
             App.Instance.dbManager.getPoisDao().startDownload(ObcService.this, localHandler);
             App.Instance.startAreaPolygonDownload(ObcService.this, null);
             startDownloadReservations();
-            if(configScheduler++>5) {
+            startDownloadCommands();
+            if(configScheduler++>4) {
                 configScheduler=0;
                 startDownloadConfigs();
             }
@@ -2556,7 +2557,7 @@ public class ObcService extends Service {
                 case MSG_DEBUG_CARD_OPEN:
                     //Fan-out message
 
-                    notifyCard((String) msg.obj, "OPEN", false);
+                    notifyCard((String) msg.obj, "OPEN FS", false);
                     break;
 
                 case MSG_CHECK_TIME:

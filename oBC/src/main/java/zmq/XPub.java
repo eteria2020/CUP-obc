@@ -184,7 +184,7 @@ class XPub extends SocketBase
     {
         boolean msgMore = msg.hasMore();
 
-        //  For the first part of multi-part message, find the matching pipes.
+        //  For the first part of multi-part message, contains the matching pipes.
         if (!more) {
             subscriptions.match(msg.data(), msg.size(),
                     markAsMatching, this);

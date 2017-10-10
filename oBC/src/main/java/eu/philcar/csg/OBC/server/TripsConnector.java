@@ -111,7 +111,27 @@ public class TripsConnector implements RemoteEntityInterface {
 				list.add(new BasicNameValuePair("n_pin", corsa.n_pin+""));
 				if (corsa.id_parent!=0)  list.add(new BasicNameValuePair("id_parent", corsa.id_parent+""));
 			} else {
-				dlog.e("Case not handled : " + corsa.toString());
+				dlog.e("Case not handled sending opening: " + corsa.toString());
+				dlog.d("GetParams, sending apertura tripInfo:"+tripInfo.toString());
+				tripInfo.trip.begin_sent=false;
+				tripInfo.UpdateCorsa();
+				list.add(new BasicNameValuePair("cmd", "1"));
+
+				list.add(new BasicNameValuePair("id_veicolo", corsa.plate + ""));
+				list.add(new BasicNameValuePair("id_cliente", corsa.id_customer + ""));
+				list.add(new BasicNameValuePair("ora", corsa.begin_timestamp + ""));
+				list.add(new BasicNameValuePair("km", corsa.begin_km + ""));
+				list.add(new BasicNameValuePair("carburante",
+						corsa.begin_battery + ""));
+				list.add(new BasicNameValuePair("lon", corsa.begin_lon + ""));
+				list.add(new BasicNameValuePair("lat", corsa.begin_lat + ""));
+				list.add(new BasicNameValuePair("warning", corsa.warning));
+				list.add(new BasicNameValuePair("pulizia_int", corsa.int_cleanliness+""));
+				list.add(new BasicNameValuePair("pulizia_ext", corsa.ext_cleanliness+""));
+				list.add(new BasicNameValuePair("mac", App.MacAddress));
+				list.add(new BasicNameValuePair("imei", App.IMEI));
+				list.add(new BasicNameValuePair("n_pin", corsa.n_pin+""));
+				if (corsa.id_parent!=0) list.add(new BasicNameValuePair("id_parent", corsa.id_parent+""));
 			}
 	
 			for (NameValuePair pair : list) {

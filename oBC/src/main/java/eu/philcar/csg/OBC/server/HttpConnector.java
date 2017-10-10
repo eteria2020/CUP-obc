@@ -128,11 +128,12 @@ public class HttpConnector {
 		
 		
 		@Override
-		protected String doInBackground(RemoteEntityInterface... entity) {
+		protected String doInBackground(final RemoteEntityInterface... entity) {
 			start = System.currentTimeMillis();
 			
-			this.entity = entity[0];			
+			this.entity = entity[0];
 			String URL = this.entity.GetRemoteUrl();
+
 			
 			if (URL==null) {
 				dlog.e("ABORTED : URL is null, probably connection is down or connector is busy");
@@ -163,7 +164,8 @@ public class HttpConnector {
 					Message msg = _handler.obtainMessage();
 					msg.what = EntityId;
 					msg.obj = entity;
-					_handler.sendMessage(msg);
+					_handler.removeMessages(msg.what);
+					_handler.sendMessageDelayed(msg,10000);
 					dlog.d("Sent message to handler ID " + EntityId);
 	    	    } else if (_messenger!=null) {
 	    	    	Message msg = new Message();

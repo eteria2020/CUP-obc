@@ -27,6 +27,7 @@ import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
+import eu.philcar.csg.OBC.helpers.CardRfid;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.server.TripsConnector;
@@ -171,6 +172,17 @@ public class TripInfo {
             dlog.e(TripInfo.class.toString()+" handleCard: Handle card - null event :"+event);
             return null;
         }
+        //Check if open only card
+        if(App.openDoorsCards!=null){
+            CardRfid card = (CardRfid) App.openDoorsCards.find(new CardRfid(code,""));
+            if(card!=null && !isOpen){
+                dlog.d("Passaggio card doorsOnly apertura porte in corso! id card: "+card.toString());
+                obc_io.setDoors(null, 1,"Porte Aperte");  //Sole se trip registrata su db apri le portiere
+                Events.eventRfid(6, code + " "+ card.getName());
+                return null;
+            }
+        }
+
 
         /**
          * Prevent any operation on vehicle with the default standard plate
@@ -255,7 +267,7 @@ public class TripInfo {
                     //obc_io.setEngine(null, 1); //TODO: RIMUOVERE!!!! Il motore si dovr? abilitare solo dopo il check del pin
                     obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
                     obc_io.setTag(null,cardCode);
-                    Events.eventRfid(1, code);
+                    Events.eventRfid(1, code+" "+event);
                     hasBeenStopped =false;
                     service.sendBeacon();
                     dlog.d(TripInfo.class.toString()+" handleCard: Car opened ");

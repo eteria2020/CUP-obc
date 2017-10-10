@@ -59,7 +59,6 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.rolling.FixedWindowRollingPolicy;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
@@ -69,6 +68,8 @@ import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.devices.RadioSetup;
+import eu.philcar.csg.OBC.helpers.CardRfid;
+import eu.philcar.csg.OBC.helpers.CardRfidCollection;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.Encryption;
@@ -400,6 +401,7 @@ public class App extends Application {
 	private static final String  KEY_Charging = "Charging";
 	private static final String  KEY_UseExternalGPS ="use_external_gps";
 	private static final String  KEY_RadioSetup ="radio_setup";
+	private static final String  KEY_OpenDoorsCards ="open_doors_cards";
 	private static final String  KEY_Watchdog = "watchdog";
 	private static final String  KEY_BatteryShutdownLevel = "battery_shutdown_level";
 	private static final String  KEY_FleetId = "fleet_id";
@@ -417,6 +419,7 @@ public class App extends Application {
 	
 
 	public static RadioSetup radioSetup;
+	public static CardRfidCollection openDoorsCards;
 	
 	public static String CarPlate="ND";
 	public static String Damages = "";
@@ -688,6 +691,16 @@ public class App extends Application {
 			e.apply();
 		}
 	}
+	public void persistOpenDoorsCards() {
+		if (this.preferences != null ) {
+			Editor e = this.preferences.edit();
+			if (openDoorsCards!=null)
+				e.putString(KEY_OpenDoorsCards, openDoorsCards.toJson());
+			else
+				e.putString(KEY_OpenDoorsCards, "");
+			e.apply();
+		}
+	}
 	
 	public void persistWatchdog() {
 		if (this.preferences != null ) {
@@ -859,6 +872,18 @@ public void loadRadioSetup() {
 			persistRadioSetup();
 			
 			dlog.d("RadioSetup from defaults : " + radioSetup.toJson());
+		}
+
+	}
+
+	public void loadOpenDoorsCards() {
+
+
+		if (this.preferences != null) {
+			String json = preferences.getString(KEY_OpenDoorsCards, "");
+			dlog.d("RadioSetup from preferences : " + json);
+			openDoorsCards = CardRfidCollection.decodeFromJson(json);
+
 		}
 
 	}
@@ -1591,7 +1616,13 @@ private void  initPhase2() {
 				} else if (key.equalsIgnoreCase("TimeZone")) {
 					timeZone = jo.getString(key);
 					persistTimeZone();
-				};
+				}  else if (key.equalsIgnoreCase("OpenDoorsCards")) {
+					if (payload!=null)
+						openDoorsCards =  CardRfidCollection.decodeFromJson(payload);
+					else
+						openDoorsCards =  CardRfidCollection.decodeFromJson(value);
+					persistOpenDoorsCards();
+				}
 			}
 			loadPreferences();
 		} catch (JSONException e) {
@@ -1797,6 +1828,7 @@ private void  initPhase2() {
 		loadCharging();
 		loadBatteryAlarmSmsNumbers();
 		loadRadioSetup();
+		loadOpenDoorsCards();
 		loadDefaultCity();
 	}
 	
