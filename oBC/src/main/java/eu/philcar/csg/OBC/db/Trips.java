@@ -114,7 +114,7 @@ public class Trips extends DbTable<Trip,Integer> {
 			
 			return this.query(query);
 										
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			dlog.e("getTripsToSend fail:",e);
 			return null;
 
