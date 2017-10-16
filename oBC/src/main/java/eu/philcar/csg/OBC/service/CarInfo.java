@@ -446,7 +446,10 @@ public class CarInfo {
                     hasChanged = true;
                     id = s;
                     App.Instance.setCarPlate(id);
-                    serviceHandler.sendMessage(MessageFactory.zmqRestart());
+                    if(App.canRestartZMQ) {
+                        App.canRestartZMQ=false;
+                        serviceHandler.sendMessage(MessageFactory.zmqRestart());
+                    }
                 }
             } else if (key.equalsIgnoreCase("VER")) {
                 s = b.getString(key);

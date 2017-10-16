@@ -1012,9 +1012,17 @@ public class Hik_io implements LowLevelInterface {
 		            
 		            if (vinCode == null || vinCode.isEmpty() || vinCode.equalsIgnoreCase("null"))
 		            	return;
-		            
+
+				 String vin = vinCode;
+				 if(vinCode.contains("~")){
+					 vin = vinCode.substring(0,vinCode.indexOf("~"));
+				 }
+
+				 if (vin.isEmpty() || vin.equalsIgnoreCase(""))
+					 return;
+
 		            Bundle b = new Bundle();
-		            b.putString("VIN", vinCode);
+		            b.putString("VIN", vin);
 		            obcService.notifyCarInfo(b);
 		            
 		            dlog.i("onVinCodeChange(vinCode):" + vinCode );

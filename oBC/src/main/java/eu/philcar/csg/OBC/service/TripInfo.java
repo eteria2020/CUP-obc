@@ -785,6 +785,13 @@ public class TripInfo {
         if (n_pin>0) {			
             trip.n_pin=n_pin;
             UpdateCorsa();
+            try {
+                HttpConnector hConnector = new HttpConnector(App.Instance.getApplicationContext());
+                TripsConnector tc = new TripsConnector(this);
+                hConnector.Execute(tc);
+            }catch(Exception e){
+                dlog.e("Exception while trying to update server trip",e);
+            }
             return true;
         } else
             return false;

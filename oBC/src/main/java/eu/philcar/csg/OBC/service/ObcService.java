@@ -60,7 +60,6 @@ import eu.philcar.csg.OBC.server.UdpServer;
 import eu.philcar.csg.OBC.server.UploaderLog;
 import eu.philcar.csg.OBC.server.ZmqRequester;
 import eu.philcar.csg.OBC.server.ZmqSubscriber;
-import eu.philcar.csg.OBC.task.LogCleanup;
 import eu.philcar.csg.OBC.task.OldLogCleamup;
 
 import android.app.AlarmManager;
@@ -275,6 +274,7 @@ public class ObcService extends Service {
                 rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time_zone 0"}); //date -s 20120423.130000
                 AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                 am.setTimeZone(App.timeZone);
+                am = null;
 
 
 
@@ -610,7 +610,7 @@ public class ObcService extends Service {
 
         virtualBMSUpdateScheduler.scheduleAtFixedRate(new Runnable() {
 
-            int canAmpAnomalies =0, canCellAnomalies =0, canBmsAnomalies=0, canAllAnomalies=0, countTo0=0;
+            int canAmpAnomalies =0, canCellAnomalies =0, canBmsAnomalies=0, canAllAnomalies=0;
             boolean bmsSocError =false, bmsCellError=false, ampError=false;
 
 
@@ -678,7 +678,7 @@ public class ObcService extends Service {
                     }
                     if(!bmsCellError && !bmsSocError && !ampError) {
                         dlog.d("virtualBMSUpdateScheduler: reset count to 0"+bmsCellError+bmsSocError+ampError);
-                        countTo0 = 0;
+                        App.Instance.setBmsCountTo90(0);
                     }
 
                     //fill carinfo attribute
@@ -711,8 +711,8 @@ public class ObcService extends Service {
                         if(bmsCellError){
 
                             if(bmsSocError){
-                                if(countTo0++<90) {
-                                    dlog.d("virtualBMSUpdateScheduler: all fault keep last valid value to 0 is "+countTo0+" times | error: "+bmsCellError+bmsSocError+ampError);
+                                if(App.Instance.incrementBmsCountTo90()<90) {
+                                    dlog.d("virtualBMSUpdateScheduler: all fault keep last valid value to 0 is "+ App.getBmsCountTo90() +" times | error: "+bmsCellError+bmsSocError+ampError);
                                     carInfo.SOCR = carInfo.batteryLevel;
                                 }
                                 else{
@@ -723,8 +723,8 @@ public class ObcService extends Service {
 
                             }else{
 
-                                if(countTo0++<90) {
-                                    dlog.d("virtualBMSUpdateScheduler: bms cells fault using bms SOC to 0 is " + countTo0 + " times | error: " + bmsCellError + bmsSocError + ampError);
+                                if( App.Instance.incrementBmsCountTo90()<90) {
+                                    dlog.d("virtualBMSUpdateScheduler: bms cells fault using bms SOC to 0 is " +  App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + ampError);
                                     carInfo.SOCR = Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS);
                                 }
                                 else{
@@ -736,8 +736,8 @@ public class ObcService extends Service {
                             }
 
                         }else if(bmsSocError){
-                            if(countTo0++<90) {
-                                dlog.d("virtualBMSUpdateScheduler: bms SOC fault using SOC2 to 0 is " + countTo0 + " times | error: " + bmsCellError + bmsSocError + ampError);
+                            if( App.Instance.incrementBmsCountTo90()<90) {
+                                dlog.d("virtualBMSUpdateScheduler: bms SOC fault using SOC2 to 0 is " + App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + ampError);
                                 carInfo.SOCR = carInfo.virtualSOC;
                             }
                             else{
@@ -998,7 +998,8 @@ public class ObcService extends Service {
             App.lastNetworkOn = new Date();
 
             //Force zmq restart for faster reconnection
-            localHandler.sendMessage(MessageFactory.zmqRestart());
+            localHandler.removeMessages(MessageFactory.zmqRestart().what);
+            localHandler.sendMessageDelayed(MessageFactory.zmqRestart(),15000);
 
             //Dequeue eventual offline trip or events
             privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
@@ -2044,8 +2045,10 @@ public class ObcService extends Service {
             privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
             privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
 
-            Message msg = MessageFactory.zmqRestart();
-            localHandler.sendMessage(msg);
+            if(configScheduler%2==0) {
+                localHandler.sendMessage(MessageFactory.zmqRestart());
+                App.canRestartZMQ=true;
+            }
             if(App.currentTripInfo==null && System.currentTimeMillis()- App.AppScheduledReboot.getTime()>24*60*60*1000 && !startedReboot){
                 startedReboot=true;
                 if(App.reservation!=null) {
@@ -2501,7 +2504,7 @@ public class ObcService extends Service {
 
                 case MSG_CHECK_LOG_SIZE:
                     new OldLogCleamup().execute();
-                    new LogCleanup().execute();
+                    //new LogCleanup().execute();
                     break;
 
                 case MSG_TRIP_SENDBEACON:

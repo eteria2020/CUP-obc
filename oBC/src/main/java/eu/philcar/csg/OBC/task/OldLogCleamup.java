@@ -29,7 +29,7 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
 
         try {
             dlog.d("CheckOldLogSize ~ Start cleaning log");
-            File logRoot = new File(App.getAppOldLogPath());
+            File logRoot = new File(App.getAppLogPath());
             long logsize = FileTools.getFileSize(logRoot);
 
             dlog.d("CheckOldLogSize ~ Log directory weight: " + logsize);
@@ -39,7 +39,7 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
                 retreiveAllLogs(logRoot);
                 logs.removeFromBottom(30);
                 return true;
-            }
+            }else
             {
 
 

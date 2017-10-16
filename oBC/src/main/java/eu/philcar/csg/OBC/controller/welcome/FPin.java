@@ -262,11 +262,11 @@ public class FPin extends FBase implements OnClickListener {
 		//progressDF.dismiss();
 		
 		boolean result;
-		if (Debug.IGNORE_HARDWARE) {
+		//if (Debug.IGNORE_HARDWARE) {
 			result = valid;
-		} else {
+		/*} else {
 			result = (App.currentTripInfo!=null?App.currentTripInfo.CheckPin(pin):false);
-		}
+		}*/
 		
 		if (result) {
 			

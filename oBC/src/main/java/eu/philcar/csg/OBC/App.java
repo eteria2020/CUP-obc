@@ -68,7 +68,6 @@ import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.devices.RadioSetup;
-import eu.philcar.csg.OBC.helpers.CardRfid;
 import eu.philcar.csg.OBC.helpers.CardRfidCollection;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
@@ -385,6 +384,7 @@ public class App extends Application {
 	private static final String  KEY_current_apm="current_amp";
 	private static final String  KEY_charging_amp="charging_apm";
 	private static final String  KEY_max_amp="max_apm";
+	private static final String  KEY_BmsCountTo90="bms_count_to_90";
 	private static final String  KEY_MaxVoltage="max_voltage";
 	private static final String  KEY_Km="km";
 	private static final String  KEY_parkModeStarted="parkModeStarted";
@@ -430,6 +430,7 @@ public class App extends Application {
 	
 	public static boolean isNavigatorEnabled = true;
 	public static int isAdmin=0; //1=MAGGIMI PRIVILEGI; 2=PRIVILEGI RIDOTTI;
+	public static boolean canRestartZMQ=true;
 	
 	public static int     id_Version;
 	public static String  sw_Version="ND";
@@ -457,6 +458,7 @@ public class App extends Application {
 	public static long   networkExceptions=0;
 	public static Location lastLocation;
 	public static Boolean saveLog =true;
+	private static int bmsCountTo90 =0;
 
 
 	
@@ -502,7 +504,7 @@ public class App extends Application {
 	public static Date    lastUpdateCAN =new Date();
 	
 	public static String APP_DATA_PATH = "/csg/";
-	public static final String APP_LOG_PATH = "/logNew/";
+	public static final String APP_LOG_PATH = "/log/";
 	public static final String APP_OLD_LOG_PATH = "/log/";
 	public static final String POI_ICON_FOLDER ="PoisIcon/";
 	public static final String POI_POSITION_FOLDER ="PoisPos/";
@@ -577,6 +579,16 @@ public class App extends Application {
 		return getAppDataPath().concat(BANNER_IMAGES_FOLDER);
 	}
 
+	public static int getBmsCountTo90() {
+		return bmsCountTo90;
+	}
+
+	public int incrementBmsCountTo90() {
+		bmsCountTo90++;
+		persistBmsCountTo90();
+		return (bmsCountTo90-1);
+	}
+
 	public static String getEndImagesFolder() {
 		return getAppDataPath().concat(END_IMAGES_FOLDER);
 	}
@@ -612,6 +624,15 @@ public class App extends Application {
 			e.apply();
 		}
 	}
+
+	public void persistBmsCountTo90() {
+		if (this.preferences != null) {
+			Editor e = this.preferences.edit();
+			e.putInt(KEY_BmsCountTo90, App.bmsCountTo90);
+			e.apply();
+		}
+	}
+
 	public void persistCounterCleanlines() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
@@ -950,6 +971,19 @@ public void loadRadioSetup() {
 
 	}
 
+	public void loadBmsCountTo90() {
+
+		try {
+			bmsCountTo90 = preferences!=null?preferences.getInt(KEY_BmsCountTo90,0):0;
+
+		} catch (Exception e) {
+			dlog.e("Loading max voltage",e);
+		}
+
+
+
+	}
+
 	
 	
 	public void SaveDefaultCity(String city) {
@@ -1060,7 +1094,7 @@ public void loadRadioSetup() {
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		StatusPrinter.print(lc);
 
-		configureLogbackDirectly(getAppLogPath(),"logtest");
+		//configureLogbackDirectly(getAppLogPath(),"logtest");
 		//SystemControl.InsertAPN(this, "");
 
         FontsOverride.setDefaultFont(this, "DEFAULT", "interstateregular.ttf");
@@ -1474,6 +1508,10 @@ private void  initPhase2() {
 		loadPreferences();
 	}
 
+	public void setBmsCountTo90(int countTo90){
+		bmsCountTo90 =countTo90;
+		persistBmsCountTo90();
+	}
 	public  void setChargingAmp( double Amp) {
 		Editor editor = preferences.edit();
 
@@ -1830,6 +1868,7 @@ private void  initPhase2() {
 		loadRadioSetup();
 		loadOpenDoorsCards();
 		loadDefaultCity();
+		loadBmsCountTo90();
 	}
 	
 	public static String getipAddress() { 

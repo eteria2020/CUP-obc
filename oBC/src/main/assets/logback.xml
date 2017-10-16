@@ -14,7 +14,6 @@
       <fileNamePattern>${LOG_DIR}/giorno%d{yyyy-MM-dd,aux}/log.%d{yyyy-MM-dd_HH}.txt.zip</fileNamePattern>
       <!-- keep 7 days' worth of history -->
       <maxFileSize>500KB</maxFileSize>
-     <maxHistory>30240</maxHistory>
       <totalSizeCap>500MB</totalSizeCap>
     </rollingPolicy>
   </appender>
