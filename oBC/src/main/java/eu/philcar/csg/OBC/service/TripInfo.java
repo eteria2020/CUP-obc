@@ -757,7 +757,7 @@ public class TripInfo {
 
 
 
-    public boolean CheckPin(String pin) {
+    public boolean CheckPin(String pin, boolean notify) {
 
         if (this.customer==null) {
             dlog.e("CheckPin: customer==null");
@@ -776,7 +776,7 @@ public class TripInfo {
             DbManager dbm = App.Instance.dbManager;
             BusinessEmployees employees = dbm.getDipendentiDao();
             BusinessEmployee employee = employees.getBusinessEmployee(customer.id);
-            if (!customer.isCompanyPinEnabled() || !employee.isBusinessEnabled() || !employee.isWithinTimeLimits()) {
+            if (!customer.isCompanyPinEnabled() || employee==null || !employee.isBusinessEnabled() || !employee.isWithinTimeLimits()) {
                 dlog.e("CheckPin : can't open business trip");
                 return false;
             }
@@ -786,9 +786,11 @@ public class TripInfo {
             trip.n_pin=n_pin;
             UpdateCorsa();
             try {
-                HttpConnector hConnector = new HttpConnector(App.Instance.getApplicationContext());
-                TripsConnector tc = new TripsConnector(this);
-                hConnector.Execute(tc);
+                if(notify) {
+                    HttpConnector hConnector = new HttpConnector(App.Instance.getApplicationContext());
+                    TripsConnector tc = new TripsConnector(this);
+                    hConnector.Execute(tc);
+                }
             }catch(Exception e){
                 dlog.e("Exception while trying to update server trip",e);
             }

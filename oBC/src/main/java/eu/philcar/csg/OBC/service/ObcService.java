@@ -2314,7 +2314,7 @@ public class ObcService extends Service {
                         rmsg.arg1 = 0;
 
                         if (tripInfo != null) {
-                            boolean isVerified = tripInfo.CheckPin(pin);
+                            boolean isVerified = tripInfo.CheckPin(pin, false);
                             if (isVerified) {
                                 dlog.d("Pin OK");
                                 //obc_io.setEngine(rmsg.replyTo, 1);

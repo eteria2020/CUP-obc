@@ -196,7 +196,7 @@ public class FPin extends FBase implements OnClickListener {
 					((AWelcome) getActivity()).sendMessage(MessageFactory.checkPin(pin));
 
 					if (App.currentTripInfo.trip.recharge != -15) {
-						pinChecked(App.currentTripInfo.CheckPin(pin));
+						pinChecked(App.currentTripInfo.CheckPin(pin, true));
 					} else {
 						//progressDF.dismiss();
 						messageTV.setText(R.string.other_trip_message);
