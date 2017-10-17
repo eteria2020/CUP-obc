@@ -61,6 +61,7 @@ import eu.philcar.csg.OBC.server.UploaderLog;
 import eu.philcar.csg.OBC.server.ZmqRequester;
 import eu.philcar.csg.OBC.server.ZmqSubscriber;
 import eu.philcar.csg.OBC.task.OldLogCleamup;
+import eu.philcar.csg.OBC.task.UDPServer;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -206,6 +207,8 @@ public class ObcService extends Service {
     private LowLevelInterface obc_io;
     private CarInfo carInfo;
     private TripInfo tripInfo;
+
+    private Thread udpBroadcastReceiver;
 
     private ZmqSubscriber zmqSubscriber;
     private ZmqRequester zmqRequester;
@@ -401,6 +404,9 @@ public class ObcService extends Service {
 
         dlog.d("Service onCreate");
 
+        //UDP SERVER to receive broadcast from mobile app
+        //udpBroadcastReceiver = new Thread(new UDPServer());
+        //udpBroadcastReceiver.start();
 
 
         if (App.Instance.loadZmqDisabledConfig()) {
