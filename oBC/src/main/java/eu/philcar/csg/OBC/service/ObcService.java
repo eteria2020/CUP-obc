@@ -1539,6 +1539,13 @@ public class ObcService extends Service {
                         boolean forced = (cmd.txtarg1 == null || cmd.txtarg1.isEmpty());
                         dlog.d(ObcService.class.toString() + " executeServerCommands: CLOSE_TRIP forced : " + forced);
                         localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,1));
+                        if(cmd.txtarg2.equalsIgnoreCase("null") && (cmd.txtarg1 == null || cmd.txtarg1.isEmpty())){
+                            long now = new Date().getTime() /1000;
+                            if ((cmd.ttl<=0 || cmd.queued+cmd.ttl>now) || cmd.command.equalsIgnoreCase("CLOSE_TRIP"))
+                                this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
+                            else
+                                dlog.d("Received expired close_trip");
+                        }else
                         try{
                             JSONObject commandJson = new JSONObject(cmd.txtarg2);
 

@@ -163,9 +163,8 @@ public class HttpConnector {
 	    	    if (_handler!=null) {
 					Message msg = _handler.obtainMessage();
 					msg.what = EntityId;
-					msg.obj = entity;
-					_handler.removeMessages(msg.what);
-					_handler.sendMessageDelayed(msg,10000);
+					msg.obj = entity; //can't remove previous message, may have empty new message
+					_handler.sendMessageDelayed(msg,3000);
 					dlog.d("Sent message to handler ID " + EntityId);
 	    	    } else if (_messenger!=null) {
 	    	    	Message msg = new Message();
