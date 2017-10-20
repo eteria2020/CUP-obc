@@ -11,6 +11,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -27,6 +28,7 @@ import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
+import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.SystemControl;
@@ -1537,7 +1539,41 @@ public class ObcService extends Service {
                         boolean forced = (cmd.txtarg1 == null || cmd.txtarg1.isEmpty());
                         dlog.d(ObcService.class.toString() + " executeServerCommands: CLOSE_TRIP forced : " + forced);
                         localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,1));
-                        this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
+                        try{
+                            JSONObject commandJson = new JSONObject(cmd.txtarg2);
+
+                            int tripId = commandJson.optInt("TripId");
+                            int customersId = commandJson.optInt("CustomerId");
+                            String timestampBegin = commandJson.optString("TimestampBeginning");
+
+                            if(tripId == App.currentTripInfo.trip.remote_id){
+                                this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
+                            }else{
+                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.getDefault());
+                                if(customersId == App.currentTripInfo.trip.id_customer && timestampBegin.equalsIgnoreCase(simpleDateFormat.format(App.currentTripInfo.trip.begin_time))){
+                                    try{
+                                        DbManager dbm = App.Instance.dbManager;
+
+                                        Customers customers = dbm.getClientiDao();
+                                        Customer customer = customers.queryForId(customersId);
+                                        if(customer != null ){
+                                            this.notifyCard(customer.card_code, "CLOSE", false, forced);
+
+                                        }
+                                    }catch (Exception e){
+                                        dlog.e("queryForId - customers not found ",e);
+                                    }
+
+                                }else{
+                                    dlog.e("No match tripId , customersId and timestamp");
+                                }
+                            }
+                        }catch (Exception e ){
+
+                            dlog.e("executeServerCommands - close_trips - Error parsing json",e);
+                        }
+
+
                     } else
                         dlog.w(ObcService.class.toString() + " executeServerCommands: CLOSE_TRIP ignored since there is a no open trip");
                     break;
