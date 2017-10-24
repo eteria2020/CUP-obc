@@ -17,6 +17,7 @@ import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.interfaces.ApiCallback;
 import eu.philcar.csg.OBC.service.TripInfo;
 
 
@@ -30,9 +31,17 @@ public class TripsConnector implements RemoteEntityInterface {
 
 	public final TripInfo tripInfo;
 
+	private final ApiCallback callback;
+
+
+	public TripsConnector(TripInfo tripInfo, ApiCallback callback) {
+		this.tripInfo = tripInfo;
+		this.callback = callback;
+	}
 
 	public TripsConnector(TripInfo tripInfo) {
 		this.tripInfo = tripInfo;
+		this.callback = null;
 	}
 
 	public int MsgId() {
@@ -221,7 +230,8 @@ public class TripsConnector implements RemoteEntityInterface {
 				}
 
 				tripInfo.UpdateCorsa();
-				
+				if(callback!=null)
+					callback.onResult(result);
 			}
 		} catch (JSONException e) {
 			dlog.e("DecodeJson, JSON exception",e);
