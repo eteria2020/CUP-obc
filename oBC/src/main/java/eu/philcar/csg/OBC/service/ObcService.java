@@ -1570,6 +1570,7 @@ public class ObcService extends Service {
                                         }*/
 
                                     } else {
+                                        //TODO: SEND CLOSE OF TRIP
                                         dlog.e("No match tripId , customersId and timestamp");
                                     }
                                 }
