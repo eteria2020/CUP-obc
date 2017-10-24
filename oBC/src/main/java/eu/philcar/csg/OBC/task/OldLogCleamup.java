@@ -103,7 +103,7 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
                             logs.addLog(log);
                             log = null;
                         } catch (Exception e) {
-                            dlog.e("CheckOldLogSize ~ Found a file that should not be here, what to do?", e);
+                            dlog.w("CheckOldLogSize ~ Found a file that should not be here, what to do?"+logFile.getName());
                             String fileType = name.substring(name.lastIndexOf(".") + 1);
                             if (fileType.equalsIgnoreCase("tmp")) {
                                 boolean succes = logFile.delete();

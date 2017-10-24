@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Encryption;
 
@@ -27,45 +28,61 @@ public class Customer extends DbRecord {
 
 
 	@DatabaseField(id = true)
-	public int id;
+	public int 		id;
 
 	@DatabaseField
-	public String name;
+	public String 	name;
 
 	@DatabaseField
-	public String surname;
+	public String 	surname;
 
 	@DatabaseField
-	public String language;
+	public String 	language;
 
 	@DatabaseField
-	public String mobile;
+	public String	mobile;
 
 	@DatabaseField
-	public boolean enabled;
+	public boolean 	enabled;
 
 	@DatabaseField
-	public String info_display;
+	public String 	info_display;
 
 	@DatabaseField
-	public String pin;
+	public String	 pin;
 
 	@DatabaseField(index = true)
-	public String card_code;
+	public String 	card_code;
 
 	@DatabaseField(index = true)
-	public long update_timestamp;
+	public long 	update_timestamp;
+
+	private boolean isEnctypted = true;
+
+	public Customer(boolean isNew) {
+		if(isNew)
+			isEnctypted=false;
+	}
+
+	public Customer() {
+	}
 
 	public void encrypt() {
-		name = Encryption.encrypt(name);
-		surname = Encryption.encrypt(surname);
-		mobile = Encryption.encrypt(mobile);
+        if(!isEnctypted) {
+            name = Encryption.encrypt(name);
+            surname = Encryption.encrypt(surname);
+            mobile = Encryption.encrypt(mobile);
+            isEnctypted = true;
+        }
 	}
 
 	public void decrypt() {
-		name = Encryption.decrypt(name);
-		surname = Encryption.decrypt(surname);
-		mobile = Encryption.decrypt(mobile);
+        if(isEnctypted) {
+            name = Encryption.decrypt(name);
+            surname = Encryption.decrypt(surname);
+            mobile = Encryption.decrypt(mobile);
+            isEnctypted = false;
+        }
 	}
 
 
@@ -178,4 +195,36 @@ public class Customer extends DbRecord {
 		}
 		return true;
 	}
+
+	public boolean update(){
+		try {
+			DLog.D("Customer update: start updating Customer from DB");
+			DbManager dbm = App.Instance.dbManager;
+			Customers daoCustomers = dbm.getClientiDao();
+			Customer customer = daoCustomers.queryForId(id);
+			customer.decrypt();
+			updateFromCustomer(customer);
+
+			return true;
+
+		}catch(Exception e){
+			DLog.E("Customer update: Exception while updating Customer",e);
+			return false;
+		}
+	}
+
+	private void updateFromCustomer(Customer customer){
+
+		id = customer.id;
+		name = customer.name;
+		surname = customer.surname;
+		language = customer.language;
+		mobile = customer.mobile;
+		enabled = customer.enabled;
+		info_display = customer.info_display;
+		pin = customer.pin;
+		card_code = customer.card_code;
+		update_timestamp = customer.update_timestamp;
+	}
+
 }

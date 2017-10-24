@@ -13,6 +13,7 @@ import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.support.ConnectionSource;
 
+import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.CustomersConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
@@ -128,6 +129,8 @@ public class Customers extends DbTable<Customer,Integer> {
 		
 		return null;
 	}
+
+
 	
 	public void startWhitelistDownload(Context ctx, Handler handler) {
 		DLog.D("Start whitelist download..");
@@ -137,5 +140,5 @@ public class Customers extends DbTable<Customer,Integer> {
 		http.SetHandler(handler);
 		http.Execute(cn);
 	}
-	
+
 }
