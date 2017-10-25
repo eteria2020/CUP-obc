@@ -3,7 +3,7 @@ package eu.philcar.csg.OBC.interfaces;
 /**
  * Created by Fulvio on 24/10/2017.
  */
-public interface ApiCallback {
+public interface OnTripCallback {
 
-     void onResult(int response);
+     void onTripResult(int response);
 }

@@ -281,7 +281,7 @@ public class TripInfo {
                 } else
                     obc_io.setLcd(null,"Errore sistema");
 
-                TripsConnector cc = new TripsConnector(this);
+                TripsConnector cc = new TripsConnector(this, service);
 
                 http = new HttpConnector(service);
                 http.Execute(cc);

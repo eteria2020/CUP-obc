@@ -8,7 +8,6 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,6 +35,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.util.JsonWriter;
 
@@ -61,7 +61,9 @@ public class CarInfo {
     public int isKeyOn = 0;
     public String keyStatus = "";
     public String gear = "";
-    public boolean batterySafety = false;
+    private boolean batterySafety = false;
+    private boolean lastBatterySafety = batterySafety;
+    private Date lastBatterySafetyTx = new Date();
     public int outAmp = 0;
     public Long timestampCurrent = null;
     public Long lastForceReady=System.currentTimeMillis();
@@ -120,6 +122,18 @@ public class CarInfo {
     private SimpleDateFormat log_sdf = new SimpleDateFormat("dd/MM/yyyy HH.mm.ss", Locale.ITALY);
 
 
+    private boolean checkLastBatterySafety(boolean newBatterySafety) {
+        if(lastBatterySafetyTx.getTime()+1000*60*10<=System.currentTimeMillis()){
+            return true;
+        }else
+        return false;
+    }
+
+    private void setLastBatterySafety(boolean lastBatterySafety) {
+        this.lastBatterySafety = lastBatterySafety;
+        lastBatterySafetyTx.setTime(System.currentTimeMillis());
+    }
+
     public CarInfo(Handler handler) {
         serviceHandler = handler;
         serviceLocationListener = new ServiceLocationListener();
@@ -127,6 +141,28 @@ public class CarInfo {
     }
 
 
+    public boolean isBatterySafety() {
+
+        return batterySafety;
+    }
+
+    public void setBatterySafety(boolean newBatterySafety) {
+        if(newBatterySafety!=batterySafety){
+            if(newBatterySafety==lastBatterySafety){
+                if(checkLastBatterySafety(newBatterySafety)){
+                    dlog.d("setBatterySafety: set new BS to" + newBatterySafety);
+                    batterySafety=newBatterySafety;
+                }else{
+                    dlog.d("setBatterySafety: wait to set new battery safety lastBStime"+lastBatterySafetyTx.toString());
+                }
+            }else{
+                setLastBatterySafety(newBatterySafety);
+            }
+        }
+
+
+        batterySafety = newBatterySafety;
+    }
 
     public void setBatteryLevel(int batteryLevel) {
 
@@ -376,9 +412,9 @@ public class CarInfo {
             }else if (key.equalsIgnoreCase("batterySafety")) {
 
                 bo = b.getBoolean(key);
-                if (bo != batterySafety) {
+                if (bo != isBatterySafety()) {
                     hasChanged = true;
-                    batterySafety = bo;
+                    setBatterySafety(bo);
                 }
 
 
