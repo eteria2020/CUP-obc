@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.List;
@@ -898,7 +899,7 @@ public class ObcService extends Service {
         }, 40, 300, TimeUnit.SECONDS);
 
 
-        timeCheckFuture = timeCheckScheduler.scheduleAtFixedRate(timeCheckRunnable, 1, 720, TimeUnit.MINUTES);
+        timeCheckFuture = timeCheckScheduler.scheduleAtFixedRate(timeCheckRunnable, 1, 360, TimeUnit.MINUTES);
 
 
         //Register receiver for battery data
@@ -1781,12 +1782,14 @@ public class ObcService extends Service {
 
 
     public void startDownloadCommands() {
-        dlog.d("Start Downloading comandi");
-        HttpConnector http = new HttpConnector(this);
-        http.SetHandler(localHandler);
-        CommandsConnector rc = new CommandsConnector();
-        rc.setTarga(App.CarPlate);
-        http.Execute(rc);
+
+            dlog.d("Start Downloading comandi");
+            HttpConnector http = new HttpConnector(this);
+            http.SetHandler(localHandler);
+            CommandsConnector rc = new CommandsConnector();
+            rc.setTarga(App.CarPlate);
+            http.Execute(rc);
+
 
     }
 
@@ -2071,7 +2074,7 @@ public class ObcService extends Service {
 
     private final BroadcastReceiver AlarmReceiver = new BroadcastReceiver() {
 
-        int configScheduler=0;
+        int hourScheduler=0;
         @Override
         public void onReceive(Context c, Intent i) {
 
@@ -2081,20 +2084,22 @@ public class ObcService extends Service {
             localHandler.sendMessage(MessageFactory.checkLogSize());
 
             App.Instance.dbManager.getClientiDao().startWhitelistDownload(ObcService.this, privateHandler);
-            App.Instance.dbManager.getPoisDao().startDownload(ObcService.this, localHandler);
-            App.Instance.startAreaPolygonDownload(ObcService.this, null);
-            startDownloadReservations();
-            startDownloadCommands();
-            if(configScheduler++>4) {
-                configScheduler=0;
+            //App.Instance.dbManager.getPoisDao().startDownload(ObcService.this, localHandler);
+            if(hourScheduler++>4) {
+                hourScheduler=0;
+                App.Instance.startAreaPolygonDownload(ObcService.this, null);
                 startDownloadConfigs();
             }
+            startDownloadReservations();
+            //startDownloadCommands();
+
+
 
             //Dequeue eventual offline trip or events
             privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
             privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
 
-            if(configScheduler%2==0) {
+            if(hourScheduler%2==0) {
                 localHandler.sendMessage(MessageFactory.zmqRestart());
                 App.canRestartZMQ=true;
             }

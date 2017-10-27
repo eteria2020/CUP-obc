@@ -79,7 +79,7 @@ public class ZmqSubscriber {
 
 	private class ZmqRunnable implements Runnable {
 		private ZMQ.Context context;
-		private ZMQ.Socket socket;
+		//private ZMQ.Socket socket;
 
 		public void zmqStop(final Thread th) {
 
@@ -115,7 +115,7 @@ public class ZmqSubscriber {
 				isStarting = true;
 				context = ZMQ.context(1);
 
-				socket = context.socket(ZMQ.SUB);
+				ZMQ.Socket socket = context.socket(ZMQ.SUB);
 				socket.setLinger(0);
 				socket.setSndHWM(10);
 				socket.setRcvHWM(10);
