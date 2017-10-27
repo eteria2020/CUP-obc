@@ -208,7 +208,7 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 					public void run() {
 						checkTripResult();
 					}
-				}, 400);
+				}, 4000);
 			}
 			
 			return;
@@ -337,7 +337,7 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 
 	void checkTripResult(){
 		if(App.currentTripInfo.trip.offline || App.currentTripInfo.trip.begin_sent){
-			if(App.currentTripInfo.trip.recharge>=0) {
+			if(App.currentTripInfo.trip.recharge>=0 ) {
 
 				try {
 
@@ -385,8 +385,8 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 						break;
 
 					case -17://preauth fail
-
-						messageTV.setText("PREAUTORIZZAZIONE NON RIUSCITA");
+						messageTV.setTextSize(29);
+						messageTV.setText("Credito insufficiente sulla carta registrata per aprire la corsa, contattare il servizio clienti per ulteriori dettagli.");
 						break;
 
 
