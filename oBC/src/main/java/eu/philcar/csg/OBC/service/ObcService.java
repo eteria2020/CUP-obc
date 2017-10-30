@@ -2074,7 +2074,7 @@ public class ObcService extends Service {
 
     private final BroadcastReceiver AlarmReceiver = new BroadcastReceiver() {
 
-        int hourScheduler=0;
+        int fourHurScheduler=0;
         @Override
         public void onReceive(Context c, Intent i) {
 
@@ -2085,8 +2085,8 @@ public class ObcService extends Service {
 
             App.Instance.dbManager.getClientiDao().startWhitelistDownload(ObcService.this, privateHandler);
             //App.Instance.dbManager.getPoisDao().startDownload(ObcService.this, localHandler);
-            if(hourScheduler++>4) {
-                hourScheduler=0;
+            if(fourHurScheduler++>4*4) {
+                fourHurScheduler=0;
                 App.Instance.startAreaPolygonDownload(ObcService.this, null);
                 startDownloadConfigs();
             }
@@ -2099,7 +2099,7 @@ public class ObcService extends Service {
             privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
             privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
 
-            if(hourScheduler%2==0) {
+            if(fourHurScheduler%2==0) {
                 localHandler.sendMessage(MessageFactory.zmqRestart());
                 App.canRestartZMQ=true;
             }
