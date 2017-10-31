@@ -10,7 +10,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -27,6 +29,7 @@ import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
+import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.SystemControl;
@@ -896,7 +899,7 @@ public class ObcService extends Service {
         }, 40, 300, TimeUnit.SECONDS);
 
 
-        timeCheckFuture = timeCheckScheduler.scheduleAtFixedRate(timeCheckRunnable, 1, 720, TimeUnit.MINUTES);
+        timeCheckFuture = timeCheckScheduler.scheduleAtFixedRate(timeCheckRunnable, 1, 360, TimeUnit.MINUTES);
 
 
         //Register receiver for battery data
@@ -1537,7 +1540,48 @@ public class ObcService extends Service {
                         boolean forced = (cmd.txtarg1 == null || cmd.txtarg1.isEmpty());
                         dlog.d(ObcService.class.toString() + " executeServerCommands: CLOSE_TRIP forced : " + forced);
                         localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,1));
-                        this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
+                        if(cmd.txtarg2.equalsIgnoreCase("null") && (cmd.txtarg1 == null || cmd.txtarg1.isEmpty())){
+                            long now = new Date().getTime() /1000;
+                            if ((cmd.ttl<=0 || cmd.queued+cmd.ttl>now) || cmd.command.equalsIgnoreCase("CLOSE_TRIP"))
+                                this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
+                            else
+                                dlog.d("Received expired close_trip");
+                        }else
+                        try{
+                            JSONObject commandJson = new JSONObject(cmd.txtarg2);
+
+                            int tripId = commandJson.optInt("TripId");
+                            int customersId = commandJson.optInt("CustomerId");
+                            String timestampBegin = commandJson.optString("TimestampBeginning");
+
+                            if(tripId == App.currentTripInfo.trip.remote_id){
+                                this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
+                            }else{
+                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.getDefault());
+                                if(customersId == App.currentTripInfo.trip.id_customer && timestampBegin.equalsIgnoreCase(simpleDateFormat.format(App.currentTripInfo.trip.begin_time))){
+                                    try{
+                                        DbManager dbm = App.Instance.dbManager;
+
+                                        Customers customers = dbm.getClientiDao();
+                                        Customer customer = customers.queryForId(customersId);
+                                        if(customer != null ){
+                                            this.notifyCard(customer.card_code, "CLOSE", false, forced);
+
+                                        }
+                                    }catch (Exception e){
+                                        dlog.e("queryForId - customers not found ",e);
+                                    }
+
+                                }else{
+                                    dlog.e("No match tripId , customersId and timestamp");
+                                }
+                            }
+                        }catch (Exception e ){
+
+                            dlog.e("executeServerCommands - close_trips - Error parsing json",e);
+                        }
+
+
                     } else
                         dlog.w(ObcService.class.toString() + " executeServerCommands: CLOSE_TRIP ignored since there is a no open trip");
                     break;
@@ -1738,12 +1782,14 @@ public class ObcService extends Service {
 
 
     public void startDownloadCommands() {
-        dlog.d("Start Downloading comandi");
-        HttpConnector http = new HttpConnector(this);
-        http.SetHandler(localHandler);
-        CommandsConnector rc = new CommandsConnector();
-        rc.setTarga(App.CarPlate);
-        http.Execute(rc);
+
+            dlog.d("Start Downloading comandi");
+            HttpConnector http = new HttpConnector(this);
+            http.SetHandler(localHandler);
+            CommandsConnector rc = new CommandsConnector();
+            rc.setTarga(App.CarPlate);
+            http.Execute(rc);
+
 
     }
 
@@ -2028,7 +2074,7 @@ public class ObcService extends Service {
 
     private final BroadcastReceiver AlarmReceiver = new BroadcastReceiver() {
 
-        int configScheduler=0;
+        int fourHurScheduler=0;
         @Override
         public void onReceive(Context c, Intent i) {
 
@@ -2038,20 +2084,22 @@ public class ObcService extends Service {
             localHandler.sendMessage(MessageFactory.checkLogSize());
 
             App.Instance.dbManager.getClientiDao().startWhitelistDownload(ObcService.this, privateHandler);
-            App.Instance.dbManager.getPoisDao().startDownload(ObcService.this, localHandler);
-            App.Instance.startAreaPolygonDownload(ObcService.this, null);
-            startDownloadReservations();
-            startDownloadCommands();
-            if(configScheduler++>4) {
-                configScheduler=0;
+            //App.Instance.dbManager.getPoisDao().startDownload(ObcService.this, localHandler);
+            if(fourHurScheduler++>4*4) {
+                fourHurScheduler=0;
+                App.Instance.startAreaPolygonDownload(ObcService.this, null);
                 startDownloadConfigs();
             }
+            startDownloadReservations();
+            //startDownloadCommands();
+
+
 
             //Dequeue eventual offline trip or events
             privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
             privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
 
-            if(configScheduler%2==0) {
+            if(fourHurScheduler%2==0) {
                 localHandler.sendMessage(MessageFactory.zmqRestart());
                 App.canRestartZMQ=true;
             }

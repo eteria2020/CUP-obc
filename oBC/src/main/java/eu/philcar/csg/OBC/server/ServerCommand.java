@@ -67,7 +67,7 @@ public class ServerCommand {
 						cmd.payload = jobj.getString("payload");
 					
 					long now = new Date().getTime() /1000;
-					if (cmd.ttl<=0 || cmd.queued+cmd.ttl>now)					
+					if ((cmd.ttl<=0 || cmd.queued+cmd.ttl>now) || cmd.command.equalsIgnoreCase("CLOSE_TRIP"))
 						list.add(cmd);
 					else
 						DLog.D("Command timeout :");					

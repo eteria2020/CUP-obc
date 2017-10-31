@@ -449,6 +449,7 @@ public class CarInfo {
                     if(App.canRestartZMQ) {
                         App.canRestartZMQ=false;
                         serviceHandler.sendMessage(MessageFactory.zmqRestart());
+                        dlog.d("new vin restarting ZMQ");
                     }
                 }
             } else if (key.equalsIgnoreCase("VER")) {

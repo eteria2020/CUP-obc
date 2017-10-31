@@ -2,6 +2,7 @@ package eu.philcar.csg.OBC.db;
 
 
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -142,12 +143,16 @@ public class Pois extends DbTable<Poi,Integer> {
 
 	
 	public void startDownload(Context ctx, Handler handler) {
-		DLog.D("Start pois download..");
-		PoisConnector cn = new PoisConnector();
-		cn.setLastUpdate(mostRecent());
-		HttpsConnector http = new HttpsConnector(ctx);
-		http.SetHandler(handler);
-		http.Execute(cn);
+		Calendar calendar = Calendar.getInstance();
+		int day = calendar.get(Calendar.DAY_OF_WEEK);
+		if(day == Calendar.MONDAY) {
+			DLog.D("Start pois download..");
+			PoisConnector cn = new PoisConnector();
+			cn.setLastUpdate(mostRecent());
+			HttpsConnector http = new HttpsConnector(ctx);
+			http.SetHandler(handler);
+			http.Execute(cn);
+		}
 	}
 	
 }

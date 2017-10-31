@@ -352,6 +352,8 @@ public class TripInfo {
                             obc_io.setDoors(null, 1,"BENTORNATO");
                             //obc_io.setEngine(null, 1);
                             dlog.d(TripInfo.class.toString()+" handleCard: Pending trips. Park mode ON user returned, open car");
+                        }else{
+                            dlog.d("End Park forced trip close");
                         }
                         obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
                         obc_io.setTag(null,cardCode);						
@@ -419,6 +421,7 @@ public class TripInfo {
                         service.sendBeacon();
                         return (MessageFactory.notifyTripEnd(this));
                     } else {
+                        dlog.d("Unable to close trip, out of operative area");
 
                         Toast.makeText(App.Instance.getBaseContext(), "Out of Operative Area", Toast.LENGTH_SHORT).show();
                         obc_io.setLcd(null, "   FUORI AREA");

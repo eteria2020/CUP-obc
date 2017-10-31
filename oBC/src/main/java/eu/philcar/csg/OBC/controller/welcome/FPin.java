@@ -281,7 +281,7 @@ public class FPin extends FBase implements OnClickListener {
 			h.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					((ABase)getActivity()).pushFragmentnoBack(FInstructions.newInstance(true), FInstructions.class.getName(), true);
+					((ABase)getActivity()).pushFragmentnoBack(FInstructions.newInstance(true), FInstructions.class.getName(), true, FPin.this);
 				}
 			}, 1000);
 			
