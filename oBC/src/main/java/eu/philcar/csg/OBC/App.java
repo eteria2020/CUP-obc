@@ -932,7 +932,7 @@ public void loadRadioSetup() {
 			}
 	    
 		}
-		return 0;
+		return 1435;
 		
 	}
 	
