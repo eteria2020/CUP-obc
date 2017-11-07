@@ -49,7 +49,8 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 		public void run() {
 			progressDF.dismiss();
 
-			((AWelcome) getActivity()).sendMessage(MessageFactory.checkPin(pin));
+            if(getActivity()!=null)
+			    ((AWelcome) getActivity()).sendMessage(MessageFactory.checkPin(pin));
 
 			pinChecked(App.currentTripInfo.CheckPin(pin, true));
 		}
@@ -208,7 +209,7 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 					public void run() {
 						checkTripResult();
 					}
-				}, 4000);
+				}, 400);
 			}
 			
 			return;
@@ -342,8 +343,8 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 				try {
 
 					progressDF.dismiss();
-
-					((AWelcome) getActivity()).sendMessage(MessageFactory.checkPin(pin));
+					if(getActivity()!=null)
+						((AWelcome) getActivity()).sendMessage(MessageFactory.checkPin(pin));
 
 					pinChecked(App.currentTripInfo.CheckPin(pin, true));
 				}catch(Exception e){
@@ -384,9 +385,18 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 						messageTV.setText("SEI DISABILITATO");
 						break;
 
-					case -17://preauth fail
+					case -26://preauth fail
+						messageTV.setTextSize(29);
+						messageTV.setText("Inserire una carta valida nell'area personale per procedere con l'apertura della corsa.");
+						break;
+					case -27://preauth fail
 						messageTV.setTextSize(29);
 						messageTV.setText("Credito insufficiente sulla carta registrata per aprire la corsa, contattare il servizio clienti per ulteriori dettagli.");
+						break;
+					case -28:
+					case -29:
+						messageTV.setTextSize(29);
+						messageTV.setText("Errore sulla preautorizzazione controlla i tuoi dati di pagamento o contatta il servizio clienti");
 						break;
 
 
@@ -405,6 +415,7 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 
 	@Override
 	public void onTripResult(int response) {
+		if(progressDF!=null && progressDF.isAdded())
 		checkTripResult();
 		/*localHandler.removeCallbacks(skipRemoteCheck);
 		try {

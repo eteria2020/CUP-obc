@@ -159,6 +159,7 @@ public class TripsConnector implements RemoteEntityInterface {
 				tripInfo.setTxOffline();
 				tripInfo.UpdateCorsa();
 				dlog.w("No response from server, keeping info off-line");
+				busy =false;
 				return MsgId();
 			}
 			
@@ -214,6 +215,19 @@ public class TripsConnector implements RemoteEntityInterface {
 						tripInfo.trip.begin_sent = true;
 						tripInfo.setTxApertura();
 					}	
+					break;
+
+				case -26:
+				case -27:
+				case -28:
+				case -29:
+					tripInfo.trip.warning="PREAUTH";
+					tripInfo.setWarning("PREAUTH");
+					if (jobj.has("extra")) {
+						tripInfo.trip.remote_id = jobj.getInt("extra");
+						tripInfo.trip.begin_sent = true;
+						tripInfo.setTxApertura();
+					}
 					break;
 					
 				
