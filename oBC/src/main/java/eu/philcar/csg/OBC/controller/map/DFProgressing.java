@@ -1,6 +1,8 @@
 package eu.philcar.csg.OBC.controller.map;
 
 import eu.philcar.csg.OBC.R;
+import eu.philcar.csg.OBC.helpers.DLog;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -78,6 +80,15 @@ public class DFProgressing extends DialogFragment {
 				
 				messageTV.setText(messageRes);
 			}
+		}
+	}
+
+	@Override
+	public void dismiss() {
+		try {
+			super.dismiss();
+		}catch (Exception e){
+			DLog.E("Exception dismissing progress dialog",e);
 		}
 	}
 }
