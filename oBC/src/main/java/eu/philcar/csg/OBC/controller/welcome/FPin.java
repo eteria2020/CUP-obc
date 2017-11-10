@@ -415,8 +415,10 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 
 	@Override
 	public void onTripResult(int response) {
-		if(progressDF!=null && progressDF.isAdded())
-		checkTripResult();
+		if(progressDF!=null && progressDF.isAdded()) {
+			localHandler.removeCallbacks(skipRemoteCheck);
+			checkTripResult();
+		}
 		/*localHandler.removeCallbacks(skipRemoteCheck);
 		try {
 
