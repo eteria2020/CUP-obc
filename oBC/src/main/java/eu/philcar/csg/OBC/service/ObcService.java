@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.List;
@@ -27,7 +28,6 @@ import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.AMainOBC;
-import eu.philcar.csg.OBC.ExceptionHandler;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Poi;
@@ -47,7 +47,6 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
-import eu.philcar.csg.OBC.interfaces.OnTripCallback;
 import eu.philcar.csg.OBC.server.AdminsConnector;
 import eu.philcar.csg.OBC.server.BusinessEmployeeConnector;
 import eu.philcar.csg.OBC.server.CallCenterConnector;
@@ -91,7 +90,7 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 import android.telephony.SmsManager;
 
-public class ObcService extends Service implements OnTripCallback {
+public class ObcService extends Service {
 
 
     private DLog dlog = new DLog(this.getClass());
@@ -184,9 +183,6 @@ public class ObcService extends Service implements OnTripCallback {
     public static final int MSG_ZMQ_RESTART = 100;
     public static final int MSG_CHECK_LOG_SIZE = 101;
 
-    public static final int MSG_API_TRIP_CALLBACK = 110;
-
-
     public static final int SERVER_NOTIFY_RAW = 0;
     public static final int SERVER_NOTIFY_RESERVATION = 1;
     public static final int SERVER_NOTIFY_COMMAND = 2;
@@ -205,6 +201,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     private boolean isStarted;
     private boolean isStopRequested = false;
+
 
 
     //ENCAPSULATED OBJECTS
@@ -237,52 +234,55 @@ public class ObcService extends Service implements OnTripCallback {
 
         private int lastResponseCode;
 
-        private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault());
-
+        private  SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault());
         @Override
         public void run() {
 
-            long sharengoTime = 0;
-            long fix = SystemClock.elapsedRealtime();
+            long sharengoTime=0;
+            long fix =SystemClock.elapsedRealtime();
             try {
                 sharengoTime = Long.parseLong(doGet(App.URL_Time));
-            } catch (Exception e) {
-                dlog.e("Exception while retreiving sharengoTime", e);
-                lastResponseCode = 0;
+            }catch (Exception e){
+                dlog.e("Exception while retreiving sharengoTime",e);
+                lastResponseCode=0;
             }
 
 
             Runtime rt = Runtime.getRuntime();
             try {
-                Date sharengo_time = null;
-                if (lastResponseCode == 200) {
-                    sharengo_time = new Date(sharengoTime * 1000 + SystemClock.elapsedRealtime() - fix);
+                Date sharengo_time=null;
+                if(lastResponseCode==200) {
+                    sharengo_time = new Date(sharengoTime*1000 + SystemClock.elapsedRealtime() - fix);
                 }
                 Date gps_time = new Date(carInfo.intGpsLocation.getTime() + SystemClock.elapsedRealtime() - carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000);
                 Date android_time = new Date(System.currentTimeMillis());
 
 
-                if (sharengo_time != null && sharengo_time.getTime() > 1234567890000L) {
 
-                    dlog.d("timeCheckScheduler: imposto ora Sharengo " + sharengo_time.toString() + "ora android: " + android_time.toString());
+                if(sharengo_time!=null && sharengo_time.getTime() > 1234567890000L){
+
+                    dlog.d("timeCheckScheduler: imposto ora Sharengo "+sharengo_time.toString()+ "ora android: "+android_time.toString());
                     rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(sharengo_time) + ";\n"}); //
-                    rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time 0"}); //date -s 20120423.130000
+                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
 
-                } else if (carInfo.intGpsLocation.getTime() > 1234567890000L) {
+                }else if(carInfo.intGpsLocation.getTime()>1234567890000L) {
                     //if(android_time.getTime()<1234567890000L) {
-                    dlog.d("timeCheckScheduler: imposto ora gps " + gps_time.toString() + "ora android: " + android_time.toString());
+                    dlog.d("timeCheckScheduler: imposto ora gps "+gps_time.toString()+ "ora android: "+android_time.toString());
                     rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(gps_time) + ";\n"}); //
-                    rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time 0"}); //date -s 20120423.130000
+                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
                     //}
 
-                } else
-                    rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time 1"}); //date -s 20120423.130000*/
-                dlog.d("timeCheckScheduler: rawGpsTime: " + new Date(carInfo.intGpsLocation.getTime()).toString() + " elapsed: " + (System.currentTimeMillis() - (carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000)) + " android time: " + android_time.toString() + " fixed gps time: " + gps_time.toString() + " Sharengo time: " + (sharengo_time != null ? sharengo_time.toString() : " response code " + lastResponseCode));
+                }
+                else
+                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 1"}); //date -s 20120423.130000*/
+                dlog.d("timeCheckScheduler: rawGpsTime: " + new Date(carInfo.intGpsLocation.getTime()).toString() + " elapsed: " + (System.currentTimeMillis() - (carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000)) + " android time: " + android_time.toString() + " fixed gps time: " + gps_time.toString() +" Sharengo time: "+(sharengo_time!=null?sharengo_time.toString():" response code "+lastResponseCode));
 
                 rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time_zone 0"}); //date -s 20120423.130000
                 AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                 am.setTimeZone(App.timeZone);
                 am = null;
+
+
 
 
             } catch (Exception e) {
@@ -296,6 +296,7 @@ public class ObcService extends Service implements OnTripCallback {
             try {
                 URL requestedUrl = new URL(url);
                 urlConnection = (HttpURLConnection) requestedUrl.openConnection();
+
 
 
                 urlConnection.setRequestMethod("GET");
@@ -317,8 +318,8 @@ public class ObcService extends Service implements OnTripCallback {
                 }
                 //result = urlConnection.getResponseCode() + " -> " + IOUtil.readFully(urlConnection.getErrorStream());
             } catch (Exception ex) {
-                dlog.e("Exception inside APIdoGet", ex);
-                lastResponseCode = 0;
+                dlog.e("Exception inside APIdoGet",ex);
+                lastResponseCode=0;
                 result = "0";
             } finally {
                 if (urlConnection != null) {
@@ -328,7 +329,7 @@ public class ObcService extends Service implements OnTripCallback {
             return result;
         }
 
-        private String readFully(InputStream inputStream) throws IOException {
+        private  String readFully(InputStream inputStream) throws IOException {
 
             if (inputStream == null) {
                 return "";
@@ -417,7 +418,7 @@ public class ObcService extends Service implements OnTripCallback {
             dlog.d("** Notify protocol: HTTP");
         } else {
             this.WITH_ZMQNOTIFY = true;
-            // this.WITH_HTTP_NOTIFIES = true;
+           // this.WITH_HTTP_NOTIFIES = true;
             dlog.d("** Notify protocol: ZMQ");
         }
 
@@ -565,8 +566,8 @@ public class ObcService extends Service implements OnTripCallback {
                     if (WITH_UDPSERVER && WITH_UDPQUERY)
                         udpServer.sendQuery();
                     //If HTTP query is enabled schedule an HTTP notifies download
-                    if (WITH_HTTP_NOTIFIES && notifiesPrescaler++ > 4 && tripInfo != null && tripInfo.isOpen && (App.parkMode == null || !App.parkMode.isOn())) {
-                        notifiesPrescaler = 0;
+                    if (WITH_HTTP_NOTIFIES&& notifiesPrescaler++>4 && tripInfo != null && tripInfo.isOpen && (App.parkMode == null || !App.parkMode.isOn()) ) {
+                        notifiesPrescaler=0;
                         HttpConnector http = new HttpConnector(ObcService.this);
                         http.SetHandler(localHandler);
                         NotifiesConnector nc = new NotifiesConnector();
@@ -618,8 +619,8 @@ public class ObcService extends Service implements OnTripCallback {
 
         virtualBMSUpdateScheduler.scheduleAtFixedRate(new Runnable() {
 
-            int canAmpAnomalies = 0, canCellAnomalies = 0, canBmsAnomalies = 0, canAllAnomalies = 0;
-            boolean bmsSocError = false, bmsCellError = false, ampError = false;
+            int canAmpAnomalies =0, canCellAnomalies =0, canBmsAnomalies=0, canAllAnomalies=0;
+            boolean bmsSocError =false, bmsCellError=false, ampError=false;
 
 
             @Override
@@ -636,23 +637,25 @@ public class ObcService extends Service implements OnTripCallback {
                     carInfo.bmsSOC = getSOCValue();
                     carInfo.outAmp = getCurrentValue();
 
-                    if (carInfo.outAmp == 350 || carInfo.outAmp == -1037) {
-                        ampError = true;
-                        if (canAmpAnomalies++ == 3) {
+                    if( carInfo.outAmp==350 || carInfo.outAmp==-1037){
+                        ampError=true;
+                        if(canAmpAnomalies++==3 ){
                             Events.CanAnomalies("350 Amp");
                         }
-                    } else {
-                        ampError = false;
+                    }
+                    else {
+                        ampError=false;
                         canAmpAnomalies = 0;
                     }
 
-                    if (carInfo.bmsSOC == 0) {
-                        bmsSocError = true;
-                        if (canAmpAnomalies++ == 3) {
+                    if( carInfo.bmsSOC==0){
+                        bmsSocError=true;
+                        if(canAmpAnomalies++==3){
                             Events.CanAnomalies("SOC 0");
                         }
-                    } else {
-                        bmsSocError = false;
+                    }
+                    else {
+                        bmsSocError=false;
                         canAmpAnomalies = 0;
                     }
 
@@ -666,7 +669,7 @@ public class ObcService extends Service implements OnTripCallback {
                     App.Instance.setMaxVoltage(carInfo.batteryType.equalsIgnoreCase("HNLD") ? 82 : 83);
 
                     //voltage sum
-                    bmsCellError = false;
+                    bmsCellError=false;
                     for (int i = 0; i < carInfo.cellVoltageValue.length; i++) {
                         if (i < (carInfo.batteryType.equalsIgnoreCase("HNLD") ? 24 : 20) && carInfo.cellVoltageValue[i] < 1) {
                             currVolt = 0;
@@ -682,8 +685,8 @@ public class ObcService extends Service implements OnTripCallback {
                             lowCellNumber = lowCellNumber.concat((i + 1) + " ");
                         }
                     }
-                    if (!bmsCellError && !bmsSocError && !ampError) {
-                        dlog.d("virtualBMSUpdateScheduler: reset count to 0" + bmsCellError + bmsSocError + ampError);
+                    if(!bmsCellError && !bmsSocError && !ampError) {
+                        dlog.d("virtualBMSUpdateScheduler: reset count to 0"+bmsCellError+bmsSocError+ampError);
                         App.Instance.setBmsCountTo90(0);
                     }
 
@@ -693,11 +696,12 @@ public class ObcService extends Service implements OnTripCallback {
                     carInfo.currVoltage = (float) Math.round(currVolt * 100) / 100f;
 
 
-                    if (bmsCellError) {
-                        if (canCellAnomalies++ == 3) {
+                    if( bmsCellError){
+                        if(canCellAnomalies++==3){
                             Events.CanAnomalies("0 CellsVolt");
                         }
-                    } else {
+                    }
+                    else {
                         canCellAnomalies = 0;
                     }
 
@@ -709,27 +713,30 @@ public class ObcService extends Service implements OnTripCallback {
                         carInfo.virtualSOC = ((float) Math.round((100 - 90 * (App.getMax_voltage() - currVolt) / 9.5) * 10) / 10f);//DFD:HNLD
 
 
+
                     //SOCR calculation
-                    if (ampError || bmsCellError || bmsSocError) {
+                    if(ampError || bmsCellError || bmsSocError){
 
-                        if (bmsCellError) {
+                        if(bmsCellError){
 
-                            if (bmsSocError) {
-                                if (App.Instance.incrementBmsCountTo90() < 90) {
-                                    dlog.d("virtualBMSUpdateScheduler: all fault keep last valid value to 0 is " + App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + ampError);
+                            if(bmsSocError){
+                                if(App.Instance.incrementBmsCountTo90()<90) {
+                                    dlog.d("virtualBMSUpdateScheduler: all fault keep last valid value to 0 is "+ App.getBmsCountTo90() +" times | error: "+bmsCellError+bmsSocError+ampError);
                                     carInfo.SOCR = carInfo.batteryLevel;
-                                } else {
+                                }
+                                else{
                                     obc_io.close();
                                     obc_io.init();
                                     carInfo.SOCR = 0;
                                 }
 
-                            } else {
+                            }else{
 
-                                if (App.Instance.incrementBmsCountTo90() < 90) {
-                                    dlog.d("virtualBMSUpdateScheduler: bms cells fault using bms SOC to 0 is " + App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + ampError);
+                                if( App.Instance.incrementBmsCountTo90()<90) {
+                                    dlog.d("virtualBMSUpdateScheduler: bms cells fault using bms SOC to 0 is " +  App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + ampError);
                                     carInfo.SOCR = Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS);
-                                } else {
+                                }
+                                else{
                                     obc_io.close();
                                     obc_io.init();
                                     carInfo.SOCR = 0;
@@ -737,21 +744,23 @@ public class ObcService extends Service implements OnTripCallback {
 
                             }
 
-                        } else if (bmsSocError) {
-                            if (App.Instance.incrementBmsCountTo90() < 90) {
+                        }else if(bmsSocError){
+                            if( App.Instance.incrementBmsCountTo90()<90) {
                                 dlog.d("virtualBMSUpdateScheduler: bms SOC fault using SOC2 to 0 is " + App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + ampError);
                                 carInfo.SOCR = carInfo.virtualSOC;
-                            } else {
+                            }
+                            else{
                                 obc_io.close();
                                 obc_io.init();
                                 carInfo.SOCR = 0;
                             }
-                        } else {
+                        }
+                        else{
                             carInfo.SOCR = Math.min(carInfo.bmsSOC, carInfo.virtualSOC);
                         }
                         dlog.d("virtualBMSUpdateScheduler:error calculation VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
 
-                    } else {
+                    }else {
                         if (Math.abs(carInfo.bmsSOC - carInfo.bmsSOC_GPRS) <= 2) {
                             if ((carInfo.bmsSOC == 0 || carInfo.bmsSOC_GPRS == 0) && carInfo.currVoltage != 0) { //BMS SOC 0 Voltage OK
                                 if (carInfo.bmsSOC == 0) {
@@ -774,14 +783,14 @@ public class ObcService extends Service implements OnTripCallback {
                         }
 
 
-                        dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "% outAmp: " + carInfo.outAmp);
-                        //check car bms usage
-                        if (carInfo.currVoltage <= 0 || (carInfo.outAmp >= 25 && carInfo.outAmp != 350)) {
-                            carInfo.setBatteryLevel((Math.min(carInfo.batteryLevel, Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS))));
-                            dlog.d("virtualBMSUpdateScheduler: value " + (carInfo.currVoltage <= 0 ? "packVoltage null" : "outAmp greater than 25") + " ignoring virtual data.");
-                            dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
-                            return;
-                        }
+                    dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "% outAmp: "+carInfo.outAmp);
+                    //check car bms usage
+                    if (carInfo.currVoltage <= 0 || (carInfo.outAmp>= 25 && carInfo.outAmp!=350)){
+                        carInfo.setBatteryLevel((Math.min(carInfo.batteryLevel,Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS))));
+                        dlog.d("virtualBMSUpdateScheduler: value "+ (carInfo.currVoltage<=0?"packVoltage null":"outAmp greater than 25")+" ignoring virtual data.");
+                        dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
+                        return;
+                    }
                         if ((carInfo.isCellLowVoltage) || carInfo.currVoltage <= 67f) {
 
                             carInfo.SOCR = Math.min(carInfo.virtualSOC, 0f);
@@ -798,15 +807,18 @@ public class ObcService extends Service implements OnTripCallback {
                     }*/
 
                     //set SOCR value
-                    dlog.d("virtualBMSUpdateScheduler: alarm state: amp: " + ampError + " cell: " + bmsCellError + " soc: " + bmsSocError);
+                    dlog.d("virtualBMSUpdateScheduler: alarm state: amp: "+ampError +" cell: "+bmsCellError+" soc: "+bmsSocError);
 
-                    carInfo.setBatteryLevel(Math.round(carInfo.SOCR));
+                        carInfo.setBatteryLevel(Math.round(carInfo.SOCR));
 
                     //carInfo.batteryLevel=Math.min(carInfo.bmsSOC,carInfo.bmsSOC_GPRS); //PER VERSIONI NON -BMS SCOMMENTARE E COMMENTARE IF SOPRA
 
 
 					/*Message msg = MessageFactory.notifyCANDataUpdate(carInfo);
                     sendAll(msg);*/
+
+
+
 
 
                 } catch (Exception e) {
@@ -826,14 +838,14 @@ public class ObcService extends Service implements OnTripCallback {
             @Override
             public void run() {
                 try {
-                    dlog.d("gpsCheckScheduler: lastIntGpsLocation: " + lastIntGpsLocation + " lastExtGpsLocation: " + lastExtGpsLocation + " newIntGpslocation: " + carInfo.intGpsLocation + " newExtGpslocation " + carInfo.extGpsLocation + " UseExternalGPS: " + App.UseExternalGPS);
+                    dlog.d("gpsCheckScheduler: lastIntGpsLocation: "+ lastIntGpsLocation +" lastExtGpsLocation: "+ lastExtGpsLocation +" newIntGpslocation: "+carInfo.intGpsLocation + " newExtGpslocation "+carInfo.extGpsLocation + " UseExternalGPS: "+App.UseExternalGPS);
 
                     if (!App.UseExternalGPS) {
 
                         if ((carInfo.intGpsLocation.getLongitude() >= 18.53 || carInfo.intGpsLocation.getLongitude() <= 6.63 || carInfo.intGpsLocation.getLatitude() >= 47.10 || carInfo.intGpsLocation.getLatitude() <= 36.64) ||
                                 (carInfo.intGpsLocation.getLongitude() == 0 || carInfo.intGpsLocation.getLongitude() == 0 || carInfo.intGpsLocation.getLatitude() == 0 || carInfo.intGpsLocation.getLatitude() == 0)) {
                             App.Instance.setUseExternalGps(true);
-                            dlog.d("GpsCheckeScheduler: setUseExternalGps(true) IntGpsLocation out from Italy or location 0.0");
+                            dlog.d("GpsCheckScheduler: setUseExternalGps(true) IntGpsLocation out from Italy or location 0.0");
                             sendBeacon();//update remoto per aggiornare int/ext
                             intCount = 0;
                             return;
@@ -843,21 +855,21 @@ public class ObcService extends Service implements OnTripCallback {
                             intCount++;
                             if (intCount >= 3) {
                                 App.Instance.setUseExternalGps(true);
-                                dlog.d("GpsCheckeScheduler: setUseExternalGps(true) same coordinate for " + intCount + " times");
+                                dlog.d("GpsCheckScheduler: setUseExternalGps(true) same coordinate for " + intCount + " times");
                                 intCount = 0;
                                 sendBeacon();
                             }
                             return;
                         } else {
                             intCount = 0;
-                            lastIntGpsLocation = carInfo.intGpsLocation;
+                            lastIntGpsLocation.set(carInfo.intGpsLocation);
                         }
                     } else {
 
                         if ((carInfo.extGpsLocation.getLongitude() >= 18.53 || carInfo.extGpsLocation.getLongitude() <= 6.63 || carInfo.extGpsLocation.getLatitude() >= 47.10 || carInfo.extGpsLocation.getLatitude() <= 36.64) ||
                                 (carInfo.extGpsLocation.getLatitude() == 0 || carInfo.extGpsLocation.getLatitude() == 0 || carInfo.extGpsLocation.getLongitude() == 0 || carInfo.extGpsLocation.getLongitude() == 0)) {
                             App.Instance.setUseExternalGps(false);
-                            dlog.d("GpsCheckeScheduler: setUseExternalGps(false) ExtGpsLocation out from Italy or location 0.0");
+                            dlog.d("GpsCheckScheduler: setUseExternalGps(false) ExtGpsLocation out from Italy or location 0.0");
                             sendBeacon();
                             extCount = 0;
                             return;
@@ -866,14 +878,14 @@ public class ObcService extends Service implements OnTripCallback {
                             extCount++;
                             if (extCount >= 3) {
                                 App.Instance.setUseExternalGps(false);
-                                dlog.d("GpsCheckeScheduler: setUseExternalGps(false) same coordinate for " + intCount + " times");
+                                dlog.d("GpsCheckScheduler: setUseExternalGps(false) same coordinate for " + extCount + " times");
                                 extCount = 0;
                                 sendBeacon();
                             }
                             return;
                         } else {
                             extCount = 0;
-                            lastExtGpsLocation = carInfo.extGpsLocation;
+                            lastExtGpsLocation.set(carInfo.extGpsLocation);
                         }
 
                     }
@@ -887,7 +899,7 @@ public class ObcService extends Service implements OnTripCallback {
         }, 40, 300, TimeUnit.SECONDS);
 
 
-        timeCheckFuture = timeCheckScheduler.scheduleAtFixedRate(timeCheckRunnable, 1, 720, TimeUnit.MINUTES);
+        timeCheckFuture = timeCheckScheduler.scheduleAtFixedRate(timeCheckRunnable, 1, 360, TimeUnit.MINUTES);
 
 
         //Register receiver for battery data
@@ -913,7 +925,7 @@ public class ObcService extends Service implements OnTripCallback {
         //SystemControl.ResycNTP();
 
 
-        localHandler.sendMessageDelayed(MessageFactory.checkLogSize(), 3000);
+        localHandler.sendMessageDelayed(MessageFactory.checkLogSize(),3000);
         dlog.d("Service created");
         isStarted = true;
     }
@@ -975,7 +987,7 @@ public class ObcService extends Service implements OnTripCallback {
     // Set the speed of locations updates
     private void setLocationMode(long minTime) {
         if (locationManager != null) {
-            dlog.d("setLocationMode " + minTime);
+            dlog.d("setLocationMode "+minTime);
             locationManager.removeUpdates(carInfo.serviceLocationListener);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, 0, carInfo.serviceLocationListener);
         }
@@ -996,7 +1008,7 @@ public class ObcService extends Service implements OnTripCallback {
 
             //Force zmq restart for faster reconnection
             localHandler.removeMessages(MessageFactory.zmqRestart().what);
-            localHandler.sendMessageDelayed(MessageFactory.zmqRestart(), 15000);
+            localHandler.sendMessageDelayed(MessageFactory.zmqRestart(),15000);
 
             //Dequeue eventual offline trip or events
             privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
@@ -1092,9 +1104,9 @@ public class ObcService extends Service implements OnTripCallback {
 
         try {
             if (clients.size() > 0)
-                for (Clients cliente : clients) {
+                for(Clients cliente:clients){
                     //dlog.d("Sending to client "+cliente.getName());
-                    myMsg = Message.obtain();
+                  myMsg=Message.obtain();
                     myMsg.copyFrom(msg);
                     cliente.getClient().send(myMsg);
                 }
@@ -1189,10 +1201,10 @@ public class ObcService extends Service implements OnTripCallback {
     }
 
     public void notifyCard(String id, String event, boolean ObcIohandled) {
-        notifyCard(id, event, ObcIohandled, TripInfo.CloseType.normal);
+        notifyCard(id, event, ObcIohandled, false);
     }
 
-    public void notifyCard(String id, String event, boolean ObcIohandled, TripInfo.CloseType forced) {
+    public void notifyCard(String id, String event, boolean ObcIohandled, boolean forced) {
         DbManager dbm = App.Instance.dbManager;
         Customers clienti = dbm.getClientiDao();
 
@@ -1504,84 +1516,70 @@ public class ObcService extends Service implements OnTripCallback {
 
                 case "OPEN_TRIP":
                     if (App.currentTripInfo == null)
-                        this.notifyCard(cmd.txtarg1, "OPEN", false, TripInfo.CloseType.normal);
+                        this.notifyCard(cmd.txtarg1, "OPEN", false, false);
                     else
                         dlog.w(ObcService.class.toString() + " executeServerCommands: OPEN_TRIP ignored since there is already an open trip");
                     break;
 
                 case "PARK_TRIP":
                     if (App.currentTripInfo != null && App.getParkModeStarted() != null && !App.parkMode.isOn()) {
-                        this.notifyCard(cmd.txtarg1, "PARK", false, TripInfo.CloseType.normal);
+                        this.notifyCard(cmd.txtarg1, "PARK", false, false);
                     } else
                         dlog.w(ObcService.class.toString() + " executeServerCommands: PARK_TRIP ignored since there isn't an open trip or not waiting park start");
                     break;
 
                 case "UNPARK_TRIP":
                     if (App.currentTripInfo != null && App.getParkModeStarted() != null && App.parkMode.isOn()) {
-                        this.notifyCard(cmd.txtarg1, "UNPARK", false, TripInfo.CloseType.normal);
+                        this.notifyCard(cmd.txtarg1, "UNPARK", false, false);
                     } else
                         dlog.w(ObcService.class.toString() + " executeServerCommands: UNPARK_TRIP ignored since there isn't an open trip or not in park ");
                     break;
 
                 case "CLOSE_TRIP":
-
-
                     if (App.currentTripInfo != null) {
-                        TripInfo.CloseType forced;
-                        if (cmd.txtarg1 == null || cmd.txtarg1.isEmpty()) {
-                            forced = TripInfo.CloseType.forced;
-                        } else if (cmd.txtarg1.equalsIgnoreCase("Maintainer")) {
-                            forced = TripInfo.CloseType.maintainer;
-                        } else {
-                            forced = TripInfo.CloseType.normal;
-                        }
+                        boolean forced = (cmd.txtarg1 == null || cmd.txtarg1.isEmpty());
                         dlog.d(ObcService.class.toString() + " executeServerCommands: CLOSE_TRIP forced : " + forced);
-                        localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE, 1));
-                        if (cmd.txtarg2.equalsIgnoreCase("null") && (cmd.txtarg1 == null || cmd.txtarg1.isEmpty())) {
-                            long now = new Date().getTime() / 1000;
-                            if ((cmd.ttl <= 0 || cmd.queued + cmd.ttl > now) || cmd.command.equalsIgnoreCase("CLOSE_TRIP")){
-                                App.currentTripInfo.updateCustomer();
+                        localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,1));
+                        if(cmd.txtarg2.equalsIgnoreCase("null") && (cmd.txtarg1 == null || cmd.txtarg1.isEmpty())){
+                            long now = new Date().getTime() /1000;
+                            if ((cmd.ttl<=0 || cmd.queued+cmd.ttl>now) || cmd.command.equalsIgnoreCase("CLOSE_TRIP"))
                                 this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
-                            }
                             else
                                 dlog.d("Received expired close_trip");
-                        } else
-                            try {
-                                JSONObject commandJson = new JSONObject(cmd.txtarg2);
+                        }else
+                        try{
+                            JSONObject commandJson = new JSONObject(cmd.txtarg2);
 
-                                int tripId = commandJson.optInt("TripId");
-                                int customersId = commandJson.optInt("CustomerId");
-                                String timestampBegin = commandJson.optString("TimestampBeginning");
+                            int tripId = commandJson.optInt("TripId");
+                            int customersId = commandJson.optInt("CustomerId");
+                            String timestampBegin = commandJson.optString("TimestampBeginning");
 
-                                if (tripId == App.currentTripInfo.trip.remote_id) {
-                                    App.currentTripInfo.updateCustomer();
-                                    this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
-                                } else {
-                                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-                                    if (customersId == App.currentTripInfo.trip.id_customer && timestampBegin.equalsIgnoreCase(simpleDateFormat.format(App.currentTripInfo.trip.begin_time))) {
-                                       // try {
-                                            /*DbManager dbm = App.Instance.dbManager;
+                            if(tripId == App.currentTripInfo.trip.remote_id){
+                                this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
+                            }else{
+                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.getDefault());
+                                if(customersId == App.currentTripInfo.trip.id_customer && timestampBegin.equalsIgnoreCase(simpleDateFormat.format(App.currentTripInfo.trip.begin_time))){
+                                    try{
+                                        DbManager dbm = App.Instance.dbManager;
 
-                                            Customers customers = dbm.getClientiDao();
-                                            Customer customer = customers.queryForId(customersId);
-                                            if (customer != null) {*/
-                                        App.currentTripInfo.updateCustomer();
-                                                this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
+                                        Customers customers = dbm.getClientiDao();
+                                        Customer customer = customers.queryForId(customersId);
+                                        if(customer != null ){
+                                            this.notifyCard(customer.card_code, "CLOSE", false, forced);
 
-                                           /* }
-                                        } catch (Exception e) {
-                                            dlog.e("queryForId - customers not found ", e);
-                                        }*/
-
-                                    } else {
-                                        //TODO: SEND CLOSE OF TRIP
-                                        dlog.e("No match tripId , customersId and timestamp");
+                                        }
+                                    }catch (Exception e){
+                                        dlog.e("queryForId - customers not found ",e);
                                     }
-                                }
-                            } catch (Exception e) {
 
-                                dlog.e("executeServerCommands - close_trips - Error parsing json", e);
+                                }else{
+                                    dlog.e("No match tripId , customersId and timestamp");
+                                }
                             }
+                        }catch (Exception e ){
+
+                            dlog.e("executeServerCommands - close_trips - Error parsing json",e);
+                        }
 
 
                     } else
@@ -1784,12 +1782,14 @@ public class ObcService extends Service implements OnTripCallback {
 
 
     public void startDownloadCommands() {
-        dlog.d("Start Downloading comandi");
-        HttpConnector http = new HttpConnector(this);
-        http.SetHandler(localHandler);
-        CommandsConnector rc = new CommandsConnector();
-        rc.setTarga(App.CarPlate);
-        http.Execute(rc);
+
+            dlog.d("Start Downloading comandi");
+            HttpConnector http = new HttpConnector(this);
+            http.SetHandler(localHandler);
+            CommandsConnector rc = new CommandsConnector();
+            rc.setTarga(App.CarPlate);
+            http.Execute(rc);
+
 
     }
 
@@ -1958,7 +1958,7 @@ public class ObcService extends Service implements OnTripCallback {
                 if ((App.askClose != null && App.askClose.getInt("id", 0) == tripInfo.trip.remote_id && App.askClose.getBoolean("close", false) && App.getParkModeStarted() == null)) {
 
 				/*try {
-                    while (((App) getApplicationContext()).getCurrentActivity()!=null)
+					while (((App) getApplicationContext()).getCurrentActivity()!=null)
 						if(((App) getApplicationContext()).getCurrentActivity() instanceof AGoodbye) {
 							((App) getApplicationContext()).getCurrentActivity().finish();
 							dlog.d("kill AGoodbye");
@@ -2014,10 +2014,10 @@ public class ObcService extends Service implements OnTripCallback {
                 //Intent i  = new Intent(ObcService.this, ServiceTestActivity.class);
                 Intent i = new Intent(ObcService.this, AWelcome.class);
                 try {
-                    if (tripInfo != null && tripInfo.trip != null && tripInfo.trip.n_pin <= 0)
+                    if (tripInfo!=null && tripInfo.trip!=null && tripInfo.trip.n_pin <= 0)
                         scheduleSelfCloseTrip(300, true);
-                } catch (Exception e) {
-                    dlog.e("checkAndRestartUI: null trip", e);
+                }catch (Exception e){
+                    dlog.e("checkAndRestartUI: null trip",e);
                 }
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
@@ -2040,9 +2040,9 @@ public class ObcService extends Service implements OnTripCallback {
 
     public void scheduleSelfCloseTrip(int seconds, boolean beforePin) {
 
-        if (App.currentTripInfo == null)
+        if(App.currentTripInfo==null)
             return;//no openTrip
-        if (App.getParkModeStarted() == null && !beforePin) {
+        if (App.getParkModeStarted() == null&&!beforePin) {
             App.askClose.putInt("id", App.currentTripInfo.trip.remote_id);
             App.askClose.putBoolean("close", true);
             App.Instance.persistAskClose();
@@ -2074,8 +2074,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     private final BroadcastReceiver AlarmReceiver = new BroadcastReceiver() {
 
-        int configScheduler = 0;
-
+        int fourHurScheduler=0;
         @Override
         public void onReceive(Context c, Intent i) {
 
@@ -2085,30 +2084,32 @@ public class ObcService extends Service implements OnTripCallback {
             localHandler.sendMessage(MessageFactory.checkLogSize());
 
             App.Instance.dbManager.getClientiDao().startWhitelistDownload(ObcService.this, privateHandler);
-            App.Instance.dbManager.getPoisDao().startDownload(ObcService.this, localHandler);
-            App.Instance.startAreaPolygonDownload(ObcService.this, null);
-            startDownloadReservations();
-            startDownloadCommands();
-            if (configScheduler++ > 4) {
-                configScheduler = 0;
+            //App.Instance.dbManager.getPoisDao().startDownload(ObcService.this, localHandler);
+            if(fourHurScheduler++>4*4) {
+                fourHurScheduler=0;
+                App.Instance.startAreaPolygonDownload(ObcService.this, null);
                 startDownloadConfigs();
             }
+            startDownloadReservations();
+            //startDownloadCommands();
+
+
 
             //Dequeue eventual offline trip or events
             privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
             privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
 
-            if (configScheduler % 2 == 0) {
+            if(fourHurScheduler%2==0) {
                 localHandler.sendMessage(MessageFactory.zmqRestart());
-                App.canRestartZMQ = true;
+                App.canRestartZMQ=true;
             }
-            if (App.currentTripInfo == null && System.currentTimeMillis() - App.AppScheduledReboot.getTime() > 24 * 60 * 60 * 1000 && !startedReboot) {
-                startedReboot = true;
-                if (App.reservation != null) {
+            if(App.currentTripInfo==null && System.currentTimeMillis()- App.AppScheduledReboot.getTime()>24*60*60*1000 && !startedReboot){
+                startedReboot=true;
+                if(App.reservation!=null) {
                     if (!App.reservation.isMaintenance()) {
                         dlog.d("found reservation while scheduling reboot, aborting");
-                        startedReboot = false;
-                        App.AppScheduledReboot.setTime(App.AppScheduledReboot.getTime() + 35 * 60 * 1000);
+                        startedReboot=false;
+                        App.AppScheduledReboot.setTime(App.AppScheduledReboot.getTime()+35*60*1000);
                         return;
                     }
                 }
@@ -2147,7 +2148,7 @@ public class ObcService extends Service implements OnTripCallback {
         return localHandler;
     }
 
-    private boolean startedReboot = false;
+    private boolean startedReboot=false;
 
     private final Handler privateHandler = new Handler() {
 
@@ -2264,7 +2265,7 @@ public class ObcService extends Service implements OnTripCallback {
                         } catch (RemoteException e) {
                             DLog.E("Error sending to client", e);
                         }
-                        clients.remove(new Clients(msg.arg1, msg.replyTo));
+                        clients.remove(new Clients(msg.arg1,msg.replyTo));
 
                         if (clients.size() == 0 && !_pendingUiCheck) {
                             _pendingUiCheck = true;
@@ -2421,10 +2422,11 @@ public class ObcService extends Service implements OnTripCallback {
                     dlog.d("RECEIVED MSG_TRIP_SELFCLOSE  arg1=" + msg.arg1);
                     if (App.currentTripInfo != null && App.currentTripInfo.isOpen && ((App.getParkModeStarted() == null && App.isCloseable) || App.getParkModeStarted() != null)) {
 
-                        localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE, 1));
+                        localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,1));
                         Events.selfCloseTrip(App.currentTripInfo.trip.remote_id, msg.arg1);
-                        App.currentTripInfo.updateCustomer();
-                        ObcService.this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, TripInfo.CloseType.normal);
+
+
+                        ObcService.this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, false);
                     } else {
                         dlog.w("MSG_TRIP_SELFCLOSE discarded");
                     }
@@ -2432,13 +2434,13 @@ public class ObcService extends Service implements OnTripCallback {
 
                 case MSG_TRIP_CLOSE_FORCED:
                     dlog.d("RECEIVED MSG_TRIP_CLOSE_FORCED ");
-                    if (App.currentTripInfo != null && App.currentTripInfo.isOpen) {
+                    if (App.currentTripInfo != null && App.currentTripInfo.isOpen ) {
 
-                        localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE, 1));
+                        localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,1));
                         Events.selfCloseTrip(App.currentTripInfo.trip.remote_id, 0);
 
-                        App.currentTripInfo.updateCustomer();
-                        ObcService.this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, TripInfo.CloseType.forced);
+
+                        ObcService.this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, true);
                     } else {
                         dlog.d("MSG_TRIP_SELFCLOSE discarded");
                     }
@@ -2532,7 +2534,7 @@ public class ObcService extends Service implements OnTripCallback {
 
                         if (!AudioPlayer.reqSystem && !ProTTS.reqSystem) {               //controllo se la richiesta non parte da audio player
                             AudioPlayer.lastAudioState = msg.arg1;
-                            ProTTS.lastAudioState = msg.arg1;
+                            ProTTS.lastAudioState=msg.arg1;
                         }
 
                         //controllo se è stato impostato System
@@ -2540,11 +2542,11 @@ public class ObcService extends Service implements OnTripCallback {
 
                         if (AudioPlayer.reqSystem || ProTTS.reqSystem) {                    //se c'era la richiesta la tolgo
                             AudioPlayer.reqSystem = false;
-                            ProTTS.reqSystem = false;
+                            ProTTS.reqSystem=false;
                         }
 
                     } catch (Exception e) {
-                        dlog.e("Exception while cleaning player state", e);
+                            dlog.e("Exception while cleaning player state",e);
                     }
 
                     break;
@@ -2570,7 +2572,7 @@ public class ObcService extends Service implements OnTripCallback {
                     if (!carInfo.chargingPlug && App.Charging) {
                         App.Charging = false;
                         App.Instance.persistCharging();
-                        if (FMaintenance.Instance != null)
+                        if(FMaintenance.Instance!=null)
                             FMaintenance.Instance.update(carInfo);
                         if (Math.max(carInfo.bmsSOC, carInfo.bmsSOC_GPRS) == 100) {
                             if (carInfo.maxAmpere != 0)
@@ -2585,7 +2587,7 @@ public class ObcService extends Service implements OnTripCallback {
                         }
 
                         sendBeacon();
-                        if (FMaintenance.Instance != null)
+                        if(FMaintenance.Instance!=null)
                             FMaintenance.Instance.update(carInfo);
                     }
                     break;
@@ -2601,7 +2603,7 @@ public class ObcService extends Service implements OnTripCallback {
                     Message nmsg = Message.obtain();
                     nmsg.copyFrom(msg);
                     //if(msg.obj instanceof Location)
-                    //dlog.d("Location Changed "+((Location)msg.obj).getLongitude()+" "+((Location)msg.obj).getLatitude());
+                        //dlog.d("Location Changed "+((Location)msg.obj).getLongitude()+" "+((Location)msg.obj).getLatitude());
                     sendAll(nmsg);
                     break;
                 case MSG_DEBUG_CARD:
@@ -2618,7 +2620,7 @@ public class ObcService extends Service implements OnTripCallback {
                 case MSG_CHECK_TIME:
                     //Fan-out message
 
-                    timeCheckScheduler.schedule(timeCheckRunnable, 0, TimeUnit.SECONDS);
+                    timeCheckScheduler.schedule(timeCheckRunnable,0,TimeUnit.SECONDS);
                     break;
 
 
@@ -2630,22 +2632,21 @@ public class ObcService extends Service implements OnTripCallback {
 
     /**
      * retreive only the first cell greater than 0
-     *
      * @return
      */
     public float[] getGreaterCellVoltages() {
 
-        ArrayList<Float> values = new ArrayList<>();
+        ArrayList<Float> values =new ArrayList<>();
         for (int i = 0; i < 24; i++) {
-            if (obc_io.getCellVoltageValue(i) == 0)
+            if(obc_io.getCellVoltageValue(i)==0)
                 break;
             values.add(obc_io.getCellVoltageValue(i));
         }
 
-        float[] finalValues = new float[values.size()];
+        float[] finalValues =new float[values.size()];
 
-        for (int i = 0; i < values.size(); i++)
-            finalValues[i] = values.get(i);
+        for(int i=0; i<values.size();i++)
+            finalValues[i]=values.get(i);
 
         return finalValues;
     }
@@ -2673,20 +2674,20 @@ public class ObcService extends Service implements OnTripCallback {
     }
 
 
-    public void startRemotePoiCheckCycle() {
+   public void startRemotePoiCheckCycle() {
 
-        stopRemotePoiCheckCycle();
+       stopRemotePoiCheckCycle();
 
-        DbManager dbm = App.Instance.dbManager;
-        Pois DaoPois = dbm.getPoisDao();
-        final List<Poi> PoiList = DaoPois.getCityPois(App.DefaultCity.toLowerCase());
-        if (PoiList == null) {
-            dlog.d("Abort remote PoiCheck Cycle PoiList is null, city: " + App.DefaultCity);
-            return;
-        }
+       DbManager dbm = App.Instance.dbManager;
+       Pois DaoPois = dbm.getPoisDao();
+       final List<Poi> PoiList =DaoPois.getCityPois(App.DefaultCity.toLowerCase());
+       if(PoiList==null) {
+           dlog.d("Abort remote PoiCheck Cycle PoiList is null, city: " +App.DefaultCity);
+           return;
+       }
 
-        tripPoiUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
-        tripPoiUpdateScheduler.scheduleAtFixedRate(new Runnable() {
+       tripPoiUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
+       tripPoiUpdateScheduler.scheduleAtFixedRate(new Runnable() {
 
 
             @SuppressWarnings("unused")
@@ -2694,18 +2695,18 @@ public class ObcService extends Service implements OnTripCallback {
             public void run() {
                 try {
 
-                    if (System.currentTimeMillis() / 1000 - App.currentTripInfo.trip.begin_timestamp < 60 * 5 || carInfo.batteryLevel >= 25 || App.lastLocation == null)
+                    if(System.currentTimeMillis()/1000- App.currentTripInfo.trip.begin_timestamp<60*5 || carInfo.batteryLevel>=25 || App.lastLocation==null )
                         return;
 
-                    for (Poi singlePoi : PoiList) {
-                        if (App.lastLocation.distanceTo(singlePoi.getLoc()) <= 90) {
-                            sendAll(MessageFactory.notifyTripPoiUpdate(1, singlePoi));
+                    for(Poi singlePoi : PoiList){
+                        if(App.lastLocation.distanceTo(singlePoi.getLoc())<=90){
+                                sendAll(MessageFactory.notifyTripPoiUpdate(1,singlePoi));
                             return;
                         }
 
                     }
 
-                    sendAll(MessageFactory.notifyTripPoiUpdate(0, null));
+                    sendAll(MessageFactory.notifyTripPoiUpdate(0,null));
 
                 } catch (Exception e) {
                     dlog.e("Exception inside tripPoiUpdateScheduler", e);
@@ -2715,10 +2716,10 @@ public class ObcService extends Service implements OnTripCallback {
 
         }, 20, 10, TimeUnit.SECONDS);
 
-        dlog.d("Started remote PoiCheck Cycle, city: " + App.DefaultCity);
-    }
+        dlog.d("Started remote PoiCheck Cycle, city: " +App.DefaultCity);
+   }
 
-    public void stopRemotePoiCheckCycle() {
+   public void stopRemotePoiCheckCycle() {
 
         if (tripPoiUpdateScheduler != null) {
             tripPoiUpdateScheduler.shutdown();
@@ -2728,17 +2729,11 @@ public class ObcService extends Service implements OnTripCallback {
         tripPoiUpdateScheduler = null;
 
 
-    }
+   }
 
-    @Override
-    public void onTripResult(final int response) {
-       /* Handler h = new Handler();
-        h.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-*/
-                sendAll(MessageFactory.apiTripCallback(response));
-            /*}
-        },15000);*/
-    }
+
+
+
+
+
 }
