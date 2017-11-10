@@ -845,7 +845,7 @@ public class ObcService extends Service {
                         if ((carInfo.intGpsLocation.getLongitude() >= 18.53 || carInfo.intGpsLocation.getLongitude() <= 6.63 || carInfo.intGpsLocation.getLatitude() >= 47.10 || carInfo.intGpsLocation.getLatitude() <= 36.64) ||
                                 (carInfo.intGpsLocation.getLongitude() == 0 || carInfo.intGpsLocation.getLongitude() == 0 || carInfo.intGpsLocation.getLatitude() == 0 || carInfo.intGpsLocation.getLatitude() == 0)) {
                             App.Instance.setUseExternalGps(true);
-                            dlog.d("GpsCheckeScheduler: setUseExternalGps(true) IntGpsLocation out from Italy or location 0.0");
+                            dlog.d("GpsCheckScheduler: setUseExternalGps(true) IntGpsLocation out from Italy or location 0.0");
                             sendBeacon();//update remoto per aggiornare int/ext
                             intCount = 0;
                             return;
@@ -855,7 +855,7 @@ public class ObcService extends Service {
                             intCount++;
                             if (intCount >= 3) {
                                 App.Instance.setUseExternalGps(true);
-                                dlog.d("GpsCheckeScheduler: setUseExternalGps(true) same coordinate for " + intCount + " times");
+                                dlog.d("GpsCheckScheduler: setUseExternalGps(true) same coordinate for " + intCount + " times");
                                 intCount = 0;
                                 sendBeacon();
                             }
@@ -869,7 +869,7 @@ public class ObcService extends Service {
                         if ((carInfo.extGpsLocation.getLongitude() >= 18.53 || carInfo.extGpsLocation.getLongitude() <= 6.63 || carInfo.extGpsLocation.getLatitude() >= 47.10 || carInfo.extGpsLocation.getLatitude() <= 36.64) ||
                                 (carInfo.extGpsLocation.getLatitude() == 0 || carInfo.extGpsLocation.getLatitude() == 0 || carInfo.extGpsLocation.getLongitude() == 0 || carInfo.extGpsLocation.getLongitude() == 0)) {
                             App.Instance.setUseExternalGps(false);
-                            dlog.d("GpsCheckeScheduler: setUseExternalGps(false) ExtGpsLocation out from Italy or location 0.0");
+                            dlog.d("GpsCheckScheduler: setUseExternalGps(false) ExtGpsLocation out from Italy or location 0.0");
                             sendBeacon();
                             extCount = 0;
                             return;
@@ -878,7 +878,7 @@ public class ObcService extends Service {
                             extCount++;
                             if (extCount >= 3) {
                                 App.Instance.setUseExternalGps(false);
-                                dlog.d("GpsCheckeScheduler: setUseExternalGps(false) same coordinate for " + extCount + " times");
+                                dlog.d("GpsCheckScheduler: setUseExternalGps(false) same coordinate for " + extCount + " times");
                                 extCount = 0;
                                 sendBeacon();
                             }
