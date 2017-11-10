@@ -967,13 +967,19 @@ public class Hik_io implements LowLevelInterface {
 				
 				Bundle b = new Bundle();
 				b.putString("VIN", carId);
-				String version = data.substring(0, data.indexOf("~"));
+				String version;
+				if(data.contains("~")){
+						version = data.substring(0, data.indexOf("~"));
 
-				b.putString("VER", version);
-				try {
-					b.putBoolean("batterySafety", Integer.parseInt(data.substring(data.indexOf("~") + 1, data.indexOf("~") + 2))>0);
-				}catch (Exception e){
-					dlog.e("Exception handling extra data inside Heartbeat",e);
+					b.putString("VER", version);
+					try {
+						b.putBoolean("batterySafety", Integer.parseInt(data.substring(data.indexOf("~") + 1, data.indexOf("~") + 2))>0);
+					}catch (Exception e){
+						dlog.e("Exception handling extra data inside Heartbeat",e);
+					}
+				}
+				else {
+					version = data;
 				}
 				if (!SDKVersion.equals(version)) {
 					SDKVersion = version;

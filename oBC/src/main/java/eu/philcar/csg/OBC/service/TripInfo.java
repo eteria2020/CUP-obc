@@ -179,6 +179,7 @@ public class TripInfo {
                 dlog.d("Passaggio card doorsOnly apertura porte in corso! id card: "+card.toString());
                 obc_io.setDoors(null, 1,"Porte Aperte");  //Sole se trip registrata su db apri le portiere
                 Events.eventRfid(6, code + " "+ card.getName());
+                Events.eventCleanliness(0, 0);
                 return null;
             }
         }

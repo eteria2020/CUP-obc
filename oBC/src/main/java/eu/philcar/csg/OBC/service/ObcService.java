@@ -862,7 +862,7 @@ public class ObcService extends Service {
                             return;
                         } else {
                             intCount = 0;
-                            lastIntGpsLocation = carInfo.intGpsLocation;
+                            lastIntGpsLocation.set(carInfo.intGpsLocation);
                         }
                     } else {
 
@@ -878,14 +878,14 @@ public class ObcService extends Service {
                             extCount++;
                             if (extCount >= 3) {
                                 App.Instance.setUseExternalGps(false);
-                                dlog.d("GpsCheckeScheduler: setUseExternalGps(false) same coordinate for " + intCount + " times");
+                                dlog.d("GpsCheckeScheduler: setUseExternalGps(false) same coordinate for " + extCount + " times");
                                 extCount = 0;
                                 sendBeacon();
                             }
                             return;
                         } else {
                             extCount = 0;
-                            lastExtGpsLocation = carInfo.extGpsLocation;
+                            lastExtGpsLocation.set(carInfo.extGpsLocation);
                         }
 
                     }
