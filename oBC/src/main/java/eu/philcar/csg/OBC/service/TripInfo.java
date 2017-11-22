@@ -185,6 +185,7 @@ public class TripInfo {
                 dlog.d("Passaggio card doorsOnly apertura porte in corso! id card: "+card.toString());
                 obc_io.setDoors(null, 1,"Porte Aperte");  //Sole se trip registrata su db apri le portiere
                 Events.eventRfid(6, code + " "+ card.getName());
+                Events.eventCleanliness(0, 0);
                 return null;
             }
         }
@@ -280,7 +281,7 @@ public class TripInfo {
                 } else
                     obc_io.setLcd(null,"Errore sistema");
 
-                TripsConnector cc = new TripsConnector(this);
+                TripsConnector cc = new TripsConnector(this, service);
 
                 http = new HttpConnector(service);
                 http.Execute(cc);
@@ -358,6 +359,8 @@ public class TripInfo {
                             obc_io.setDoors(null, 1,"BENTORNATO");
                             //obc_io.setEngine(null, 1);
                             dlog.d(TripInfo.class.toString()+" handleCard: Pending trips. Park mode ON user returned, open car");
+                        }else{
+                            dlog.d("End Park forced trip close");
                         }
                         obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
                         obc_io.setTag(null,cardCode);						
@@ -425,6 +428,7 @@ public class TripInfo {
                         service.sendBeacon();
                         return (MessageFactory.notifyTripEnd(this));
                     } else {
+                        dlog.d("Unable to close trip, out of operative area");
 
                         Toast.makeText(App.Instance.getBaseContext(), "Out of Operative Area", Toast.LENGTH_SHORT).show();
                         obc_io.setLcd(null, "   FUORI AREA");

@@ -235,7 +235,7 @@ public class ServiceTestActivity extends Activity {
 		cellsVoltage=cellsVoltage.concat("SOCR : "+ carInfo.SOCR +"\n");
 		cellsVoltage=cellsVoltage.concat("SOCAdmin: "+ carInfo.batteryLevel +"%\n");
 		cellsVoltage=cellsVoltage.concat("outAmp: "+ carInfo.outAmp +"A\n");
-		cellsVoltage=cellsVoltage.concat("Battery Safety: "+ carInfo.batterySafety +"\n");
+		cellsVoltage=cellsVoltage.concat("Battery Safety: "+ carInfo.isBatterySafety() +"\n");
 		//cellsVoltage=cellsVoltage.concat("CurrentValue: "+ carInfo.current +"A\n");
 
 		

@@ -79,7 +79,7 @@ public class FInstructions extends FBase {
 			public void onClick(View v) {
 				dlog.d("FInstructions finsNextIB click : " + login);
 				if (login) {
-					((ABase)getActivity()).pushFragment(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true);
+					((ABase)getActivity()).pushFragmentnoBack(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true,FInstructions.this);
 				} else {
 					((ABase)getActivity()).pushFragment(FGoodbye.newInstance(), FGoodbye.class.getName(), true);
 				}

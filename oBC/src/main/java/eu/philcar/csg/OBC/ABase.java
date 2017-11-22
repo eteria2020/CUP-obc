@@ -235,7 +235,7 @@ public abstract class ABase extends Activity {
 	 * @param fragmentName The name associated with the transaction (e.g., [YourClassHere].class.getName()). If the back button won't be used, then this parameter will be removed before release but until then you should stick with it.
 	 * @param animated		Self-explanatory
 	 */
-	public void pushFragmentnoBack(FBase fragment, String fragmentName, boolean animated) {
+	public void pushFragmentnoBack(FBase fragment, String fragmentName, boolean animated, FBase closingFragment) {
 
 		//getFragmentManager().popBackStack();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -244,6 +244,7 @@ public abstract class ABase extends Activity {
 		if (animated) {
 			transaction.setCustomAnimations(R.animator.slide_in_right, R.animator.slide_out_left, R.animator.slide_in_left, R.animator.slide_out_right);
 		}
+		transaction.remove(closingFragment);
 		transaction.add(getPlaceholderResource(), fragment, fragmentName);
 		transaction.disallowAddToBackStack();
 		transaction.commit();

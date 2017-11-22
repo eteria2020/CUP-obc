@@ -27,7 +27,7 @@ public class CardRfidCollection implements BasicJsonCollection{
 
         JSONArray ja;
         try {
-            if(!json.equalsIgnoreCase("")) {
+            if(!json.equalsIgnoreCase("") && !json.equalsIgnoreCase("{}")) {
                 ja = new JSONArray(json);
 
                 if (ja.length() > 0) {
