@@ -949,7 +949,26 @@ public class TripInfo {
         return result;
     }
 
+
     public void setEvent(int what, int arg, String txt) {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof TripInfo){
+         if(!trip.equals(((TripInfo) o).trip)){
+             return false;
+         }
+
+         if(!customer.equals(((TripInfo) o).customer)){
+             return false;
+         }
+
+         return true;
+
+        }
+
+        return false;
     }
 }

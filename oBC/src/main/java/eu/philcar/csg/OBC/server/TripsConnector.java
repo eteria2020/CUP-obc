@@ -239,7 +239,7 @@ public class TripsConnector implements RemoteEntityInterface {
 
 				tripInfo.UpdateCorsa();
 				if(callback!=null)
-					callback.onTripResult(result);
+					callback.onTripResult(tripInfo);
 			}
 		} catch (JSONException e) {
 			dlog.e("DecodeJson, JSON exception",e);

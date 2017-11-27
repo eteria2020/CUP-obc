@@ -3,6 +3,7 @@ package eu.philcar.csg.OBC;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
 import eu.philcar.csg.OBC.controller.welcome.FPin;
 import eu.philcar.csg.OBC.controller.welcome.FWelcome;
+import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.helpers.Clients;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
@@ -143,8 +144,10 @@ public class AWelcome extends ABase {
 
 			case ObcService.MSG_API_TRIP_CALLBACK:
 				Fragment frag = getActiveFragment();// getFragmentManager().findFragmentById(R.id.awelPlaceholderFL);
-				if (frag!=null && frag instanceof OnTripCallback) {
-					((OnTripCallback) frag).onTripResult(msg.arg1);
+				if (frag!=null && frag instanceof OnTripCallback && msg.obj instanceof TripInfo) {
+
+					((OnTripCallback) frag).onTripResult((TripInfo) msg.obj);
+
 				} else {
 					DLog.E(AWelcome.class.getName() + "Impossible cast a OnTripCallback  :");
 				}

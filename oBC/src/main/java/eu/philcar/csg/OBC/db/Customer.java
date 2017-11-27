@@ -227,4 +227,18 @@ public class Customer extends DbRecord {
 		update_timestamp = customer.update_timestamp;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if(o instanceof Customer){
+			if(id != ((Customer) o).id) {
+				return false;
+			}
+			if(update_timestamp != ((Customer) o).update_timestamp) {
+				return false;
+			}
+
+			return true;
+		}
+		return false;
+	}
 }

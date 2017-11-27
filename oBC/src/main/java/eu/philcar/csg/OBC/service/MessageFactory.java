@@ -145,9 +145,9 @@ public class MessageFactory {
 		return msg;		
 	}
 
-	public static Message apiTripCallback(int response) {
+	public static Message apiTripCallback(TripInfo response) {
 		Message msg  =  Message.obtain(null, ObcService.MSG_API_TRIP_CALLBACK);
-		msg.arg1 = response;
+		msg.obj = response;
 
 		return msg;
 	}

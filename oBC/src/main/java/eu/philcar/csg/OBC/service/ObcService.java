@@ -2735,7 +2735,7 @@ public class ObcService extends Service implements OnTripCallback {
    }
 
     @Override
-    public void onTripResult(final int response) {
+    public void onTripResult(final TripInfo response) {
        /* Handler h = new Handler();
         h.postDelayed(new Runnable() {
             @Override

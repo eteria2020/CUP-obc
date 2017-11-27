@@ -12,6 +12,7 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.interfaces.OnTripCallback;
 import eu.philcar.csg.OBC.service.MessageFactory;
+import eu.philcar.csg.OBC.service.TripInfo;
 
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -414,8 +415,8 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 	}
 
 	@Override
-	public void onTripResult(int response) {
-		if(progressDF!=null && progressDF.isAdded()) {
+	public void onTripResult(TripInfo response) {
+		if(progressDF!=null && progressDF.isAdded() && response.equals(App.currentTripInfo)) {
 			localHandler.removeCallbacks(skipRemoteCheck);
 			checkTripResult();
 		}
