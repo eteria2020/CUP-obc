@@ -8,6 +8,7 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.controller.map.DFProgressing;
+import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.interfaces.OnTripCallback;
@@ -274,8 +275,11 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 			
 			App.pinChecked = true;
 			App.Instance.persistPinChecked();
-			
-			messageTV.setText(R.string.pin_right);
+			if(App.currentTripInfo.trip.n_pin!= Customer.N_COMPANY_PIN) {
+				messageTV.setText(R.string.pin_right);
+			}else{
+				messageTV.setText(R.string.pin_business);
+			}
 			
 			localHandler.postDelayed(new Runnable() {
 				@Override
