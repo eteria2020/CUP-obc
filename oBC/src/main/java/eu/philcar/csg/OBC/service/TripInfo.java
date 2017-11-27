@@ -57,6 +57,12 @@ import org.json.JSONObject;
  */
 public class TripInfo {
 
+    public enum CloseType{
+        normal,
+        forced,
+        maintainer
+    }
+
     private static final String DEFAULT_PLATE = "XH123KM";
 
     // Properties
@@ -136,7 +142,7 @@ public class TripInfo {
 
 
     public Message handleCard(String code, String event,CarInfo carInfo,LowLevelInterface obc_io,ObcService service, WakeLock screenLock) {
-        return handleCard( code,  event, carInfo, obc_io, service,  screenLock, false) ;
+        return handleCard( code,  event, carInfo, obc_io, service,  screenLock, CloseType.normal) ;
     }
 
     /**
@@ -149,7 +155,7 @@ public class TripInfo {
      * @param obc_io
      * @param service
      * @param screenLock
-     * @param forced
+     * @param closeType
      * @return
      * 
      * TODO @throws StandardPlateException The vehicle plate is the default vehicle plate.
@@ -161,7 +167,7 @@ public class TripInfo {
             LowLevelInterface obc_io,
             ObcService service,
             WakeLock screenLock,
-            boolean forced ) {
+            CloseType closeType ) {
 
         if (code==null) {
             dlog.e(TripInfo.class.toString()+" handleCard: Handle card - null code :"+event);
@@ -275,7 +281,7 @@ public class TripInfo {
                 } else
                     obc_io.setLcd(null,"Errore sistema");
 
-                TripsConnector cc = new TripsConnector(this);
+                TripsConnector cc = new TripsConnector(this, service);
 
                 http = new HttpConnector(service);
                 http.Execute(cc);
@@ -349,7 +355,7 @@ public class TripInfo {
                     } else {    //customer rientra
 
                         obc_io.setLcd(null, " Auto prenotata");
-                        if (!forced)  { //Se non ? una chiusura forzata da remoto  apri le portiere ed abilita il motore
+                        if (closeType !=CloseType.forced)  { //Se non ? una chiusura forzata da remoto  apri le portiere ed abilita il motore
                             obc_io.setDoors(null, 1,"BENTORNATO");
                             //obc_io.setEngine(null, 1);
                             dlog.d(TripInfo.class.toString()+" handleCard: Pending trips. Park mode ON user returned, open car");
@@ -363,9 +369,9 @@ public class TripInfo {
                         App.parkMode = ParkMode.PARK_ENDED;
                         App.Instance.persistInSosta();
 
-                        if (forced) {   // Se ? una chiusura forzata chiudi la sosta e richiama ricorsivamente  questa funzione per chiudere anche la trip.
+                        if (closeType==CloseType.forced) {   // Se ? una chiusura forzata chiudi la sosta e richiama ricorsivamente  questa funzione per chiudere anche la trip.
                             setParkMode(0, obc_io);
-                            return handleCard( code,  event, carInfo, obc_io, service,  screenLock,  forced);
+                            return handleCard( code,  event, carInfo, obc_io, service,  screenLock,  closeType);
                         } else {
                         	 service.getHandler().sendMessage(MessageFactory.startRemoteUpdateCycle());  
                             service.getHandler().sendMessage(MessageFactory.RadioVolume(0));
@@ -378,12 +384,12 @@ public class TripInfo {
                     }
                 } else {  // l'auto viene rilasciata
 
-                    if (! App.isCloseable && !forced) {
+                    if (! App.isCloseable && closeType !=CloseType.forced) {
                         obc_io.setLcd(null, "CHIUDERE CORSA");
                         dlog.d("handleCard: corsa non chiudibile");
                         return null;
                     }
-                    if (service.checkParkArea() || forced) {
+                    if (service.checkParkArea() || closeType ==CloseType.forced) {
 
                         cardCode="";
                         obc_io.setLcd(null, "   Auto Libera");
@@ -932,6 +938,15 @@ public class TripInfo {
             }
         }
 
+    }
+
+    public boolean updateCustomer(){
+        boolean result = customer.update();
+        if(result){
+            cardCode = customer.card_code;
+
+        }
+        return result;
     }
 
     public void setEvent(int what, int arg, String txt) {

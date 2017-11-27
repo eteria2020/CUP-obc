@@ -1,22 +1,17 @@
 package eu.philcar.csg.OBC.server;
 
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.philcar.csg.OBC.App;
-import eu.philcar.csg.OBC.db.Customers;
 import eu.philcar.csg.OBC.db.Trip;
-import eu.philcar.csg.OBC.db.Trips;
-import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.interfaces.OnTripCallback;
 import eu.philcar.csg.OBC.service.TripInfo;
 
 
@@ -30,9 +25,17 @@ public class TripsConnector implements RemoteEntityInterface {
 
 	public final TripInfo tripInfo;
 
+	private final OnTripCallback callback;
+
+
+	public TripsConnector(TripInfo tripInfo, OnTripCallback callback) {
+		this.tripInfo = tripInfo;
+		this.callback = callback;
+	}
 
 	public TripsConnector(TripInfo tripInfo) {
 		this.tripInfo = tripInfo;
+		this.callback = null;
 	}
 
 	public int MsgId() {
@@ -147,7 +150,7 @@ public class TripsConnector implements RemoteEntityInterface {
 
 	public int DecodeJson(String responseBody) {
  
-		busy =false;
+
 		try {
 			
 			if (responseBody==null || responseBody.isEmpty()) {				
@@ -156,6 +159,7 @@ public class TripsConnector implements RemoteEntityInterface {
 				tripInfo.setTxOffline();
 				tripInfo.UpdateCorsa();
 				dlog.w("No response from server, keeping info off-line");
+				busy =false;
 				return MsgId();
 			}
 			
@@ -212,6 +216,19 @@ public class TripsConnector implements RemoteEntityInterface {
 						tripInfo.setTxApertura();
 					}	
 					break;
+
+				case -26:
+				case -27:
+				case -28:
+				case -29:
+					tripInfo.trip.warning="PREAUTH";
+					tripInfo.setWarning("PREAUTH");
+					if (jobj.has("extra")) {
+						tripInfo.trip.remote_id = jobj.getInt("extra");
+						tripInfo.trip.begin_sent = true;
+						tripInfo.setTxApertura();
+					}
+					break;
 					
 				
 				default:
@@ -221,14 +238,15 @@ public class TripsConnector implements RemoteEntityInterface {
 				}
 
 				tripInfo.UpdateCorsa();
-				
+				if(callback!=null)
+					callback.onTripResult(result);
 			}
 		} catch (JSONException e) {
 			dlog.e("DecodeJson, JSON exception",e);
 		} catch (Exception e) {
 			dlog.e("DecodeJson, exception",e);
 		}
-
+		busy =false;
 		return MsgId();
 	}
 
