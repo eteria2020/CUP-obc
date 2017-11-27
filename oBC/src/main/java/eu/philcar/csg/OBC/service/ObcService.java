@@ -47,6 +47,7 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
+import eu.philcar.csg.OBC.interfaces.OnTripCallback;
 import eu.philcar.csg.OBC.server.AdminsConnector;
 import eu.philcar.csg.OBC.server.BusinessEmployeeConnector;
 import eu.philcar.csg.OBC.server.CallCenterConnector;
@@ -90,7 +91,7 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 import android.telephony.SmsManager;
 
-public class ObcService extends Service {
+public class ObcService extends Service implements OnTripCallback {
 
 
     private DLog dlog = new DLog(this.getClass());
@@ -182,6 +183,8 @@ public class ObcService extends Service {
 
     public static final int MSG_ZMQ_RESTART = 100;
     public static final int MSG_CHECK_LOG_SIZE = 101;
+
+    public static final int MSG_API_TRIP_CALLBACK = 110;
 
     public static final int SERVER_NOTIFY_RAW = 0;
     public static final int SERVER_NOTIFY_RESERVATION = 1;
@@ -1229,7 +1232,7 @@ public class ObcService extends Service {
         if (tripInfo == null) {
             dlog.e(ObcService.class.toString() + " notifyCard: Tripinfo NULL!");
         } else {
-            Message tripMsg = tripInfo.handleCard(id, event, carInfo, obc_io, this, screenLockTrip, forced);
+            Message tripMsg = tripInfo.handleCard(id, event, carInfo, obc_io, this, screenLockTrip, forced?TripInfo.CloseType.forced:TripInfo.CloseType.normal);
             carInfo.updateTrips();
             if (tripMsg != null) {
                 if (tripMsg.what == this.MSG_TRIP_END && App.reservation != null) {
@@ -2731,7 +2734,17 @@ public class ObcService extends Service {
 
    }
 
-
+    @Override
+    public void onTripResult(final int response) {
+       /* Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+*/
+        sendAll(MessageFactory.apiTripCallback(response));
+            /*}
+        },15000);*/
+    }
 
 
 
