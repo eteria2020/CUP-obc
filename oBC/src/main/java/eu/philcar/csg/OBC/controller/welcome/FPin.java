@@ -8,13 +8,14 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.controller.map.DFProgressing;
+import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
+import eu.philcar.csg.OBC.interfaces.OnTripCallback;
 import eu.philcar.csg.OBC.service.MessageFactory;
 import eu.philcar.csg.OBC.service.TripInfo;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,7 +29,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class FPin extends FBase implements OnClickListener {
+public class FPin extends FBase implements OnClickListener, OnTripCallback {
 
 	public static FPin newInstance() {
 		
@@ -36,14 +37,26 @@ public class FPin extends FBase implements OnClickListener {
 		return fp;
 	}
 	
-	//private DFProgressing progressDF;
+	private DFProgressing progressDF;
 	
 	private Button b1,b2,b3,b4,b5,b6,b7,b8,b9,b0,sosB,faqB;
 	private ImageButton deleteIB;
 	private ImageView p1,p2,p3,p4;
 	private TextView messageTV;
 	private FrameLayout fpinRightFrame;
+	private Handler localHandler = new Handler();
 	private DLog dlog = new DLog(this.getClass());
+	private final Runnable skipRemoteCheck = new Runnable() {
+		@Override
+		public void run() {
+			progressDF.dismiss();
+
+            if(getActivity()!=null)
+			    ((AWelcome) getActivity()).sendMessage(MessageFactory.checkPin(pin));
+
+			pinChecked(App.currentTripInfo.CheckPin(pin, true));
+		}
+	};
 	
 	private String pin;
 	
@@ -63,7 +76,7 @@ public class FPin extends FBase implements OnClickListener {
 		View view = inflater.inflate(R.layout.f_pin, container, false);
 		dlog.d("OnCreareView FPin");
 		
-		//progressDF = DFProgressing.newInstance(R.string.checking_pin);
+		progressDF = DFProgressing.newInstance(R.string.checking_pin);
 		
 		b1 = (Button)view.findViewById(R.id.fpinOneB);
 		b2 = (Button)view.findViewById(R.id.fpinTwoB);
@@ -179,7 +192,7 @@ public class FPin extends FBase implements OnClickListener {
 			deleteIB.setEnabled(false);
 			deleteIB.setOnClickListener(null);
 			
-			//progressDF.show(getFragmentManager(), DFProgressing.class.getName());
+			progressDF.show(getFragmentManager(), DFProgressing.class.getName());
 			
 			if (Debug.IGNORE_HARDWARE) {
 				
@@ -191,40 +204,14 @@ public class FPin extends FBase implements OnClickListener {
 				}, 2000);
 				
 			} else {
-				try {
 
-					((AWelcome) getActivity()).sendMessage(MessageFactory.checkPin(pin));
 
-					if (App.currentTripInfo.trip.recharge != -15) {
-						pinChecked(App.currentTripInfo.CheckPin(pin, true));
-					} else {
-						//progressDF.dismiss();
-						messageTV.setText(R.string.other_trip_message);
-						return;
+				localHandler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						checkTripResult();
 					}
-				}catch(Exception e){
-					dlog.e("Exception while checking the pin resetting view",e);
-					disableUI();
-
-					messageTV.setText(R.string.pin_wrong);
-
-					pin = "";
-
-					Handler h = new Handler();
-					h.postDelayed(new Runnable() {
-						@Override
-						public void run() {
-							p1.setImageResource(R.drawable.img_pin_empty);
-							p2.setImageResource(R.drawable.img_pin_empty);
-							p3.setImageResource(R.drawable.img_pin_empty);
-							p4.setImageResource(R.drawable.img_pin_empty);
-
-							messageTV.setText(R.string.pin_type);
-
-							enableUI();
-						}
-					}, 1000);
-				}
+				}, 400);
 			}
 			
 			return;
@@ -256,10 +243,24 @@ public class FPin extends FBase implements OnClickListener {
 		
 		messageTV.setText(R.string.pin_type);
 	}
-	
+
+	/*@Override
+	public void onDetach() {
+		super.onDetach();
+		progressDF=null;
+		localHandler =null;
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		progressDF.dismiss();
+		localHandler.removeCallbacksAndMessages(null);
+	}*/
+
 	private void pinChecked(boolean valid) {
 		
-		//progressDF.dismiss();
+		progressDF.dismiss();
 		
 		boolean result;
 		//if (Debug.IGNORE_HARDWARE) {
@@ -274,11 +275,13 @@ public class FPin extends FBase implements OnClickListener {
 			
 			App.pinChecked = true;
 			App.Instance.persistPinChecked();
+			if(App.currentTripInfo.trip.n_pin!= Customer.N_COMPANY_PIN) {
+				messageTV.setText(R.string.pin_right);
+			}else{
+				messageTV.setText(R.string.pin_business);
+			}
 			
-			messageTV.setText(R.string.pin_right);
-			
-			Handler h = new Handler();
-			h.postDelayed(new Runnable() {
+			localHandler.postDelayed(new Runnable() {
 				@Override
 				public void run() {
 					((ABase)getActivity()).pushFragmentnoBack(FInstructions.newInstance(true), FInstructions.class.getName(), true, FPin.this);
@@ -336,5 +339,125 @@ public class FPin extends FBase implements OnClickListener {
 		b8.setEnabled(false);
 		b9.setEnabled(false);
 		b0.setEnabled(false);
+	}
+
+	void checkTripResult(){
+		if(App.currentTripInfo.trip.offline || App.currentTripInfo.trip.begin_sent){
+			if(App.currentTripInfo.trip.recharge>=0 ) {
+
+				try {
+
+					progressDF.dismiss();
+					if(getActivity()!=null)
+						((AWelcome) getActivity()).sendMessage(MessageFactory.checkPin(pin));
+
+					pinChecked(App.currentTripInfo.CheckPin(pin, true));
+				}catch(Exception e){
+					progressDF.dismiss();
+					dlog.e("Exception while checking the pin resetting view",e);
+					disableUI();
+
+					messageTV.setText(R.string.pin_wrong);
+
+					pin = "";
+
+					localHandler.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							p1.setImageResource(R.drawable.img_pin_empty);
+							p2.setImageResource(R.drawable.img_pin_empty);
+							p3.setImageResource(R.drawable.img_pin_empty);
+							p4.setImageResource(R.drawable.img_pin_empty);
+
+							messageTV.setText(R.string.pin_type);
+
+							enableUI();
+						}
+					}, 1000);
+				}
+			}else{
+				progressDF.dismiss();
+				disableUI();
+				switch (App.currentTripInfo.trip.recharge) {
+
+					case -15://open trip
+
+						messageTV.setText(R.string.other_trip_message);
+						break;
+
+					case -16://customers disabled
+
+						messageTV.setText("SEI DISABILITATO");
+						break;
+
+					case -26://preauth fail
+						messageTV.setTextSize(29);
+						messageTV.setText("Inserire una carta valida nell'area personale per procedere con l'apertura della corsa.");
+						break;
+					case -27://preauth fail
+						messageTV.setTextSize(29);
+						messageTV.setText("Credito insufficiente sulla carta registrata per aprire la corsa, contattare il servizio clienti per ulteriori dettagli.");
+						break;
+					case -28:
+					case -29:
+						messageTV.setTextSize(29);
+						messageTV.setText("Errore sulla preautorizzazione controlla i tuoi dati di pagamento o contatta il servizio clienti");
+						break;
+
+
+					default:
+
+						messageTV.setText("ERRORE GENERICO CONTATTA IL SERVIZIO CLIENTI");
+						//nuovi errori
+				}
+
+
+			}
+		}else{
+			localHandler.postDelayed(skipRemoteCheck,10000);
+		}
+	}
+
+	@Override
+	public void onTripResult(TripInfo response) {
+		if(progressDF!=null && progressDF.isAdded() && response.equals(App.currentTripInfo)) {
+			localHandler.removeCallbacks(skipRemoteCheck);
+			checkTripResult();
+		}
+		/*localHandler.removeCallbacks(skipRemoteCheck);
+		try {
+
+			progressDF.dismiss();
+			((AWelcome) getActivity()).sendMessage(MessageFactory.checkPin(pin));
+
+			if (App.currentTripInfo.trip.recharge != -15) {
+				pinChecked(App.currentTripInfo.CheckPin(pin, true));
+			} else {
+				messageTV.setText(R.string.other_trip_message);
+				return;
+			}
+		}catch(Exception e){
+			progressDF.dismiss();
+			dlog.e("Exception while checking the pin resetting view",e);
+			disableUI();
+
+			messageTV.setText(R.string.pin_wrong);
+
+			pin = "";
+
+			localHandler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					p1.setImageResource(R.drawable.img_pin_empty);
+					p2.setImageResource(R.drawable.img_pin_empty);
+					p3.setImageResource(R.drawable.img_pin_empty);
+					p4.setImageResource(R.drawable.img_pin_empty);
+
+					messageTV.setText(R.string.pin_type);
+
+					enableUI();
+				}
+			}, 1000);
+		}*/
 	}
 }
