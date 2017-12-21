@@ -105,4 +105,25 @@ public class Trip  extends DbRecord {
 			
 			return (System.currentTimeMillis() - begin_time.getTime())/60000;
 		}
+
+	@Override
+	public boolean equals(Object o) {
+		if(o instanceof Trip){
+			if(id != ((Trip) o).id) {
+				return false;
+			}
+			if(remote_id != ((Trip) o).remote_id) {
+				return false;
+			}
+			if(id_customer != ((Trip) o).id_customer) {
+				return false;
+			}
+			if(begin_timestamp != ((Trip) o).begin_timestamp) {
+				return false;
+			}
+
+			return true;
+		}
+		return false;
+	}
 }

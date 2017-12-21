@@ -23,61 +23,72 @@
 	    android:orientation="horizontal" >
 
 		<Button
-		    android:id="@+id/fmapSearchB"
-		    android:layout_width="134dp"
-		    android:layout_height="102dp"
-		    android:layout_alignParentLeft="true"
-		    android:layout_centerVertical="true"
-		    android:layout_gravity="center_vertical"
-		    android:layout_marginLeft="25dp"
-		    android:layout_marginStart="25dp"
-		    android:background="@drawable/sel_button_search"
-		    android:text="@string/button_search"
-		    android:textColor="@color/text_green"
-		    android:textSize="18sp"
-		    android:textStyle="bold"
+			android:id="@+id/fmapSearchB"
+			android:layout_width="134dp"
+			android:layout_height="102dp"
+			android:layout_alignParentLeft="true"
+			android:layout_centerVertical="true"
+			android:layout_gravity="center_vertical"
+			android:layout_marginLeft="10dp"
+			android:layout_marginStart="10dp"
+			android:background="@drawable/sel_button_search"
 			android:gravity="bottom|center_horizontal"
-			android:paddingBottom="18dp" />
+			android:paddingBottom="18dp"
+			android:text="@string/button_search"
+			android:textColor="@color/text_green"
+			android:textSize="18sp"
+			android:textStyle="bold" />
 
 		<Button
-		    android:id="@+id/fmapHomeB"
-		    android:layout_width="134dp"
-		    android:layout_height="102dp"
-		    android:layout_centerVertical="true"
-		    android:layout_gravity="center_vertical"
-		    android:layout_marginLeft="25dp"
-		    android:layout_marginStart="25dp"
-		    android:layout_toRightOf="@+id/fmapSearchB"
-		    android:background="@drawable/sel_button_home"
-		    android:text="@string/button_home"
-		    android:textColor="@color/text_green"
-		    android:textSize="18sp"
-		    android:textStyle="bold" />
+			android:id="@+id/fmapHomeB"
+			android:layout_width="134dp"
+			android:layout_height="102dp"
+			android:layout_centerVertical="true"
+			android:layout_gravity="center_vertical"
+			android:layout_marginLeft="10dp"
+			android:layout_marginStart="10dp"
+			android:layout_toRightOf="@+id/fmapSearchB"
+			android:background="@drawable/sel_button_home"
+			android:text="@string/button_home"
+			android:textColor="@color/text_green"
+			android:textSize="18sp"
+			android:textStyle="bold" />
+
+		<Button
+			android:id="@+id/fmapSOSB"
+			android:layout_width="120dp"
+			android:layout_height="102dp"
+			android:layout_alignEnd="@+id/fmapLeftFrame"
+			android:layout_alignTop="@+id/fmapENDB"
+			android:layout_marginLeft="10dp"
+			android:layout_marginStart="10dp"
+			android:background="@drawable/sel_button_sos"
+			android:paddingBottom="10dp" />
 
 		<FrameLayout
-		    android:id="@+id/fmapLeftFrame"
-		    android:layout_width="wrap_content"
-		    android:layout_height="match_parent"
-		    android:layout_alignParentLeft="true"
-		    android:layout_toLeftOf="@+id/fmapENDB" >
+			android:id="@+id/fmapLeftFrame"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_alignTop="@+id/llTray"
+			android:layout_marginEnd="16dp"
+			android:layout_toStartOf="@+id/fmapENDB">
 
 		</FrameLayout>
 
 		<Button
-		    android:id="@+id/fmapENDB"
-		    android:layout_width="103dp"
-		    android:layout_height="102dp"
+			android:id="@+id/fmapENDB"
+			android:layout_width="103dp"
+			android:layout_height="102dp"
+			android:layout_alignTop="@+id/fmapHomeB"
 			android:layout_gravity="center_vertical"
-			android:text="@string/button_break"
-			android:textColor="@color/text_green"
-			android:textStyle="bold"
-			android:textSize="16sp"
+			android:layout_toStartOf="@+id/fmapAlarm"
 			android:background="@drawable/sel_button_sosta_small"
 			android:gravity="bottom|center"
 			android:paddingBottom="10dp"
-			android:layout_centerVertical="true"
-			android:layout_toLeftOf="@+id/fmapAlarm"
-			android:layout_toStartOf="@+id/fmapAlarm" />
+			android:text="@string/button_break"
+			android:textColor="@color/text_green"
+			android:textSize="16sp"
+			android:textStyle="bold" />
 
 		<FrameLayout
 		    android:id="@+id/fmapAlarm"

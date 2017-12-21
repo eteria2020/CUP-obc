@@ -33,18 +33,19 @@
             android:src="@drawable/sel_button_nav"
             android:contentDescription="@string/app_name"
             android:background="@null" />
-            	    
-        <ImageButton android:id="@+id/fdriPOIIB"
-	        android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="25dp"
-            android:layout_marginStart="25dp"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/sel_button_poi"
-            android:contentDescription="@string/app_name"
-            android:background="@null" />
-	                
-        <ImageButton android:id="@+id/fdriFuelStationsB"
+
+		<ImageButton
+			android:id="@+id/fdriPOIIB"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_marginLeft="25dp"
+			android:layout_marginStart="25dp"
+			android:background="@null"
+			android:contentDescription="@string/app_name"
+			android:src="@drawable/sel_button_poi" />
+
+		<ImageButton android:id="@+id/fdriFuelStationsB"
 	        android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="25dp"

@@ -108,6 +108,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.AMainOBC.FuelStation;
@@ -158,7 +159,7 @@ public class FMap extends FBase implements OnClickListener {
 
 
 	private FrameLayout navigationFL, fmapAlarm, fmapRange;
-	private Button endB, navigationB,  findDestinationB, fuelStationsB, homeB;
+	private Button endB, navigationB,  findDestinationB, fuelStationsB, homeB,sosB;
 	private ImageView parkingStatusIV, parkingDirectionIV,  adIV, no3gIV;
 	private TextView  dayTV, timeTV, tvRange, fmapAlertTV;
 	private boolean seen=false,drawCharging=true,firstUpReceived=false;
@@ -351,6 +352,7 @@ public class FMap extends FBase implements OnClickListener {
 		findDestinationB = (Button)view.findViewById(R.id.fmapSearchB);
 		//fuelStationsB = (Button)view.findViewById(R.id.fmapFuelStationsB);
 		homeB = (Button)view.findViewById(R.id.fmapHomeB);
+		sosB = (Button)view.findViewById(R.id.fmapSOSB);
 
 		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 
@@ -388,6 +390,7 @@ public class FMap extends FBase implements OnClickListener {
 		findDestinationB.setOnClickListener(this);
 		endB.setOnClickListener(this);
 		homeB.setOnClickListener(this);
+		sosB.setOnClickListener(this);
 		navigationB.setOnClickListener(this);
 		Button btnCloseNav = (Button)view.findViewById(R.id.btnCloseNav);
 		btnCloseNav.setOnClickListener(this);
@@ -821,6 +824,7 @@ public class FMap extends FBase implements OnClickListener {
 		timeTV=null;
 		dayTV=null;
 		homeB=null;
+		sosB=null;
 		findDestinationB=null;
 		endB=null;
 		titleAnnotation=null;
@@ -1258,7 +1262,11 @@ public class FMap extends FBase implements OnClickListener {
 
 			break;
 
-		case R.id.fmapRadioB:
+		case R.id.fmapSOSB://sos
+			startActivity(new Intent(getActivity(), ASOS.class));
+			break;
+
+			case R.id.fmapRadioB:
 			if (!navigationActive) {
 				((ABase) getActivity()).pushFragment(FRadio.newInstance(), FRadio.class.getName(), true);
 			}else{
