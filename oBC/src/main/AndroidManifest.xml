@@ -2,7 +2,7 @@
 	package="eu.philcar.csg.OBC"
 
 	android:versionCode="139"
-	android:versionName="0.106.8bis" >
+	android:versionName="0.106.8pre" >
 
 		<uses-sdk
 		android:minSdkVersion="15"

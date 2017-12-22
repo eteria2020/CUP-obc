@@ -1498,9 +1498,10 @@ private void  initPhase2() {
 		Editor editor = preferences.edit();
 		float currVoltage=0;
 
-
-		if (fuel_level==App.fuel_level || fuel_level==0)
+		if (fuel_level==App.fuel_level || fuel_level==0) {
+			App.fuel_level=fuel_level;
 			return;
+		}
 		
 
 		editor.putInt(KEY_fuel_level, fuel_level);

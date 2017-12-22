@@ -144,6 +144,14 @@ public class MessageFactory {
 		
 		return msg;		
 	}
+
+	public static Message apiTripCallback(TripInfo response) {
+		Message msg  =  Message.obtain(null, ObcService.MSG_API_TRIP_CALLBACK);
+		msg.obj = response;
+
+		return msg;
+	}
+
 	
 	public static Message changeTripParkMode(boolean paused) {
 		Message msg  =  Message.obtain(null, ObcService.MSG_TRIP_PARK);

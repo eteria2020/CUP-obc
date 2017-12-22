@@ -117,7 +117,7 @@ public class CustomersConnector implements RemoteEntityInterface {
 							JSONArray ojarray = new JSONArray();
 
 							// if (!clienti.isPresent(id, tms)) {
-							Customer c = new Customer();
+							Customer c = new Customer(true);
 							c.id = id;
 							c.name = jobj.getString("nome");
 							c.surname = jobj.getString("cognome");
@@ -198,6 +198,7 @@ public class CustomersConnector implements RemoteEntityInterface {
 			
 			return null;
 		}
+
 
 		@Override
 		public List<NameValuePair> GetParams() {
