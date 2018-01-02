@@ -238,7 +238,7 @@ public class App extends Application {
 			URL_Beacon = "http://corestage.sharengo.it/api/pushbeacon.php?";
 			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
 			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
-			URL_Clienti = "https://corestage.sharengo.it:8123/whitelist";
+			URL_Clienti = "https://corestage.sharengo.it:8123/whitelist2";
 			URL_Dipendenti = "https://corestage.sharengo.it:8123/business-employees";
 			URL_Commands = "http://corestage.sharengo.it/api/get_commands.php?";
 			//URL_Corse = "http://corestage.sharengo.it/api/pushcorsa-convenzioni.php?";
@@ -269,7 +269,7 @@ public class App extends Application {
 			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
 
 			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
-			URL_Clienti = "https://api.sharengo.it:8123/whitelist";
+			URL_Clienti = "https://api.sharengo.it:8123/whitelist2";
 			URL_Dipendenti = "https://api.sharengo.it:8123/business-employees";
 			URL_Commands = "http://core.sharengo.it/api/get_commands.php?";
 			URL_Corse = "http://core.sharengo.it/api/pushcorsa-convenzioni.php?";
