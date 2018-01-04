@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.NetworkOnMainThreadException;
@@ -18,6 +20,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -76,6 +79,7 @@ public class FDriveMessage_new extends FBase {
 
 
     private ImageView adIV;
+    private VideoView video;
 	private static Boolean RequestBanner=false;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -161,6 +165,7 @@ public class FDriveMessage_new extends FBase {
 
 		((View)view.findViewById(R.id.btnNext)).setVisibility(View.INVISIBLE);
 		((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.VISIBLE);
+
 		
 		((ImageButton)view.findViewById(R.id.btnNext)).setOnClickListener(new OnClickListener() {
 			@Override
@@ -219,10 +224,18 @@ public class FDriveMessage_new extends FBase {
 		};
 
         adIV = (ImageView)view.findViewById(R.id.imgfsIV);
+		video = (VideoView)view.findViewById(R.id.video);
 
 		adIV.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+
+					dlog.i("video caricato");
+					video.setVideoURI(Uri.parse(Environment.getExternalStorageDirectory() + "/video.mp4"));
+					video.requestFocus();
+					((View)view.findViewById(R.id.imgfsIV)).setVisibility(View.GONE);
+					video.start();
+					/*
 				if(App.Instance.BannerName.getBundle("START")!=null){
 					if(App.Instance.BannerName.getBundle("START").getString("CLICK").compareTo("null")!=0){
 
@@ -251,10 +264,14 @@ public class FDriveMessage_new extends FBase {
 									}
 
 								}
-							}).start();
+							}) .start();
+						}else{
+
+
 						}
+
 					}
-				}
+				}*/
 			}
 		});
 
@@ -270,8 +287,8 @@ public class FDriveMessage_new extends FBase {
 				public void onFinish() {
 					((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.INVISIBLE);
 					((View)view.findViewById(R.id.btnNext)).setVisibility(View.VISIBLE);
-					localHandler.removeMessages(MSG_CLOSE_FRAGMENT);
-					localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,10000);
+
+				//	localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,10000);
 
 				}
 
