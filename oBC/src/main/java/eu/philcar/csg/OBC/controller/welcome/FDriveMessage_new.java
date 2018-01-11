@@ -230,12 +230,6 @@ public class FDriveMessage_new extends FBase {
 			@Override
 			public void onClick(View v) {
 
-					dlog.i("video caricato");
-					video.setVideoURI(Uri.parse(Environment.getExternalStorageDirectory() + "/video.mp4"));
-					video.requestFocus();
-					((View)view.findViewById(R.id.imgfsIV)).setVisibility(View.GONE);
-					video.start();
-					/*
 				if(App.Instance.BannerName.getBundle("START")!=null){
 					if(App.Instance.BannerName.getBundle("START").getString("CLICK").compareTo("null")!=0){
 
@@ -271,7 +265,7 @@ public class FDriveMessage_new extends FBase {
 						}
 
 					}
-				}*/
+				}
 			}
 		});
 
@@ -303,6 +297,29 @@ public class FDriveMessage_new extends FBase {
 		updateBanner("START");
 		return view;
 	}
+
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+
+		if (App.Instance.BannerName.getBundle("START") != null) {
+
+			dlog.i("STRINGID" + App.Instance.BannerName.getBundle("START").getString("ID"));
+
+			if (App.Instance.BannerName.getBundle("START").getString("ID").compareTo("680") == 0) {
+				dlog.i("video caricato");
+				View noDataView = getView().findViewById(R.id.imgfsIV);
+				noDataView.setVisibility(View.GONE);
+				video.setVisibility(View.VISIBLE);
+				video.setVideoURI(Uri.parse(Environment.getExternalStorageDirectory() + "/video.mp4"));
+				video.requestFocus();
+				video.start();
+			}
+		}
+
+	}
+
 
 	@Override
 	public void onResume() {
