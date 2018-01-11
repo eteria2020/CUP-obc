@@ -43,8 +43,7 @@ public class FMenu extends FBase implements OnClickListener {
 	public static String clickedButton; // to determinate which button is clicked
 	
 	public static FMenu newInstance() {
-		
-
+		clickedButton ="";
 		return new FMenu();
 	}
 	public static FMenu newInstance(String button) {
@@ -105,6 +104,10 @@ public class FMenu extends FBase implements OnClickListener {
 		}else if(clickedButton == "PARK")
 		{
 			(view.findViewById(R.id.llCancel)).setVisibility(View.GONE);
+			(view.findViewById(R.id.llPause)).setVisibility(View.VISIBLE);
+		}else
+		{
+			(view.findViewById(R.id.llCancel)).setVisibility(View.VISIBLE);
 			(view.findViewById(R.id.llPause)).setVisibility(View.VISIBLE);
 		}
 
