@@ -34,19 +34,25 @@ import android.widget.TextView;
 public class FMenu extends FBase implements OnClickListener {
 
 	private DLog dlog = new DLog(this.getClass());
-	
-	public static FMenu newInstance() {
-		
-
-		return new FMenu();
-	}
-	
 	private ImageButton endRentIB, pauseRentIB, refuelIB, backIB;
 	private ImageView ivDamages;
 	private TextView endRentTV, pauseRentTV, refuelTV;
 	private Button sosB;
 	private View rootView;
 	private FrameLayout fmen_right_FL;
+	public static String clickedButton; // to determinate which button is clicked
+	
+	public static FMenu newInstance() {
+		
+
+		return new FMenu();
+	}
+	public static FMenu newInstance(String button) {
+		clickedButton = button;
+		return new FMenu();
+	}
+
+
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -91,7 +97,18 @@ public class FMenu extends FBase implements OnClickListener {
 		} else {
 			fmen_right_FL.setBackgroundColor(getResources().getColor(R.color.background_green));
 		}
-		
+
+		if(clickedButton == "CANCEL")
+		{
+			(view.findViewById(R.id.llCancel)).setVisibility(View.VISIBLE);
+			(view.findViewById(R.id.llPause)).setVisibility(View.GONE);
+		}else if(clickedButton == "PARK")
+		{
+			(view.findViewById(R.id.llCancel)).setVisibility(View.GONE);
+			(view.findViewById(R.id.llPause)).setVisibility(View.VISIBLE);
+		}
+
+
 		return view;
 	}
 	
@@ -129,8 +146,14 @@ public class FMenu extends FBase implements OnClickListener {
 		case R.id.fmenEndRentTV:
 			if (activity!=null && activity.checkisInsideParkingArea()) {
 				Events.menuclick("END RENT");
-				FMap.timer_2min.cancel();
-				FMap.timer_5sec.cancel();
+				try {
+
+
+					FMap.timer_2min.cancel();
+					FMap.timer_5sec.cancel();
+				}catch (Exception e){
+					dlog.e("Exeption while ending rent",e);
+				}
 				dlog.d("Banner: end rent stopping update, start countdown");
 				FMap.firstRun=true;
 				((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(false));
@@ -146,9 +169,12 @@ public class FMenu extends FBase implements OnClickListener {
 			
 		case R.id.fmenPauseRentIB:
 		case R.id.fmenPauseRentTV:
-
-			FMap.timer_2min.cancel();
-			FMap.timer_5sec.cancel();
+			try {
+				FMap.timer_2min.cancel();
+				FMap.timer_5sec.cancel();
+			}catch (Exception e){
+				dlog.e("Exeption while park",e);
+			}
 			FMap.firstRun=true;
 			((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,-1));
 			dlog.d("Banner: pause rent stopping update");
@@ -171,9 +197,9 @@ public class FMenu extends FBase implements OnClickListener {
 				stopSelfClose(rootView);
 				//((ABase)getActivity()).popFragment();
 				try {
-					((ABase)getActivity()).popTillFragment(FMap.class.getName());
+					((ABase)getActivity()).popTillFragment(FHome.class.getName());
 				} catch (Exception e) {
-					dlog.d("Exception while popping fragment");
+					dlog.e("Exception while popping fragment",e);
 				}
 			}
 			
@@ -191,7 +217,7 @@ public class FMenu extends FBase implements OnClickListener {
 		case R.id.fmenBackIB:
 			//((ABase)getActivity()).popFragment();
 			try {
-				((ABase)getActivity()).popTillFragment(FMap.class.getName());
+				((ABase)getActivity()).popTillFragment(FHome.class.getName());
 			} catch (Exception e) {
 				dlog.d("Exception while popping fragment");
 			}
@@ -454,4 +480,5 @@ public class FMenu extends FBase implements OnClickListener {
 		pauseRentTV=null;
 		super.onDestroy();
 	}
+
 }

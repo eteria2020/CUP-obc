@@ -702,7 +702,7 @@ public class FMap extends FBase implements OnClickListener {
 			findDestinationB.setVisibility(View.INVISIBLE);
 		}
 
-		
+
 		return view;
 	}
 
