@@ -38,7 +38,7 @@ public class CustomersConnector implements RemoteEntityInterface {
 		private long lastUpdate;
 		private int  receivedRecords;
 
-		private static boolean busy;
+		private static boolean busy=false;
 		
 		public void setLastUpdate(long v) {
 			this.lastUpdate = v;
