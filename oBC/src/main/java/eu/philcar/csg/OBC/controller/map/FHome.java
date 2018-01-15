@@ -28,6 +28,7 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.controller.FPdfViewer;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
@@ -48,6 +49,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -161,6 +163,8 @@ public class FHome extends FBase implements OnClickListener {
         //((Button) view.findViewById(R.id.fmapFuelStationsB)).setOnClickListener(this); rimosso su richiesta mkt
         ((Button) view.findViewById(R.id.fmapCancelB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapParkB)).setOnClickListener(this);
+        ((Button) view.findViewById(R.id.fmapAssicurazione)).setOnClickListener(this);
+        ((Button) view.findViewById(R.id.fmapLibretto)).setOnClickListener(this);
 
         dayTV = (TextView) view.findViewById(R.id.fmap_date_TV);
         timeTV = (TextView) view.findViewById(R.id.fmap_hour_TV);
@@ -449,6 +453,16 @@ public class FHome extends FBase implements OnClickListener {
                 final int id = Resources.getSystem().getIdentifier(
                         "config_ntpServer", "string","android");
                 final String defaultServer = res.getString(id);*/
+
+                break;
+            case R.id.fmapAssicurazione:
+                ((ABase) getActivity()).pushFragment(FPdfViewer.newInstance("ASSICURAZIONE"), FPdfViewer.class.getName(), true);
+                //startActivity(new Intent(getActivity(), FPdfViewer.class)); //pushfragment usare
+
+                break;
+            case R.id.fmapLibretto:
+                ((ABase) getActivity()).pushFragment(FPdfViewer.newInstance("LIBRETTO"), FPdfViewer.class.getName(), true);
+                //startActivity(new Intent(getActivity(), FPdfViewer.class)); //pushfragment usare
 
                 break;
             case R.id.fmapLeftBorderIV://Banner

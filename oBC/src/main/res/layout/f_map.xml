@@ -12,15 +12,14 @@
 		android:background="#fdee66" />
 
 	<RelativeLayout
-	    android:id="@+id/fmap_top_LL"
-	    android:layout_width="match_parent"
-	    android:layout_height="132dp"
-	    android:layout_below="@+id/fmap_top_V"
-	    android:layout_toEndOf="@+id/fmapLeftBorderIV"
-	    android:layout_toRightOf="@+id/fmapLeftBorderIV"
-	    android:background="#3ea447"
-	    android:gravity="right"
-	    android:orientation="horizontal" >
+		android:id="@+id/fmap_top_LL"
+		android:layout_width="match_parent"
+		android:layout_height="132dp"
+		android:layout_below="@+id/fmap_top_V"
+		android:layout_toEndOf="@+id/fmapLeftBorderIV"
+		android:background="#3ea447"
+		android:gravity="right"
+		android:orientation="horizontal">
 
 		<Button
 			android:id="@+id/fmapSearchB"
@@ -54,6 +53,15 @@
 			android:textSize="18sp"
 			android:textStyle="bold" />
 
+		<Button
+			android:id="@+id/fmapSOSB"
+			android:layout_width="120dp"
+			android:layout_height="102dp"
+			android:layout_alignBottom="@+id/fmapAlarm"
+			android:layout_toStartOf="@+id/fmapAlarm"
+			android:background="@drawable/sel_button_sos"
+			android:paddingBottom="10dp"
+			android:visibility="visible" />
 
 		<FrameLayout
 			android:id="@+id/fmapLeftFrame"
@@ -65,214 +73,213 @@
 
 		</FrameLayout>
 
-		<Button
-			android:id="@+id/fmapENDB"
-			android:layout_width="103dp"
-			android:layout_height="102dp"
-			android:layout_alignTop="@+id/fmapHomeB"
-			android:layout_gravity="center_vertical"
-			android:layout_toStartOf="@+id/fmapAlarm"
-			android:background="@drawable/sel_button_sosta_small"
-			android:gravity="bottom|center"
-			android:paddingBottom="10dp"
-			android:text="@string/button_break"
-			android:textColor="@color/text_green"
-			android:textSize="16sp"
-			android:textStyle="bold" />
+
 
 		<FrameLayout
-		    android:id="@+id/fmapAlarm"
-		    android:layout_width="100dp"
-		    android:layout_height="wrap_content"
-		    android:layout_centerVertical="true"
-		    android:layout_marginBottom="5dp"
-		    android:layout_marginLeft="8dp"
-		    android:layout_marginTop="5dp"
-		    android:layout_toLeftOf="@+id/fmap_divider_V"
-		    android:visibility="visible" >
+			android:id="@+id/fmapAlarm"
+			android:layout_width="100dp"
+			android:layout_height="wrap_content"
+			android:layout_centerVertical="true"
+			android:layout_marginBottom="5dp"
+			android:layout_marginLeft="8dp"
+			android:layout_marginTop="5dp"
+			android:layout_toLeftOf="@+id/fmap_divider_V"
+			android:visibility="visible">
 
-		    <ImageView
-		        android:id="@+id/fmapAlarmIV"
-		        android:layout_width="wrap_content"
-		        android:layout_height="114dp"
-		        android:adjustViewBounds="true"
-		        android:alpha="75"
-		        android:maxWidth="120dp"
-		        android:scaleType="fitXY"
-				android:background="@drawable/outofcharge" />
+			<ImageView
+				android:id="@+id/fmapAlarmIV"
+				android:layout_width="wrap_content"
+				android:layout_height="114dp"
+				android:adjustViewBounds="true"
+				android:alpha="75"
+				android:background="@drawable/outofcharge"
+				android:maxWidth="120dp"
+				android:scaleType="fitXY" />
 		</FrameLayout>
 
 		<FrameLayout
-		    android:id="@+id/fmapRange"
-		    android:layout_width="100dp"
-		    android:layout_height="wrap_content"
-		    android:layout_centerVertical="true"
-		    android:layout_marginBottom="5dp"
-		    android:layout_marginLeft="8dp"
-		    android:layout_marginTop="5dp"
-		    android:layout_toLeftOf="@+id/fmap_divider_V"
-		    android:visibility="invisible" >
+			android:id="@+id/fmapRange"
+			android:layout_width="100dp"
+			android:layout_height="wrap_content"
+			android:layout_centerVertical="true"
+			android:layout_marginBottom="5dp"
+			android:layout_marginLeft="8dp"
+			android:layout_marginTop="5dp"
+			android:layout_toLeftOf="@+id/fmap_divider_V"
+			android:visibility="invisible">
 
 			<ImageView
-			    android:id="@+id/imageView2"
-			    android:layout_width="fill_parent"
-			    android:layout_height="wrap_content"
-			    android:adjustViewBounds="true"
-			    android:alpha="75"
-			    android:scaleType="fitXY"
-			    android:src="@drawable/range" />
+				android:id="@+id/imageView2"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:adjustViewBounds="true"
+				android:alpha="75"
+				android:scaleType="fitXY"
+				android:src="@drawable/range" />
 
 			<TextView
-			    android:id="@+id/tvBtnName"
-			    android:layout_width="match_parent"
-			    android:layout_height="wrap_content"
-			    android:layout_gravity="top"
-			    android:layout_marginTop="50dp"
-			    android:gravity="center_horizontal"
-			    android:text="@string/navigator_range"
-			    android:textAppearance="?android:attr/textAppearanceLarge"
-			    android:textColor="#FFF"
-			    android:textSize="20sp" />
+				android:id="@+id/tvBtnName"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="top"
+				android:layout_marginTop="50dp"
+				android:gravity="center_horizontal"
+				android:text="@string/navigator_range"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:textColor="#FFF"
+				android:textSize="20sp" />
 
 			<TextView
-			    android:id="@+id/tvRange"
-			    android:layout_width="match_parent"
-			    android:layout_height="wrap_content"
-			    android:layout_gravity="top"
-			    android:layout_marginTop="82dp"
-			    android:gravity="center_horizontal"
-			    android:text="-- Km"
-			    android:textAppearance="?android:attr/textAppearanceLarge"
-			    android:textColor="#FFF875"
-			    android:textSize="20sp" />
+				android:id="@+id/tvRange"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="top"
+				android:layout_marginTop="82dp"
+				android:gravity="center_horizontal"
+				android:text="-- Km"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:textColor="#FFF875"
+				android:textSize="20sp" />
 
 		</FrameLayout>
 
 		<View
-		    android:id="@+id/fmap_divider_V"
-		    android:layout_width="2dp"
-		    android:layout_height="match_parent"
-		    android:layout_marginBottom="8dp"
-		    android:layout_marginLeft="3dp"
-		    android:layout_marginTop="8dp"
-		    android:layout_toLeftOf="@+id/llTray"
-		    android:background="#BBBBBB" />
+			android:id="@+id/fmap_divider_V"
+			android:layout_width="2dp"
+			android:layout_height="match_parent"
+			android:layout_marginBottom="8dp"
+			android:layout_marginLeft="3dp"
+			android:layout_marginTop="8dp"
+			android:layout_toLeftOf="@+id/llTray"
+			android:background="#BBBBBB" />
+
+		<LinearLayout
+			android:id="@+id/llTray"
+			android:layout_width="120dp"
+			android:layout_height="wrap_content"
+			android:layout_alignParentEnd="true"
+			android:layout_alignParentRight="true"
+			android:layout_centerVertical="true"
+			android:layout_gravity="center_vertical|end"
+			android:layout_marginLeft="2dp"
+			android:orientation="vertical">
+
+			<TextView
+				android:id="@+id/fmap_date_TV"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:layout_marginBottom="8dp"
+				android:layout_marginLeft="2dp"
+				android:layout_marginRight="2dp"
+				android:text="01/04/2016"
+				android:textColor="#FFFFFF"
+				android:textSize="20sp" />
+
+			<TextView
+				android:id="@+id/fmap_hour_TV"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:layout_marginBottom="8dp"
+				android:text="16:55"
+				android:textColor="#FFFFFF"
+				android:textSize="22sp" />
 
 			<LinearLayout
-			    android:id="@+id/llTray"
-			    android:layout_width="120dp"
-			    android:layout_height="wrap_content"
-				android:layout_centerVertical="true"
-			    android:layout_gravity="center_vertical|end"
-				android:layout_marginLeft="2dp"
-				android:orientation="vertical"
-				android:layout_alignParentRight="true"
-				android:layout_alignParentEnd="true">
-
-				<TextView android:id="@+id/fmap_date_TV"
-					android:layout_width="wrap_content" android:layout_height="wrap_content"
-					android:layout_gravity="center" android:layout_marginBottom="8dp"
-					android:text="01/04/2016" android:textSize="20sp"
-					android:textColor="#FFFFFF"
-					android:layout_marginRight="2dp"
-					android:layout_marginLeft="2dp" />
-
-				<TextView android:id="@+id/fmap_hour_TV"
-					android:layout_width="wrap_content" android:layout_height="wrap_content"
-					android:layout_gravity="center" android:layout_marginBottom="8dp"
-					android:text="16:55" android:textSize="22sp" android:textColor="#FFFFFF" />
-
-				<LinearLayout android:layout_width="wrap_content"
-					android:layout_height="wrap_content" android:layout_marginBottom="8dp"
-					android:layout_gravity="end" android:orientation="horizontal"
-					android:visibility="gone">
-
-					<LinearLayout
-					    android:id="@+id/llOutsideArea"
-					    android:layout_width="wrap_content"
-					    android:layout_height="match_parent"
-					    android:background="@drawable/sha_whiteroundedredbox"
-					    android:paddingBottom="4dp"
-					    android:paddingLeft="4dp"
-					    android:paddingRight="4dp"
-					    android:paddingTop="4dp" >
-
-                        <ImageView
-                            android:id="@+id/fmapParkingStatusIV"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="left|center_vertical"
-                            android:layout_marginBottom="8dp"
-                            android:layout_marginLeft="14dp"
-                            android:layout_marginRight="6dp"
-                            android:layout_marginTop="8dp"
-                            android:contentDescription="@string/content_description"
-                            android:scaleType="center"
-                            android:src="@drawable/img_parking_p_green" />
-
-                        <TextView
-                            android:id="@+id/fmapAlertTV"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginRight="16dp"
-                            android:text="@string/outside_area"
-                            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                    </LinearLayout>
-
-					<ImageView
-					    android:id="@+id/fmapParkingDirectionIV"
-					    android:layout_width="wrap_content"
-					    android:layout_height="wrap_content"
-					    android:background="@drawable/map_arrow_bg"
-					    android:contentDescription="@string/content_description"
-					    android:scaleType="center"
-					    android:src="@drawable/img_parking_arrow"
-					    android:visibility="gone" />
-
-				</LinearLayout>
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="end"
+				android:layout_marginBottom="8dp"
+				android:orientation="horizontal"
+				android:visibility="gone">
 
 				<LinearLayout
-					android:id="@+id/ll3G_MAP"
-					android:orientation="horizontal"
+					android:id="@+id/llOutsideArea"
 					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
+					android:layout_height="match_parent"
 					android:background="@drawable/sha_whiteroundedredbox"
-					android:layout_marginBottom="13dp"
-					android:layout_gravity="bottom|center_horizontal"
-					android:visibility="invisible">
+					android:paddingBottom="4dp"
+					android:paddingLeft="4dp"
+					android:paddingRight="4dp"
+					android:paddingTop="4dp">
 
 					<ImageView
-						android:layout_width="22dp"
-						android:layout_height="22dp"
-						android:id="@+id/no3gIV_MAP"
-						android:layout_marginLeft="9dp"
-						android:layout_marginTop="8dp"
-						android:layout_marginRight="0dp"
-						android:layout_marginBottom="8dp"
-						android:layout_gravity="center_vertical"
-						android:src="@drawable/no_connection"
-						android:visibility="visible" />
-
-					<TextView
-						android:id="@+id/no3gtxt_MAP"
+						android:id="@+id/fmapParkingStatusIV"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:layout_gravity="center_vertical|right"
-						android:text="NO 3G"
-						android:textAppearance="?android:attr/textAppearanceMedium"
-						android:layout_marginLeft="9dp"
-						android:textStyle="bold"
-						android:textSize="19dp"
-						android:layout_marginTop="8dp"
-						android:layout_marginRight="9dp"
-						android:layout_weight="1"
+						android:layout_gravity="left|center_vertical"
 						android:layout_marginBottom="8dp"
-						android:singleLine="true" />
+						android:layout_marginLeft="14dp"
+						android:layout_marginRight="6dp"
+						android:layout_marginTop="8dp"
+						android:contentDescription="@string/content_description"
+						android:scaleType="center"
+						android:src="@drawable/img_parking_p_green" />
+
+					<TextView
+						android:id="@+id/fmapAlertTV"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center_vertical"
+						android:layout_marginRight="16dp"
+						android:text="@string/outside_area"
+						android:textAppearance="?android:attr/textAppearanceMedium" />
+
 				</LinearLayout>
 
+				<ImageView
+					android:id="@+id/fmapParkingDirectionIV"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:background="@drawable/map_arrow_bg"
+					android:contentDescription="@string/content_description"
+					android:scaleType="center"
+					android:src="@drawable/img_parking_arrow"
+					android:visibility="gone" />
+
 			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/ll3G_MAP"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="bottom|center_horizontal"
+				android:layout_marginBottom="13dp"
+				android:background="@drawable/sha_whiteroundedredbox"
+				android:orientation="horizontal"
+				android:visibility="invisible">
+
+				<ImageView
+					android:id="@+id/no3gIV_MAP"
+					android:layout_width="22dp"
+					android:layout_height="22dp"
+					android:layout_gravity="center_vertical"
+					android:layout_marginBottom="8dp"
+					android:layout_marginLeft="9dp"
+					android:layout_marginRight="0dp"
+					android:layout_marginTop="8dp"
+					android:src="@drawable/no_connection"
+					android:visibility="visible" />
+
+				<TextView
+					android:id="@+id/no3gtxt_MAP"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center_vertical|right"
+					android:layout_marginBottom="8dp"
+					android:layout_marginLeft="9dp"
+					android:layout_marginRight="9dp"
+					android:layout_marginTop="8dp"
+					android:layout_weight="1"
+					android:singleLine="true"
+					android:text="NO 3G"
+					android:textAppearance="?android:attr/textAppearanceMedium"
+					android:textSize="19dp"
+					android:textStyle="bold" />
+			</LinearLayout>
+
+		</LinearLayout>
 
 	</RelativeLayout>
 
@@ -287,24 +294,20 @@
 
 
 	<FrameLayout android:id="@+id/fmapMapMV"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:layout_alignParentRight="true"
-		android:layout_alignParentEnd="true"
-		android:layout_below="@+id/fmap_top_LL"
-		android:layout_above="@+id/fmap_bottom_V"
+		android:layout_width="match_parent" android:layout_height="match_parent"
+		android:layout_alignParentRight="true" android:layout_alignParentEnd="true"
+		android:layout_below="@+id/fmap_top_LL" android:layout_above="@+id/fmap_bottom_V"
 		android:layout_toRightOf="@+id/fmapLeftBorderIV"
-		android:layout_toEndOf="@+id/fmapLeftBorderIV"
-		android:background="#CCCCCC" >
+		android:layout_toEndOf="@+id/fmapLeftBorderIV" android:background="#CCCCCC" >
 
 	</FrameLayout>
 
 	<FrameLayout
-        android:layout_width="500dp"
-        android:layout_height="315dp"
-        android:layout_gravity="center"
-        android:background="@drawable/sha_redalertbox"
-        android:id="@+id/fmapAlertSOCFL"
+		android:layout_width="500dp"
+		android:layout_height="315dp"
+		android:layout_gravity="center"
+		android:background="@drawable/sha_redalertbox"
+		android:id="@+id/fmapAlertSOCFL"
 		android:visibility="gone"
 		android:layout_alignParentRight="false"
 		android:layout_below="@+id/txtNextStreet"
@@ -312,28 +315,28 @@
 		android:layout_marginLeft="140dp"
 		android:layout_marginTop="20dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" Attenzione!"
-            android:id="@+id/fmapAlertTitleTV"
-            android:layout_gravity="center_horizontal|top"
-            android:textStyle="bold"
-            android:textSize="40sp"
-            android:textColor="#fdef2c"
-            android:layout_marginTop="10dp" />
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text=" Attenzione!"
+			android:id="@+id/fmapAlertTitleTV"
+			android:layout_gravity="center_horizontal|top"
+			android:textStyle="bold"
+			android:textSize="40sp"
+			android:textColor="#fdef2c"
+			android:layout_marginTop="10dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/alert_5km"
-            android:id="@+id/fmapAlertDescTV"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:textSize="33sp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/alert_5km"
+			android:id="@+id/fmapAlertDescTV"
+			android:layout_gravity="center"
+			android:gravity="center"
+			android:textColor="@color/white"
+			android:textSize="33sp"
+			android:layout_marginLeft="12dp"
+			android:layout_marginRight="12dp"
 			android:layout_marginTop="20dp"
 			android:textStyle="bold" />
 
@@ -350,18 +353,18 @@
 	</FrameLayout>
 
 	<RelativeLayout
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:layout_below="@+id/txtNextStreet"
 		android:layout_alignLeft="@+id/fmap_top_LL"
 		android:background="@drawable/sel_button_nav_white"
 		android:visibility="gone"
 		android:id="@+id/annotationLL">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
 			android:id="@+id/titleAnnotationTV"
 			android:textColor="@color/black"
 			android:textSize="25sp"
@@ -373,8 +376,8 @@
 			android:layout_marginTop="10dp" />
 
 		<TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
 			android:id="@+id/descriptionAnnotationTV"
 			android:textColor="@color/bullet_gray"
 			android:textSize="20sp"
@@ -410,22 +413,22 @@
 		android:textColor="#000" android:textSize="18sp" />
 
 	<TextView
-	    android:id="@+id/txtCurrentStreet"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_above="@+id/fmap_bottom_V"
-	    android:layout_alignLeft="@+id/fmap_top_LL"
-	    android:layout_gravity="bottom"
-	    android:layout_toLeftOf="@+id/btnCloseNav"
-	    android:alpha="0.7"
-	    android:background="#F6ECB1"
-	    android:gravity="center_horizontal"
-	    android:paddingBottom="3dp"
-	    android:paddingTop="3dp"
-	    android:text=""
-	    android:textAppearance="?android:attr/textAppearanceLarge"
-	    android:textColor="#000"
-	    android:textSize="18sp" />
+		android:id="@+id/txtCurrentStreet"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_above="@+id/fmap_bottom_V"
+		android:layout_alignLeft="@+id/fmap_top_LL"
+		android:layout_gravity="bottom"
+		android:layout_toLeftOf="@+id/btnCloseNav"
+		android:alpha="0.7"
+		android:background="#F6ECB1"
+		android:gravity="center_horizontal"
+		android:paddingBottom="3dp"
+		android:paddingTop="3dp"
+		android:text=""
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:textColor="#000"
+		android:textSize="18sp" />
 
 	<FrameLayout
 		android:id="@+id/flNoTouch"
@@ -435,17 +438,17 @@
 		android:layout_alignParentRight="true"/>
 
 	<Button
-	    android:id="@+id/btnCloseNav"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_above="@+id/fmap_bottom_V"
-	    android:layout_alignParentRight="true"
-	    android:layout_marginRight="5dp"
-	    android:background="@drawable/sel_button_nav_white"
-	    android:drawableTop="@drawable/stop48"
-	    android:padding="8dp"
-	    android:text="@string/navigator_stop"
-	    android:visibility="gone"
+		android:id="@+id/btnCloseNav"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_above="@+id/fmap_bottom_V"
+		android:layout_alignParentRight="true"
+		android:layout_marginRight="5dp"
+		android:background="@drawable/sel_button_nav_white"
+		android:drawableTop="@drawable/stop48"
+		android:padding="8dp"
+		android:text="@string/navigator_stop"
+		android:visibility="gone"
 		android:textColor="@color/text_green"
 		android:textSize="17dp"
 		android:layout_marginBottom="5dp"
