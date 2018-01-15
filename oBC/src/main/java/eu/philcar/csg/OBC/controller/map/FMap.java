@@ -348,7 +348,7 @@ public class FMap extends FBase implements OnClickListener {
 		no3gwarning = view.findViewById(R.id.ll3G_MAP);
 		no3gtxt = (TextView) view.findViewById(R.id.no3gtxt_MAP);
 
-		endB = (Button)view.findViewById(R.id.fmapENDB);
+		//endB = (Button)view.findViewById(R.id.fmapENDB);
 		findDestinationB = (Button)view.findViewById(R.id.fmapSearchB);
 		//fuelStationsB = (Button)view.findViewById(R.id.fmapFuelStationsB);
 		homeB = (Button)view.findViewById(R.id.fmapHomeB);
@@ -388,7 +388,7 @@ public class FMap extends FBase implements OnClickListener {
 
 
 		findDestinationB.setOnClickListener(this);
-		endB.setOnClickListener(this);
+		//endB.setOnClickListener(this);
 		homeB.setOnClickListener(this);
 		sosB.setOnClickListener(this);
 		navigationB.setOnClickListener(this);
@@ -1305,10 +1305,10 @@ public class FMap extends FBase implements OnClickListener {
 			break;*/
 
 			
-		case R.id.fmapENDB:
+		/*case R.id.fmapENDB:
 			((ABase)getActivity()).pushFragment(FMenu.newInstance(), FMenu.class.getName(), true);
 
-			break;
+			break; */
 
 		case R.id.fmapCancelB:
 			timer_2min.cancel();

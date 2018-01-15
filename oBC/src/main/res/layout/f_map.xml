@@ -54,16 +54,6 @@
 			android:textSize="18sp"
 			android:textStyle="bold" />
 
-		<Button
-			android:id="@+id/fmapSOSB"
-			android:layout_width="120dp"
-			android:layout_height="102dp"
-			android:layout_alignEnd="@+id/fmapLeftFrame"
-			android:layout_alignTop="@+id/fmapENDB"
-			android:layout_marginLeft="10dp"
-			android:layout_marginStart="10dp"
-			android:background="@drawable/sel_button_sos"
-			android:paddingBottom="10dp" />
 
 		<FrameLayout
 			android:id="@+id/fmapLeftFrame"
