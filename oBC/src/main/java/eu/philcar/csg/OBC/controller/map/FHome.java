@@ -160,6 +160,7 @@ public class FHome extends FBase implements OnClickListener {
         ((Button) view.findViewById(R.id.fmapMusicB)).setOnClickListener(this);
         //((Button) view.findViewById(R.id.fmapFuelStationsB)).setOnClickListener(this); rimosso su richiesta mkt
         ((Button) view.findViewById(R.id.fmapCancelB)).setOnClickListener(this);
+        ((Button) view.findViewById(R.id.fmapParkB)).setOnClickListener(this);
 
         dayTV = (TextView) view.findViewById(R.id.fmap_date_TV);
         timeTV = (TextView) view.findViewById(R.id.fmap_hour_TV);
@@ -371,6 +372,7 @@ public class FHome extends FBase implements OnClickListener {
         ((Button) rootView.findViewById(R.id.fmapSearchB)).setOnClickListener(null);
         ((Button) rootView.findViewById(R.id.fmapRadioB)).setOnClickListener(null);
         ((Button) rootView.findViewById(R.id.fmapCancelB)).setOnClickListener(null);
+        ((Button) rootView.findViewById(R.id.fmapParkB)).setOnClickListener(null);
         rootView=null;
         tvRange=null;
         fmapRange=null;
@@ -423,9 +425,12 @@ public class FHome extends FBase implements OnClickListener {
                 break;
 
             case R.id.fmapCancelB://End Trip
-                ((ABase) getActivity()).pushFragment(FMenu.newInstance(), FMenu.class.getName(), true);
+                ((ABase) getActivity()).pushFragment(FMenu.newInstance("CANCEL"), FMenu.class.getName(), true);
                 break;
 
+            case R.id.fmapParkB://End Trip
+                ((ABase) getActivity()).pushFragment(FMenu.newInstance("PARK"), FMenu.class.getName(), true);
+                break;
 
 
 

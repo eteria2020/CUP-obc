@@ -393,7 +393,7 @@ public class FRadio  extends FBase {
 			switch (msg.what) {
 			case MSG_CLOSE:
 				try {
-					((ABase)getActivity()).popTillFragment(FMap.class.getName());
+					((ABase)getActivity()).popTillFragment(FHome.class.getName());
 				} catch (Exception e) {
 					dlog.d("Exception while popping fragment");
 				}

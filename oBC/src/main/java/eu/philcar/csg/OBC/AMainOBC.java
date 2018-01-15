@@ -178,8 +178,8 @@ public class AMainOBC extends ABase implements LocationListener {
 			FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
 			if (App.isNavigatorEnabled) {
-				transaction.add(R.id.awelPlaceholderFL, FMap.newInstance(), FMap.class.getName());
-				transaction.addToBackStack(FMap.class.getName());
+				transaction.add(R.id.awelPlaceholderFL, FHome.newInstance(), FHome.class.getName());
+				transaction.addToBackStack(FHome.class.getName());
 			} else {
 				transaction.add(R.id.awelPlaceholderFL, FDriving.newInstance(), FDriving.class.getName());
 				transaction.addToBackStack(FDriving.class.getName());
