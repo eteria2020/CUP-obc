@@ -47,13 +47,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.ASOS;
+import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.UrlTools;
+import eu.philcar.csg.OBC.service.MessageFactory;
 
 public class FDriveMessage_new extends FBase {
 	
@@ -282,7 +286,7 @@ public class FDriveMessage_new extends FBase {
 					((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.INVISIBLE);
 					((View)view.findViewById(R.id.btnNext)).setVisibility(View.VISIBLE);
 
-				//	localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,10000);
+					//localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,10000);
 
 				}
 
@@ -314,8 +318,13 @@ public class FDriveMessage_new extends FBase {
 				video.setVisibility(View.VISIBLE);
 				video.setVideoURI(Uri.parse(Environment.getExternalStorageDirectory() + "/video.mp4"));
 				video.requestFocus();
+				((AWelcome) getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_SYSTEM,15));
 				video.start();
+				localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,45000);
+
 			}
+		}else{
+			localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,10000);
 		}
 
 	}
