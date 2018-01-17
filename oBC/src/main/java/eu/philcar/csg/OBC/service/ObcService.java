@@ -28,6 +28,7 @@ import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.AMainOBC;
+import eu.philcar.csg.OBC.controller.FPdfViewer;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Poi;
@@ -79,6 +80,7 @@ import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -931,6 +933,12 @@ public class ObcService extends Service implements OnTripCallback {
         localHandler.sendMessageDelayed(MessageFactory.checkLogSize(),3000);
         dlog.d("Service created");
         isStarted = true;
+        /*
+        control if documenti of the veichele is present in the device before starting
+         */
+        if(App.hasNetworkConnection) {
+            new DocumentControl().execute();
+        }
     }
 
     @Override
@@ -2746,7 +2754,22 @@ public class ObcService extends Service implements OnTripCallback {
         },15000);*/
     }
 
+    private class DocumentControl extends AsyncTask<URL, Integer, Long> {
 
 
+        @Override
+        protected Long doInBackground(URL... urls) {
 
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Long aLong) {
+
+            super.onPostExecute(aLong);
+            FPdfViewer P2 = new FPdfViewer().newInstance("LIBRETTO",false,true);
+            P2.control("ASSICURAZIONE");
+            P2.control("LIBRETTO");}
+
+    }
 }
