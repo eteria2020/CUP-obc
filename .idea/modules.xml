@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/csd 1664 da modificare.iml" filepath="$PROJECT_DIR$/csd 1664 da modificare.iml" />
+      <module fileurl="file://$PROJECT_DIR$/1661-v2.iml" filepath="$PROJECT_DIR$/1661-v2.iml" />
+      <module fileurl="file://C:\Users\Momo\Desktop\obc 1664\1661-v2\csd-1661.iml" filepath="C:\Users\Momo\Desktop\obc 1664\1661-v2\csd-1661.iml" />
       <module fileurl="file://$PROJECT_DIR$/oBC/oBC.iml" filepath="$PROJECT_DIR$/oBC/oBC.iml" />
       <module fileurl="file://$PROJECT_DIR$/sDKTools/sDKTools.iml" filepath="$PROJECT_DIR$/sDKTools/sDKTools.iml" />
     </modules>

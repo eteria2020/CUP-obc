@@ -153,7 +153,7 @@ public class FHome extends FBase implements OnClickListener {
 
         tts=new ProTTS(getActivity());
 
-
+        ((Button) view.findViewById(R.id.fmapVideo)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapSOSB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapSearchB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapRadioB)).setOnClickListener(this);
@@ -368,6 +368,7 @@ public class FHome extends FBase implements OnClickListener {
      * */
     @Override
     public void onDestroy() {
+        ((Button) rootView.findViewById(R.id.fmapVideo)).setOnClickListener(null);
         ((Button) rootView.findViewById(R.id.fmapSOSB)).setOnClickListener(null);
         ((Button) rootView.findViewById(R.id.fmapSearchB)).setOnClickListener(null);
         ((Button) rootView.findViewById(R.id.fmapRadioB)).setOnClickListener(null);
@@ -410,6 +411,9 @@ public class FHome extends FBase implements OnClickListener {
 
         switch (v.getId()) {
 
+            case R.id.fmapVideo://SOS
+                ((ABase) getActivity()).pushBackFragment(FVideo.newInstance(), FVideo.class.getName(), true);
+                break;
 
             case R.id.fmapSOSB://SOS
                 startActivity(new Intent(getActivity(), ASOS.class));
