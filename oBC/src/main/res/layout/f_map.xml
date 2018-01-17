@@ -23,6 +23,16 @@
 	    android:orientation="horizontal" >
 
 		<Button
+			android:id="@+id/fmapSOSB"
+			android:layout_width="120dp"
+			android:layout_height="102dp"
+			android:layout_alignBottom="@+id/fmapAlarm"
+			android:layout_toStartOf="@+id/fmapAlarm"
+			android:background="@drawable/sel_button_sos"
+			android:paddingBottom="10dp"
+			android:visibility="visible" />
+
+		<Button
 			android:id="@+id/fmapSearchB"
 			android:layout_width="134dp"
 			android:layout_height="102dp"
@@ -54,16 +64,6 @@
 			android:textSize="18sp"
 			android:textStyle="bold" />
 
-		<Button
-			android:id="@+id/fmapSOSB"
-			android:layout_width="120dp"
-			android:layout_height="102dp"
-			android:layout_alignEnd="@+id/fmapLeftFrame"
-			android:layout_alignTop="@+id/fmapENDB"
-			android:layout_marginLeft="10dp"
-			android:layout_marginStart="10dp"
-			android:background="@drawable/sel_button_sos"
-			android:paddingBottom="10dp" />
 
 		<FrameLayout
 			android:id="@+id/fmapLeftFrame"
@@ -74,21 +74,6 @@
 			android:layout_toStartOf="@+id/fmapENDB">
 
 		</FrameLayout>
-
-		<Button
-			android:id="@+id/fmapENDB"
-			android:layout_width="103dp"
-			android:layout_height="102dp"
-			android:layout_alignTop="@+id/fmapHomeB"
-			android:layout_gravity="center_vertical"
-			android:layout_toStartOf="@+id/fmapAlarm"
-			android:background="@drawable/sel_button_sosta_small"
-			android:gravity="bottom|center"
-			android:paddingBottom="10dp"
-			android:text="@string/button_break"
-			android:textColor="@color/text_green"
-			android:textSize="16sp"
-			android:textStyle="bold" />
 
 		<FrameLayout
 		    android:id="@+id/fmapAlarm"
@@ -297,11 +282,15 @@
 
 
 	<FrameLayout android:id="@+id/fmapMapMV"
-		android:layout_width="match_parent" android:layout_height="match_parent"
-		android:layout_alignParentRight="true" android:layout_alignParentEnd="true"
-		android:layout_below="@+id/fmap_top_LL" android:layout_above="@+id/fmap_bottom_V"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_alignParentRight="true"
+		android:layout_alignParentEnd="true"
+		android:layout_below="@+id/fmap_top_LL"
+		android:layout_above="@+id/fmap_bottom_V"
 		android:layout_toRightOf="@+id/fmapLeftBorderIV"
-		android:layout_toEndOf="@+id/fmapLeftBorderIV" android:background="#CCCCCC" >
+		android:layout_toEndOf="@+id/fmapLeftBorderIV"
+		android:background="#CCCCCC" >
 
 	</FrameLayout>
 
