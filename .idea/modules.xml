@@ -2,13 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Downadviewpdf.iml" filepath="$PROJECT_DIR$/Downadviewpdf.iml" />
-      <module fileurl="file://C:\Users\Momo\OneDrive - Politecnico di Milano\Sharengo\OBC&amp;GPRS\Downadviewpdf\csd-1661.iml" filepath="C:\Users\Momo\OneDrive - Politecnico di Milano\Sharengo\OBC&amp;GPRS\Downadviewpdf\csd-1661.iml" />
+      <module fileurl="file://$PROJECT_DIR$/master.iml" filepath="$PROJECT_DIR$/master.iml" />
       <module fileurl="file://$PROJECT_DIR$/oBC/oBC.iml" filepath="$PROJECT_DIR$/oBC/oBC.iml" />
-      <module fileurl="file://C:\Users\Momo\OneDrive - Politecnico di Milano\Sharengo\OBC&amp;GPRS\Downadviewpdf\oBC\oBC.iml" filepath="C:\Users\Momo\OneDrive - Politecnico di Milano\Sharengo\OBC&amp;GPRS\Downadviewpdf\oBC\oBC.iml" />
-      <module fileurl="file://C:\Users\Momo\OneDrive - Politecnico di Milano\Sharengo\OBC&amp;GPRS\csd-1661\obc.iml" filepath="C:\Users\Momo\OneDrive - Politecnico di Milano\Sharengo\OBC&amp;GPRS\csd-1661\obc.iml" />
+      <module fileurl="file://C:\Users\Momo\Desktop\obc 1664\master\oBC\oBC.iml" filepath="C:\Users\Momo\Desktop\obc 1664\master\oBC\oBC.iml" />
+      <module fileurl="file://C:\Users\Momo\Desktop\obc 1664\master\obc.iml" filepath="C:\Users\Momo\Desktop\obc 1664\master\obc.iml" />
       <module fileurl="file://$PROJECT_DIR$/sDKTools/sDKTools.iml" filepath="$PROJECT_DIR$/sDKTools/sDKTools.iml" />
-      <module fileurl="file://C:\Users\Momo\OneDrive - Politecnico di Milano\Sharengo\OBC&amp;GPRS\Downadviewpdf\sDKTools\sDKTools.iml" filepath="C:\Users\Momo\OneDrive - Politecnico di Milano\Sharengo\OBC&amp;GPRS\Downadviewpdf\sDKTools\sDKTools.iml" />
+      <module fileurl="file://C:\Users\Momo\Desktop\obc 1664\master\sDKTools\sDKTools.iml" filepath="C:\Users\Momo\Desktop\obc 1664\master\sDKTools\sDKTools.iml" />
     </modules>
   </component>
 </project>

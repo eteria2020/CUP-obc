@@ -5,6 +5,9 @@ android {
     buildToolsVersion '25.0.0'
 
     defaultConfig {
+        ndk{
+            abiFilters "armeabi-v7a"// add your required cpu architecture
+        }
     }
 
     buildTypes {
