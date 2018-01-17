@@ -43,7 +43,6 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 
 import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 
 
 /**
@@ -100,7 +99,7 @@ public class FPdfViewer extends FBase {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setOpenFile(true);
-        View view = inflater.inflate(R.layout.a_pdf, container, false);
+        View view = inflater.inflate(R.layout.f_pdf, container, false);
 
         ((ImageButton) view.findViewById(R.id.fmenBackIB)).setOnClickListener(new View.OnClickListener() {
             @Override
