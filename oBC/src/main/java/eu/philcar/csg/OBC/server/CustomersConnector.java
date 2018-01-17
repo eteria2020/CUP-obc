@@ -38,7 +38,7 @@ public class CustomersConnector implements RemoteEntityInterface {
 		private long lastUpdate;
 		private int  receivedRecords;
 
-		private static boolean busy;
+		private static boolean busy=false;
 		
 		public void setLastUpdate(long v) {
 			this.lastUpdate = v;
@@ -112,29 +112,29 @@ public class CustomersConnector implements RemoteEntityInterface {
 						try {
 							JSONObject jobj = jArray.getJSONObject(i);
 
-							int id = jobj.getInt("id");
-							long tms = jobj.getLong("tms");
+							int id = jobj.getInt("i");
+							long tms = jobj.getLong("tm");
 							JSONArray ojarray = new JSONArray();
 
 							// if (!clienti.isPresent(id, tms)) {
 							Customer c = new Customer(true);
 							c.id = id;
-							c.name = jobj.getString("nome");
-							c.surname = jobj.getString("cognome");
-							c.language = jobj.getString("lingua");
-							c.mobile = jobj.getString("cellulare");
+							c.name = jobj.getString("n");
+							c.surname = jobj.getString("c");
+						//	c.language = jobj.getString("lingua");
+							c.mobile = jobj.getString("t");
 							
-							abilitato = jobj.getString("abilitato");
+							abilitato = jobj.getString("a");
 							if (abilitato!=null)
 								c.enabled = abilitato.equalsIgnoreCase("TRUE");
 							else
 								c.enabled = false;
 							
-							c.info_display = jobj.getString("info_display");
+							c.info_display = jobj.getString("id");
 							
-							c.card_code = jobj.getString("codice_card");
+							c.card_code = jobj.getString("cc");
 							
-							ojarray.put(jobj.getString("pin"));
+							ojarray.put(jobj.getString("p"));
 							if (jobj.has("pin2")) {
 							    String pin2 = jobj.getString("pin2");
 							    if (pin2!=null && !pin2.isEmpty()) {
@@ -144,8 +144,8 @@ public class CustomersConnector implements RemoteEntityInterface {
 
 							c.pin = ojarray.toString();
 							
-							if (jobj.has("pins")) {
-							    String pins = jobj.getString("pins");
+							if (jobj.has("ps")) {
+							    String pins = jobj.getString("ps");
 							    if (pins!=null && !pins.isEmpty()) {
 							    	c.pin = pins;
 							    }
