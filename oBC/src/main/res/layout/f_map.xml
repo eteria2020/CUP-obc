@@ -63,16 +63,6 @@
 			android:textSize="18sp"
 			android:textStyle="bold" />
 
-		<Button
-			android:id="@+id/fmapSOSB"
-			android:layout_width="120dp"
-			android:layout_height="102dp"
-			android:layout_alignBottom="@+id/fmapAlarm"
-			android:layout_toStartOf="@+id/fmapAlarm"
-			android:background="@drawable/sel_button_sos"
-			android:paddingBottom="10dp"
-			android:visibility="visible" />
-
 		<FrameLayout
 			android:id="@+id/fmapLeftFrame"
 			android:layout_width="wrap_content"

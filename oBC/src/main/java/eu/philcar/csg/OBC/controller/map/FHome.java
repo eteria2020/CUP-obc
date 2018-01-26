@@ -159,7 +159,7 @@ public class FHome extends FBase implements OnClickListener {
         ((Button) view.findViewById(R.id.fmapSOSB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapSearchB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapRadioB)).setOnClickListener(this);
-        ((Button) view.findViewById(R.id.fmapMusicB)).setOnClickListener(this);
+       // ((Button) view.findViewById(R.id.fmapMusicB)).setOnClickListener(this);
         //((Button) view.findViewById(R.id.fmapFuelStationsB)).setOnClickListener(this); rimosso su richiesta mkt
         ((Button) view.findViewById(R.id.fmapCancelB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapParkB)).setOnClickListener(this);
@@ -447,18 +447,18 @@ public class FHome extends FBase implements OnClickListener {
 
                 break;
 
-            case R.id.fmapMusicB:
-
+      /*    case R.id.fmapMusicB:
 
                 ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_AUX,30);
-                Toast.makeText(App.Instance.getApplicationContext(),getResources().getString(R.string.music_hint),Toast.LENGTH_LONG).show();
+                Toast.makeText(App.Instance.getApplicationContext(),getResources().getString(R.string.music_hint),Toast.LENGTH_LONG).show(); */
 
                 /*final Resources res = this.getResources();
                 final int id = Resources.getSystem().getIdentifier(
                         "config_ntpServer", "string","android");
                 final String defaultServer = res.getString(id);*/
+             //   break;
 
-                break;
+
             case R.id.fmapAssicurazione:
                 ((ABase) getActivity()).pushFragment(FPdfViewer.newInstance("ASSICURAZIONE"), FPdfViewer.class.getName(), true);
                 //startActivity(new Intent(getActivity(), FPdfViewer.class)); //pushfragment usare
