@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/keyoff.iml" filepath="$PROJECT_DIR$/keyoff.iml" />
       <module fileurl="file://$PROJECT_DIR$/oBC/oBC.iml" filepath="$PROJECT_DIR$/oBC/oBC.iml" />
-      <module fileurl="file://$PROJECT_DIR$/obc.iml" filepath="$PROJECT_DIR$/obc.iml" />
       <module fileurl="file://$PROJECT_DIR$/sDKTools/sDKTools.iml" filepath="$PROJECT_DIR$/sDKTools/sDKTools.iml" />
     </modules>
   </component>

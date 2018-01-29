@@ -113,6 +113,10 @@ public class ServiceTestActivity extends Activity {
 			case ObcService.MSG_PING:
 				Toast.makeText(ServiceTestActivity.this, "PING OK", Toast.LENGTH_SHORT).show();
 				break;
+
+				case ObcService.MSG_CAR_KEY_CHECK:
+					Toast.makeText(ServiceTestActivity.this, "CAR key Check", Toast.LENGTH_SHORT).show();
+					break;
 				
 			case ObcService.MSG_IO_RFID:
 				screenLock.acquire();
@@ -430,6 +434,27 @@ public class ServiceTestActivity extends Activity {
 				}
 
 			});
+			((Button) findViewById(R.id.btnKeyY)).setOnClickListener(new OnClickListener() {
+
+
+				public void onClick(View arg0) {
+					dlog.i("pulsante cliccato");
+					Toast.makeText(ServiceTestActivity.this, "check key abilitato", Toast.LENGTH_SHORT).show();
+					Message msg = MessageFactory.enableKeycheck();
+					serviceConnector.send(msg);
+				}
+
+			});
+			((Button) findViewById(R.id.btnKeyN)).setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					Toast.makeText(ServiceTestActivity.this, "check key disabilitato", Toast.LENGTH_SHORT).show();
+					Message msg = MessageFactory.disableKeycheck();
+					serviceConnector.send(msg);
+				}
+
+			});
 
 			((Button) findViewById(R.id.btnlogN)).setOnClickListener(new OnClickListener() {
 
@@ -445,6 +470,27 @@ public class ServiceTestActivity extends Activity {
 
 
 		} else {
+			((Button) findViewById(R.id.btnKeyY)).setOnClickListener(new OnClickListener() {
+
+
+				public void onClick(View arg0) {
+					dlog.i("pulsante cliccato");
+					Toast.makeText(ServiceTestActivity.this, "check key abilitato", Toast.LENGTH_SHORT).show();
+					Message msg = MessageFactory.enableKeycheck();
+					serviceConnector.send(msg);
+				}
+
+			});
+			((Button) findViewById(R.id.btnKeyN)).setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					Toast.makeText(ServiceTestActivity.this, "check key disabilitato", Toast.LENGTH_SHORT).show();
+					Message msg = MessageFactory.disableKeycheck();
+					serviceConnector.send(msg);
+				}
+
+			});
 
 			findViewById(R.id.DoorsLL).setVisibility(View.GONE);
 			findViewById(R.id.MotorLL).setVisibility(View.GONE);

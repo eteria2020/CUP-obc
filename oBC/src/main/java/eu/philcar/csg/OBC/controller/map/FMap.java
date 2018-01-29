@@ -217,7 +217,7 @@ public class FMap extends FBase implements OnClickListener {
 	private RelativeLayout fmap_top_LL;
 	private static Boolean RequestBanner=false;
 	public static Boolean firstRun=true;
-	private static Context context;
+	public static Context context;
 
 
 	private static Boolean isSecondCallout=false;

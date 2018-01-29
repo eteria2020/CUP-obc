@@ -137,6 +137,7 @@ public class ObcService extends Service implements OnTripCallback {
     public static final int MSG_CAR_LOCATION = 34;
     public static final int MSG_CAR_CAN_UPDATE = 35;
     public static final int MSG_CAR_START_CHARGING = 36;
+    public static final int MSG_CAR_KEY_CHECK = 37;
 
     public static final int MSG_CUSTOMER_INFO = 40;
     public static final int MSG_CUSTOMER_CHECKPIN = 41;
@@ -2500,6 +2501,10 @@ public class ObcService extends Service implements OnTripCallback {
                     App.Instance.initSharengo();
                     break;
 
+                case MSG_CAR_KEY_CHECK:
+                    App.checkKeyOff = (msg.arg1 == 1 ? true : false);
+                    App.Instance.checkKeyOff();
+                    break;
                 case MSG_SERVER_CHANGE_LOG:
                     App.saveLog = (msg.arg1 == 1 ? true : false);
                     App.Instance.persistSaveLog();

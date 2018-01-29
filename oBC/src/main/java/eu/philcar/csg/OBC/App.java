@@ -408,6 +408,7 @@ public class App extends Application {
 	private static final String  KEY_ServerIP = "server_ip";
 	private static final String  KEY_RebootTime = "reboot_time";
 	private static final String  KEY_PersistLog = "persist_log";
+	private static final String  KEY_CheckKeyOff = "Check_key";
 	private static final String  KEY_IsAskClose = "is_ask_close";
 	private static final String  KEY_IdAskClose = "id_ask_close";
 	private static final String  KEY_CounterCleanliness = "Cleanliness";
@@ -458,6 +459,7 @@ public class App extends Application {
 	public static long   networkExceptions=0;
 	public static Location lastLocation;
 	public static Boolean saveLog =true;
+	public static Boolean checkKeyOff=true;
 	private static int bmsCountTo90 =0;
 
 
@@ -772,6 +774,14 @@ public class App extends Application {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putBoolean(KEY_PersistLog, saveLog);
+			e.apply();
+		}
+	}
+
+	public void checkKeyOff() {
+		if (this.preferences != null ) {
+			Editor e = this.preferences.edit();
+			e.putBoolean(KEY_CheckKeyOff, checkKeyOff);
 			e.apply();
 		}
 	}
@@ -1458,33 +1468,33 @@ private void  initPhase2() {
 
 	}
 
-	
+
 	public  void setCarPlate(String carPlate) {
-		
-		//Null or empty Plate should be ignored 
+
+		//Null or empty Plate should be ignored
 		if (carPlate==null || carPlate.isEmpty() || carPlate.equalsIgnoreCase("NULL"))
 			return;
-		
-		
-		//Plate with non alphanumeric chars should be ignored		
-		if (carPlate.matches("^.*[^a-zA-Z0-9 ].*$")) 
+
+
+		//Plate with non alphanumeric chars should be ignored
+		if (carPlate.matches("^.*[^a-zA-Z0-9 ].*$"))
 			return;
-		
+
 		//If plate is unchanged do nothing
 		if (carPlate.equals(App.CarPlate))
 			return;
-		
+
 		Events.CarPlateChange(App.CarPlate,carPlate);
-		
+
 		Editor editor = preferences.edit();
 		editor.putString(KEY_CarPlate, carPlate);
 		editor.apply();
 		loadPreferences();
 	}
 
-	
+
 	public  void setFwVersion(String fw_version) {
-		
+
 		if (fw_version.equals(App.fw_version))
 			return;
 		
@@ -1847,6 +1857,7 @@ private void  initPhase2() {
 		ServerIP = preferences.getInt(KEY_ServerIP, 0);
 		timeZone = preferences.getString(KEY_TimeZone,"Europe/Rome");
 		saveLog = preferences.getBoolean(KEY_PersistLog, true);
+		checkKeyOff = preferences.getBoolean(KEY_CheckKeyOff, true);
 		try {
 		askClose.putInt("id",preferences.getInt(KEY_IdAskClose,0));
 		askClose.putBoolean("close",preferences.getBoolean(KEY_IsAskClose,false));

@@ -1,11 +1,14 @@
 package eu.philcar.csg.OBC.devices;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Bundle;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+import android.support.v4.app.FragmentManager;
 
 import com.Hik.Mercury.SDK.Audio.AudioInfo;
 import com.Hik.Mercury.SDK.Audio.AudioObserver;
@@ -19,28 +22,9 @@ import com.Hik.Mercury.SDK.Lease.LeaseObserver;
 import com.Hik.Mercury.SDK.LeaseItaly.LeaseInfoItaly;
 import com.Hik.Mercury.SDK.LeaseItaly.LeaseObserverItaly;
 import com.Hik.Mercury.SDK.Manager.CANManager;
-
-
 import com.Hik.Mercury.SDK.Manager.HIKAudioManager;
 import com.Hik.Mercury.SDK.Manager.LeaseManager;
 import com.Hik.Mercury.SDK.Manager.LeaseManagerItaly;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import com.Hik.Mercury.SDK.Manager.RadioManager;
 import com.Hik.Mercury.SDK.Manager.VersionManager;
 import com.Hik.Mercury.SDK.Radio.RadioInfo;
@@ -48,8 +32,13 @@ import com.Hik.Mercury.SDK.Radio.RadioObserver;
 import com.Hik.Mercury.SDK.bluetooth.BTManager;
 import com.Hik.Mercury.SDK.bluetooth.BluetoothStateCallback;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+
 import eu.philcar.csg.OBC.App;
-import eu.philcar.csg.OBC.SystemControl;
+import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.helpers.Converts;
 import eu.philcar.csg.OBC.helpers.DLog;
@@ -57,18 +46,8 @@ import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.Reservation;
-import eu.philcar.csg.OBC.db.Events;
-import android.bluetooth.BluetoothDevice;
-import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
-import android.util.Log;
+
+//import eu.philcar.csg.OBC.R;
 
 
 
@@ -110,9 +89,11 @@ public class Hik_io implements LowLevelInterface {
 	
 	private String lastGpsInfo="";
 	
-	
+
 	private String SDKVersion="";
     private int ServiceVersion=-1;
+
+	private FragmentManager getSupportFragmentManager;
 	
 	
 	private boolean getMinorGPSDisabled= false;
@@ -1067,7 +1048,9 @@ public class Hik_io implements LowLevelInterface {
 			
 				obcService.notifyCarInfo(b);
 
-	        }
+		//		FInstructionsClose FInstructionsClose = (FInstructionsClose)  getSupportFragmentManager().findFragmentById("");
+
+	    	 }
 
 	        @Override
 	        public void onMotorDCVoltageValueChange(float motorDCVoltage) throws RemoteException {
