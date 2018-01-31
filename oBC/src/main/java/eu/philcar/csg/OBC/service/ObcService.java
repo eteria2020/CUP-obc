@@ -869,6 +869,7 @@ public class ObcService extends Service implements OnTripCallback {
                         } else {
                             intCount = 0;
                             lastIntGpsLocation.set(carInfo.intGpsLocation);
+                            App.resetGPSSwitchCount();
                         }
                     } else {
 
@@ -892,6 +893,7 @@ public class ObcService extends Service implements OnTripCallback {
                         } else {
                             extCount = 0;
                             lastExtGpsLocation.set(carInfo.extGpsLocation);
+                            App.resetGPSSwitchCount();
                         }
 
                     }

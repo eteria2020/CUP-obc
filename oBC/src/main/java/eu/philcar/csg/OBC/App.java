@@ -491,6 +491,7 @@ public class App extends Application {
 	public static List<String> BatteryAlarmSmsNumbers;
 	public static String   DefaultCity="";
 	public static boolean  UseExternalGPS=false;
+    public static int      GPSSwitchCount = 0;
 	public static int      Watchdog = 0;
 	public static int      BatteryShutdownLevel = 0;
 	public static int	   FleetId = 0;
@@ -1589,10 +1590,32 @@ private void  initPhase2() {
 		editor.putBoolean(KEY_UseExternalGPS, use);
 		editor.apply();
 		loadPreferences();
+        incrementGPSSwitchCount();
 	}
-	
-	
-	public ArrayList<String> getDamagesList() {
+
+	public static void incrementGPSSwitchCount(){
+        setGPSSwitchCount(getGPSSwitchCount()+1);
+
+    }
+
+    public static void resetGPSSwitchCount(){
+         setGPSSwitchCount(0);
+    }
+
+    public static boolean getNoGPSAlarm(){
+        return getGPSSwitchCount()>5;
+    }
+
+
+    public static int getGPSSwitchCount() {
+        return GPSSwitchCount;
+    }
+
+    public static void setGPSSwitchCount(int GPSSwitchCount) {
+        App.GPSSwitchCount = GPSSwitchCount;
+    }
+
+    public ArrayList<String> getDamagesList() {
 		ArrayList<String> list = new ArrayList<String>();
 
 		if (Damages!=null && !Damages.isEmpty() && !Damages.equalsIgnoreCase("null")) {

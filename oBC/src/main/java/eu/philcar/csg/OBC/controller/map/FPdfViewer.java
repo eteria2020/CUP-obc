@@ -159,7 +159,7 @@ public class FPdfViewer extends FBase {
     private boolean needUpdate(File[] listOfFiles) {
         String name = listOfFiles[0].getName().replaceAll("[^?0-9]+", "");
 
-        SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String TodayDate = sdf.format(new Date());
         int x = Integer.parseInt(TodayDate);
         int y = Integer.parseInt(name);
@@ -252,6 +252,7 @@ public class FPdfViewer extends FBase {
                 if (needUpdate(pdf)) {
                     setUpdate(true);
                     if (App.hasNetworkConnection) {
+                        Toast.makeText(getActivity(), "Scaricamento file aggiornato...", Toast.LENGTH_LONG).show();
                         new DownloadFile().execute();
                     } else {
                         Toast.makeText(getActivity(), "No Application available to view PDF", Toast.LENGTH_SHORT).show();
@@ -265,10 +266,12 @@ public class FPdfViewer extends FBase {
                 }
             } else {
                 setDownload(true);
+                Toast.makeText(getActivity(), "Scaricamento file, Attendere...", Toast.LENGTH_LONG).show();
                 new DownloadFile().execute();
             }
 
         } else if (App.hasNetworkConnection) {
+            Toast.makeText(getActivity(), "Scaricamento file, Attendere...", Toast.LENGTH_LONG).show();
             new DownloadFile().execute();
         } else {
             Toast.makeText(getActivity(), "Nessuna connessione internet", Toast.LENGTH_SHORT).show();
@@ -402,7 +405,11 @@ public class FPdfViewer extends FBase {
                     e.printStackTrace();
                 }
                 if (openFile)
-                    openPdf(file, PDFView);
+                    try{
+                    openPdf(file, PDFView);}
+                    catch (Exception e){
+
+                    }
 
         }
 
@@ -415,8 +422,13 @@ public class FPdfViewer extends FBase {
                 return FALSE;
             if (Json.getString("filesize") == null || Json.getString("filesize") == "false")
                 return FALSE;
-            String pdfname = fileType + "-" + fileUrl.replace(PLATE,"").replaceAll("[^?0-9]+", "") + ".pdf";
-            ;
+       //     StringBuilder  temp = new StringBuilder();
+         //   temp.append();
+         //   temp.reverse();
+            String tmp[] =fileUrl.replace(PLATE,"").replace(".pdf","").split("--"); //replaceAll("[^?0-9]+", "")
+            String temp[] = tmp[1].split("_");
+            String pdfname = fileType + "-" + temp[2]+temp[1]+temp[0] + ".pdf";
+
             String extStorageDirectory = Environment.getExternalStorageDirectory().toString();
             File folder = new File(extStorageDirectory, directory);
             folder.mkdir();
