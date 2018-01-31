@@ -68,6 +68,7 @@ import eu.philcar.csg.OBC.server.ZmqSubscriber;
 import eu.philcar.csg.OBC.task.OldLogCleamup;
 import eu.philcar.csg.OBC.task.UDPServer;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -2161,6 +2162,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     private boolean startedReboot=false;
 
+    @SuppressLint("HandlerLeak")
     private final Handler privateHandler = new Handler() {
 
 
@@ -2207,6 +2209,7 @@ public class ObcService extends Service implements OnTripCallback {
     };
 
 
+    @SuppressLint("HandlerLeak")
     private final Handler localHandler = new Handler() {
 
         @Override

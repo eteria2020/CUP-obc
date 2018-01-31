@@ -268,6 +268,7 @@ public class AMainOBC extends ABase implements LocationListener {
 		unregisterReceiver(advertisementReceiver);
 	}
 
+	@Override
 	public void sendMessage(Message msg) {
 		serviceConnector.send(msg);
 	}

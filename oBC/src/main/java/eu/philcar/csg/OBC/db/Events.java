@@ -159,6 +159,7 @@ public class Events extends DbTable<Event,Integer> {
 	}
 
 	public static void outOfArea(Boolean status) {
+		if(App.lastLocation.getLongitude()!=0.0 && App.lastLocation.getLatitude()!=0.0)
 		generateEvent(EVT_OUTOFAREA,status?1:0,status?"Uscita Area Operativa":"Rientro Area Operativa");
 	}
 

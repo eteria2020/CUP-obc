@@ -1,5 +1,6 @@
 package eu.philcar.csg.OBC.controller.map;
 
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,7 +14,9 @@ import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 
+import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.service.MessageFactory;
 
 /**
  * Created by Momo on 11/01/2018.
@@ -41,6 +44,8 @@ public class FVideo extends FBase implements View.OnClickListener {
         backIB.setOnClickListener(this);
         video.setVideoURI(Uri.parse(Environment.getExternalStorageDirectory() + "/video.mp4"));
         video.requestFocus();
+        ((ABase)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_SYSTEM,15));
+
         video.start();
 
 
