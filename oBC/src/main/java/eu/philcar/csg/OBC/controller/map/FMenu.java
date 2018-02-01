@@ -361,6 +361,7 @@ public class FMenu extends FBase implements OnClickListener {
 				}
 			}
 		}
+		KeyOffCheck();
 	}
 	
 	// Convenient method to update all the UI elements
@@ -432,7 +433,8 @@ public class FMenu extends FBase implements OnClickListener {
 		
 	}
 
-	public void onActivityCreated(Bundle savedInstanceState) {
+/*	public void onActivityCreated(Bundle savedInstanceState) {
+
 		if(Checkkey != true)
 			return;
 		final Handler h = new Handler();
@@ -456,7 +458,7 @@ public class FMenu extends FBase implements OnClickListener {
 		super.onActivityCreated(savedInstanceState);
 
 	}
-
+ */
 
 
 	private void KeyOffCheck(){
