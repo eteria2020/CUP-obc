@@ -465,22 +465,23 @@ public class FMenu extends FBase implements OnClickListener {
 
 		if( CarInfo.keyStatus != "OFF" && CarInfo.keyStatus != null && App.checkKeyOff == true)
 		{
-			if(changed == false)
-				return;
+
 		endRentIB.setEnabled(false);
 		pauseRentIB.setEnabled(false);
 			UIHelper(R.drawable.sel_button_cancel, R.string.menu_rent_end_key_on, this,
 					R.drawable.button_rent_pause_pushed, R.string.menu_park_mode_suspend_key_on, null,
 					R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this,
 					R.drawable.sel_button_back, this);
-			changed = true;
+
 
 		}else {
-			if(changed == true)
-				return;
+
 			endRentIB.setEnabled(true);
 			pauseRentIB.setEnabled(true);
-			changed = false;
+			UIHelper(R.drawable.sel_button_cancel, R.string.menu_rent_end, this,
+					R.drawable.sel_button_rent_pause, R.string.menu_park_mode_suspend, this,
+					R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this,
+					R.drawable.sel_button_back, this);
 
 		}
 
