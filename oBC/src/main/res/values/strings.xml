@@ -233,8 +233,8 @@
     <string name="alert_bonus_park">From this moment you can earn 5 minutes bonus by leaving this car to be recharged in one of the car parks shown on the map</string>
     <string name="music_hint">Connect the AUX cable to listen to music from your phone</string>
     <string name="pin_business">You\'ve used the business pin!</string>
-    <string name="menu_rent_end_key_on">Please turn off the car before ending the rent</string>
-    <string name="menu_park_mode_suspend_key_on">Please turn off the car before pausing the rent</string>
+    <string name="menu_rent_end_key_on">Please turn off the dashboard before ending the rent</string>
+    <string name="menu_park_mode_suspend_key_on">Please turn off the dashboard before pausing the rent</string>
 
 
 
