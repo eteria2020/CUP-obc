@@ -35,7 +35,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.util.JsonWriter;
 
@@ -781,6 +780,7 @@ public class CarInfo {
             jw.name("parkEnabled").value(!App.motoreAvviato && App.getParkModeStarted() != null);
             jw.name("parking").value(App.getParkModeStarted() != null && App.parkMode.isOn());
             jw.name("charging").value(App.Charging);
+            jw.name("noGPS").value(App.getNoGPSAlarm());
             jw.name("PPStatus").value(this.chargingPlug);
             if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
                 jw.name("id_trip").value(App.currentTripInfo.trip.remote_id);
@@ -880,6 +880,7 @@ public class CarInfo {
             jw.name("parkEnabled").value(!App.motoreAvviato && App.getParkModeStarted() != null);
             jw.name("parking").value(App.getParkModeStarted() != null && App.parkMode.isOn());
             jw.name("charging").value(App.Charging);
+            jw.name("noGPS").value(App.getNoGPSAlarm());
             if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
                 jw.name("id_trip").value(App.currentTripInfo.trip.remote_id);
             }

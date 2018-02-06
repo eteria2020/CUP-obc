@@ -238,7 +238,7 @@ public class App extends Application {
 			URL_Beacon = "http://corestage.sharengo.it/api/pushbeacon.php?";
 			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
 			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
-			URL_Clienti = "https://corestage.sharengo.it:8123/whitelist";
+			URL_Clienti = "https://corestage.sharengo.it:8123/whitelist2";
 			URL_Dipendenti = "https://corestage.sharengo.it:8123/business-employees";
 			URL_Commands = "http://corestage.sharengo.it/api/get_commands.php?";
 			//URL_Corse = "http://corestage.sharengo.it/api/pushcorsa-convenzioni.php?";
@@ -256,7 +256,7 @@ public class App extends Application {
 			URL_ZMQNotifier = "tcp://185.81.1.24:8001";
 			URL_AdsBuilder = "http://manage.sharengo.it/banner2.php";
 			URL_AdsBuilderCar = "http://manage.sharengo.it/banner2_offline.php";
-			URL_AdsBuilderStart = "http://manage.sharengo.it/banner4_offline.php";
+			URL_AdsBuilderStart = "http://manage.sharengo.it/dev/banner4_video.php";
 			URL_AdsBuilderEnd = "http://manage.sharengo.it/banner5_offline.php";
 			URL_Time = "http://corestage.sharengo.it/api/get_date.php";
 			IP_UDP_Beacon = "185.81.1.24";
@@ -269,7 +269,7 @@ public class App extends Application {
 			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
 
 			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
-			URL_Clienti = "https://api.sharengo.it:8123/whitelist";
+			URL_Clienti = "https://api.sharengo.it:8123/whitelist2";
 			URL_Dipendenti = "https://api.sharengo.it:8123/business-employees";
 			URL_Commands = "http://core.sharengo.it/api/get_commands.php?";
 			URL_Corse = "http://core.sharengo.it/api/pushcorsa-convenzioni.php?";
@@ -286,7 +286,7 @@ public class App extends Application {
 			URL_ZMQNotifier = "tcp://185.58.119.117:8001";
 			URL_AdsBuilder = "http://manage.sharengo.it/banner2.php";
 			URL_AdsBuilderCar = "http://manage.sharengo.it/banner2_offline.php";
-			URL_AdsBuilderStart = "http://manage.sharengo.it/banner4_offline.php";
+			URL_AdsBuilderStart = "http://manage.sharengo.it/dev/banner4_video.php";
 			URL_AdsBuilderEnd = "http://manage.sharengo.it/banner5_offline.php";
 			URL_Time = "http://core.sharengo.it/api/get_date.php";
 			IP_UDP_Beacon = "185.58.119.117";
@@ -493,6 +493,7 @@ public class App extends Application {
 	public static List<String> BatteryAlarmSmsNumbers;
 	public static String   DefaultCity="";
 	public static boolean  UseExternalGPS=false;
+    public static int      GPSSwitchCount = 0;
 	public static int      Watchdog = 0;
 	public static int      BatteryShutdownLevel = 0;
 	public static int	   FleetId = 0;
@@ -1599,10 +1600,32 @@ private void  initPhase2() {
 		editor.putBoolean(KEY_UseExternalGPS, use);
 		editor.apply();
 		loadPreferences();
+        incrementGPSSwitchCount();
 	}
-	
-	
-	public ArrayList<String> getDamagesList() {
+
+	public static void incrementGPSSwitchCount(){
+        setGPSSwitchCount(getGPSSwitchCount()+1);
+
+    }
+
+    public static void resetGPSSwitchCount(){
+         setGPSSwitchCount(0);
+    }
+
+    public static boolean getNoGPSAlarm(){
+        return getGPSSwitchCount()>5;
+    }
+
+
+    public static int getGPSSwitchCount() {
+        return GPSSwitchCount;
+    }
+
+    public static void setGPSSwitchCount(int GPSSwitchCount) {
+        App.GPSSwitchCount = GPSSwitchCount;
+    }
+
+    public ArrayList<String> getDamagesList() {
 		ArrayList<String> list = new ArrayList<String>();
 
 		if (Damages!=null && !Damages.isEmpty() && !Damages.equalsIgnoreCase("null")) {

@@ -38,4 +38,5 @@ dependencies {
     compile files('libs/activation.jar')
     compile files('libs/additionnal.jar')
     compile files('libs/mail.jar')
+    compile 'com.github.barteksc:android-pdf-viewer:2.8.1'
 }

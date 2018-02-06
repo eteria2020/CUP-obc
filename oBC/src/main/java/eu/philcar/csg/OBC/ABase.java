@@ -5,6 +5,8 @@ import java.util.Locale;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.service.ServiceClient;
+
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -21,7 +23,7 @@ import com.skobbler.ngx.map.SKMapViewStyle;
 import com.skobbler.ngx.navigation.SKAdvisorSettings;
 import com.skobbler.ngx.routing.SKRouteManager;
 
-public abstract class ABase extends Activity {
+public abstract class ABase extends Activity implements ServiceClient{
 
 
 	private DLog dlog = new DLog(this.getClass());

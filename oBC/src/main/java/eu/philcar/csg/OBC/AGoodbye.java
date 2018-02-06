@@ -83,7 +83,8 @@ public class AGoodbye extends ABase {
 	protected int getPlaceholderResource() {
 		return R.id.awelPlaceholderFL;
 	}
-	
+
+	@Override
 	public void sendMessage(Message msg) {
 		serviceConnector.send(msg);
 	}
