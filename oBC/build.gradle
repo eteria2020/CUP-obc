@@ -8,6 +8,9 @@ android {
         applicationId "eu.philcar.csg.OBC"
         minSdkVersion 17
         targetSdkVersion 19
+        ndk{
+            abiFilters "armeabi-v7a"// add your required cpu architecture
+        }
     }
 
     buildTypes {
