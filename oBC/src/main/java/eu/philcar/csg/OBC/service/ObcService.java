@@ -28,7 +28,7 @@ import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.AMainOBC;
-import eu.philcar.csg.OBC.controller.FPdfViewer;
+import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Poi;

@@ -233,5 +233,8 @@
     <string name="alert_bonus_park">从现在开始，您可以通过将这辆汽车在地图上显示的停车场之一中收取5分钟的奖金</string>
     <string name="menu_rent_end_key_on">Please turn off the car before ending the rent</string>
     <string name="menu_park_mode_suspend_key_on">Please turn off the car before pausing the rent</string>
+    <string name="button_video_tutorial">TUTORIAL</string>
+    <string name="button_assicurazione">ASSICURAZIONE</string>
+    <string name="button_libretto">LIBRETTO</string>
 
 </resources>

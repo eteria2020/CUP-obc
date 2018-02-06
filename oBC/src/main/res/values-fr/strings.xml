@@ -229,5 +229,8 @@
     <string name="alert_bonus_park">Désormais, vous pouvez gagner 5 minutes de bonus en laissant cette voiture être rechargée dans l\'un des parkings indiqués sur la carte</string>
     <string name="menu_rent_end_key_on">Please turn off the car before ending the rent</string>
     <string name="menu_park_mode_suspend_key_on">Please turn off the car before pausing the rent</string>
+    <string name="button_video_tutorial">TUTORIAL</string>
+    <string name="button_assicurazione">ASSICURAZIONE</string>
+    <string name="button_libretto">LIBRETTO</string>
 
 </resources>

@@ -235,7 +235,9 @@
     <string name="pin_business">You\'ve used the business pin!</string>
     <string name="menu_rent_end_key_on">Please turn off the dashboard before ending the rent</string>
     <string name="menu_park_mode_suspend_key_on">Please turn off the dashboard before pausing the rent</string>
-
+    <string name="button_video_tutorial">TUTORIAL</string>
+    <string name="button_assicurazione">ASSICURAZIONE</string>
+    <string name="button_libretto">LIBRETTO</string>
 
 
 </resources>

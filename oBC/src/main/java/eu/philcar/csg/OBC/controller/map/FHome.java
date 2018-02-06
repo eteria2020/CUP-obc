@@ -28,7 +28,7 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
-import eu.philcar.csg.OBC.controller.FPdfViewer;
+import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;

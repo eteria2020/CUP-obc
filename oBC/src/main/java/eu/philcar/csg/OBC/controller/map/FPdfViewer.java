@@ -1,4 +1,4 @@
-package eu.philcar.csg.OBC.controller;
+package eu.philcar.csg.OBC.controller.map;
 
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -41,6 +41,7 @@ import java.util.Date;
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
+import eu.philcar.csg.OBC.controller.FBase;
 
 import static java.lang.Boolean.FALSE;
 
