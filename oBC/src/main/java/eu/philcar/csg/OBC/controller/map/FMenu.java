@@ -1,25 +1,10 @@
 package eu.philcar.csg.OBC.controller.map;
 
-import eu.philcar.csg.OBC.ABase;
-import eu.philcar.csg.OBC.AGoodbye;
-import eu.philcar.csg.OBC.ASOS;
-import eu.philcar.csg.OBC.AWelcome;
-import eu.philcar.csg.OBC.App;
-import eu.philcar.csg.OBC.R;
-import eu.philcar.csg.OBC.AMainOBC;
-import eu.philcar.csg.OBC.controller.FBase;
-import eu.philcar.csg.OBC.controller.welcome.FDamages;
-import eu.philcar.csg.OBC.db.Events;
-import eu.philcar.csg.OBC.devices.LowLevelInterface;
-import eu.philcar.csg.OBC.helpers.DLog;
-import eu.philcar.csg.OBC.helpers.Debug;
-import eu.philcar.csg.OBC.service.MessageFactory;
-import eu.philcar.csg.OBC.service.ParkMode;
-
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,8 +13,24 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import eu.philcar.csg.OBC.ABase;
+import eu.philcar.csg.OBC.AGoodbye;
+import eu.philcar.csg.OBC.AMainOBC;
+import eu.philcar.csg.OBC.ASOS;
+import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.R;
+import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.controller.welcome.FDamages;
+import eu.philcar.csg.OBC.db.Events;
+import eu.philcar.csg.OBC.devices.LowLevelInterface;
+import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.helpers.Debug;
+import eu.philcar.csg.OBC.service.CarInfo;
+import eu.philcar.csg.OBC.service.MessageFactory;
+import eu.philcar.csg.OBC.service.ParkMode;
+
 
 public class FMenu extends FBase implements OnClickListener {
 
@@ -40,6 +41,9 @@ public class FMenu extends FBase implements OnClickListener {
 	private Button sosB;
 	private View rootView;
 	private FrameLayout fmen_right_FL;
+	private boolean Checkkey = App.checkKeyOff;
+	public boolean changed =true;
+
 	public static String clickedButton; // to determinate which button is clicked
 	
 	public static FMenu newInstance() {
@@ -50,6 +54,7 @@ public class FMenu extends FBase implements OnClickListener {
 		clickedButton = button;
 		return new FMenu();
 	}
+
 
 
 	
@@ -345,10 +350,18 @@ public class FMenu extends FBase implements OnClickListener {
 				switch (App.parkMode) {
 				case PARK_OFF: 		// (FALSE, NULL, OFF)
 					if (activity.checkisInsideParkingArea()) {
-						UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end, this, 
-								 R.drawable.sel_button_rent_pause, R.string.menu_park_mode_suspend, this, 
-								 R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this, 
-								 R.drawable.sel_button_back, this);
+						if( CarInfo.keyStatus != null && !CarInfo.keyStatus.equalsIgnoreCase("OFF") && App.checkKeyOff) {
+							UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end_key_on, null,
+									R.drawable.button_rent_pause_pushed, R.string.menu_park_mode_suspend_key_on, null,
+									R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this,
+									R.drawable.sel_button_back, this);
+						}else {
+							UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end, this,
+									R.drawable.sel_button_rent_pause, R.string.menu_park_mode_suspend, this,
+									R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this,
+									R.drawable.sel_button_back, this);
+
+						}
 					} else {
 						UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end_outside_park_area, null, 
 								 R.drawable.sel_button_rent_pause, R.string.menu_park_mode_suspend, this, 
@@ -387,6 +400,7 @@ public class FMenu extends FBase implements OnClickListener {
 				}
 			}
 		}
+
 	}
 	
 	// Convenient method to update all the UI elements
@@ -457,6 +471,33 @@ public class FMenu extends FBase implements OnClickListener {
 		dlog.d("FMenu: start countdown");
 		
 	}
+
+/*	public void onActivityCreated(Bundle savedInstanceState) {
+
+		if(Checkkey != true)
+			return;
+		final Handler h = new Handler();
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					KeyOffCheck();
+				}catch (Exception e)
+				{
+					dlog.e("keyoffceck",e);
+				}
+
+				h.postDelayed(this, 1000);
+			}
+		};
+
+
+		h.postDelayed(runnable, 1000);
+
+		super.onActivityCreated(savedInstanceState);
+
+	}
+ */
 	
 	private void stopSelfClose(final View root) {
 		try {

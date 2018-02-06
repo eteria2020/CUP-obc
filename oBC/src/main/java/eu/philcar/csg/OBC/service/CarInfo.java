@@ -58,7 +58,7 @@ public class CarInfo {
     public int km = 0;
     public float voltage = 0;
     public int isKeyOn = 0;
-    public String keyStatus = "";
+    public static String keyStatus = "";
     public String gear = "";
     private boolean batterySafety = false;
     private boolean lastBatterySafety = batterySafety;

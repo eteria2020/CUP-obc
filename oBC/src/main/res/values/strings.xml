@@ -40,7 +40,7 @@
     <string name="error_http_code_failure">Failure with HTTP code</string>
     <string name="error_malformed_url">Malformed URL in request</string>
     <string name="error_parsing_invalid_type">Invalid type in address</string>
-    <string name="error_parsing_missing_address">address-parameter not found</string>
+    <string name="error_parsing_missing_addresse">address-parameter not found</string>
     <string name="error_parsing_missing_geometry">geometry parameter not found</string>
     <string name="error_parsing_missing_latitude">latitude parameter not found</string>
     <string name="error_parsing_missing_location">location parameter not found</string>
@@ -233,6 +233,11 @@
     <string name="alert_bonus_park">From this moment you can earn 5 minutes bonus by leaving this car to be recharged in one of the car parks shown on the map</string>
     <string name="music_hint">Connect the AUX cable to listen to music from your phone</string>
     <string name="pin_business">You\'ve used the business pin!</string>
+    <string name="menu_rent_end_key_on">Please turn off the dashboard before ending the rent</string>
+    <string name="menu_park_mode_suspend_key_on">Please turn off the dashboard before pausing the rent</string>
+    <string name="button_video_tutorial">TUTORIAL</string>
+    <string name="button_assicurazione">ASSICURAZIONE</string>
+    <string name="button_libretto">LIBRETTO</string>
 
 
 </resources>

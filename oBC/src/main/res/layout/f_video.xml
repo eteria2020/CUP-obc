@@ -15,21 +15,21 @@
         android:layout_alignParentBottom="true"
         android:background="#fdee66" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/fmen_top_V"
         android:layout_above="@+id/fmen_bottom_V"
         android:layout_toLeftOf="@+id/fmen_right_FL"
-        android:layout_toStartOf="@+id/fmen_right_FL"
-        android:orientation="vertical" >
+        android:layout_toStartOf="@+id/fmen_right_FL">
 
         <VideoView
             android:id="@+id/video"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <FrameLayout android:id="@+id/fmen_right_FL"
         android:layout_width="225dp"

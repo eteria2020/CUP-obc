@@ -49,7 +49,7 @@
     <string name="error_http_code_failure">无法建立HTTP连接</string>
     <string name="error_malformed_url">请求的URL格式错误</string>
     <string name="error_parsing_invalid_type">无效的地址类型</string>
-    <string name="error_parsing_missing_address">地址参数未找到</string>
+    <string name="error_parsing_missing_addresse">地址参数未找到</string>
     <string name="error_parsing_missing_geometry">几何参数未找到</string>
     <string name="error_parsing_missing_latitude">维度参数未找到</string>
     <string name="error_parsing_missing_location">位置参数未找到</string>
@@ -231,5 +231,10 @@
     <string name="alert_area">请注意，车辆在工作区域外，不可能关闭旅程</string>
     <string name="alert_key">记得在离开车前转动钥匙关闭仪表板</string>
     <string name="alert_bonus_park">从现在开始，您可以通过将这辆汽车在地图上显示的停车场之一中收取5分钟的奖金</string>
+    <string name="menu_rent_end_key_on">Please turn off the car before ending the rent</string>
+    <string name="menu_park_mode_suspend_key_on">Please turn off the car before pausing the rent</string>
+    <string name="button_video_tutorial">TUTORIAL</string>
+    <string name="button_assicurazione">ASSICURAZIONE</string>
+    <string name="button_libretto">LIBRETTO</string>
 
 </resources>

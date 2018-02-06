@@ -12,8 +12,6 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.Date;
-
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AMainOBC;
@@ -178,7 +176,7 @@ public class FInstructionsClose extends FBase implements OnClickListener {
 	}
 		
 	}
-	
+
 	
 
 }

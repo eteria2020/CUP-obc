@@ -1,4 +1,4 @@
-package eu.philcar.csg.OBC.controller;
+package eu.philcar.csg.OBC.controller.map;
 
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -41,6 +41,7 @@ import java.util.Date;
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
+import eu.philcar.csg.OBC.controller.FBase;
 
 import static java.lang.Boolean.FALSE;
 
@@ -262,12 +263,14 @@ public class FPdfViewer extends FBase {
                 } else {
                     //    openPdf(pdf[0],getView());
                     setUpdate(false);
-
                 }
-            } else {
+            } else if(App.hasNetworkConnection) {
                 setDownload(true);
                 Toast.makeText(getActivity(), "Scaricamento file, Attendere...", Toast.LENGTH_LONG).show();
                 new DownloadFile().execute();
+            }else
+            {
+                Toast.makeText(getActivity(), "Nessuna connessione internet", Toast.LENGTH_SHORT).show();
             }
 
         } else if (App.hasNetworkConnection) {

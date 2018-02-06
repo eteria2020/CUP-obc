@@ -3,6 +3,53 @@
 	android:layout_height="match_parent" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
+        android:id="@+id/KeyOffCheckLL"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/rl6"
+        android:layout_below="@+id/LogLL"
+        android:layout_toEndOf="@+id/BodyLL"
+        android:background="@drawable/border1"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/KeyOffTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="KeyOffCheck"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="20dp"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnKeyY"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Enable"
+                android:textSize="14.8dp"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/btnKeyN"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_weight="1"
+                android:text="Disable"
+                android:textSize="14.8dp"
+                android:visibility="visible" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/LedsLL"
