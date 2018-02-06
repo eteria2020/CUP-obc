@@ -146,18 +146,13 @@
             </LinearLayout>
 
             <LinearLayout android:id="@+id/ll3G_HOME"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/sha_whiteroundedredbox"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
+                android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginBottom="13dp"
-                android:layout_gravity="bottom"
-                android:visibility="visible"
-                android:gravity="center_horizontal"
-                android:layout_marginLeft="9dp">
+                android:background="@drawable/sha_whiteroundedredbox"
+                android:orientation="horizontal"
+                android:visibility="invisible">
 
                 <ImageView
                     android:layout_width="22dp"
