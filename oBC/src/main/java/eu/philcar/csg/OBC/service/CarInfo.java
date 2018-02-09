@@ -598,7 +598,7 @@ public class CarInfo {
     public Boolean sendMail(String Url) {
 
 
-        if (!App.hasNetworkConnection) {
+        if (!App.hasNetworkConnection()) {
             dlog.e(" sendMail: nessuna connessione");
             return false;
         }

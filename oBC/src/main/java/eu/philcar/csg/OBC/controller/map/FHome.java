@@ -28,7 +28,6 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
-import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
@@ -50,7 +49,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -63,7 +61,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 @SuppressLint("SimpleDateFormat")
 public class FHome extends FBase implements OnClickListener {
@@ -815,7 +812,7 @@ public class FHome extends FBase implements OnClickListener {
 
 
 
-        if (!App.hasNetworkConnection) {
+        if (!App.hasNetworkConnection()) {
             dlog.e(FHome.class.toString()+" loadBanner: nessuna connessione");
             App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
             return;

@@ -47,7 +47,7 @@ public class TripsConnector implements RemoteEntityInterface {
 
 	public String GetRemoteUrl() {
 	
-		if (!App.hasNetworkConnection) {
+		if (!App.hasNetworkConnection()) {
 			dlog.w("Trips : No network");
 			return null;
 		}

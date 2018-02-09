@@ -544,7 +544,7 @@ public class FMap extends FBase implements OnClickListener {
 			updateParkAreaStatus(activity.isInsideParkArea(), activity.getRotationToParkAngle());
 		}
 
-		if(App.first_UP_poi && App.hasNetworkConnection){
+		if(App.first_UP_poi && App.hasNetworkConnection()){
 			new Thread(new Runnable() {
 				public void run() {
 					dlog.d(FMap.class.toString()+" onCreateView: Primo aggiornamento Poi");
@@ -555,7 +555,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		}
 
-		if((new Date().getTime()- App.update_Poi.getTime())>3*60*60*1000 && App.hasNetworkConnection && !App.first_UP_poi) {    //3600000 = 1 ora
+		if((new Date().getTime()- App.update_Poi.getTime())>3*60*60*1000 && App.hasNetworkConnection() && !App.first_UP_poi) {    //3600000 = 1 ora
 
 
 			new Thread(new Runnable() {
@@ -3276,7 +3276,7 @@ public class FMap extends FBase implements OnClickListener {
 			return;
 		}
 
-		if (!App.hasNetworkConnection) {
+		if (!App.hasNetworkConnection()) {
 			dlog.e(FMap.class.toString()+" loadBanner: nessuna connessione");
 			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;

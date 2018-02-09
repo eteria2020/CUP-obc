@@ -74,6 +74,8 @@ import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.Encryption;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.helpers.SkobblerSearch;
+import eu.philcar.csg.OBC.injection.component.ApplicationComponent;
+import eu.philcar.csg.OBC.injection.module.ApplicationModule;
 import eu.philcar.csg.OBC.server.AreaConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.server.SslConnection;
@@ -117,6 +119,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
+import android.support.multidex.MultiDexApplication;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
@@ -137,17 +140,28 @@ import android.widget.Toast;
 
 
 
-public class App extends Application {
+public class App extends MultiDexApplication {
 
 	private DLog dlog = new DLog(this.getClass());
 	
 	public static App Instance;
+
+	ApplicationComponent mApplicationComponent;
+
 	public App() {
 		Instance = this;
 		initSharengo();
 		
 	}
-	
+
+	public static boolean hasNetworkConnection() {
+		return hasNetworkConnection;
+	}
+
+	public static void setHasNetworkConnection(boolean hasNetworkConnection) {
+		App.hasNetworkConnection = hasNetworkConnection;
+	}
+
 
 	public static class Versions {
 		
@@ -503,7 +517,7 @@ public class App extends Application {
 	public static int	   ServerIP = 0;
 	public static String timeZone;
 	
-	public static boolean hasNetworkConnection=false;
+	private static boolean hasNetworkConnection=false;
 	public static Date    lastNetworkOn = new Date();
 	
 	public static Date    AppStartupTime = new Date(), AppScheduledReboot=new Date();
@@ -2384,5 +2398,22 @@ private void  initPhase2() {
 		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 		root.setLevel(Level.TRACE);
 		root.addAppender(rollingFileAppender);
+	}
+
+	public static App get(Context context) {
+		return (App) context.getApplicationContext();
+	}
+
+	public ApplicationComponent getComponent() {
+		if (mApplicationComponent == null) {
+			mApplicationComponent = DaggerApplicationComponent.builder()
+					.applicationModule(new ApplicationModule(this))
+					.build();
+		}
+		return mApplicationComponent;
+	}
+
+	public void setComponent(ApplicationComponent applicationComponent) {
+		mApplicationComponent = applicationComponent;
 	}
 }

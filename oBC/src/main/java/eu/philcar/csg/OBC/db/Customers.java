@@ -3,6 +3,7 @@ package eu.philcar.csg.OBC.db;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -18,6 +19,9 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.CustomersConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.server.HttpsConnector;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 
 public class Customers extends DbTable<Customer,Integer> {
 
@@ -139,6 +143,27 @@ public class Customers extends DbTable<Customer,Integer> {
 		HttpsConnector http = new HttpsConnector(ctx);
 		http.SetHandler(handler);
 		http.Execute(cn);
+	}
+
+	public Observable<Customer> setCustomers(final Collection<Customer> customers){
+		return Observable.create(new ObservableOnSubscribe<Customer>() {
+			@Override
+			public void subscribe(ObservableEmitter<Customer> emitter) throws Exception {
+				if (emitter.isDisposed()) return;
+
+				try {
+					for (Customer customer : customers) {
+						customer.encrypt();
+						int result = createOrUpdate(customer).getNumLinesChanged();
+						if (result >= 0) emitter.onNext(customer);
+					}
+					emitter.onComplete();
+				} catch(Exception e) {
+					DLog.E("Exception updating Customer",e);
+					emitter.onError(e);
+				}
+			}
+		});
 	}
 
 }

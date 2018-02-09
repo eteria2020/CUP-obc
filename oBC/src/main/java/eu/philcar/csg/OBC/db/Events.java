@@ -2,7 +2,6 @@ package eu.philcar.csg.OBC.db;
 
 
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.SystemClock;
 
-import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
@@ -19,7 +17,6 @@ import com.j256.ormlite.support.ConnectionSource;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.Connectors;
-import eu.philcar.csg.OBC.server.TripsConnector;
 import eu.philcar.csg.OBC.server.EventsConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.service.TripInfo;
@@ -357,7 +354,7 @@ public class Events extends DbTable<Event,Integer> {
 		
 		dlog.d("Eventi to send : " + list.size());
 		
-		if (!App.hasNetworkConnection) {
+		if (!App.hasNetworkConnection()) {
 			dlog.w("No connection: aborted");
 			return false;
 		}

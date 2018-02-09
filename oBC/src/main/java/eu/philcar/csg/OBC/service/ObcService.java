@@ -12,9 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -966,7 +964,7 @@ public class ObcService extends Service implements OnTripCallback {
         /*
         control if documenti of the veichele is present in the device before starting
          */
-        if(App.hasNetworkConnection) {
+        if(App.hasNetworkConnection()) {
             new DocumentControl().execute();
         }
     }
@@ -1041,10 +1039,10 @@ public class ObcService extends Service implements OnTripCallback {
         obc_io.setForcedLedBlink(!status);
 
         //Detect loss or recover connection
-        if (App.hasNetworkConnection && !status) {
-            App.hasNetworkConnection = false;
-        } else if (!App.hasNetworkConnection && status) {
-            App.hasNetworkConnection = true;
+        if (App.hasNetworkConnection() && !status) {
+            App.setHasNetworkConnection(false);
+        } else if (!App.hasNetworkConnection() && status) {
+            App.setHasNetworkConnection(true);
             App.lastNetworkOn = new Date();
 
             //Force zmq restart for faster reconnection
@@ -1108,7 +1106,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     public void sendBeacon() {
 
-        if (!App.hasNetworkConnection) {
+        if (!App.hasNetworkConnection()) {
             dlog.w("No connection. Beacon aborted");
             return;
         }

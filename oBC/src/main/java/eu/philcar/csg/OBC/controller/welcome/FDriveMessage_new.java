@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.AWelcome;
@@ -657,7 +656,7 @@ public class FDriveMessage_new extends FBase {
 
 
 
-		if (!App.hasNetworkConnection) {
+		if (!App.hasNetworkConnection()) {
 			dlog.e(" loadBanner: nessuna connessione");
 			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;

@@ -10,8 +10,6 @@ import android.location.Location;
 import android.os.Handler;
 
 import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.PreparedUpdate;
-import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
@@ -161,7 +159,7 @@ public class Trips extends DbTable<Trip,Integer> {
 		
 		dlog.d("Trips to send : " + list.size());
 		
-		if (!App.hasNetworkConnection) {
+		if (!App.hasNetworkConnection()) {
 			dlog.w("No connection: aborted");
 			return false;
 		}

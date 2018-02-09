@@ -471,7 +471,7 @@ public class TripInfo {
 
 
 
-        if (!App.hasNetworkConnection) {
+        if (!App.hasNetworkConnection()) {
             dlog.w(" loadBanner: nessuna connessione");
             App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
             return;
