@@ -349,24 +349,26 @@ public class FMenu extends FBase implements OnClickListener {
 								
 				switch (App.parkMode) {
 				case PARK_OFF: 		// (FALSE, NULL, OFF)
-					if (activity.checkisInsideParkingArea()) {
-						if( CarInfo.keyStatus != null && !CarInfo.keyStatus.equalsIgnoreCase("OFF") && App.checkKeyOff) {
-							UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end_key_on, null,
-									R.drawable.button_rent_pause_pushed, R.string.menu_park_mode_suspend_key_on, null,
-									R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this,
-									R.drawable.sel_button_back, this);
-						}else {
+					if( CarInfo.keyStatus != null && !CarInfo.keyStatus.equalsIgnoreCase("OFF") && App.checkKeyOff) {
+						UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end_key_on, null,
+								R.drawable.button_rent_pause_pushed, R.string.menu_park_mode_suspend_key_on, null,
+								R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this,
+								R.drawable.sel_button_back, this);
+					}else {
+						if (activity.checkisInsideParkingArea()) {
+
 							UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end, this,
 									R.drawable.sel_button_rent_pause, R.string.menu_park_mode_suspend, this,
 									R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this,
 									R.drawable.sel_button_back, this);
 
+
+						} else {
+							UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end_outside_park_area, null,
+									R.drawable.sel_button_rent_pause, R.string.menu_park_mode_suspend, this,
+									R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this,
+									R.drawable.sel_button_back, this);
 						}
-					} else {
-						UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end_outside_park_area, null, 
-								 R.drawable.sel_button_rent_pause, R.string.menu_park_mode_suspend, this, 
-								 R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this, 
-								 R.drawable.sel_button_back, this);
 					}
 					break;
 				case PARK_STARTED:	// (FALSE, NULL, STARTED) - WTF STATE
