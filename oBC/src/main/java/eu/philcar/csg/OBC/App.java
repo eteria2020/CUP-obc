@@ -75,6 +75,7 @@ import eu.philcar.csg.OBC.helpers.Encryption;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.helpers.SkobblerSearch;
 import eu.philcar.csg.OBC.injection.component.ApplicationComponent;
+import eu.philcar.csg.OBC.injection.component.DaggerApplicationComponent;
 import eu.philcar.csg.OBC.injection.module.ApplicationModule;
 import eu.philcar.csg.OBC.server.AreaConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
@@ -1282,7 +1283,7 @@ public void loadRadioSetup() {
 	};
 	
 		
-private Handler searchHandler = new Handler() {
+/*private Handler searchHandler = new Handler() {
 	
 	 SkobblerSearch sks = new SkobblerSearch();
 	
@@ -1310,7 +1311,7 @@ private Handler searchHandler = new Handler() {
 		 }
 		 
 	 }
-};
+};*/
 
 private void  initPhase2() {		
 	

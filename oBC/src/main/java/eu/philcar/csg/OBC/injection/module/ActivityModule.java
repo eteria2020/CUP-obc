@@ -5,7 +5,7 @@ import android.content.Context;
 
 import dagger.Module;
 import dagger.Provides;
-import it.bomby.mycookbook.injection.ActivityContext;
+import eu.philcar.csg.OBC.injection.ActivityContext;
 
 @Module
 public class ActivityModule {

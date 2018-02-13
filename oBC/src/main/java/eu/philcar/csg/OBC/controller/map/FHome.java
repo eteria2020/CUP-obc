@@ -37,6 +37,7 @@ import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
+import eu.philcar.csg.OBC.service.SyncService;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;

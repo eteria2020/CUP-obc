@@ -4,9 +4,6 @@
 	android:versionCode="150"
 	android:versionName="0.108.0" >
 
-		<uses-sdk
-		android:minSdkVersion="15"
-		android:targetSdkVersion="19" />
 	
 	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 	
@@ -126,6 +123,7 @@
 	   
 		<service android:enabled="true" android:name="eu.philcar.csg.OBC.service.ObcService"></service>
 		<service android:enabled="true" android:name="eu.philcar.csg.OBC.service.AdvertisementService"></service>
+		<service android:enabled="true" android:name="eu.philcar.csg.OBC.service.SyncService"></service>
 		
 
 

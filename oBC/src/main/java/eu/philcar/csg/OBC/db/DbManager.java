@@ -9,8 +9,12 @@ import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+import javax.inject.Inject;
+
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.injection.ApplicationContext;
+
 public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public static final String DB_NAME = "sharengo.db";
@@ -35,7 +39,8 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 		return System.currentTimeMillis()/1000;
 	}
 
-	public DbManager(Context context) {
+	@Inject
+	public DbManager(@ApplicationContext Context context) {
 		//super(context, new File( Environment.getExternalStorageDirectory(),DB_NAME).toString(), null, DATABASE_VERSION);
 		super(context, getDbName(), null, DATABASE_VERSION);
 	}

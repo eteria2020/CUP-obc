@@ -1,10 +1,9 @@
 package eu.philcar.csg.OBC.injection.component;
 
 import dagger.Component;
-import it.bomby.mycookbook.injection.ConfigPersistent;
-import it.bomby.mycookbook.injection.module.ActivityModule;
-import it.bomby.mycookbook.injection.module.FragmentModule;
-import it.bomby.mycookbook.ui.base.BaseActivity;
+import eu.philcar.csg.OBC.injection.ConfigPersistent;
+import eu.philcar.csg.OBC.injection.module.ActivityModule;
+import eu.philcar.csg.OBC.injection.module.FragmentModule;
 
 /**
  * A dagger component that will live during the lifecycle of an Activity but it won't

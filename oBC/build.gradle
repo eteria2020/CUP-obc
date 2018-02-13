@@ -3,8 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
-
-    useLibrary 'org.apache.http.legacy'
+useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "eu.philcar.csg.OBC"
         minSdkVersion 17
