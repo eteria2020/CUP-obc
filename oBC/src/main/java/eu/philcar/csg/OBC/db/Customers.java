@@ -11,6 +11,7 @@ import android.content.Context;
 import android.os.Handler;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -146,24 +147,28 @@ public class Customers extends DbTable<Customer,Integer> {
 	}
 
 	public Observable<Customer> setCustomers(final Collection<Customer> customers){
-		return Observable.create(new ObservableOnSubscribe<Customer>() {
-			@Override
-			public void subscribe(ObservableEmitter<Customer> emitter) throws Exception {
-				if (emitter.isDisposed()) return;
+		return Observable.create(emitter -> {
+            if (emitter.isDisposed()) return;
 
-				try {
-					for (Customer customer : customers) {
-						customer.encrypt();
-						int result = createOrUpdate(customer).getNumLinesChanged();
-						if (result >= 0) emitter.onNext(customer);
-					}
-					emitter.onComplete();
-				} catch(Exception e) {
-					DLog.E("Exception updating Customer",e);
-					emitter.onError(e);
-				}
-			}
-		});
+            try {int index =0;
+                for (Customer customer : customers) {
+                	index++;
+                    customer.encrypt();
+                    int result = createOrUpdate(customer).getNumLinesChanged();
+                    if (result >= 0) emitter.onNext(customer);
+                }
+                emitter.onComplete();
+            } catch(Exception e) {
+                DLog.E("Exception updating Customer",e);
+                emitter.onError(e);
+            }
+        });
 	}
 
+	@Override
+	public CreateOrUpdateStatus createOrUpdate(Customer data) throws SQLException {
+		if(data.pins!=null)
+			data.pin=data.pins.getJson();
+		return super.createOrUpdate(data);
+	}
 }

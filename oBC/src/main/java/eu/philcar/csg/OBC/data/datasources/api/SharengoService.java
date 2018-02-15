@@ -1,4 +1,4 @@
-package eu.philcar.csg.OBC.service;
+package eu.philcar.csg.OBC.data.datasources.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -6,7 +6,7 @@ import com.google.gson.GsonBuilder;
 import java.util.List;
 
 import eu.philcar.csg.OBC.db.Customer;
-import eu.philcar.csg.OBC.service.common.SerializationExclusionStrategy;
+import eu.philcar.csg.OBC.data.common.SerializationExclusionStrategy;
 import io.reactivex.Observable;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;

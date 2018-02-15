@@ -28,6 +28,8 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoRepository;
+import eu.philcar.csg.OBC.data.model.Pin;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
@@ -63,10 +65,14 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import javax.inject.Inject;
+
 @SuppressLint("SimpleDateFormat")
 public class FHome extends FBase implements OnClickListener {
 
     private DLog dlog = new DLog(this.getClass());
+    @Inject
+    SharengoRepository repository;
 
     public static FHome newInstance() {
         FHome fm = new FHome();
@@ -109,6 +115,8 @@ public class FHome extends FBase implements OnClickListener {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        App.get(getActivity()).getComponent().inject(this);
 
         player=new AudioPlayer(getActivity());
 
@@ -453,10 +461,11 @@ public class FHome extends FBase implements OnClickListener {
 
       /*    case R.id.fmapMusicB:
 
-                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_AUX,30);
-                Toast.makeText(App.Instance.getApplicationContext(),getResources().getString(R.string.music_hint),Toast.LENGTH_LONG).show(); */
+              getActivity().startService(SyncService.getStartIntent(getActivity()));
+                /*((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_AUX,30);
+                Toast.makeText(App.Instance.getApplicationContext(),getResources().getString(R.string.music_hint),Toast.LENGTH_LONG).show();
 
-                /*final Resources res = this.getResources();
+                final Resources res = this.getResources();
                 final int id = Resources.getSystem().getIdentifier(
                         "config_ntpServer", "string","android");
                 final String defaultServer = res.getString(id);*/

@@ -8,7 +8,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import eu.philcar.csg.OBC.injection.ApplicationContext;
-import eu.philcar.csg.OBC.service.SharengoService;
+import eu.philcar.csg.OBC.data.datasources.api.SharengoService;
 
 /**
  * Provide application-level dependencies.

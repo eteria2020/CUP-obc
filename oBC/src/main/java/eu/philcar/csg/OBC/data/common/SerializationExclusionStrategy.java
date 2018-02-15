@@ -1,4 +1,4 @@
-package eu.philcar.csg.OBC.service.common;
+package eu.philcar.csg.OBC.data.common;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;

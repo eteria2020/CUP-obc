@@ -1,4 +1,4 @@
-package eu.philcar.csg.OBC.service.common;
+package eu.philcar.csg.OBC.data.common;
 
 //import org.apache.commons.lang3.builder.EqualsBuilder;
 //import org.apache.commons.lang3.builder.HashCodeBuilder;

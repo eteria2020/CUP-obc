@@ -1,11 +1,8 @@
 package eu.philcar.csg.OBC.db;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,9 +13,10 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.model.Pin;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Encryption;
-import eu.philcar.csg.OBC.service.common.ExcludeSerialization;
+import eu.philcar.csg.OBC.data.common.ExcludeSerialization;
 
 @DatabaseTable(tableName = "customers", daoClass = Customers.class )
 public class Customer extends DbRecord {
@@ -60,7 +58,7 @@ public class Customer extends DbRecord {
 	@DatabaseField
 	public String 	info_display;
 
-	@SerializedName("ps")
+	@ExcludeSerialization
 	@DatabaseField
 	public String	 pin;
 
@@ -71,6 +69,9 @@ public class Customer extends DbRecord {
 	@SerializedName("tm")
 	@DatabaseField(index = true)
 	public long 	update_timestamp;
+
+	@SerializedName("ps")
+	public Pin pins=null;
 
 	@ExcludeSerialization
 	private boolean isEnctypted = true;

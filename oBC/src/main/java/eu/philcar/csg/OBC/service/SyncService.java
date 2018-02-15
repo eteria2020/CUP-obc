@@ -51,7 +51,7 @@ public class SyncService extends Service {
 
         if (!App.hasNetworkConnection()) {
             dlog.i("Sync canceled, connection not available");
-            AndroidComponentUtil.toggleComponent(this, SyncOnConnectionAvailable.class, true);
+            AndroidComponentUtil.toggleComponent(this, SyncService.class, true);
             stopSelf(startId);
             return START_NOT_STICKY;
         }
@@ -122,18 +122,7 @@ public class SyncService extends Service {
         return null;
     }
 
-    public static class SyncOnConnectionAvailable extends BroadcastReceiver {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)
-                    && App.hasNetworkConnection()) {
-                DLog.I("Connection is now available, triggering sync...");
-                AndroidComponentUtil.toggleComponent(context, this.getClass(), false);
-                context.startService(getStartIntent(context));
-            }
-        }
-    }
 
 
 }

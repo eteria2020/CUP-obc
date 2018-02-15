@@ -64,6 +64,7 @@ import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 import ch.qos.logback.core.util.StatusPrinter;
 import eu.philcar.csg.OBC.controller.map.util.GeoUtils;
+import eu.philcar.csg.OBC.data.datasources.api.ApiModule;
 import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Events;
@@ -133,7 +134,7 @@ import android.widget.Toast;
 @ReportsCrashes(
         formKey = "", // This is required for backward compatibility but not used
 		formUri = "http://core.sharengo.it/api/post_crashreport.php",
-        mode = ReportingInteractionMode.SILENT, 
+        mode = ReportingInteractionMode.SILENT,
         customReportContent = {APP_VERSION_CODE , APP_VERSION_NAME,/* SETTINGS_GLOBAL,*/ AVAILABLE_MEM_SIZE, CUSTOM_DATA, STACK_TRACE, USER_APP_START_DATE ,LOGCAT/*, DEVICE_ID, SHARED_PREFERENCES*/ },
         reportType=org.acra.sender.HttpSender.Type.JSON,
         resToastText = R.string.Acra_message
@@ -144,7 +145,7 @@ import android.widget.Toast;
 public class App extends MultiDexApplication {
 
 	private DLog dlog = new DLog(this.getClass());
-	
+
 	public static App Instance;
 
 	ApplicationComponent mApplicationComponent;
@@ -152,7 +153,7 @@ public class App extends MultiDexApplication {
 	public App() {
 		Instance = this;
 		initSharengo();
-		
+
 	}
 
 	public static boolean hasNetworkConnection() {
@@ -165,7 +166,7 @@ public class App extends MultiDexApplication {
 
 
 	public static class Versions {
-		
+
 		static  {
 			AndroidDevice = Build.DEVICE;
 			AndroidModel = Build.MODEL;
@@ -173,7 +174,7 @@ public class App extends MultiDexApplication {
 			AndroidRadio = Build.getRadioVersion();
 			AndroidSDK =  Build.VERSION.SDK_INT;
 		}
-		
+
 		public static String AndroidDevice;
 		public static String AndroidBuild;
 		public static String AndroidModel;
@@ -193,37 +194,37 @@ public class App extends MultiDexApplication {
 		public static String TBoxSw;
 		public static String VINCode;
 		public static String HbVer;
-		
+
 		public static int getLevel() {
 			if (AndroidDevice==null)
 				return 0;
-			
+
 			switch (AndroidDevice) {
-			
+
 			case "tiny4412":
 				return 0;
-				
+
 			case "ita_d1":
 				return 1;
 
 			default:
 				return 0;
 			}
-					
+
 		}
-		
-		
+
+
 		public static String toJson() {
 			JSONObject jo = new JSONObject();
 			try {
-				
+
 				jo.put("AndroidDevice", AndroidDevice);
 				jo.put("AndroidBuild",AndroidBuild);
-				
+
 				jo.put("AppName", AppName);
 				jo.put("AppCode", AppCode);
-				
-				
+
+
 				jo.put("Service", Service);
 				jo.put("SDK", SDK);
 				jo.put("MCU", MCU);
@@ -234,7 +235,7 @@ public class App extends MultiDexApplication {
 				jo.put("MCUModel", MCUModel);
 				jo.put("TBoxHw", TBoxHw);
 				jo.put("TBoxSw", TBoxSw);
-				jo.put("VINCode", VINCode);				
+				jo.put("VINCode", VINCode);
 				jo.put("HbVer", HbVer);
 			} catch (JSONException e) {
 				DLog.E("Versions to json",e);
@@ -242,10 +243,10 @@ public class App extends MultiDexApplication {
 			return jo.toString();
 
 		}
-		
+
 	}
 
-	
+
 
 	public void initSharengo() {
 
@@ -341,10 +342,10 @@ public class App extends MultiDexApplication {
 	}
 
 	public enum Fleets { SHARENGO };
-	
-	
+
+
 	public static final Fleets FLEET_IDENTITY = Fleets.SHARENGO;
-	
+
 	public static final int AWELCOME_UID = 0x0001;
 	public static final int ASOS_UID     = 0x0010;
 	public static final int AMAINOBC_UID = 0x0100;
@@ -354,8 +355,8 @@ public class App extends MultiDexApplication {
 	public static final boolean USE_TTS_ALERT=false;
 
 	public static final int ConnectionTimeout=61000;
-	
-	
+
+
 	public static String URL_Area;
 	public static String URL_Beacon;
 	public static String URL_PoisIcons;
@@ -380,20 +381,20 @@ public class App extends MultiDexApplication {
 	public static String URL_UpdateEndImages;
 	public static String URL_Configs;
 	public static String URL_Time;
-	
+
 	public static String IP_UDP_Beacon;
 	public static int    Port_UDP_Beacon;
-	
-	
+
+
 	public static final String COMMON_PREFERENCES = "eu.philcar.csg.preferences";
 //	public static final String USE_NAVIGATOR = COMMON_PREFERENCES + ".use_navigator";
-	
-	public DbManager dbManager;	
-	
+
+	public DbManager dbManager;
+
 	private ServiceConnector serviceConnector;
-	
+
 	private SharedPreferences preferences;
-	
+
 
 	private static final String  KEY_CarPlate = "CarPlate";
 	private static final String  KEY_fw_version = "fw_version";
@@ -432,24 +433,24 @@ public class App extends MultiDexApplication {
 	private static final String  KEY_TimeZone = "time_zone";
 	private static final String  KEY_NewBatteryShutdownLevel = "new_battery_shutdown_level";
 
-	
+
 	public static final String  KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
-	
+
 
 	public static RadioSetup radioSetup;
 	public static CardRfidCollection openDoorsCards;
-	
+
 	public static String CarPlate="ND";
 	public static String Damages = "";
 	public static String FuelCard_PIN = null;
-	
+
 	public static int    Pulizia_int=0;
 	public static int    Pulizia_ext=0;
-	
+
 	public static boolean isNavigatorEnabled = true;
 	public static int isAdmin=0; //1=MAGGIMI PRIVILEGI; 2=PRIVILEGI RIDOTTI;
 	public static boolean canRestartZMQ=true;
-	
+
 	public static int     id_Version;
 	public static String  sw_Version="ND";
 	public static String  fw_version="ND";
@@ -481,31 +482,31 @@ public class App extends MultiDexApplication {
 	private static int bmsCountTo90 =0;
 
 
-	
+
 	public static TripInfo currentTripInfo;
-	
+
 	public static Reservation reservation;
-	
+
 	public static String MacAddress="";
 	public static String IMEI="";
 	public static String PhoneNumber="";
 	public static String SimSerialNumber="";
-	
+
 	private static Date   ParkModeStarted;
 	public static ParkMode parkMode = ParkMode.PARK_OFF;
 	public static boolean motoreAvviato=false;
-	
+
 	public static boolean pinChecked = false;
 	public static boolean userDrunk = false;
-	
+
 	public static boolean isCloseable=true;
 	public static boolean isClosing=false;
-	
+
 	public static boolean  ObcIoError=false;
 	public static boolean  Charging = false;
-	
+
 	public static boolean  AlarmSOCSent=false;
-	
+
 	public static boolean  AlarmEnabled=false;
 	public static String   AlarmSmsNumber="";
 	public static List<String> BatteryAlarmSmsNumbers;
@@ -517,13 +518,13 @@ public class App extends MultiDexApplication {
 	public static int	   FleetId = 0;
 	public static int	   ServerIP = 0;
 	public static String timeZone;
-	
+
 	private static boolean hasNetworkConnection=false;
 	public static Date    lastNetworkOn = new Date();
-	
+
 	public static Date    AppStartupTime = new Date(), AppScheduledReboot=new Date();
 	public static Date    lastUpdateCAN =new Date();
-	
+
 	public static String APP_DATA_PATH = "/csg/";
 	public static final String APP_LOG_PATH = "/log/";
 	public static final String APP_OLD_LOG_PATH = "/log/";
@@ -531,16 +532,16 @@ public class App extends MultiDexApplication {
 	public static final String POI_POSITION_FOLDER ="PoisPos/";
 	public static final String BANNER_IMAGES_FOLDER ="BannerImages/";
 	public static final String END_IMAGES_FOLDER ="BannerImages/";
-	
+
 	private final String  CONFIG_FILE ="config";
 	private final String  STOP_FILE ="stop";
 
-	
+
 	private final String  SPLIT_TRIP_CONFIG_FILE ="splittrip.txt";
 	private final String  DEFAULT_CITY_CONFIG_FILE = "default_city.txt";
 	private final String  MOCKLOCATION_CONFIG_FILE ="mockgps.txt";
 	private final String  ZMQ_DISABLE_CONFIG_FILE = "zmq_disable.txt";
-	
+
 	private static String foregroundActivity="";
 	private static boolean loaded=false;
 	public static long serverTime=0;
@@ -548,12 +549,12 @@ public class App extends MultiDexApplication {
 
 	private SensorManager sensorManager;
 	private Sensor        motionDetector;
-	
+
 	private SMSreceiver smsReceiver;
 	private IntentFilter intentFilter;
 
 	public CANManager CanManager;
-	
+
 	private ABase mCurrentActivity = null;
 	public static long lastConnReset =0;
 	public static Date update_Poi = new Date();
@@ -565,10 +566,10 @@ public class App extends MultiDexApplication {
 	public static Bundle BannerName= new Bundle();
 	public static Bundle askClose=new Bundle();
 	public static int CounterCleanlines=0;
-	
+
 	public static String AreaPolygonMD5;
 	public static ArrayList<double[]> AreaPolygons;
-	
+
 	//public static final double[] polygon = new double[]{46.091832, 13.235410, 46.096125, 13.234584, 46.097628, 13.239723, 46.092658, 13.240678};	// Udine
 	//public static final double[] polygon = new double[]{45.402867 , 9.276161, 45.402867 , 9.053406, 45.542358 , 9.053406, 45.542358 , 9.276161};		// Milano
 	//public static final double[] polygon = new double[]{46.090560, 13.067453, 46.090560, 13.174187, 46.123334, 13.174187, 46.123334, 13.067453};		// Fagagna
@@ -714,7 +715,7 @@ public class App extends MultiDexApplication {
 			e.apply();
 		}
 	}
-	
+
 	public void persistCharging() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
@@ -722,7 +723,7 @@ public class App extends MultiDexApplication {
 			e.apply();
 		}
 	}
-	
+
 	public void persistRadioSetup() {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
@@ -743,7 +744,7 @@ public class App extends MultiDexApplication {
 			e.apply();
 		}
 	}
-	
+
 	public void persistWatchdog() {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
@@ -751,14 +752,14 @@ public class App extends MultiDexApplication {
 			e.apply();
 		}
 	}
-	
+
 	public void persistBatteryShutdownLevel() {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_NewBatteryShutdownLevel, BatteryShutdownLevel);
 			e.apply();
-		}		
-		
+		}
+
 	}
 
 	public void persistFleetId() {
@@ -853,7 +854,7 @@ public class App extends MultiDexApplication {
 			App.userDrunk = false;
 		}
 	}
-	
+
 
 	public void loadReservation() {
 		if (this.preferences != null) {
@@ -864,7 +865,7 @@ public class App extends MultiDexApplication {
 			App.reservation = null;
 		}
 	}
-	
+
 	public void loadCharging() {
 		if (this.preferences != null) {
 			App.Charging = this.preferences.getBoolean(KEY_Charging, false);
@@ -872,12 +873,12 @@ public class App extends MultiDexApplication {
 			App.Charging = false;
 		}
 	}
-	
-	
+
+
 	public void loadBatteryAlarmSmsNumbers() {
-		
-		BatteryAlarmSmsNumbers = new ArrayList<String>();			
-		
+
+		BatteryAlarmSmsNumbers = new ArrayList<String>();
+
 		if (this.preferences != null) {
 			String json = preferences.getString(KEY_BatteryAlarmSmsNumbers, "[]");
 			JSONArray ja;
@@ -893,7 +894,7 @@ public class App extends MultiDexApplication {
 				dlog.e("Parsing BatteryAlarmSmsNumbers",e);
 			}
 		}
-		
+
 		if (BatteryAlarmSmsNumbers.size()==0) {
 			BatteryAlarmSmsNumbers.add("3442653987");
 			BatteryAlarmSmsNumbers.add("3703322640");
@@ -901,26 +902,26 @@ public class App extends MultiDexApplication {
 		}
 
 	}
-	
+
 public void loadRadioSetup() {
-		
-			
+
+
 		if (this.preferences != null) {
 			String json = preferences.getString(KEY_RadioSetup, "");
 			dlog.d("RadioSetup from preferences : " + json);
 			radioSetup = RadioSetup.fromJson(json);
-			
+
 		}
-		
+
 		if (radioSetup==null) {
 			radioSetup = new RadioSetup();
 			radioSetup.addChannel("FM", 105.10, "LifeGate");
 			radioSetup.addChannel("FM", 107.60, "Radio Popolare");
 			radioSetup.addChannel("FM", 99.70, "Radio Deejay");
 			radioSetup.addChannel("FM", 104.50, "Virgin Radio");
-			
+
 			persistRadioSetup();
-			
+
 			dlog.d("RadioSetup from defaults : " + radioSetup.toJson());
 		}
 
@@ -937,14 +938,14 @@ public void loadRadioSetup() {
 		}
 
 	}
-	
-	
+
+
 	public boolean loadZmqDisabledConfig() {
 		File f = new File(getZMQ_DISABLE_CONFIG_FILE());
-		
+
 		return f.exists();
 	}
-	
+
 	public int loadSplitTripConfig() {
 		File f = new File(getSPLIT_TRIP_CONFIG_FILE());
 		if (f.exists()) {
@@ -959,13 +960,13 @@ public void loadRadioSetup() {
 			} catch (Exception e) {
 				dlog.e("Loading split trip config : " + getSPLIT_TRIP_CONFIG_FILE(),e);
 			}
-	    
+
 		}
 		return 1435;
-		
+
 	}
-	
-	
+
+
 	public String loadDefaultCity() {
 		File f = new File(getDEFAULT_CITY_CONFIG_FILE());
 		if (f.exists()) {
@@ -981,10 +982,10 @@ public void loadRadioSetup() {
 			} catch (Exception e) {
 				dlog.e("Loading split trip config : " + getDEFAULT_CITY_CONFIG_FILE(),e);
 			}
-	    
+
 		}
 		return "";
-		
+
 	}
 
 	public void loadMaxVoltage() {
@@ -1013,57 +1014,57 @@ public void loadRadioSetup() {
 
 	}
 
-	
-	
+
+
 	public void SaveDefaultCity(String city) {
-		
+
 		App.DefaultCity = city;
-		
+
 		File f = new File(getDEFAULT_CITY_CONFIG_FILE());
-		
+
 		if (city==null) {
 			f.delete();
-		} else {		
+		} else {
 			try {
-				BufferedWriter bw = new BufferedWriter(new FileWriter(f));				
+				BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 				bw.write(city);
 				bw.close();
 			} catch (IOException e) {
 				dlog.e("Writing default city",e);
-	
+
 			}
 		}
-		
-			
+
+
 	}
 
 
 	public void setMockLocation(String json) {
-		
+
 		if (json==null || json.isEmpty() || json.equalsIgnoreCase("null")) {
 			setMockLocation(0,0);
 			return;
 		}
-		
+
 		try {
 			JSONArray ja = new JSONArray(json);
 			if (ja.length()>=2) {
 				setMockLocation(ja.getDouble(0),ja.getDouble(1));
 			}
-			
+
 		} catch (JSONException e) {
 			dlog.e("Setting MockLocation",e);
 		}
-		
-		
+
+
 	}
-	
+
 	public void setMockLocation(double lat, double lon) {
 		File f = new File(getMOCKLOCATION_CONFIG_FILE());
-		
+
 		if (lat==0 && lon==0) {
 			f.delete();
-		} else {		
+		} else {
 			try {
 				BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 				String line = String.format(Locale.US,"%f;%f", lat,lon);
@@ -1071,16 +1072,16 @@ public void loadRadioSetup() {
 				bw.close();
 			} catch (IOException e) {
 				dlog.e("Writing MOCKLOCATION",e);
-	
+
 			}
 		}
-		
+
 		loadMockLocationConfig();
 	}
-	
+
 	public void loadMockLocationConfig() {
 		File f = new File(getMOCKLOCATION_CONFIG_FILE());
-		
+
 		if (f.exists()) {
 			try {
 			    BufferedReader br = new BufferedReader(new FileReader(f));
@@ -1093,30 +1094,30 @@ public void loadRadioSetup() {
 				    	App.mockLocation.setLatitude(Double.parseDouble(p[0]));
 				    	App.mockLocation.setLongitude(Double.parseDouble(p[1]));
 				    	App.mockLocation.setAccuracy(1);
-				    	
+
 				    	App.lastLocation = App.mockLocation;
 			    	}
-			    	
+
 			    }
 			    br.close();
 			} catch (Exception e) {
 				dlog.e("Loading split trip config : " + getMOCKLOCATION_CONFIG_FILE(),e);
 			}
-	    
+
 		} else {
 			App.mockLocation = null;
 		}
-		
-		
+
+
 	}
-	
-	
-	
-	
+
+
+
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+
 
 
 
@@ -1313,18 +1314,18 @@ public void loadRadioSetup() {
 	 }
 };*/
 
-private void  initPhase2() {		
-	
+private void  initPhase2() {
+
 		//SkobblerSearch sks = new SkobblerSearch();
 		//sks.preselect(new String[] {"Milano","Via Massena", "10"}, null);		
 		//searchHandler.sendEmptyMessage(0);
 
-	
+
 		ACRA.init(this);
 
 		PackageInfo pInfo;
 		try {
-			pInfo = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_PERMISSIONS);			
+			pInfo = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_PERMISSIONS);
 			App.sw_Version = pInfo.versionName;
 			App.id_Version = pInfo.versionCode;
 			App.Versions.AppCode = pInfo.versionCode;
@@ -1334,12 +1335,12 @@ private void  initPhase2() {
 					dlog.d("Uses permission: " + s);
 				}
 			}
-				
+
 		} catch (NameNotFoundException e1) {
 			dlog.e("App package not found",e1);
 
 		}
-		
+
 		try {
 			WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 			WifiInfo info = manager.getConnectionInfo();
@@ -1348,13 +1349,15 @@ private void  initPhase2() {
 		} catch (Exception e){
 			dlog.e("Failed reading MAC address",e);
 		}
-		
+
 		try {
 			TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 			IMEI = telephonyManager.getDeviceId();
 			SimSerialNumber =  telephonyManager.getSimSerialNumber();
 			PhoneNumber = telephonyManager.getLine1Number();
 			dlog.d("Got IMEI : " + IMEI);
+		} catch (SecurityException e){
+			dlog.e("Failed reading IMEI ",e);
 		} catch (Exception e){
 			dlog.e("Failed reading IMEI ",e);
 		}
@@ -2409,6 +2412,7 @@ private void  initPhase2() {
 		if (mApplicationComponent == null) {
 			mApplicationComponent = DaggerApplicationComponent.builder()
 					.applicationModule(new ApplicationModule(this))
+					.apiModule(new ApiModule())
 					.build();
 		}
 		return mApplicationComponent;

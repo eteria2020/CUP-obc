@@ -1,4 +1,4 @@
-package eu.philcar.csg.OBC.service.common;
+package eu.philcar.csg.OBC.data.common;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
