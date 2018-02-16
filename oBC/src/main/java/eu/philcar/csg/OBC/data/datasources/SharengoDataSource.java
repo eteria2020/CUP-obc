@@ -2,7 +2,8 @@ package eu.philcar.csg.OBC.data.datasources;
 
 import java.util.List;
 
-import eu.philcar.csg.OBC.data.model.ResponseCustomer;
+import eu.philcar.csg.OBC.data.model.ConfigResponse;
+import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
 import io.reactivex.Observable;
 
@@ -13,4 +14,8 @@ import io.reactivex.Observable;
 public interface SharengoDataSource {
 
     Observable<List<Customer>> getCustomer(long lastupdate);
+
+    Observable<List<BusinessEmployee>> getBusinessEmployees();
+
+    Observable<ConfigResponse> getConfig(String car_plate);
 }

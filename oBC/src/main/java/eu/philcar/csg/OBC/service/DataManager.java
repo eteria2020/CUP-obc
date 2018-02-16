@@ -1,22 +1,18 @@
 package eu.philcar.csg.OBC.service;
 
-import android.support.annotation.NonNull;
-import android.util.Log;
-
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoService;
-import eu.philcar.csg.OBC.data.model.ResponseCustomer;
+import eu.philcar.csg.OBC.data.model.ConfigResponse;
+import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Customers;
 import eu.philcar.csg.OBC.db.DbManager;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.ObservableTransformer;
-import io.reactivex.functions.Function;
 
 @Singleton
 public class DataManager {
@@ -39,9 +35,22 @@ public class DataManager {
 
     public Observable<Customer> saveCustomer(List<Customer> customer) {
 
-        return  mDbManager.getClientiDao().setCustomers(customer);
+        return  mDbManager.getClientiDao().createOrUpdateMany(customer);
 
     }
+
+    public Observable<BusinessEmployee> saveEmployee(List<BusinessEmployee> customer) {
+
+        return  mDbManager.getDipendentiDao().createOrUpdateMany(customer);
+
+    }
+
+    public void saveConfig(ConfigResponse customer) {
+
+        App.Instance.setConfig(customer.getJson(),null);
+
+    }
+
 
     public long getMaxLastupdate(){
         return mDbManager.getClientiDao().mostRecentTimestamp();

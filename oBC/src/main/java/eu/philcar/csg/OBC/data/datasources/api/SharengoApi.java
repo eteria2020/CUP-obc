@@ -2,7 +2,8 @@ package eu.philcar.csg.OBC.data.datasources.api;
 
 import java.util.List;
 
-import eu.philcar.csg.OBC.data.model.ResponseCustomer;
+import eu.philcar.csg.OBC.data.model.ConfigResponse;
+import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
 import io.reactivex.Observable;
 import retrofit2.adapter.rxjava2.Result;
@@ -17,4 +18,11 @@ public interface SharengoApi {
 
     @GET("whitelist2")
     Observable<Result<List<Customer>>> getCustomer(@Query("lastupdate") long lastupdate);
+
+    @GET("business-employees")
+    Observable<Result<List<BusinessEmployee>>> getBusinessEmployees();
+
+
+    @GET("configs")
+    Observable<Result<ConfigResponse>> getConfigs(@Query("car_plate") String car_plate);
 }

@@ -19,7 +19,7 @@ import eu.philcar.csg.OBC.helpers.Encryption;
 import eu.philcar.csg.OBC.data.common.ExcludeSerialization;
 
 @DatabaseTable(tableName = "customers", daoClass = Customers.class )
-public class Customer extends DbRecord {
+public class Customer extends DbRecord implements CustomOp{
 
 	@ExcludeSerialization
 	public static final int N_ERROR_PIN = 0;
@@ -257,5 +257,10 @@ public class Customer extends DbRecord {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void onDbWrite() {
+		encrypt();
 	}
 }

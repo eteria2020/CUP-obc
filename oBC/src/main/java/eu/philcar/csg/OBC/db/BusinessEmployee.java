@@ -1,5 +1,6 @@
 package eu.philcar.csg.OBC.db;
 
+import com.google.gson.annotations.SerializedName;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -14,13 +15,16 @@ public class BusinessEmployee extends DbRecord {
 
 	@DatabaseField(id = true)
 	public int id;
-	
+
+	@SerializedName("codice_azienda")
 	@DatabaseField
 	public String businessCode;
 
+	@SerializedName("azienda_abilitata")
 	@DatabaseField
 	public boolean isBusinessEnabled;
-	
+
+	@SerializedName("limite_orari")
 	@DatabaseField
 	public String timeLimits;
 

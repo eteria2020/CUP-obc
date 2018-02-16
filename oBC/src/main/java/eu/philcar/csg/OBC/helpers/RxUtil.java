@@ -10,4 +10,8 @@ public class RxUtil {
         }
     }
 
+    public static boolean isRunning(Disposable disposable) {
+        return disposable != null && !disposable.isDisposed();
+    }
+
 }
