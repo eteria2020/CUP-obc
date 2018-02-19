@@ -51,5 +51,26 @@ public class DbTable<tableClass, pk>  extends BaseDaoImpl<tableClass, pk>{
 
 		});
 	}
+
+	public Observable<tableClass> createOrUpdateOne(final tableClass collection){
+		return Observable.create(emitter -> {
+			if (emitter.isDisposed())
+				return;
+				try {
+					if(collection instanceof CustomOp){
+						((CustomOp) collection).onDbWrite();
+					}
+					int result = createOrUpdate(collection).getNumLinesChanged();
+					if (result >= 0) emitter.onNext(collection);
+
+					emitter.onComplete();
+				} catch(Exception e) {
+					DLog.E("Exception updating Customer",e);
+					emitter.onError(e);
+				}
+
+
+		});
+	}
 	
 }

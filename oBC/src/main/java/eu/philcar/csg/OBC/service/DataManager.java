@@ -1,5 +1,11 @@
 package eu.philcar.csg.OBC.service;
 
+import com.google.gson.Gson;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -7,31 +13,30 @@ import javax.inject.Singleton;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoService;
+import eu.philcar.csg.OBC.data.model.AreaResponse;
+import eu.philcar.csg.OBC.data.model.CommandResponse;
 import eu.philcar.csg.OBC.data.model.ConfigResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Customers;
 import eu.philcar.csg.OBC.db.DbManager;
+import eu.philcar.csg.OBC.db.Trip;
+import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.server.ServerCommand;
 import io.reactivex.Observable;
 
 @Singleton
 public class DataManager {
 
-    private final SharengoService mSharengoService;
-    private final DbManager mDbManager;
+    private final DbManager mDbManager; //TODO use interface DbHelper
+
 
     @Inject
-    public DataManager(SharengoService SharengoService,
-                       DbManager DbManager) {
-        mSharengoService = SharengoService;
+    public DataManager(DbManager DbManager) {
         mDbManager = DbManager;
     }
 
-    public Observable<Customer> syncCustomer() {
-        final Customers table = mDbManager.getClientiDao();
-        return mSharengoService.getCustomer()
-                .concatMap(customer -> table.setCustomers(customer));
-    }
+
 
     public Observable<Customer> saveCustomer(List<Customer> customer) {
 
@@ -45,10 +50,55 @@ public class DataManager {
 
     }
 
+    public Observable<Trip> saveTrip(Trip trip) {
+
+        return  mDbManager.getCorseDao().createOrUpdateOne(trip);
+
+    }
+
     public void saveConfig(ConfigResponse customer) {
 
         App.Instance.setConfig(customer.getJson(),null);
 
+    }
+
+    public void saveArea(List<AreaResponse> area){
+
+        persistArea(area);
+    }
+
+    public Observable<ServerCommand> handleCommands(List<ServerCommand> commands){
+
+        return Observable.create(emitter -> {
+            if (emitter.isDisposed())
+                return;
+                try {
+                    for (ServerCommand row : commands) {
+                        emitter.onNext(row);
+                    }
+                    emitter.onComplete();
+                } catch(Exception e) {
+                    DLog.E("Exception updating Customer",e);
+                    emitter.onError(e);
+                }
+        });
+    }
+
+    private void persistArea(List<AreaResponse> area){
+        File file = new File(App.getAppDataPath(),"area.json");
+
+        String result;
+
+            Gson gson = new Gson();
+            result = gson.toJson(area);
+
+        try {
+            OutputStream os = new FileOutputStream(file);
+            os.write(result.getBytes());
+            os.close();
+        } catch (IOException e) {
+            DLog.E("File output error area.json",e);
+        }
     }
 
 

@@ -58,7 +58,7 @@ public class SyncService extends Service {
 
         RxUtil.dispose(mDisposable);
 
-        Observable.interval(30, TimeUnit.SECONDS)
+        /*Observable.interval(30, TimeUnit.SECONDS)
                 .flatMap(n -> mDataManager.syncCustomer())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<Customer>() {
@@ -82,7 +82,7 @@ public class SyncService extends Service {
                         dlog.i("Synced successfully!");
                         stopSelf(startId);
                     }
-                });
+                });*/
 
 
         /*mDataManager.syncRecipe().subscribeOn(Schedulers.io())

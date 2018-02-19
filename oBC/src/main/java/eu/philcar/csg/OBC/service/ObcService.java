@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -33,6 +34,7 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
@@ -72,6 +74,9 @@ import eu.philcar.csg.OBC.server.ZmqSubscriber;
 import eu.philcar.csg.OBC.task.OldLogCleamup;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 import eu.philcar.csg.OBC.task.UDPServer;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -98,7 +103,10 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.RemoteException;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.telephony.SmsManager;
+
+import javax.inject.Inject;
 
 import com.google.gson.Gson;
 
@@ -173,6 +181,7 @@ public class ObcService extends Service implements OnTripCallback {
     public static final int MSG_SERVER_HTTPNOTIFY = 63;
     public static final int MSG_SERVER_CHANGE_IP = 64;
     public static final int MSG_SERVER_CHANGE_LOG = 65;
+    public static final int MSG_SERVER_COMMAND_NEW = 66;
 
     public static final int MSG_RADIO_SET_CHANNEL = 70;
     public static final int MSG_RADIO_SET_VOLUME = 71;
@@ -217,6 +226,9 @@ public class ObcService extends Service implements OnTripCallback {
     private boolean isStarted;
     private boolean isStopRequested = false;
 
+
+    @Inject
+    SharengoPhpRepository phpRepository;
 
 
     //ENCAPSULATED OBJECTS
@@ -421,6 +433,8 @@ public class ObcService extends Service implements OnTripCallback {
     public void onCreate() {
         super.onCreate();
 
+        App.get(this).getComponent().inject(this);
+
         dlog.d("Service onCreate");
 
         //UDP SERVER to receive broadcast from mobile app
@@ -474,7 +488,7 @@ public class ObcService extends Service implements OnTripCallback {
         carInfo = new CarInfo(localHandler);
         carInfo.id = App.CarPlate;
 
-        tripInfo = new TripInfo();
+        tripInfo = new TripInfo(this);
         tripInfo.init();
 
         //Init GPS
@@ -1529,6 +1543,13 @@ public class ObcService extends Service implements OnTripCallback {
 
     }
 
+    private void executeServerCommands(ServerCommand command) {
+        List<ServerCommand> list = new ArrayList<>();
+        list.add(command);
+        executeServerCommands(list);
+    }
+
+
     private void executeServerCommands(List<ServerCommand> list) {
         Customers clienti;
 
@@ -1743,6 +1764,7 @@ public class ObcService extends Service implements OnTripCallback {
 
         }
 
+
     }
 
     private void parseServerNotify(String payload) {
@@ -1833,6 +1855,32 @@ public class ObcService extends Service implements OnTripCallback {
             http.Execute(rc);
 
 
+    }
+
+    public void startDownloadCommandsNew(){
+        phpRepository.getCommands(App.CarPlate)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<ServerCommand>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull ServerCommand command) {
+                        executeServerCommands(command);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        DLog.E("Error syncing.", e);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        DLog.I("Synced successfully!");
+                    }
+                });
     }
 
 
@@ -2520,6 +2568,21 @@ public class ObcService extends Service implements OnTripCallback {
                         }
 
                         executeServerCommands(list);
+                    }
+                    break;
+
+                case MSG_SERVER_COMMAND_NEW:
+                    if (msg.obj != null) {
+                        ServerCommand command = null;
+                        try {
+                            if(msg.obj instanceof ServerCommand)
+                            command = (ServerCommand) msg.obj;
+                        } catch (Exception e) {
+                            dlog.e("Exception casting server command:", e);
+                            break;
+                        }
+
+                        executeServerCommands(command);
                     }
                     break;
 

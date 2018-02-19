@@ -29,6 +29,7 @@ import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
@@ -72,6 +73,8 @@ public class FHome extends FBase implements OnClickListener {
     private DLog dlog = new DLog(this.getClass());
     @Inject
     SharengoApiRepository repository;
+    @Inject
+    SharengoPhpRepository repositoryPhp;
 
     public static FHome newInstance() {
         FHome fm = new FHome();
@@ -460,7 +463,7 @@ public class FHome extends FBase implements OnClickListener {
 
       /*    case R.id.fmapMusicB:
 
-              repository.getCustomer();
+              repository.getConfig();
                 /*((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_AUX,30);
                 Toast.makeText(App.Instance.getApplicationContext(),getResources().getString(R.string.music_hint),Toast.LENGTH_LONG).show();
 

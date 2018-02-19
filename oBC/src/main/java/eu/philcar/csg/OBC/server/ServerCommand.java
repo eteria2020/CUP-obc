@@ -7,10 +7,11 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.service.Reservation;
 
-public class ServerCommand {
+public class ServerCommand extends BaseResponse {
 
 	public String comandoRaw;
 	
@@ -23,6 +24,8 @@ public class ServerCommand {
 	public long queued;
 	public int ttl;
 	public String payload;
+
+
 	
 	
 	public static List<ServerCommand> createFromString(String str) {

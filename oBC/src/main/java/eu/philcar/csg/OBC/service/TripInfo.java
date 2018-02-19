@@ -18,6 +18,7 @@ import com.j256.ormlite.stmt.UpdateBuilder;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.controller.map.FRadio;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.BusinessEmployees;
 import eu.philcar.csg.OBC.db.Customer;
@@ -36,6 +37,7 @@ import eu.philcar.csg.OBC.server.ReservationConnector;
 import eu.philcar.csg.OBC.task.OdoController;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.PowerManager.WakeLock;
@@ -52,6 +54,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.inject.Inject;
+
 /**
  * This Class represents all information of a Trip
  * 
@@ -66,6 +70,9 @@ public class TripInfo {
     }
 
     private static final String DEFAULT_PLATE = "XH123KM";
+
+    @Inject
+    SharengoPhpRepository repositoryPhp;
 
     // Properties
     public Customer customer;
@@ -89,12 +96,23 @@ public class TripInfo {
     // Standard Log Object
     private DLog  dlog = new DLog(TripInfo.class);
 
+    private final Context mContext;
+
+    public TripInfo(Context context) {
+        mContext = context;
+        App.get(mContext).getComponent().inject(this);
+
+    }
+
     /**
      * Class Initializer
      * 
      * @throws SQLException
      * @throws Exception
      */
+
+
+
     public void init() {
         // Getting data from DB
         DbManager dbm = App.Instance.dbManager;
@@ -634,6 +652,35 @@ public class TripInfo {
 
     }
 
+    private Trip buildOpenTrip(){
+        Trip trip = new Trip(this.customer.id,App.CarPlate,new Date(), DbManager.getTimestamp(), App.fuel_level, App.km);
+        trip.setBeginLocation(App.lastLocation);
+
+        return trip;
+    }
+
+    public boolean OpenTripNew(CarInfo carInfo, Customer customer) {
+
+        if (carInfo==null || customer==null) {
+            dlog.e(TripInfo.class.toString()+" OpenTrip:  carInfo or customer == NULL");
+            return false;
+        }
+
+
+        this.customer = customer;
+        this.isOpen=true;
+
+        trip = repositoryPhp.openTrip(buildOpenTrip());
+
+
+
+        App.currentTripInfo = this;
+
+        dlog.d("OpenTrip: "+this.toString());
+        return (trip!=null);
+
+    }
+
     public boolean OpenTrip(CarInfo carInfo, Customer customer) {
 
         if (carInfo==null || customer==null) {
@@ -921,7 +968,7 @@ public class TripInfo {
                 CloseCorsa(carInfo);
 
                 //.... inva la corsa incapsulandola in un oggeto tripinfo separato per evitare modifiche
-                TripInfo tripInfo =  new TripInfo();
+                TripInfo tripInfo =  new TripInfo(mContext);
                 tripInfo.trip = trip;
                 TripsConnector cc = new TripsConnector(tripInfo);
 

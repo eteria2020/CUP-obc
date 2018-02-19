@@ -170,9 +170,7 @@ public class Trips extends DbTable<Trip,Integer> {
 			dlog.d("Selected trip to send:" + c.toString());
 			
 			c.offline=true;
-			TripInfo t = new TripInfo();
-			t.trip = c;
-			TripInfo tripInfo =  new TripInfo();
+			TripInfo tripInfo =  new TripInfo(context);
 			tripInfo.trip = c;
 			TripsConnector cc = new TripsConnector(tripInfo);
 			http = new HttpConnector(context);

@@ -1,0 +1,163 @@
+package eu.philcar.csg.OBC.data.datasources.repositories;
+
+import android.support.annotation.NonNull;
+
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.datasources.SharengoDataSource;
+import eu.philcar.csg.OBC.data.datasources.SharengoPhpDataSource;
+import eu.philcar.csg.OBC.data.model.AreaResponse;
+import eu.philcar.csg.OBC.data.model.CommandResponse;
+import eu.philcar.csg.OBC.data.model.TripResponse;
+import eu.philcar.csg.OBC.db.Trip;
+import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.helpers.RxUtil;
+import eu.philcar.csg.OBC.server.ServerCommand;
+import eu.philcar.csg.OBC.service.DataManager;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.schedulers.Schedulers;
+
+/**
+ * Created by Fulvio on 16/02/2018.
+ */
+@Singleton
+public class SharengoPhpRepository {
+
+    private DataManager mDataManager;
+    private SharengoPhpDataSource mRemoteDataSource;
+
+    private Disposable areaDisposable;
+    private Disposable commandDisposable;
+    private Disposable openTripDisposable;
+
+    @Inject
+    public SharengoPhpRepository(DataManager mDataManager, SharengoPhpDataSource mRemoteDataSource) {
+        this.mDataManager = mDataManager;
+        this.mRemoteDataSource = mRemoteDataSource;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                      AREA                                                  //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void stopCustomer(){
+        if (areaDisposable != null)
+            areaDisposable.dispose();
+    }
+
+
+    public void getArea(){
+
+        if(!RxUtil.isRunning(areaDisposable)) {
+            mRemoteDataSource.getArea(App.CarPlate,App.AreaPolygonMD5)
+                    .doOnNext(n -> mDataManager.saveArea(n))
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Observer<List<AreaResponse>>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
+                            areaDisposable = d;
+                        }
+
+                        @Override
+                        public void onNext(@NonNull List<AreaResponse> ribot) {
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            DLog.E("Error syncing.", e);
+                            RxUtil.dispose(areaDisposable);
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            DLog.I("Synced successfully!");
+                            RxUtil.dispose(areaDisposable);
+                            App.Instance.initAreaPolygon();
+                        }
+                    });
+        }
+    }
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                      COMMANDS                                              //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void stopCommand(){
+        if (commandDisposable != null)
+            commandDisposable.dispose();
+    }
+
+
+    public Observable<ServerCommand> getCommands(String plate) {
+
+        return  mRemoteDataSource.getCommands(plate)
+                .flatMap(n -> mDataManager.handleCommands(n))
+                .doOnSubscribe(n -> {
+                    RxUtil.dispose(commandDisposable);
+                    commandDisposable = n;})
+                .doOnError(e -> {
+                    DLog.E("Error insiede GetCommand",e);
+                    RxUtil.dispose(commandDisposable);})
+                .doOnComplete(() -> RxUtil.dispose(commandDisposable));
+
+
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                      TRIPS                                                 //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void stopOpenTrip(){
+        if (openTripDisposable != null)
+            openTripDisposable.dispose();
+    }
+
+
+    public void openTrip(final Trip trip) {
+        if (!RxUtil.isRunning(openTripDisposable)) {
+            mDataManager.saveTrip(trip)
+                    .concatMap(n -> mRemoteDataSource.openTrip(n))
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Observer<TripResponse>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
+                            openTripDisposable = d;
+                        }
+
+                        @Override
+                        public void onNext(@NonNull TripResponse trip1) {
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            DLog.E("Error syncing.", e);
+                            RxUtil.dispose(openTripDisposable);
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            DLog.I("Synced successfully!");
+                            RxUtil.dispose(openTripDisposable);
+                        }
+                    });
+
+
+        }
+    }
+
+}

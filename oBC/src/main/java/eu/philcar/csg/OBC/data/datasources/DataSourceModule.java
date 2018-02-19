@@ -5,6 +5,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoApi;
+import eu.philcar.csg.OBC.data.datasources.api.SharengoPhpApi;
 import eu.philcar.csg.OBC.service.DataManager;
 
 /**
@@ -17,6 +18,12 @@ public class DataSourceModule {
     @Singleton
     SharengoDataSource provideSharengoRemoteDataSource(SharengoApi api) {
         return new SharengoRetrofitDataSource(api);
+    }
+
+    @Provides
+    @Singleton
+    SharengoPhpDataSource provideSharengoPhpRemoteDataSource(SharengoPhpApi api) {
+        return new SharengoPhpRetrofitDataSource(api);
     }
 
 

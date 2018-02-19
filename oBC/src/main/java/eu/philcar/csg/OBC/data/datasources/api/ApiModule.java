@@ -64,6 +64,36 @@ public class ApiModule {
 
     @Provides
     @Singleton
+    SharengoPhpApi provideSharengoPhpApi(@ApplicationContext Context context) {
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        if (BuildConfig.DEBUG) {
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        } else {
+            logging.setLevel(HttpLoggingInterceptor.Level.NONE);
+        }
+
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
+        Gson gson = new GsonBuilder()
+                .addSerializationExclusionStrategy(new SerializationExclusionStrategy())
+                .create();
+
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(context.getString(R.string.endpointSharengoPhp))
+                //.baseUrl("http:gr3dcomunication.com/sharengo/")
+                .client(httpClient.build())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        return retrofit.create(SharengoPhpApi.class);
+    }
+
+    @Provides
+    @Singleton
     OkHttpClient provideOkHttpClientTrusted(Context context){
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         if (BuildConfig.DEBUG) {

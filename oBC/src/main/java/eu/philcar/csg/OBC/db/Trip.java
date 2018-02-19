@@ -1,9 +1,13 @@
 package eu.philcar.csg.OBC.db;
 
+import android.location.Location;
+
 import java.util.Date;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+
+import io.reactivex.annotations.Nullable;
 
 @DatabaseTable(tableName = "trips", daoClass = Trips.class )
 public class Trip  extends DbRecord {
@@ -96,8 +100,29 @@ public class Trip  extends DbRecord {
 
 //		@DatabaseField
 //		public boolean sospeso;
-		
-		public String toString() {
+
+
+	public Trip() {
+	}
+
+	public Trip(int id_customer, String plate, Date begin_time, long begin_timestamp, int begin_battery, int begin_km) {
+		this.id_customer = id_customer;
+		this.plate = plate;
+		this.begin_time = begin_time;
+		this.begin_timestamp = begin_timestamp;
+		this.begin_battery = begin_battery;
+		this.begin_km = begin_km;
+		this.begin_sent = false;
+	}
+
+	public void setBeginLocation(Location location) {
+		if (location != null) {
+			this.begin_lat = location.getLatitude();
+			this.begin_lon = location.getLongitude();
+		}
+	}
+
+	public String toString() {
 			return String.format("Trip { Id:%d , RId:%d \n Tms begin:%d , Tms end:%d \n TX 1 : %b , TX 2  : %b , n_pin : %d , id_parent : %d }", id,remote_id,begin_timestamp, end_timestamp, begin_sent, end_sent,n_pin, id_parent);
 		}
 		
