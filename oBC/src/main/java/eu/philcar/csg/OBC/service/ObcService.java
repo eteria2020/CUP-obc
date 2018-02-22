@@ -2849,6 +2849,8 @@ public class ObcService extends Service implements OnTripCallback {
             @Override
             public void run() {
 */
+       if(response.trip.id == App.currentTripInfo.trip.id)
+           App.currentTripInfo = response;
         sendAll(MessageFactory.apiTripCallback(response));
             /*}
         },15000);*/

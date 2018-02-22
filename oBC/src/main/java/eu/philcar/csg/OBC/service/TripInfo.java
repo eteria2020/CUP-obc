@@ -19,6 +19,8 @@ import com.j256.ormlite.stmt.UpdateBuilder;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.controller.map.FRadio;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
+import eu.philcar.csg.OBC.data.model.AreaResponse;
+import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.BusinessEmployees;
 import eu.philcar.csg.OBC.db.Customer;
@@ -30,17 +32,23 @@ import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.CardRfid;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.helpers.RxUtil;
 import eu.philcar.csg.OBC.helpers.UrlTools;
+import eu.philcar.csg.OBC.interfaces.OnTripCallback;
 import eu.philcar.csg.OBC.server.TripsConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.server.ReservationConnector;
 import eu.philcar.csg.OBC.task.OdoController;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.PowerManager.WakeLock;
+import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
@@ -289,7 +297,7 @@ public class TripInfo {
 
                 cardCode = code;					
 
-                if (OpenTrip(carInfo, customer)) {
+                if (OpenTripNew(carInfo, customer,service)) {
                     obc_io.setLcd(null, " Auto in uso");
                     obc_io.setDoors(null, 1,customer.info_display);  //Sole se trip registrata su db apri le portiere
                     //obc_io.setEngine(null, 1); //TODO: RIMUOVERE!!!! Il motore si dovr? abilitare solo dopo il check del pin
@@ -303,10 +311,10 @@ public class TripInfo {
                 } else
                     obc_io.setLcd(null,"Errore sistema");
 
-                TripsConnector cc = new TripsConnector(this, service);
+               /* TripsConnector cc = new TripsConnector(this, service);
 
                 http = new HttpConnector(service);
-                http.Execute(cc);
+                http.Execute(cc);*/
 
                 // Prepara un messaggio ritardato che chiude l'auto se non viene abilitata la trip entro un timeout
                 service.scheduleSelfCloseTrip(300,true);
@@ -653,13 +661,17 @@ public class TripInfo {
     }
 
     private Trip buildOpenTrip(){
-        Trip trip = new Trip(this.customer.id,App.CarPlate,new Date(), DbManager.getTimestamp(), App.fuel_level, App.km);
+        int km =0;
+        if(OptimizeDistanceCalc.totalDistance != 0)
+            km =  (int) OptimizeDistanceCalc.totalDistance/1000;
+
+        Trip trip = new Trip(this.customer.id,App.CarPlate,new Date(), DbManager.getTimestamp(), App.fuel_level, km);
         trip.setBeginLocation(App.lastLocation);
 
         return trip;
     }
 
-    public boolean OpenTripNew(CarInfo carInfo, Customer customer) {
+    public boolean OpenTripNew(CarInfo carInfo, Customer customer, final OnTripCallback callback) {
 
         if (carInfo==null || customer==null) {
             dlog.e(TripInfo.class.toString()+" OpenTrip:  carInfo or customer == NULL");
@@ -670,7 +682,100 @@ public class TripInfo {
         this.customer = customer;
         this.isOpen=true;
 
-        trip = repositoryPhp.openTrip(buildOpenTrip());
+        trip = buildOpenTrip();
+        //Scrittura DB +
+        repositoryPhp.openTrip(trip,this)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<TripResponse>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull TripResponse tripResponse) {
+                        if (tripResponse.getResult() > 0) {
+
+                            if (!trip.begin_sent) {
+                                trip.remote_id = tripResponse.getResult();
+                                trip.begin_sent = true;
+                                setTxApertura();
+                            } else {
+                                trip.end_sent = true;
+                                setTxChiusura();
+                            }
+
+                            UpdateCorsa();
+
+                        } else {
+                            switch (tripResponse.getResult()) {
+
+                                case -15:
+                                    trip.warning="OPEN TRIP";
+                                    setWarning("OPEN TRIP");
+                                    if (tripResponse.getExtra()!=null && !tripResponse.getExtra().isEmpty()) {
+                                        try {
+                                            trip.remote_id = Integer.parseInt(tripResponse.getExtra());
+                                        }catch (Exception e){
+                                            dlog.e("Exception while extracting extra",e);
+                                        }
+                                        trip.begin_sent = true;
+                                        setTxApertura();
+                                    }
+                                    break;
+
+                                case -16:
+                                    trip.warning="FORBIDDEN";
+                                    setWarning("FORBIDDEN");
+                                    if (tripResponse.getExtra()!=null && !tripResponse.getExtra().isEmpty()) {
+                                        try {
+                                            trip.remote_id = Integer.parseInt(tripResponse.getExtra());
+                                        }catch (Exception e){
+                                            dlog.e("Exception while extracting extra",e);
+                                        }
+                                        trip.begin_sent = true;
+                                        setTxApertura();
+                                    }
+                                    break;
+
+                                case -26:
+                                case -27:
+                                case -28:
+                                case -29:
+                                    trip.warning="PREAUTH";
+                                    setWarning("PREAUTH");
+                                    if (tripResponse.getExtra()!=null && !tripResponse.getExtra().isEmpty()) {
+                                        try {
+                                            trip.remote_id = Integer.parseInt(tripResponse.getExtra());
+                                        }catch (Exception e){
+                                            dlog.e("Exception while extracting extra",e);
+                                        }
+                                        trip.begin_sent = true;
+                                        setTxApertura();
+                                    }
+                                    break;
+
+
+                                default:
+                                    trip.warning="FAIL";
+                                    setWarning("FAIL");
+                                    trip.begin_sent = false;
+                            }
+                        }
+                            UpdateCorsa();
+                            if(callback!=null)
+                                callback.onTripResult(TripInfo.this);
+
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
 
 
 

@@ -18,6 +18,7 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.RxUtil;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.DataManager;
+import eu.philcar.csg.OBC.service.TripInfo;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -106,7 +107,7 @@ public class SharengoPhpRepository {
         return  mRemoteDataSource.getCommands(plate)
                 .flatMap(n -> mDataManager.handleCommands(n))
                 .doOnSubscribe(n -> {
-                    RxUtil.dispose(commandDisposable);
+                    //RxUtil.dispose(commandDisposable);
                     commandDisposable = n;})
                 .doOnError(e -> {
                     DLog.E("Error insiede GetCommand",e);
@@ -128,36 +129,20 @@ public class SharengoPhpRepository {
     }
 
 
-    public void openTrip(final Trip trip) {
-        if (!RxUtil.isRunning(openTripDisposable)) {
-            mDataManager.saveTrip(trip)
+    public Observable<TripResponse> openTrip(final Trip trip, final TripInfo tripInfo) {
+           return mDataManager.saveTrip(trip)
                     .concatMap(n -> mRemoteDataSource.openTrip(n))
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(new Observer<TripResponse>() {
-                        @Override
-                        public void onSubscribe(@NonNull Disposable d) {
-                            openTripDisposable = d;
-                        }
-
-                        @Override
-                        public void onNext(@NonNull TripResponse trip1) {
-                        }
-
-                        @Override
-                        public void onError(@NonNull Throwable e) {
-                            DLog.E("Error syncing.", e);
-                            RxUtil.dispose(openTripDisposable);
-                        }
-
-                        @Override
-                        public void onComplete() {
-                            DLog.I("Synced successfully!");
-                            RxUtil.dispose(openTripDisposable);
-                        }
-                    });
+                   .doOnSubscribe(n -> {
+                       //RxUtil.dispose(openTripDisposable);
+                       openTripDisposable = n;})
+                   .doOnError(e -> {
+                       DLog.E("Error insiede GetCommand",e);
+                       RxUtil.dispose(openTripDisposable);})
+                   .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
 
 
-        }
+
+
     }
 
 }

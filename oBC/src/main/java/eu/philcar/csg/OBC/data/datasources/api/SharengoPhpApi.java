@@ -25,7 +25,7 @@ public interface SharengoPhpApi {
     Observable<Result<List<ServerCommand>>> getCommands(@Query("car_plate") String car_plate);
 
 
-    @GET("get_commands.php")
+    @GET("pushcorsa-convenzioni.php")
     Observable<Result<TripResponse>> openTrip(@Query("cmd") int cmd_type, @Query("id_veicolo") String plate, @Query("id_cliente") int customerId, @Query("ora") long beginTimestamp, @Query("km") int km, @Query("carburante") int soc,
                                              @Query("lon") double beginLon, @Query("lat") double beginLat, @Query("warning") String warning, @Query("pulizia_int") int intCleanliness, @Query("pulizia_ext") int extCleanliness,
                                              @Query("mac") String macAddress, @Query("imei") String imei, @Query("n_pin") int nPin);
