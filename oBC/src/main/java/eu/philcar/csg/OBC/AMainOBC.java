@@ -33,6 +33,8 @@ import eu.philcar.csg.OBC.service.MessageFactory;
 import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.ServiceConnector;
 import android.annotation.SuppressLint;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -49,6 +51,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.util.LongSparseArray;
 import android.view.View;
+
+import static android.app.PendingIntent.getActivity;
 
 @SuppressLint("HandlerLeak")
 public class AMainOBC extends ABase implements LocationListener {
@@ -178,14 +182,18 @@ public class AMainOBC extends ABase implements LocationListener {
 			FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
 			if (App.isNavigatorEnabled) {
+				//transaction.add(R.id.awelPlaceholderFL, FMap.newInstance(), FMap.class.getName());
+				//pushFragment(FMap.newInstance(), FMap.class.getName(), false);
+				transaction.add(FMap.newInstance(),FMap.class.getName());
 				transaction.add(R.id.awelPlaceholderFL, FHome.newInstance(), FHome.class.getName());
+				//transaction.replace(R.id.awelPlaceholderFL, FHome.newInstance(), FHome.class.getName());
 				transaction.addToBackStack(FHome.class.getName());
 			} else {
 				transaction.add(R.id.awelPlaceholderFL, FDriving.newInstance(), FDriving.class.getName());
 				transaction.addToBackStack(FDriving.class.getName());
 			}
-
 			transaction.commit();
+		//	popFragment();
 		}
 
 		registerAdsReceiver();

@@ -133,11 +133,12 @@ public class FMap extends FBase implements OnClickListener {
 
 	public static FMap newInstance() {
 		FMap fm = new FMap();
+
 		return fm;
 	}
 
 	private DLog dlog = new DLog(this.getClass());
-
+	private Location location = null;
 	public final static int  BASE_TOLLERANCE = 50;					// Circle radius in meters (for fuel station on-map-tap)
 	public final static byte BASE_ZOOM_LEVEL = 17;				// Maps-forge level
 	public final static byte BASE_TOLLERANCE_INCREMENT = 50;	// meters
@@ -252,6 +253,7 @@ public class FMap extends FBase implements OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
 
     	super.onCreate(savedInstanceState);
+		onCreateinitMapSetting();
 		context=getActivity();
 		player=new AudioPlayer(getActivity());
         App.isCloseable = false;
@@ -1711,7 +1713,16 @@ public class FMap extends FBase implements OnClickListener {
 		currentPosition.setCoordinate(currentPoint);
 		SKPositionerManager.getInstance().reportNewGPSPosition(currentPosition);
 	}
+		public void onCreateinitMapSetting(){
+				SKCoordinate currentPoint = new SKCoordinate(12.9788f, 45.9559f);
 
+				if (App.lastLocation!=null && App.lastLocation.getLatitude()!=0 && App.lastLocation.getLongitude()!=0) {
+					currentPoint.setLatitude(App.lastLocation.getLatitude());
+					currentPoint.setLongitude(App.lastLocation.getLongitude());
+				}
+			currentPosition.setCoordinate(currentPoint);
+	//		SKPositionerManager.getInstance().reportNewGPSPosition(currentPosition);
+		}
 
 	public void startRouteCallout(){
 		if(navigationCallout!=null)
@@ -1725,6 +1736,7 @@ public class FMap extends FBase implements OnClickListener {
         // get a route object and populate it with the desired properties
         SKRouteSettings route = new SKRouteSettings();
         // set start and destination points
+
         route.setStartCoordinate(currentPosition.getCoordinate());
         route.setDestinationCoordinate(destination);
         // set the number of routes to be calculated
@@ -3645,6 +3657,9 @@ public class FMap extends FBase implements OnClickListener {
 			dlog.e("playAlertAdvice exception while start speak",e);
 		}
 
+	}
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 }

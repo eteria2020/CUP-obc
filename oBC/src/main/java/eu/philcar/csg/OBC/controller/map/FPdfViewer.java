@@ -320,12 +320,12 @@ public class FPdfViewer extends FBase {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            HttpEntity entity = response.getEntity();
             InputStream is = null; // Create an InputStream with the response
             try {
+                HttpEntity entity = response.getEntity();
                 is = entity.getContent();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e("FPDF", "Download pdf: ",e );
             }
             BufferedReader reader = null;
             try {
