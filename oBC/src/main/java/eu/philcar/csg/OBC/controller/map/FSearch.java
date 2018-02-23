@@ -515,16 +515,14 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 	};
 	
 	private void navigateTo(SKSearchResult result) {
-
-
-		
 		if (result!=null) {
 			dlog.d("navigateTo: set destination to "+ result.toString());
 			Location point = new Location("");
 			point.setLatitude(result.getLocation().getLatitude());
 			point.setLongitude(result.getLocation().getLongitude());
+			((ABase)getActivity()).pushFragment(FMap.newInstance(),FMap.class.getName(),true);
+
 			((AMainOBC)getActivity()).navigateTo(point);
-			((ABase)getActivity()).popFragment();
 		}
 	}
 

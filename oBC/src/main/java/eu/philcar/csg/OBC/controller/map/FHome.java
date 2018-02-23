@@ -39,6 +39,9 @@ import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.CarInfo;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -423,8 +426,9 @@ public class FHome extends FBase implements OnClickListener {
                 startActivity(new Intent(getActivity(), ASOS.class));
                 break;
 
-            case R.id.fmapSearchB://Search
-                ((ABase) getActivity()).pushBackFragment(FMap.newInstance(), FMap.class.getName(), true);
+            case R.id.fmapSearchB://Searchp
+                  ((ABase)getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
+
 
                 break;
 
