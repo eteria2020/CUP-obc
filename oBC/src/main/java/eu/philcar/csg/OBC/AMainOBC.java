@@ -60,7 +60,7 @@ public class AMainOBC extends ABase implements LocationListener {
 	private DLog dlog = new DLog(this.getClass());
 	public final static int  MSG_UPDATE_TIME = 10;
 	public final static int  MSG_UPDATE_DATE = 11;
-
+	public FMap f;
 	public static AudioPlayer player;
 	private ProTTS tts;
 	private Boolean firstUpCharging=true;
@@ -182,18 +182,13 @@ public class AMainOBC extends ABase implements LocationListener {
 			FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
 			if (App.isNavigatorEnabled) {
-				//transaction.add(R.id.awelPlaceholderFL, FMap.newInstance(), FMap.class.getName());
-				//pushFragment(FMap.newInstance(), FMap.class.getName(), false);
-				transaction.add(FMap.newInstance(),FMap.class.getName());
 				transaction.add(R.id.awelPlaceholderFL, FHome.newInstance(), FHome.class.getName());
-				//transaction.replace(R.id.awelPlaceholderFL, FHome.newInstance(), FHome.class.getName());
 				transaction.addToBackStack(FHome.class.getName());
 			} else {
 				transaction.add(R.id.awelPlaceholderFL, FDriving.newInstance(), FDriving.class.getName());
 				transaction.addToBackStack(FDriving.class.getName());
 			}
 			transaction.commit();
-		//	popFragment();
 		}
 
 		registerAdsReceiver();
@@ -434,6 +429,15 @@ public class AMainOBC extends ABase implements LocationListener {
 		FMap fMap = (FMap)getFragmentManager().findFragmentByTag(FMap.class.getName());
 		if (fMap!=null) {
 			fMap.navigateTo(location);
+		}
+		else {
+			 f = new FMap();
+			Bundle bundle = new Bundle();
+			bundle.putDouble("navtolong", location.getLongitude());
+			bundle.putDouble("navtolat", location.getLatitude());
+			f.setArguments(bundle);
+			pushFragment(f,FMap.class.getName(),false);
+
 		}
 	}
 

@@ -520,12 +520,9 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 			Location point = new Location("");
 			point.setLatitude(result.getLocation().getLatitude());
 			point.setLongitude(result.getLocation().getLongitude());
+			((ABase)getActivity()).pushFragment(FMap.newInstance(),FMap.class.getName(),true);
+
 			((AMainOBC)getActivity()).navigateTo(point);
-			try {
-				((ABase)getActivity()).popTillFragment(FMap.class.getName());
-			} catch (ABase.PopTillException e) {
-				dlog.e("Fsearch:Ongoclick:",e);
-			}
 		}
 	}
 

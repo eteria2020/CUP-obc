@@ -427,13 +427,6 @@ public class FHome extends FBase implements OnClickListener {
                 break;
 
             case R.id.fmapSearchB://Searchp
-                FMap Fmap = (FMap) getFragmentManager().findFragmentByTag(FMap.class.getName());
-             //     FragmentManager fm = getFragmentManager();
-               //   fm.beginTransaction().detach(FHome).commit();
-              //  ((ABase)getActivity()).pushFragment(FMap.newInstance(), FMap.class.getName(), false);
-        //        ((ABase) getActivity()).pushFragment(FMap.newInstance(), FMap.class.getName(), false);
-           //     fm.beginTransaction().addToBackStack(FMap.class.getName()).commit();
-                  ((ABase)getActivity()).pushBackFragment(Fmap, FMap.class.getName(), true);
                   ((ABase)getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
 
 
