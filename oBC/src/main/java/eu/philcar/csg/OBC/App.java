@@ -1400,7 +1400,7 @@ private void  initPhase2() {
 		
 		
 		Trips corse = dbManager.getCorseDao();
-		corse.sendOffline(this, null);
+		//corse.sendOffline(this, null);
 
 		
         //SMS event receiver

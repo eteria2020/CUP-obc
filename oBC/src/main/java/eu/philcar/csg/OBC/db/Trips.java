@@ -15,10 +15,15 @@ import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
+import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.TripsConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.service.TripInfo;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class Trips extends DbTable<Trip,Integer> {
 
@@ -29,6 +34,8 @@ public class Trips extends DbTable<Trip,Integer> {
 		super(connectionSource, dataClass);
 		// TODO Auto-generated constructor stub
 	}
+
+
 	
 	
 	public  static Class GetRecordClass() {
@@ -146,7 +153,7 @@ public class Trips extends DbTable<Trip,Integer> {
 	
 	
 	
-	public boolean sendOffline(Context context, Handler handler) {
+	public boolean sendOffline(Context context, Handler handler, SharengoPhpRepository phpRepository) {
 		HttpConnector http;
 		List<Trip> list = getTripsToSend();
 
@@ -163,9 +170,35 @@ public class Trips extends DbTable<Trip,Integer> {
 			dlog.w("No connection: aborted");
 			return false;
 		}
-		
-		//Dato che l'invio � asincrono viene richiesto l'invio solo della prima corsa non spedito, quando arriva il messaggio di risposto di invio eseguito(o fallito) passa alla successiva 
-		for(Trip c : list) {
+
+		//Dato che l'invio � asincrono viene richiesto l'invio solo della prima corsa non spedito, quando arriva il messaggio di risposto di invio eseguito(o fallito) passa alla successiva
+
+		phpRepository.closeTrips(list)
+				.subscribeOn(Schedulers.io())
+				.subscribe(new Observer<TripResponse>() {
+					@Override
+					public void onSubscribe(Disposable d) {
+
+					}
+
+					@Override
+					public void onNext(TripResponse tripResponse) {
+						dlog.d("Sent offline trip, response is " + tripResponse.getJson());
+
+					}
+
+					@Override
+					public void onError(Throwable e) {
+						dlog.e("Error while communicating offline trip, ",e);
+					}
+
+					@Override
+					public void onComplete() {
+						dlog.d("Completed sendOfflineTrip successfully");
+					}
+				});
+
+		/*for(Trip c : list) {
 			
 			dlog.d("Selected trip to send:" + c.toString());
 			
@@ -177,7 +210,7 @@ public class Trips extends DbTable<Trip,Integer> {
 			http.SetHandler(handler);
 			http.Execute(cc);
 			return true;
-		}
+		}*/
 		
 		return false;
 	}

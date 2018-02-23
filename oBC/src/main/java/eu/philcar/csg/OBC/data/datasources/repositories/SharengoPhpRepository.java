@@ -2,6 +2,7 @@ package eu.philcar.csg.OBC.data.datasources.repositories;
 
 import android.support.annotation.NonNull;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -131,7 +132,7 @@ public class SharengoPhpRepository {
 
     public Observable<TripResponse> openTrip(final Trip trip, final TripInfo tripInfo) {
            return mDataManager.saveTrip(trip)
-                    .concatMap(n -> mRemoteDataSource.openTrip(n))
+                    .concatMap(n -> mRemoteDataSource.openTrip(n, mDataManager))
                    .doOnSubscribe(n -> {
                        //RxUtil.dispose(openTripDisposable);
                        openTripDisposable = n;})
@@ -139,6 +140,55 @@ public class SharengoPhpRepository {
                        DLog.E("Error insiede GetCommand",e);
                        RxUtil.dispose(openTripDisposable);})
                    .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
+
+
+
+
+    }
+
+    public Observable<TripResponse> updateServerTripData(Trip trip){
+        return mRemoteDataSource.updateTrip(trip)
+                .doOnSubscribe(n -> {
+                    //RxUtil.dispose(openTripDisposable);
+                    openTripDisposable = n;})
+                .doOnError(e -> {
+                    DLog.E("Error insiede GetCommand",e);
+                    RxUtil.dispose(openTripDisposable);})
+                .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
+    }
+
+
+    public Observable<TripResponse> closeTrip(final Trip trip) {//TODO gestire la parte di salvataggio di begin_sent dentro la parte di comunicazione corsa conun concatMap avendo cura di passare il mDataManager
+        return mDataManager.saveTrip(trip)
+                .doOnNext(n -> {if(!n.begin_sent)
+                                mRemoteDataSource.openTrip(n, mDataManager);})
+                .concatMap(n -> mRemoteDataSource.closeTrip(n, mDataManager))
+                .doOnSubscribe(n -> {
+                    //RxUtil.dispose(openTripDisposable);
+                    openTripDisposable = n;})
+                .doOnError(e -> {
+                    DLog.E("Error insiede GetCommand",e);
+                    RxUtil.dispose(openTripDisposable);})
+                .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
+
+
+
+
+    }
+
+    public Observable<TripResponse> closeTrips(final Collection<Trip> trip) {//TODO gestire la parte di salvataggio di begin_sent dentro la parte di comunicazione corsa conun concatMap avendo cura di passare il mDataManager
+        return mDataManager.saveTrips(trip)
+                .doOnNext(n -> {
+                    if(!n.begin_sent)
+                    mRemoteDataSource.openTrip(n, mDataManager);})
+                .concatMap(n -> mRemoteDataSource.closeTrip(n, mDataManager))
+                .doOnSubscribe(n -> {
+                    //RxUtil.dispose(openTripDisposable);
+                    openTripDisposable = n;})
+                .doOnError(e -> {
+                    DLog.E("Error insiede GetCommand",e);
+                    RxUtil.dispose(openTripDisposable);})
+                .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
 
 
 

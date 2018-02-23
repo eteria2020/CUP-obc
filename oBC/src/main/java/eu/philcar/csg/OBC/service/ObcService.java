@@ -2252,7 +2252,7 @@ public class ObcService extends Service implements OnTripCallback {
                 case Connectors.MSG_TRIPS_SENT_OFFLINE:
                 case Connectors.MSG_TRIPS_SENT_REALTIME:
                     Trips corse = App.Instance.getDbManager().getCorseDao();
-                    corse.sendOffline(ObcService.this, this);
+                    corse.sendOffline(ObcService.this, this, phpRepository);
                     carInfo.updateTrips();
                     break;
 

@@ -434,12 +434,12 @@ public class TripInfo {
                         Events.eventRfid(2, code);
                         CloseTrip(carInfo);
 
-                        TripsConnector cc = new TripsConnector(this);
+                        /*TripsConnector cc = new TripsConnector(this);
 
                         http = new HttpConnector(service);
                         http.SetHandler(service.getPrivateHandler());
                         dlog.d("Sending close trip");
-                        http.Execute(cc);
+                        http.Execute(cc);*/
 
                         service.setDisplayStatus(false,15);
                         service.getHandler().sendMessage(MessageFactory.RadioVolume(0));						
@@ -683,7 +683,7 @@ public class TripInfo {
         this.isOpen=true;
 
         trip = buildOpenTrip();
-        //Scrittura DB +
+        //Scrittura DB
         repositoryPhp.openTrip(trip,this)
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<TripResponse>() {
@@ -694,75 +694,7 @@ public class TripInfo {
 
                     @Override
                     public void onNext(@NonNull TripResponse tripResponse) {
-                        if (tripResponse.getResult() > 0) {
 
-                            if (!trip.begin_sent) {
-                                trip.remote_id = tripResponse.getResult();
-                                trip.begin_sent = true;
-                                setTxApertura();
-                            } else {
-                                trip.end_sent = true;
-                                setTxChiusura();
-                            }
-
-                            UpdateCorsa();
-
-                        } else {
-                            switch (tripResponse.getResult()) {
-
-                                case -15:
-                                    trip.warning="OPEN TRIP";
-                                    setWarning("OPEN TRIP");
-                                    if (tripResponse.getExtra()!=null && !tripResponse.getExtra().isEmpty()) {
-                                        try {
-                                            trip.remote_id = Integer.parseInt(tripResponse.getExtra());
-                                        }catch (Exception e){
-                                            dlog.e("Exception while extracting extra",e);
-                                        }
-                                        trip.begin_sent = true;
-                                        setTxApertura();
-                                    }
-                                    break;
-
-                                case -16:
-                                    trip.warning="FORBIDDEN";
-                                    setWarning("FORBIDDEN");
-                                    if (tripResponse.getExtra()!=null && !tripResponse.getExtra().isEmpty()) {
-                                        try {
-                                            trip.remote_id = Integer.parseInt(tripResponse.getExtra());
-                                        }catch (Exception e){
-                                            dlog.e("Exception while extracting extra",e);
-                                        }
-                                        trip.begin_sent = true;
-                                        setTxApertura();
-                                    }
-                                    break;
-
-                                case -26:
-                                case -27:
-                                case -28:
-                                case -29:
-                                    trip.warning="PREAUTH";
-                                    setWarning("PREAUTH");
-                                    if (tripResponse.getExtra()!=null && !tripResponse.getExtra().isEmpty()) {
-                                        try {
-                                            trip.remote_id = Integer.parseInt(tripResponse.getExtra());
-                                        }catch (Exception e){
-                                            dlog.e("Exception while extracting extra",e);
-                                        }
-                                        trip.begin_sent = true;
-                                        setTxApertura();
-                                    }
-                                    break;
-
-
-                                default:
-                                    trip.warning="FAIL";
-                                    setWarning("FAIL");
-                                    trip.begin_sent = false;
-                            }
-                        }
-                            UpdateCorsa();
                             if(callback!=null)
                                 callback.onTripResult(TripInfo.this);
 
@@ -786,6 +718,7 @@ public class TripInfo {
 
     }
 
+    @Deprecated
     public boolean OpenTrip(CarInfo carInfo, Customer customer) {
 
         if (carInfo==null || customer==null) {
@@ -815,7 +748,7 @@ public class TripInfo {
 
     public void CloseTrip(CarInfo carInfo) {
 
-        CloseCorsa(carInfo);
+        CloseCorsaNew(carInfo);
 
         if(App.pinChecked && App.currentTripInfo.trip.int_cleanliness==0 && App.currentTripInfo.trip.ext_cleanliness==0){
             App.CounterCleanlines++;
@@ -835,8 +768,58 @@ public class TripInfo {
         this.isMaintenance = false;
         OptimizeDistanceCalc.Controller(OdoController.STOP);
     }
+    public void CloseCorsaNew(CarInfo carInfo) {
+        //TODO: gestire se non ? aperta
 
+        if (trip==null) {
+            dlog.e("CloseTrip: trip == NULL");
+            return;
+        }
 
+        int km =0;
+        if(OptimizeDistanceCalc.totalDistance != 0)
+            km =  (int) OptimizeDistanceCalc.totalDistance/1000;
+
+        trip.end_battery = App.fuel_level;
+        trip.end_km =  km;
+        trip.end_time = new Date();
+        trip.end_timestamp = System.currentTimeMillis()/1000;
+
+        if (carInfo!=null) {
+            trip.end_lat = carInfo.latitude;
+            trip.end_lon = carInfo.longitude;
+        }
+
+        dlog.d("CloseCorsa: closing trip"+trip.toString());
+        OptimizeDistanceCalc.Controller(OdoController.STOP);
+
+        repositoryPhp.closeTrip(trip)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<TripResponse>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull TripResponse tripResponse) {
+                        //handled inside deeper closeTrip
+
+                        //Callback unused
+
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+    }
+
+    @Deprecated
     public void CloseCorsa(CarInfo carInfo) {
         //TODO: gestire se non ? aperta
 
@@ -963,9 +946,7 @@ public class TripInfo {
             UpdateCorsa();
             try {
                 if(notify) {
-                    HttpConnector hConnector = new HttpConnector(App.Instance.getApplicationContext());
-                    TripsConnector tc = new TripsConnector(this);
-                    hConnector.Execute(tc);
+                    sendUpdateTrip(trip);
                 }
             }catch(Exception e){
                 dlog.e("Exception while trying to update server trip",e);
@@ -974,6 +955,32 @@ public class TripInfo {
         } else
             return false;
 
+    }
+
+    private void sendUpdateTrip(Trip trip){
+        repositoryPhp.updateServerTripData(trip)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<TripResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(TripResponse tripResponse) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                })
     }
 
 
@@ -1070,28 +1077,50 @@ public class TripInfo {
                 int id_parent = trip.id_parent;
                 int n_pin = trip.n_pin;
                 //Se ? passata la durata massima chiudi la trip amministrativamente...
-                CloseCorsa(carInfo);
+                CloseCorsaNew(carInfo);
+                //CloseCorsa(carInfo);
 
                 //.... inva la corsa incapsulandola in un oggeto tripinfo separato per evitare modifiche
-                TripInfo tripInfo =  new TripInfo(mContext);
+                /*TripInfo tripInfo =  new TripInfo(mContext);
                 tripInfo.trip = trip;
                 TripsConnector cc = new TripsConnector(tripInfo);
 
                 HttpConnector http = new HttpConnector(App.Instance);
                 http.SetHandler(service.getPrivateHandler());
-                http.Execute(cc);				
+                http.Execute(cc);	*/
 
                 // Apri una nuova trip che sostituisce la precedente
-                DbManager dbm = App.Instance.dbManager;
-                Trips trips = dbm.getCorseDao();
-                if(OptimizeDistanceCalc.totalDistance != 0)
-                    trip = trips.Begin(App.CarPlate, customer, carInfo.location, App.fuel_level, (int) OptimizeDistanceCalc.totalDistance/1000);
-                else
-                    trip = trips.Begin(App.CarPlate, customer, carInfo.location, App.fuel_level, 0);
-                dlog.d("New trip: " + trip.toString());
+//                DbManager dbm = App.Instance.dbManager;
+//                Trips trips = dbm.getCorseDao();
+
+
+                trip = buildOpenTrip();
                 trip.id_parent = id_parent;
                 trip.n_pin = n_pin;
-                UpdateCorsa();
+                repositoryPhp.openTrip(trip,this)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(new Observer<TripResponse>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(@NonNull TripResponse tripResponse) {
+
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+                            }
+
+                            @Override
+                            public void onComplete() {
+                            }
+                        });
+                //trip = trips.Begin(App.CarPlate,customer, carInfo.location, App.fuel_level, App.km);
+                dlog.d("New trip: " + trip.toString());
+                //UpdateCorsa();
 
                 //Do not send now, it will collide with previous trip closure. After sending will be scheduled.
 

@@ -7,6 +7,7 @@ import eu.philcar.csg.OBC.data.model.CommandResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.server.ServerCommand;
+import eu.philcar.csg.OBC.service.DataManager;
 import io.reactivex.Observable;
 
 /**
@@ -24,6 +25,11 @@ public interface SharengoPhpDataSource {
                                               double beginLon,  double beginLat,  String warning,  int intCleanliness,
                                               int extCleanliness,String macAddress, String imei,  int nPin);*/
 
-    Observable<TripResponse> openTrip(Trip trip);
+    Observable<TripResponse> openTrip(Trip trip, DataManager dataManager);
+
+
+    Observable<TripResponse> updateTrip(Trip trip);
+
+    Observable<TripResponse> closeTrip(Trip trip, DataManager dataManager);
 
 }

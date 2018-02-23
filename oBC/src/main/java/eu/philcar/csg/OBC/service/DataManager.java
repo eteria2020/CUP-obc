@@ -1,11 +1,14 @@
 package eu.philcar.csg.OBC.service;
 
 import com.google.gson.Gson;
+import com.j256.ormlite.stmt.UpdateBuilder;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -26,7 +29,7 @@ import eu.philcar.csg.OBC.server.ServerCommand;
 import io.reactivex.Observable;
 
 @Singleton
-public class DataManager {
+public class DataManager { //TODO change to interface-type system like api does
 
     private final DbManager mDbManager; //TODO use interface DbHelper
 
@@ -56,6 +59,12 @@ public class DataManager {
 
     }
 
+    public Observable<Trip> saveTrips(Collection<Trip> trip) {
+
+        return  mDbManager.getCorseDao().createOrUpdateMany(trip);
+
+    }
+
     public void saveConfig(ConfigResponse customer) {
 
         App.Instance.setConfig(customer.getJson(),null);
@@ -66,6 +75,57 @@ public class DataManager {
 
         persistArea(area);
     }
+
+    public void updateBeginSentDone(Trip trip){
+        UpdateBuilder<Trip,Integer> builder = mDbManager.getCorseDao().updateBuilder();
+        try {
+            builder.updateColumnValue("warning", trip.warning);
+            builder.updateColumnValue("recharge", trip.recharge);
+            builder.updateColumnValue("begin_sent", trip.begin_sent);
+            builder.updateColumnValue("remote_id", trip.remote_id);
+            builder.where().idEq(trip.id);
+            builder.update();
+            builder.reset();
+        } catch (SQLException e) {
+            DLog.E("setTxApertura : ",e);
+        }
+    }
+
+    public void updateTripSetOffline(Trip trip) {
+
+        if (trip==null)
+            return;
+
+
+        UpdateBuilder<Trip,Integer> builder =  mDbManager.getCorseDao().updateBuilder();
+        try {
+            builder.updateColumnValue("recharge", trip.recharge);
+            builder.updateColumnValue("offline", true);
+            builder.where().idEq(trip.id);
+            builder.update();
+            builder.reset();
+        } catch (SQLException e) {
+            DLog.E("setTxOffline : ",e);
+        }
+    }
+
+    public void updateEndSentDone(Trip trip) {
+
+        if (trip==null)
+            return;
+
+
+        UpdateBuilder<Trip,Integer> builder =  mDbManager.getCorseDao().updateBuilder();
+        try {
+            builder.updateColumnValue("end_sent", true);
+            builder.where().idEq(trip.id);
+            builder.update();
+            builder.reset();
+        } catch (SQLException e) {
+            DLog.E("setTxChiusura : ",e);
+        }
+    }
+
 
     public Observable<ServerCommand> handleCommands(List<ServerCommand> commands){
 
