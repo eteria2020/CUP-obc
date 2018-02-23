@@ -33,8 +33,6 @@ import eu.philcar.csg.OBC.service.MessageFactory;
 import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.ServiceConnector;
 import android.annotation.SuppressLint;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -52,15 +50,13 @@ import android.os.Message;
 import android.support.v4.util.LongSparseArray;
 import android.view.View;
 
-import static android.app.PendingIntent.getActivity;
-
 @SuppressLint("HandlerLeak")
 public class AMainOBC extends ABase implements LocationListener {
 
 	private DLog dlog = new DLog(this.getClass());
 	public final static int  MSG_UPDATE_TIME = 10;
 	public final static int  MSG_UPDATE_DATE = 11;
-	public FMap f;
+
 	public static AudioPlayer player;
 	private ProTTS tts;
 	private Boolean firstUpCharging=true;
@@ -429,15 +425,6 @@ public class AMainOBC extends ABase implements LocationListener {
 		FMap fMap = (FMap)getFragmentManager().findFragmentByTag(FMap.class.getName());
 		if (fMap!=null) {
 			fMap.navigateTo(location);
-		}
-		else {
-			 f = new FMap();
-			Bundle bundle = new Bundle();
-			bundle.putDouble("navtolong", location.getLongitude());
-			bundle.putDouble("navtolat", location.getLatitude());
-			f.setArguments(bundle);
-			pushFragment(f,FMap.class.getName(),false);
-
 		}
 	}
 

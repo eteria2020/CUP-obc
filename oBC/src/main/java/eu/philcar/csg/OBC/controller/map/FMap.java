@@ -137,14 +137,11 @@ public class FMap extends FBase implements OnClickListener {
 	}
 
 	private DLog dlog = new DLog(this.getClass());
-	private Location location = null;
+
 	public final static int  BASE_TOLLERANCE = 50;					// Circle radius in meters (for fuel station on-map-tap)
 	public final static byte BASE_ZOOM_LEVEL = 17;				// Maps-forge level
 	public final static byte BASE_TOLLERANCE_INCREMENT = 50;	// meters
-	public Bundle bFromSearch;
-	public static double lat;
-	public static double lon;
-	public static boolean navto = false;
+
 
 	private final static int  MSG_SHOW_REAL_REACH  = 1;
 	private final static int  MSG_ZOOM_REAL_REACH  = 2;
@@ -255,59 +252,13 @@ public class FMap extends FBase implements OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
 
     	super.onCreate(savedInstanceState);
-		onCreateinitMapSetting();
-		bFromSearch = this.getArguments();
 		context=getActivity();
 		player=new AudioPlayer(getActivity());
         App.isCloseable = false;
 
 
     }
-    @Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		bFromSearch = this.getArguments();
-	/*	FrameLayout frame = (FrameLayout)rootView.findViewById(R.id.fmapMapMV);
 
-		if (new File("/sdcard/SKMaps/Maps/v1/20150413/meta/").exists()) {
-			if (mapHolder == null) {
-				mapHolder = new SKMapViewHolder(this.getActivity());
-				mapHolder.setMapSurfaceListener(mapSurfaceListener);
-				frame.addView(mapHolder);
-			} else {
-				mapHolder.onResume();
-				mapHolder.setMapSurfaceListener(mapSurfaceListener);
-			}
-		}
-
-/*		if (new File("/sdcard/SKMaps/Maps/v1/20150413/meta/").exists()) {
-			if (mapHolder == null) {
-				mapHolder = new SKMapViewHolder(this.getActivity());
-				mapHolder.setMapSurfaceListener(mapSurfaceListener);
-				frame.addView(mapHolder);
-			} else {
-
-			}
-		}
-
-		try {
-			getActivity().registerReceiver(this.ConnectivityChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
-		}catch(Exception e){
-			dlog.e("onResume: eccezione nella registrazione del broadcast receiver ",e);
-		}
-
-*/
-		Bundle b = this.getArguments();
-		if (b != null) {
-			Location loc = new Location("");
-			 lat = b.getDouble("navtolat");
-			 lon= b.getDouble("navtolong");
-			 navto = true;
-		//	navigateTo(lat,lon);
-		}
-		updateUI();
-
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -1301,12 +1252,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		case R.id.fmapHomeB:
 			if (!navigationActive) {
-				try {
-					((ABase) getActivity()).popTillFragment(FHome.class.getName());
-				} catch (ABase.PopTillException e) {
-					((ABase) getActivity()).pushBackFragment(FHome.newInstance(),FHome.class.getName(),false);
-					e.printStackTrace();
-				}
+				((ABase) getActivity()).pushBackFragment(FHome.newInstance(), FHome.class.getName(), true);
 
 			}else{
 				Toast toast = Toast.makeText(getActivity(),R.string.navigation_active_error , Toast.LENGTH_LONG);
@@ -1699,12 +1645,7 @@ public class FMap extends FBase implements OnClickListener {
 
 	}
 
-	public void navigateTo(double lat, double lon) {
-		SKCoordinate destination = new SKCoordinate();
-		destination.setLatitude(lat);
-		destination.setLongitude(lon);
-		startRoute(destination);
-	}
+
 	public void navigateTo(Location location) {
 		SKCoordinate destination = new SKCoordinate();
 		destination.setLatitude(location.getLatitude());
@@ -1770,16 +1711,7 @@ public class FMap extends FBase implements OnClickListener {
 		currentPosition.setCoordinate(currentPoint);
 		SKPositionerManager.getInstance().reportNewGPSPosition(currentPosition);
 	}
-		public void onCreateinitMapSetting(){
-				SKCoordinate currentPoint = new SKCoordinate(12.9788f, 45.9559f);
 
-				if (App.lastLocation!=null && App.lastLocation.getLatitude()!=0 && App.lastLocation.getLongitude()!=0) {
-					currentPoint.setLatitude(App.lastLocation.getLatitude());
-					currentPoint.setLongitude(App.lastLocation.getLongitude());
-				}
-			currentPosition.setCoordinate(currentPoint);
-	//		SKPositionerManager.getInstance().reportNewGPSPosition(currentPosition);
-		}
 
 	public void startRouteCallout(){
 		if(navigationCallout!=null)
@@ -1793,7 +1725,6 @@ public class FMap extends FBase implements OnClickListener {
         // get a route object and populate it with the desired properties
         SKRouteSettings route = new SKRouteSettings();
         // set start and destination points
-
         route.setStartCoordinate(currentPosition.getCoordinate());
         route.setDestinationCoordinate(destination);
         // set the number of routes to be calculated
@@ -2713,11 +2644,17 @@ public class FMap extends FBase implements OnClickListener {
 		@Override
 		public void onSurfaceCreated(SKMapViewHolder holder) {
 			Boolean test=false;
+
+
+
+
 			mapView = holder.getMapSurfaceView();
 			mapView.deleteAnnotation(9);
 			mapView.deleteAnnotation(0);
 	        if (firstLaunch) {
+
 	        	initMapSettings();
+
 		        firstLaunch=false;
 				try{
 					drawPOIS();
@@ -2727,20 +2664,15 @@ public class FMap extends FBase implements OnClickListener {
 				}catch(Exception e){
 					dlog.e("drawPois: Generic Exception ",e);
 				}
-				if (FMap.navto) {
-					navigateTo(FMap.lat,FMap.lon);
-					startRouteNavigation();
-				}
 					return;
+
+
 	        }
 			try {
 				if (navigationActive) {
 					startRouteNavigation();
-				} else if (navto) {
-					navigateTo(lat,lon);
-					startRouteNavigation();
-				}else{
-					resetMapSettings();}
+				} else
+					resetMapSettings();
 			}catch(Exception e){
 				dlog.e("exception startRouteNavigation() ",e);
 			}
@@ -3713,9 +3645,6 @@ public class FMap extends FBase implements OnClickListener {
 			dlog.e("playAlertAdvice exception while start speak",e);
 		}
 
-	}
-	public void setLocation(Location location) {
-		this.location = location;
 	}
 
 }
