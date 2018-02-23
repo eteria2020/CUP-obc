@@ -49,7 +49,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
                         trip.offline = true;
                         dataManager.updateTripSetOffline(trip);
                     })
-                    .doOnNext(t -> {
+                    .concatMap(t -> {
                         trip.recharge = t.getResult();
                         if (t.getResult() > 0) {
 
@@ -93,6 +93,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
                             }
                             dataManager.updateBeginSentDone(trip);
                         }
+                        return Observable.just(t);
                     });
         }else{
             return mSharengoPhpApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat, trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin, trip.id_parent)
@@ -102,7 +103,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
                         trip.offline = true;
                         dataManager.updateTripSetOffline(trip);
                     })
-                    .doOnNext(t -> {
+                    .concatMap(t -> {
                         trip.recharge = t.getResult();
                         if (t.getResult() > 0) {
 
@@ -146,8 +147,15 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
                             }
                             dataManager.updateBeginSentDone(trip);
                         }
+                        return Observable.just(t);
                     });
         }
+    }
+
+    @Override
+    public Observable<Trip> openTripPassive(final Trip trip, final DataManager dataManager) {
+        return openTrip(trip,dataManager)
+                .concatMap(tripResponse -> Observable.just(trip));
     }
 
 
@@ -173,7 +181,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
                         trip.offline=true;
                         dataManager.updateTripSetOffline(trip);
                     })
-                    .doOnNext(t -> {
+                    .concatMap(t -> {
                         trip.recharge = t.getResult();
                         if (t.getResult() > 0) {
 
@@ -200,6 +208,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
 
                             dataManager.updateEndSentDone(trip);
                         }
+                        return Observable.just(t);
                     });
 
         }else {
@@ -209,7 +218,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
                         trip.offline=true;
                         dataManager.updateTripSetOffline(trip);
                     })
-                    .doOnNext(t -> {
+                    .concatMap(t -> {
                         trip.recharge = t.getResult();
                         if (t.getResult() > 0) {
 
@@ -236,6 +245,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
 
                             dataManager.updateEndSentDone(trip);
                         }
+                        return Observable.just(t);
                     });
         }
     }

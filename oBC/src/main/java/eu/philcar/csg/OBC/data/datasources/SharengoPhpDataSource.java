@@ -27,6 +27,7 @@ public interface SharengoPhpDataSource {
 
     Observable<TripResponse> openTrip(Trip trip, DataManager dataManager);
 
+    Observable<Trip> openTripPassive(Trip trip, DataManager dataManager);
 
     Observable<TripResponse> updateTrip(Trip trip);
 

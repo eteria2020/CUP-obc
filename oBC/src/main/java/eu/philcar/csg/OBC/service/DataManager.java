@@ -29,7 +29,7 @@ import eu.philcar.csg.OBC.server.ServerCommand;
 import io.reactivex.Observable;
 
 @Singleton
-public class DataManager { //TODO change to interface-type system like api does
+public class DataManager { //TODO change to interface-type system like api does |||| use an Injection module style
 
     private final DbManager mDbManager; //TODO use interface DbHelper
 
@@ -100,7 +100,7 @@ public class DataManager { //TODO change to interface-type system like api does
         UpdateBuilder<Trip,Integer> builder =  mDbManager.getCorseDao().updateBuilder();
         try {
             builder.updateColumnValue("recharge", trip.recharge);
-            builder.updateColumnValue("offline", true);
+            builder.updateColumnValue("offline", trip.offline);
             builder.where().idEq(trip.id);
             builder.update();
             builder.reset();

@@ -18,6 +18,7 @@ import com.j256.ormlite.stmt.UpdateBuilder;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.controller.map.FRadio;
+import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.data.model.AreaResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
@@ -702,6 +703,10 @@ public class TripInfo {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
+                        if( e instanceof ErrorResponse){
+
+                            dlog.e("Error inside Trip Opening "+((ErrorResponse) e).errorType ,e);
+                        }
                     }
 
                     @Override
@@ -980,7 +985,7 @@ public class TripInfo {
                     public void onComplete() {
 
                     }
-                })
+                });
     }
 
 

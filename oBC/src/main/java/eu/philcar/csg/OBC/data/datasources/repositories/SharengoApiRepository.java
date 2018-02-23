@@ -61,6 +61,7 @@ public class SharengoApiRepository {
 
                         @Override
                         public void onNext(@NonNull Customer ribot) {
+
                         }
 
                         @Override

@@ -135,7 +135,8 @@ public class SharengoPhpRepository {
                     .concatMap(n -> mRemoteDataSource.openTrip(n, mDataManager))
                    .doOnSubscribe(n -> {
                        //RxUtil.dispose(openTripDisposable);
-                       openTripDisposable = n;})
+                       //openTripDisposable = n;
+                   })
                    .doOnError(e -> {
                        DLog.E("Error insiede GetCommand",e);
                        RxUtil.dispose(openTripDisposable);})
@@ -150,7 +151,8 @@ public class SharengoPhpRepository {
         return mRemoteDataSource.updateTrip(trip)
                 .doOnSubscribe(n -> {
                     //RxUtil.dispose(openTripDisposable);
-                    openTripDisposable = n;})
+                    //openTripDisposable = n;
+                })
                 .doOnError(e -> {
                     DLog.E("Error insiede GetCommand",e);
                     RxUtil.dispose(openTripDisposable);})
@@ -160,12 +162,16 @@ public class SharengoPhpRepository {
 
     public Observable<TripResponse> closeTrip(final Trip trip) {//TODO gestire la parte di salvataggio di begin_sent dentro la parte di comunicazione corsa conun concatMap avendo cura di passare il mDataManager
         return mDataManager.saveTrip(trip)
-                .doOnNext(n -> {if(!n.begin_sent)
-                                mRemoteDataSource.openTrip(n, mDataManager);})
+                .concatMap(n -> {
+                    if(!n.begin_sent)
+                        return mRemoteDataSource.openTripPassive(n, mDataManager);
+                    return Observable.just(n);
+                })
                 .concatMap(n -> mRemoteDataSource.closeTrip(n, mDataManager))
                 .doOnSubscribe(n -> {
                     //RxUtil.dispose(openTripDisposable);
-                    openTripDisposable = n;})
+                    //openTripDisposable = n;
+                    })
                 .doOnError(e -> {
                     DLog.E("Error insiede GetCommand",e);
                     RxUtil.dispose(openTripDisposable);})
@@ -178,13 +184,16 @@ public class SharengoPhpRepository {
 
     public Observable<TripResponse> closeTrips(final Collection<Trip> trip) {//TODO gestire la parte di salvataggio di begin_sent dentro la parte di comunicazione corsa conun concatMap avendo cura di passare il mDataManager
         return mDataManager.saveTrips(trip)
-                .doOnNext(n -> {
+                .concatMap(n -> {
                     if(!n.begin_sent)
-                    mRemoteDataSource.openTrip(n, mDataManager);})
+                        return mRemoteDataSource.openTripPassive(n, mDataManager);
+                    return Observable.just(n);
+                })
                 .concatMap(n -> mRemoteDataSource.closeTrip(n, mDataManager))
                 .doOnSubscribe(n -> {
                     //RxUtil.dispose(openTripDisposable);
-                    openTripDisposable = n;})
+                    //openTripDisposable = n;
+                    })
                 .doOnError(e -> {
                     DLog.E("Error insiede GetCommand",e);
                     RxUtil.dispose(openTripDisposable);})
