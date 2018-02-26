@@ -121,16 +121,17 @@ public class FMaintenance extends FBase {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		Events.Maintenance("Show");
-		askPin();
+		//App.Charging = true;
+		//askPin();
 		((AWelcome)getActivity()).sendMessage(MessageFactory.requestCarInfo());
 		view = inflater.inflate(R.layout.f_maintenance, container, false);
 
 		((View)view.findViewById(R.id.finsNextIB)).setVisibility(View.INVISIBLE);
 		((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.VISIBLE);
 
-		((Button)view.findViewById(R.id.finsNextIB)).setOnClickListener(new OnClickListener() {
+		((Button)view.findViewById(R.id.finsNextIB)).setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
-			public void onClick(View v) {
+			public boolean onLongClick(View v) {
 				((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
 
 				if(App.Charging) {
@@ -138,6 +139,7 @@ public class FMaintenance extends FBase {
 					Events.Maintenance("Skip");
 				}
 				dlog.d("Closing FMaintenance");
+				return true;
 			}
 		});
 
@@ -205,9 +207,9 @@ public class FMaintenance extends FBase {
 			return;
 		}
 		dlog.d("update App.Charging: "+App.Charging+" chargingPlug: "+carinfo.chargingPlug);
-		if (App.Charging && carinfo.chargingPlug==false) {
+		if (App.Charging && !carinfo.chargingPlug) {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(true);
-			((TextView)view.findViewById(R.id.tvEndCharging)).setText("TERMINA RICARICA: L'auto sar� nuovamente disponible al noleggio a meno di altre condizioni di allarme");
+			((TextView)view.findViewById(R.id.tvEndCharging)).setText("TERMINA RICARICA: L'auto sarà nuovamente disponible al noleggio a meno di altre condizioni di allarme, ricordati di mettere il cavo nel bagagliaio");
 		} else {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
 			if (carinfo.chargingPlug)
@@ -233,13 +235,13 @@ public class FMaintenance extends FBase {
 	public void onPause() {
 		super.onPause();
 		Instance=null;
-		dialog.dismiss();
+		//dialog.dismiss();
 	}
 
 	@Override
 	public void onDestroy() {
 		Instance=null;
-		dialog.dismiss();
+		//dialog.dismiss();
 		super.onDestroy();
 	}
 }
