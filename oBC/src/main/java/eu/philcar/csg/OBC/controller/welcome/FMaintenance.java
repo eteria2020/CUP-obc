@@ -9,6 +9,7 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.controller.map.FMap;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
@@ -22,6 +23,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.text.Html;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -35,9 +37,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import javax.inject.Inject;
+
 public class FMaintenance extends FBase {
 
 	private DLog dlog = new DLog(this.getClass());
+	@Inject
+	EventRepository eventRepository;
 
 	public  static FMaintenance Instance;
 	private Handler handler = new Handler();
@@ -76,7 +82,7 @@ public class FMaintenance extends FBase {
 				dialog.dismiss();
 				((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
 				dlog.d("Skipped FMaintenance");
-				Events.Maintenance("Skip");
+				eventRepository.Maintenance("Skip");
 			}
 		});
 
@@ -100,14 +106,14 @@ public class FMaintenance extends FBase {
 						}
 
 						if (npwd>0) {
-							Events.Maintenance("Enter");
+							eventRepository.Maintenance("Enter");
 							dlog.d("Entering FMaintenance");
 							d.dismiss();
 						} else {
 							input.setText("");
 							Toast.makeText(FMaintenance.this.getActivity(), "PIN errato", Toast.LENGTH_SHORT).show();;
 							dlog.d("Wrong pin");
-							Events.Maintenance("Wrong pin");
+							eventRepository.Maintenance("Wrong pin");
 						}
 					}
 				});
@@ -119,11 +125,17 @@ public class FMaintenance extends FBase {
 	}
 
 	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		App.get(getActivity()).getComponent().inject(this);
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		Events.Maintenance("Show");
-		/*App.Charging = true;
-		App.Instance.persistCharging();*/
-		//askPin();
+		//App.Charging = true;
+		eventRepository.Maintenance("Show");
+		askPin();
 		((AWelcome)getActivity()).sendMessage(MessageFactory.requestCarInfo());
 		view = inflater.inflate(R.layout.f_maintenance, container, false);
 
@@ -137,7 +149,7 @@ public class FMaintenance extends FBase {
 			public void onClick(View v) {
 				dlog.d("Pushed EndCharging");
 				((AWelcome)getActivity()).sendMessage(MessageFactory.sendEndCharging());
-				Events.Maintenance("EndCharging");
+                eventRepository.Maintenance("EndCharging");
 				((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_wait);
 
 			}

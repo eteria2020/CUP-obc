@@ -1492,7 +1492,7 @@ private void  initPhase2() {
 	}
 
 
-	public  void setCarPlate(String carPlate) {
+	public void setCarPlate(String carPlate) {
 
 		//Null or empty Plate should be ignored
 		if (carPlate==null || carPlate.isEmpty() || carPlate.equalsIgnoreCase("NULL"))
@@ -1507,7 +1507,7 @@ private void  initPhase2() {
 		if (carPlate.equals(App.CarPlate))
 			return;
 
-		Events.CarPlateChange(App.CarPlate,carPlate);
+		//Events.CarPlateChange(App.CarPlate,carPlate);
 
 		Editor editor = preferences.edit();
 		editor.putString(KEY_CarPlate, carPlate);
@@ -1979,13 +1979,7 @@ private void  initPhase2() {
 		return (now-boot)/1000;
 	}
 	
-	public void startAreaPolygonDownload(Context ctx, Handler handler) {
-		DLog.D("Start area download..");
-		AreaConnector cn = new AreaConnector();
-		HttpConnector http = new HttpConnector(ctx);
-		http.SetHandler(handler);
-		http.Execute(cn);
-	}
+
 	
 	public void initAreaPolygon() {
 		
@@ -2343,9 +2337,10 @@ private void  initPhase2() {
 	    }
 	}
 
+	@Deprecated
 	public static boolean startShutdownTimer(){
 		if(shutdownTimer==0) {
-			Events.StartShutdown();
+			//Events.StartShutdown();
 			shutdownTimer = SystemClock.elapsedRealtime();
 		}
 		if (SystemClock.elapsedRealtime() - shutdownTimer >3*60 * 60 * 1000) { //3 ORE
@@ -2357,10 +2352,11 @@ private void  initPhase2() {
 		}
 	}
 
+	@Deprecated
 	public static void stopShutdownTimer(){
 		if(shutdownTimer!=0){
 			shutdownTimer = 0;
-			Events.StopShutdown();
+			//Events.StopShutdown();
 		}
 	}
 

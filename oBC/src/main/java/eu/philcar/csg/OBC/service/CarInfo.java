@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.db.Events;
@@ -31,6 +32,7 @@ import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.task.OdoController;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 
+import android.app.Application;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -40,9 +42,15 @@ import android.os.SystemClock;
 import android.text.format.DateFormat;
 import android.util.JsonWriter;
 
+import javax.inject.Inject;
+
 public class CarInfo {
 
     private DLog dlog = new DLog(this.getClass());
+
+    @Inject
+    EventRepository eventRepository;
+
     private Handler serviceHandler;
 
     public String id = "";
@@ -136,6 +144,7 @@ public class CarInfo {
     }
 
     public CarInfo(Handler handler) {
+        App.Instance.getComponent().inject(this);
         serviceHandler = handler;
         serviceLocationListener = new ServiceLocationListener();
         allData = new Bundle();
@@ -236,7 +245,7 @@ public class CarInfo {
                 int k = b.getBoolean(key) ? 1 : 0;
                 if (k != isKeyOn) {
                     isKeyOn = k;
-                    Events.eventKey(k);
+                    eventRepository.eventKey(k);
 
                 }
             }
@@ -261,7 +270,7 @@ public class CarInfo {
                 if (batteryLevel > 20)
                     sent = false;
                 if (batteryLevel <= 15 && batteryLevel > 0 && !sent && sendMail("http://manage.sharengo.it/mailObcLowBattery.php")) {
-                    Events.eventSoc(batteryLevel, "Email");
+                    eventRepository.eventSoc(batteryLevel, "Email");
                     sent = true;
                 }
                 App.Instance.setBatteryLevel(batteryLevel);
@@ -292,6 +301,7 @@ public class CarInfo {
                 voltage = b.getFloat(key);
             } else if (key.equalsIgnoreCase("VIN")) {
                 id = b.getString(key);
+                eventRepository.CarPlateChange(App.CarPlate,id);
                 App.Instance.setCarPlate(id);
             } else if (key.equalsIgnoreCase("VER")) {
                 App.Instance.setFwVersion(b.getString(key));
@@ -301,13 +311,13 @@ public class CarInfo {
                 String str = b.getString(key);
                 if (!this.gear.equals(str)) {
                     this.gear = str;
-                    Events.eventGear(str);
+                    eventRepository.eventGear(str);
                 }
             } else if (key.equalsIgnoreCase("PPStatus")) {
                 boolean v = b.getBoolean(key);
                 if (v != this.chargingPlug) {
                     this.chargingPlug = v;
-                    Events.eventCharge(v ? 1 : 0);
+                    eventRepository.eventCharge(v ? 1 : 0);
                 }
 
                 if (!App.Charging && this.chargingPlug) {
@@ -321,7 +331,7 @@ public class CarInfo {
                 boolean v = b.getBoolean(key);
                 if (v != this.ready) {
                     this.ready = v;
-                    Events.eventReady(v ? 1 : 0);
+                    eventRepository.eventReady(v ? 1 : 0);
                 }
             } else if (key.equalsIgnoreCase("BrakesOn")) {
                 this.brakes = b.getBoolean(key);
@@ -393,7 +403,7 @@ public class CarInfo {
                 if (i != isKeyOn) {
                     hasChanged = true;
                     isKeyOn = i;
-                    Events.eventKey(i);
+                    eventRepository.eventKey(i);
 
                     if(i==1&& App.currentTripInfo!=null && App.currentTripInfo.isOpen && App.pinChecked && App.getParkModeStarted()==null && !App.isClosing && System.currentTimeMillis()-lastForceReady>5000){        //Ask Rosco if good idea
                         lastForceReady=System.currentTimeMillis();
@@ -482,6 +492,7 @@ public class CarInfo {
                 if (!s.equals(App.CarPlate)) {
                     hasChanged = true;
                     id = s;
+                    eventRepository.CarPlateChange(App.CarPlate,id);
                     App.Instance.setCarPlate(id);
                     if(App.canRestartZMQ) {
                         App.canRestartZMQ=false;
@@ -506,13 +517,13 @@ public class CarInfo {
                 if (!this.gear.equals(s)) {
                     hasChanged = true;
                     this.gear = s;
-                    Events.eventGear(s);
+                    eventRepository.eventGear(s);
                 }
             } else if (key.equalsIgnoreCase("PPStatus")) {
                 bo = b.getBoolean(key);
                 if (bo != this.chargingPlug) {
                     this.chargingPlug = bo;
-                    Events.eventCharge(bo ? 1 : 0);
+                    eventRepository.eventCharge(bo ? 1 : 0);
 
                     if (!App.Charging && this.chargingPlug ) {
 
@@ -528,7 +539,7 @@ public class CarInfo {
                 if (bo != this.ready) {
                     hasChanged = true;
                     this.ready = bo;
-                    Events.eventReady(bo ? 1 : 0);
+                    eventRepository.eventReady(bo ? 1 : 0);
                 }
             } else if (key.equalsIgnoreCase("BrakesOn")) {
                 bo = b.getBoolean(key);

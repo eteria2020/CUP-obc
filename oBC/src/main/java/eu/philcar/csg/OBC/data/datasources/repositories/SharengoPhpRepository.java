@@ -9,11 +9,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import eu.philcar.csg.OBC.App;
-import eu.philcar.csg.OBC.data.datasources.SharengoDataSource;
 import eu.philcar.csg.OBC.data.datasources.SharengoPhpDataSource;
 import eu.philcar.csg.OBC.data.model.AreaResponse;
-import eu.philcar.csg.OBC.data.model.CommandResponse;
+import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
+import eu.philcar.csg.OBC.db.Event;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.RxUtil;
@@ -23,7 +23,6 @@ import eu.philcar.csg.OBC.service.TripInfo;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -198,10 +197,59 @@ public class SharengoPhpRepository {
                     DLog.E("Error insiede GetCommand",e);
                     RxUtil.dispose(openTripDisposable);})
                 .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
-
-
-
-
     }
 
+    public void sendEvent(final Event event){
+        mDataManager.saveEvent(event)
+                .concatMap(e -> mRemoteDataSource.sendEvent(e,mDataManager))
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<EventResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(EventResponse eventResponse) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    public void sendEvents(final Collection<Event> event){
+        mDataManager.saveEvents(event)
+                .concatMap(e -> mRemoteDataSource.sendEvent(e,mDataManager))
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<EventResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(EventResponse eventResponse) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
 }

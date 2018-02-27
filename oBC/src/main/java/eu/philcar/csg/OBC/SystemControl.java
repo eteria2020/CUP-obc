@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.service.ObcService;
@@ -19,6 +20,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+
+import javax.inject.Inject;
 
 public class SystemControl {
 	
@@ -163,7 +166,7 @@ public class SystemControl {
 	
 	
 	private static int countFailedTests=0;
-	public static boolean hasNetworkConnection(Context ctx) {
+	public static boolean hasNetworkConnection(Context ctx, EventRepository eventRepository) {
 		if (ctx==null)
 			return false;
 	    ConnectivityManager connectivityManager  = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -173,7 +176,7 @@ public class SystemControl {
 	    
 	    if (ok) {
 	    	if (countFailedTests>0) {
-		    	Events.Restart3G(countFailedTests, activeNetworkInfo.getTypeName());
+		    	eventRepository.Restart3G(countFailedTests, activeNetworkInfo.getTypeName());
 		    	countFailedTests=0;
 	    	} 
 	    } else {
@@ -235,13 +238,15 @@ public class SystemControl {
 	}
 	
 	
-	private static class TestConnection implements Runnable {
+	public static class TestConnection implements Runnable {
 
 		private Message msg;
 		private Context ctx;
 		private Handler hnd;
+		@Inject EventRepository eventRepository;
 		
 		public TestConnection(Message msg, Context ctx, Handler hnd) {
+			App.get(ctx).getComponent().inject(this);
 		   this.msg = msg;	
 		   this.ctx = ctx;
 		   this.hnd = hnd;
@@ -253,7 +258,7 @@ public class SystemControl {
 			if (msg==null)
 				return;
 			
-		    if (hasNetworkConnection(ctx)) {
+		    if (hasNetworkConnection(ctx,eventRepository)) {
 		        try {
 		            HttpURLConnection urlc = (HttpURLConnection) (new URL("http://www.google.com").openConnection());
 		            urlc.setRequestProperty("User-Agent", "Test");
@@ -279,19 +284,27 @@ public class SystemControl {
 	public static void doShutdown() {
 		//If there is another shutdown in progress not older than 60 sec : ignore
 		if (System.currentTimeMillis() - shutdownInProgress>60000) {
-			Thread th = new Thread(new Shutdown());
+			Thread th = new Thread(new Shutdown(App.Instance.getApplicationContext()));
 			th.start();			
 		} else {
 			dlog.d("Shutdown already in progress");
 		}
 	}
 	
-	private static class Shutdown implements Runnable {
+	public static class Shutdown implements Runnable {
+
+		@Inject
+		EventRepository eventRepository;
+
+		public Shutdown(Context ctx) {
+			App.get(ctx).getComponent().inject(this);
+		}
+
 		@Override
 		public void run() {
 			DLog.D(SystemControl.class.toString()+" Begin shutdown ");
 			shutdownInProgress = System.currentTimeMillis();
-			Events.Shutdown();
+			eventRepository.Shutdown();
 			Runtime rt = Runtime.getRuntime();
 			try {
 				Thread.sleep(60000);

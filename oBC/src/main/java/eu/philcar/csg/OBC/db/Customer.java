@@ -13,13 +13,16 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
 import eu.philcar.csg.OBC.data.model.Pin;
+import eu.philcar.csg.OBC.data.model.ServerResponse;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Encryption;
 import eu.philcar.csg.OBC.data.common.ExcludeSerialization;
+import eu.philcar.csg.OBC.service.DataManager;
 
 @DatabaseTable(tableName = "customers", daoClass = Customers.class )
-public class Customer extends DbRecord implements CustomOp{
+public class Customer extends DbRecord<Customer> implements CustomOp, ServerResponse{
 
 	@ExcludeSerialization
 	public static final int N_ERROR_PIN = 0;
@@ -262,5 +265,10 @@ public class Customer extends DbRecord implements CustomOp{
 	@Override
 	public void onDbWrite() {
 		encrypt();
+	}
+
+	@Override
+	public void handleResponse(Customer customer, DataManager manager, int callOrder) {
+
 	}
 }

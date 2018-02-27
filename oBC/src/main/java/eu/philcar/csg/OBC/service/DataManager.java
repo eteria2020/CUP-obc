@@ -23,6 +23,7 @@ import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Customers;
 import eu.philcar.csg.OBC.db.DbManager;
+import eu.philcar.csg.OBC.db.Event;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.ServerCommand;
@@ -62,6 +63,18 @@ public class DataManager { //TODO change to interface-type system like api does 
     public Observable<Trip> saveTrips(Collection<Trip> trip) {
 
         return  mDbManager.getCorseDao().createOrUpdateMany(trip);
+
+    }
+
+    public Observable<Event> saveEvent(Event event) {
+
+        return  mDbManager.getEventiDao().createOrUpdateOne(event);
+
+    }
+
+    public Observable<Event> saveEvents(Collection<Event> event) {
+
+        return  mDbManager.getEventiDao().createOrUpdateMany(event);
 
     }
 
@@ -109,7 +122,25 @@ public class DataManager { //TODO change to interface-type system like api does 
         }
     }
 
-    public void updateEndSentDone(Trip trip) {
+    public void updateEventSendingResponse(Event event) {
+
+        if (event==null)
+            return;
+
+
+        UpdateBuilder<Event,Integer> builder =  mDbManager.getEventiDao().updateBuilder();
+        try {
+            builder.updateColumnValue("sending_error", event.sending_error);
+            builder.updateColumnValue("sent", event.sent);
+            builder.where().idEq(event.id);
+            builder.update();
+            builder.reset();
+        } catch (SQLException e) {
+            DLog.E("setTxOffline : ",e);
+        }
+    }
+
+    public void updateTripEndSentDone(Trip trip) {
 
         if (trip==null)
             return;

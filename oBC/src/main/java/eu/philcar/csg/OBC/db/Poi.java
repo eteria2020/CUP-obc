@@ -2,20 +2,15 @@ package eu.philcar.csg.OBC.db;
 
 import android.location.Location;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import eu.philcar.csg.OBC.helpers.DLog;
-import eu.philcar.csg.OBC.helpers.Encryption;
+import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
+import eu.philcar.csg.OBC.data.model.ServerResponse;
+import eu.philcar.csg.OBC.service.DataManager;
 
 @DatabaseTable(tableName = "poi", daoClass = Pois.class )  
-public class Poi extends DbRecord {
+public class Poi extends DbRecord<ServerResponse> {
 	
 	@DatabaseField(id = true)
 	public int id;
@@ -65,9 +60,10 @@ public class Poi extends DbRecord {
 		loc1.setLongitude(lon);
 		return loc1;
 	}
-	
 
-	
 
-	
+	@Override
+	public void handleResponse(ServerResponse e, DataManager manager, int callOrder) {
+
+	}
 }

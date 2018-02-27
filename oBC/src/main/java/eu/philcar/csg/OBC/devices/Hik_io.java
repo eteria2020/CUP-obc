@@ -9,6 +9,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.FragmentManager;
+import android.webkit.JavascriptInterface;
 
 import com.Hik.Mercury.SDK.Audio.AudioInfo;
 import com.Hik.Mercury.SDK.Audio.AudioObserver;
@@ -37,7 +38,10 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.helpers.Converts;
@@ -66,7 +70,9 @@ public class Hik_io implements LowLevelInterface {
 	private DLog dlog = new DLog(this.getClass());
 	
 	private static final boolean WITH_RADIO = true;
-	
+
+	@Inject
+	EventRepository eventRepository;
 	
 	private CANManager mCANManager;
 	private BTManager mBTManager;
@@ -116,6 +122,8 @@ public class Hik_io implements LowLevelInterface {
 		ledStatuses[LeaseInfoItaly.LED_INDEX_LED2][1]=LeaseInfoItaly.LED_STATUS_LIGHT_OFF;
 		ledStatuses[LeaseInfoItaly.LED_INDEX_LED3][1]=LeaseInfoItaly.LED_STATUS_LIGHT_OFF;
 		ledStatuses[LeaseInfoItaly.LED_INDEX_LED4][1]=LeaseInfoItaly.LED_STATUS_LIGHT_OFF;
+
+		App.get(service).getComponent().inject(this);
 	}
 
 	
@@ -152,8 +160,8 @@ public class Hik_io implements LowLevelInterface {
 		if (mLeaseManager!=null) {
 			mLeaseManager.attachLeaseInfoObserver(mLeaseObserver);
 			int status = mLeaseManager.GetLeaseStatus();
-			int memberId = mLeaseManager.GetLeaseMerberID();			
-			Events.LeaseInfo(status, memberId);
+			int memberId = mLeaseManager.GetLeaseMerberID();
+			eventRepository.LeaseInfo(status, memberId);
 		}
 		
 		if (WITH_RADIO) {
@@ -987,7 +995,7 @@ public class Hik_io implements LowLevelInterface {
 	    		Bundle b = new Bundle();
 	    		b.putInt("LEASE", result);
 	    		b.putInt("LEASEID", memberID);
-	    		Events.LeaseInfo(result, memberID);
+				eventRepository.LeaseInfo(result, memberID);
 	    	}
 	    	
 	    }

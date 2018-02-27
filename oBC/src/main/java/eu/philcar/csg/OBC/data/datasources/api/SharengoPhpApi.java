@@ -4,6 +4,7 @@ import java.util.List;
 
 import eu.philcar.csg.OBC.data.model.AreaResponse;
 import eu.philcar.csg.OBC.data.model.CommandResponse;
+import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.server.ServerCommand;
@@ -44,6 +45,12 @@ public interface SharengoPhpApi {
     Observable<Result<TripResponse>> closeTrip(@Query("cmd") int cmd_type,@Query("id") int remote_id, @Query("id_veicolo") String plate, @Query("id_cliente") int customerId, @Query("ora") long endTimestamp, @Query("km") int km, @Query("carburante") int soc,
                                                @Query("lon") double endLon, @Query("lat") double endLat, @Query("warning") String warning, @Query("pulizia_int") int intCleanliness, @Query("pulizia_ext") int extCleanliness,
                                                @Query("park_seconds") int park_seconds, @Query("n_pin") int nPin, @Query("id_parent") int id_parent);
+
+    @GET("pushevent.php")
+    Observable<Result<EventResponse>> sendEvent(@Query("event_id") int event_id, @Query("label") String label, @Query("car_plate") String car_plate, @Query("customer_id") int customer_id,
+                                                @Query("trip_id") int trip_id, @Query("event_time") long event_time, @Query("intval") int intval, @Query("txtval") String txtval,
+                                                @Query("lon") double lon, @Query("lat") double lat, @Query("km") int km, @Query("battery") int battery, @Query("imei") String imei,
+                                                @Query("json_data") String json_data);
 
 
 }

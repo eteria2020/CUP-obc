@@ -28,6 +28,7 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.db.Events;
@@ -75,6 +76,8 @@ public class FHome extends FBase implements OnClickListener {
     SharengoApiRepository repository;
     @Inject
     SharengoPhpRepository repositoryPhp;
+    @Inject
+    EventRepository eventRepository;
 
     public static FHome newInstance() {
         FHome fm = new FHome();
@@ -535,7 +538,7 @@ public class FHome extends FBase implements OnClickListener {
                     animQueue.remove("area");
                 }
                 if(lastInside!=0 && lastInside!=1)
-                    Events.outOfArea(false);
+                    eventRepository.outOfArea(false);
                 lastInside=0;
 
 
@@ -790,7 +793,7 @@ public class FHome extends FBase implements OnClickListener {
             try {
                 if (getActivity() == null && c==null)
                     return;
-                boolean status = SystemControl.hasNetworkConnection(c!=null?c:getActivity());
+                boolean status = SystemControl.hasNetworkConnection(c!=null?c:getActivity(),eventRepository);
 
                 if (status) {
                     if (animQueue.contains("3g")) {

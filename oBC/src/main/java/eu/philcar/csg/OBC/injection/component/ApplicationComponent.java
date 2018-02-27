@@ -6,12 +6,24 @@ import android.content.Context;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import eu.philcar.csg.OBC.SystemControl;
+import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.controller.map.FHome;
+import eu.philcar.csg.OBC.controller.map.FMap;
+import eu.philcar.csg.OBC.controller.map.FMenu;
+import eu.philcar.csg.OBC.controller.sos.FSOS;
+import eu.philcar.csg.OBC.controller.welcome.FCleanliness;
+import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
+import eu.philcar.csg.OBC.controller.welcome.FWelcome;
 import eu.philcar.csg.OBC.data.datasources.DataSourceModule;
 import eu.philcar.csg.OBC.data.datasources.api.ApiModule;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
+import eu.philcar.csg.OBC.devices.Hik_io;
+import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.injection.ApplicationContext;
 import eu.philcar.csg.OBC.injection.module.ApplicationModule;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoService;
+import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.SyncService;
 import eu.philcar.csg.OBC.service.TripInfo;
@@ -27,6 +39,17 @@ import eu.philcar.csg.OBC.service.TripInfo;
 public interface ApplicationComponent {
 
     void inject(SyncService syncService);
+    void inject(SystemControl.TestConnection testConnection);
+    void inject(SystemControl.Shutdown shutdown);
+    void inject(CarInfo carInfo);
+    void inject(FSOS fsos);
+    void inject(FMap fMap);
+    void inject(FWelcome fWelcome);
+    void inject(Hik_io hik_io);
+    void inject(ServiceTestActivity serviceTestActivity);
+    void inject(FMenu fMenu);
+    void inject(FCleanliness fCleanliness);
+    void inject(FMaintenance fMaintenance);
     void inject(TripInfo tripInfo);
     void inject(FHome fHome);
     void inject(ObcService obcService);
@@ -34,5 +57,6 @@ public interface ApplicationComponent {
     @ApplicationContext Context context();
     Application application();
     SharengoService sharengoService();
+    SharengoPhpRepository sharengoPhpRepository();
 
 }

@@ -24,6 +24,7 @@ import io.reactivex.schedulers.Schedulers;
 public class SharengoApiRepository {
     private DataManager mDataManager;
     private SharengoDataSource mRemoteDataSource;
+    private boolean needUpdateCustomer;
 
     private Disposable customerDisposable;
     private Disposable employeeDisposable;
@@ -48,6 +49,7 @@ public class SharengoApiRepository {
 
 
     public void getCustomer(){
+        needUpdateCustomer=false;
 
         if(!RxUtil.isRunning(customerDisposable)) {
             mRemoteDataSource.getCustomer(mDataManager.getMaxLastupdate())
@@ -61,7 +63,8 @@ public class SharengoApiRepository {
 
                         @Override
                         public void onNext(@NonNull Customer ribot) {
-
+                            //TODO schedule new call in case of >10000
+                            needUpdateCustomer=true;
                         }
 
                         @Override
@@ -74,6 +77,8 @@ public class SharengoApiRepository {
                         public void onComplete() {
                             DLog.I("Synced successfully!");
                             RxUtil.dispose(customerDisposable);
+                            if(needUpdateCustomer)
+                                getCustomer();
                         }
                     });
         }

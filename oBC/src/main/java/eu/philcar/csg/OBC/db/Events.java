@@ -15,6 +15,7 @@ import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.Connectors;
 import eu.philcar.csg.OBC.server.EventsConnector;
@@ -345,7 +346,7 @@ public class Events extends DbTable<Event,Integer> {
 	}
 	
 	
-	public boolean spedisciOffline(Context context, Handler handler) {
+	public boolean spedisciOffline(Context context, Handler handler, SharengoPhpRepository phpRepository) {
 		HttpConnector http;
 		List<Event> list = getEventsToSend();
 		
@@ -358,9 +359,12 @@ public class Events extends DbTable<Event,Integer> {
 			dlog.w("No connection: aborted");
 			return false;
 		}
-		
+
+
+		phpRepository.sendEvents(list);
+
 		//Dato che l'invio � asincrono viene richiesto l'invio solo della prima corsa non spedito, quando arriva il messaggio di risposto di invio eseguito(o fallito) passa alla successiva 
-		for(Event e : list) {
+		/*for(Event e : list) {
 			
 			dlog.d("Selected  evento to send:" + e.toString());
 			
@@ -373,12 +377,12 @@ public class Events extends DbTable<Event,Integer> {
 			/*if(ec.event.id_trip==0 && ec.event.id_trip_local!=0){
 				Trips corse = App.Instance.getDbManager().getCorseDao();
 				ec.event.id_trip=corse.getRemoteIDfromLocal(ec.event.id_trip_local);
-			}*/
+			}
 			ec.returnMessageId = Connectors.MSG_EVENTS_SENT_OFFLINE;
 			http.Execute(ec);
 						
 			return true;
-		}
+		}*/
 		
 		return false;
 	}

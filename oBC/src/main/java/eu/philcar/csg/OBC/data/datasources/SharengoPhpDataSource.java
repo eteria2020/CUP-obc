@@ -4,7 +4,9 @@ import java.util.List;
 
 import eu.philcar.csg.OBC.data.model.AreaResponse;
 import eu.philcar.csg.OBC.data.model.CommandResponse;
+import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
+import eu.philcar.csg.OBC.db.Event;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.DataManager;
@@ -32,5 +34,7 @@ public interface SharengoPhpDataSource {
     Observable<TripResponse> updateTrip(Trip trip);
 
     Observable<TripResponse> closeTrip(Trip trip, DataManager dataManager);
+
+    Observable<EventResponse> sendEvent(Event trip, DataManager dataManager);
 
 }

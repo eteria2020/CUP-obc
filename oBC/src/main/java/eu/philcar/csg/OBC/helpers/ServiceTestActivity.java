@@ -31,8 +31,11 @@ import android.widget.ToggleButton;
 
 import com.Hik.Mercury.SDK.Manager.CANManager;
 
+import javax.inject.Inject;
+
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.devices.UsbSerialConnection;
 import eu.philcar.csg.OBC.service.CarInfo;
@@ -49,6 +52,10 @@ public class ServiceTestActivity extends Activity {
 	//Riferimento alla classe helper che si occuper� di connettersi al servizio 	
 	private ServiceConnector serviceConnector =  null;
 	private EditText etPlate;
+
+
+	@Inject
+	EventRepository eventRepository;
 
 	private UsbSerialConnection usc;
 	private CarInfo carInfo;
@@ -316,9 +323,11 @@ public class ServiceTestActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		App.get(this).getComponent().inject(this);
+
 		CanManager = CANManager.get(this);
 
-		Events.DiagnosticPage(0);
+		eventRepository.DiagnosticPage(0);
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,

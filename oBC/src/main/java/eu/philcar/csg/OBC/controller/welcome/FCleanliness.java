@@ -5,6 +5,7 @@ import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Trips;
@@ -13,6 +14,7 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,6 +26,8 @@ import android.widget.TextView;
 
 import java.sql.SQLException;
 
+import javax.inject.Inject;
+
 public class FCleanliness extends FBase implements OnClickListener {
 
 	public static FCleanliness newInstance() {
@@ -31,14 +35,23 @@ public class FCleanliness extends FBase implements OnClickListener {
 		FCleanliness fc = new FCleanliness();
 		return fc;
 	}
-	
+
+	@Inject
+	EventRepository eventRepository;
+
 	private ImageButton insideGreenLedIB, insideYellowLedIB, insideRedLedIB, outsideGreenLedIB, outsideYellowLedIB, outsideRedLedIB;
 	private Button sosB;
 	private FrameLayout fcle_right_FL;
 	private DLog dlog = new DLog(this.getClass());
 	
 	private int insideState, outsideState;
-	
+
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		App.get(getActivity()).getComponent().inject(this);
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
@@ -165,7 +178,7 @@ public class FCleanliness extends FBase implements OnClickListener {
 			if (App.currentTripInfo!=null && App.currentTripInfo.trip!=null) {
 				App.CounterCleanlines=0;
 				App.Instance.persistCounterCleanlines();
-				Events.eventCleanliness(App.currentTripInfo.trip.int_cleanliness, App.currentTripInfo.trip.ext_cleanliness);
+				eventRepository.eventCleanliness(App.currentTripInfo.trip.int_cleanliness, App.currentTripInfo.trip.ext_cleanliness);
 				App.currentTripInfo.UpdateCorsa();
 
 

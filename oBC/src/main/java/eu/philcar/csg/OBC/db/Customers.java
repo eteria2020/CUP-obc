@@ -136,14 +136,14 @@ public class Customers extends DbTable<Customer,Integer> {
 	}
 
 
-	
+	@Deprecated
 	public void startWhitelistDownload(Context ctx, Handler handler) {
 		DLog.D("Start whitelist download..");
-		CustomersConnector cn = new CustomersConnector();
+		/*CustomersConnector cn = new CustomersConnector();
 		cn.setLastUpdate(mostRecentTimestamp());
 		HttpsConnector http = new HttpsConnector(ctx);
 		http.SetHandler(handler);
-		http.Execute(cn);
+		http.Execute(cn);*/
 	}
 
 	public Observable<Customer> setCustomers(final Collection<Customer> customers){

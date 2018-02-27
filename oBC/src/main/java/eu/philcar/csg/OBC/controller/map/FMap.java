@@ -108,6 +108,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AMainOBC;
@@ -116,6 +118,7 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
@@ -136,6 +139,8 @@ public class FMap extends FBase implements OnClickListener {
 		return fm;
 	}
 
+	@Inject
+	EventRepository eventRepository;
 	private DLog dlog = new DLog(this.getClass());
 
 	public final static int  BASE_TOLLERANCE = 50;					// Circle radius in meters (for fuel station on-map-tap)
@@ -255,6 +260,7 @@ public class FMap extends FBase implements OnClickListener {
 		context=getActivity();
 		player=new AudioPlayer(getActivity());
         App.isCloseable = false;
+        App.get(getActivity()).getComponent().inject(this);
 
 
     }
@@ -690,7 +696,7 @@ public class FMap extends FBase implements OnClickListener {
 			fmapRange.setVisibility(View.INVISIBLE);
 
 
-		if(!SystemControl.hasNetworkConnection(getActivity())){
+		if(!SystemControl.hasNetworkConnection(getActivity(),eventRepository)){
 			if(!animQueue.contains("3g"))
 				animQueue.add("3g");
 			if(no3gwarning.getAnimation()==null)
@@ -994,7 +1000,7 @@ public class FMap extends FBase implements OnClickListener {
 					animQueue.remove("area");
 				}
 				if(lastInside!=0 && lastInside!=1)
-					Events.outOfArea(false);
+					eventRepository.outOfArea(false);
 				lastInside=0;
 
 
@@ -1102,7 +1108,7 @@ public class FMap extends FBase implements OnClickListener {
 					if (statusAlertSOC <= 1) {
 						dlog.d("Display popup 5km");
 						statusAlertSOC = 2;
-						Events.eventSoc(SOC, "Popup 5km");
+						eventRepository.eventSoc(SOC, "Popup 5km");
 						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
 						rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
 						((FrameLayout) (rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_redalertbox);
@@ -1134,7 +1140,7 @@ public class FMap extends FBase implements OnClickListener {
 						dlog.d("Display popup 20km");
 
 						statusAlertSOC = 1;
-						Events.eventSoc(SOC, "Popup 20km");
+						eventRepository.eventSoc(SOC, "Popup 20km");
 						rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
 						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
 						((FrameLayout) (rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_orangealertbox);
@@ -3244,7 +3250,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		@Override
 		public void onReceive(Context c, Intent i) {
-			boolean status = SystemControl.hasNetworkConnection(c);
+			boolean status = SystemControl.hasNetworkConnection(c,eventRepository);
 
 			if (status) {
 				if (animQueue.contains("3g")) {

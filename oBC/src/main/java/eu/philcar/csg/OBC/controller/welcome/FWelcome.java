@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,11 +25,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
@@ -43,6 +47,10 @@ public class FWelcome extends FBase {
 		FWelcome fw = new FWelcome();
 		return fw;
 	}
+
+
+	@Inject
+	EventRepository eventRepository;
 
 	private  RelativeLayout fwcm_whole_RL;
 	private DLog dlog = new DLog(this.getClass());
@@ -65,6 +73,12 @@ public class FWelcome extends FBase {
 
 	}
 
+
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		App.get(getActivity()).getComponent().inject(this);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -185,7 +199,7 @@ public class FWelcome extends FBase {
 	private void nextPage() {
 		// if the charge mode is active go to Maintenance page for resetting it.
 		// We assume that if the car is in charging mode no one but the admins can get in
-		if (App.Charging) {
+		if (App.Charging || true ) {
 			((ABase)getActivity()).pushFragment(FMaintenance.newInstance(), FMaintenance.class.getName(), true);
 			DLog.D("Request FMaintenance");
 		} else
@@ -216,11 +230,11 @@ public class FWelcome extends FBase {
 		        if (pwd.equals("pamal17"))  App.isAdmin=2;
 		        	
 		        if (App.isAdmin>0) {
-		        	Events.DiagnosticPage(App.isAdmin);
+					eventRepository.DiagnosticPage(App.isAdmin);
 		        	Intent intent = new Intent(FWelcome.this.getActivity(), ServiceTestActivity.class);
 		        	FWelcome.this.getActivity().startActivity(intent);
 		        } else {
-		        	Events.DiagnosticPageFail(pwd);
+					eventRepository.DiagnosticPageFail(pwd);
 		        }
 		    }
 		});

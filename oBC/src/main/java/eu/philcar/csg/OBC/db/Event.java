@@ -5,10 +5,12 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.service.DataManager;
 
 @DatabaseTable(tableName = "eventi", daoClass = Events.class )  
-public class Event extends DbRecord {
+public class Event extends DbRecord<EventResponse> {
 	
 
 	@DatabaseField(generatedId = true)
@@ -68,6 +70,16 @@ public class Event extends DbRecord {
 
 	    }
 	}
-	
-	
+
+
+	@Override
+	public void handleResponse(EventResponse eventResponse, DataManager manager, int callOrder) {
+		sent = true;
+		if (eventResponse.getResult() > 0) {
+			sending_error=false;
+		} else {
+			sending_error=true;
+		}
+		manager.updateEventSendingResponse(this);
+	}
 }

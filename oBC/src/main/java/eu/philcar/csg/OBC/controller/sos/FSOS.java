@@ -7,6 +7,7 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.controller.FNumber;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
@@ -17,6 +18,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +31,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import javax.inject.Inject;
+
 public class FSOS extends FBase implements OnClickListener {
 
 	public static FSOS newInstance() {
@@ -36,6 +40,9 @@ public class FSOS extends FBase implements OnClickListener {
 		FSOS fsos = new FSOS();
 		return fsos;
 	}
+
+	@Inject
+	EventRepository eventRepository;
 	
 	private TextView messageTV, numberTV,tvCarPlate;
 	private ImageButton cancelIB;
@@ -45,7 +52,14 @@ public class FSOS extends FBase implements OnClickListener {
 	private DLog dlog = new DLog(this.getClass());
 	
 	private String customerCenterNumber;
-	
+
+
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		App.get(getActivity()).getComponent().inject(this);
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
@@ -171,11 +185,11 @@ public class FSOS extends FBase implements OnClickListener {
 				if (pwd.equals("pamal17"))  App.isAdmin=2;
 
 				if (App.isAdmin>0) {
-					Events.DiagnosticPage(App.isAdmin);
+					eventRepository.DiagnosticPage(App.isAdmin);
 					Intent intent = new Intent(FSOS.this.getActivity(), ServiceTestActivity.class);
 					FSOS.this.getActivity().startActivity(intent);
 				} else {
-					Events.DiagnosticPageFail(pwd);
+					eventRepository.DiagnosticPageFail(pwd);
 				}
 			}
 		});

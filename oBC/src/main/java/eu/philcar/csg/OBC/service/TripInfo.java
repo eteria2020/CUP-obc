@@ -19,6 +19,7 @@ import com.j256.ormlite.stmt.UpdateBuilder;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.controller.map.FRadio;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.data.model.AreaResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
@@ -82,6 +83,8 @@ public class TripInfo {
 
     @Inject
     SharengoPhpRepository repositoryPhp;
+    @Inject
+    EventRepository eventRepository;
 
     // Properties
     public Customer customer;
@@ -214,8 +217,8 @@ public class TripInfo {
             if(card!=null && !isOpen){
                 dlog.d("Passaggio card doorsOnly apertura porte in corso! id card: "+card.toString());
                 obc_io.setDoors(null, 1,"Porte Aperte");  //Sole se trip registrata su db apri le portiere
-                Events.eventRfid(6, code + " "+ card.getName());
-                Events.eventCleanliness(0, 0);
+                eventRepository.eventRfid(6, code + " "+ card.getName());
+                eventRepository.eventCleanliness(0, 0);
                 return null;
             }
         }
@@ -242,7 +245,7 @@ public class TripInfo {
         if (customer==null) {			
             obc_io.setLcd(null,"SCONOSCIUTA");
             dlog.d(TripInfo.class.toString()+" handleCard: Card unknown :" + code);
-            Events.eventRfid(0, code);
+            eventRepository.eventRfid(0, code);
             return null;
         }
 
@@ -284,7 +287,7 @@ public class TripInfo {
                             //}
                         } else {
                             dlog.d(TripInfo.class.toString()+" handleCard: Local out of order reservation");
-                            Events.TripOutOfOrder(code);
+                            eventRepository.TripOutOfOrder(code);
                         }
 
                     } else {    //... altrimenti segnala che ? prenotata e non fare nulla
@@ -304,7 +307,7 @@ public class TripInfo {
                     //obc_io.setEngine(null, 1); //TODO: RIMUOVERE!!!! Il motore si dovr? abilitare solo dopo il check del pin
                     obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
                     obc_io.setTag(null,cardCode);
-                    Events.eventRfid(1, code+" "+event);
+                    eventRepository.eventRfid(1, code+" "+event);
                     hasBeenStopped =false;
                     service.sendBeacon();
                     dlog.d(TripInfo.class.toString() + " handleCard: Car opened ");
@@ -369,8 +372,8 @@ public class TripInfo {
                         obc_io.setDoors(null, 0,"IN SOSTA");
                         obc_io.setEngine(null, 0);
                         obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
-                        Events.eventRfid(3, code);
-                        Events.eventParkBegin();
+                        eventRepository.eventRfid(3, code);
+                        eventRepository.eventParkBegin();
                         hasBeenStopped = true;
                         App.parkMode = ParkMode.PARK_STARTED;
                         App.Instance.persistInSosta();
@@ -394,9 +397,9 @@ public class TripInfo {
                             dlog.d("End Park forced trip close");
                         }
                         obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
-                        obc_io.setTag(null,cardCode);						
-                        Events.eventRfid(4, code);
-                        Events.eventParkEnd();
+                        obc_io.setTag(null,cardCode);
+                        eventRepository.eventRfid(4, code);
+                        eventRepository.eventParkEnd();
                         App.parkMode = ParkMode.PARK_ENDED;
                         App.Instance.persistInSosta();
 
@@ -432,7 +435,7 @@ public class TripInfo {
 
 
 
-                        Events.eventRfid(2, code);
+                        eventRepository.eventRfid(2, code);
                         CloseTrip(carInfo);
 
                         /*TripsConnector cc = new TripsConnector(this);
@@ -473,7 +476,7 @@ public class TripInfo {
 
                 obc_io.setLcd(null,"AUTO IN USO");
                 dlog.d(TripInfo.class.toString()+" handleCard: Different card, nothing to do");
-                Events.eventRfid(5, code);
+                eventRepository.eventRfid(5, code);
                 return null;
             }
 
@@ -759,7 +762,7 @@ public class TripInfo {
             App.CounterCleanlines++;
             if(App.CounterCleanlines>=5){
                 App.CounterCleanlines=0;
-                Events.eventCleanliness(0, 0);
+                eventRepository.eventCleanliness(0, 0);
             }
             App.Instance.persistCounterCleanlines();
         }

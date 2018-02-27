@@ -6,6 +6,8 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
+import eu.philcar.csg.OBC.db.DbRecord;
+import eu.philcar.csg.OBC.service.DataManager;
 import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.functions.Function;
@@ -54,5 +56,13 @@ public abstract class BaseRetrofitDataSource {
 
             return Observable.just(r.response().body());
         });
+    }
+
+    protected void handleResponsePersistance(DbRecord record,BaseResponse response, DataManager manager, int callOrder){
+
+
+
+        record.handleResponse(response, manager, callOrder);
+
     }
 }
