@@ -198,7 +198,7 @@ public class FHome extends FBase implements OnClickListener {
 
 
         alertAnimation = new AlphaAnimation(0.0f, 1.0f);
-        alertAnimation.setDuration(500); //You can manage the time of the blink with this parameter
+        alertAnimation.setDuration(500); //You can manage the date of the blink with this parameter
         alertAnimation.setStartOffset(200);
         alertAnimation.setRepeatMode(Animation.REVERSE);
         alertAnimation.setRepeatCount(Animation.INFINITE);
@@ -756,7 +756,7 @@ public class FHome extends FBase implements OnClickListener {
 
     }*/
 /**
- * Handle message to update the time
+ * Handle message to update the date
  * */
     private Handler localHandler = new Handler() {
 

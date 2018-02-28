@@ -1,5 +1,6 @@
 package eu.philcar.csg.OBC.data.datasources.base;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -30,8 +31,10 @@ public abstract class BaseRetrofitDataSource {
                         return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.SERVER_TIMEOUT));
                     } else if (throwable instanceof UnknownHostException) {
                         return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK));
-                    } else {
-                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED));
+                    } else if (throwable instanceof EOFException) {
+                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.EMPTY));
+                    }else{
+                            return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED));
                     }
                 } else {
                     return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED));

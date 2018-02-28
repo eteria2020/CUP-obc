@@ -111,7 +111,7 @@ abstract class PollerBase
             return 0L;
         }
 
-        //  Get the current time.
+        //  Get the current date.
         long current = Clock.nowMS();
 
         //   Execute the timers that are already due.
@@ -120,7 +120,7 @@ abstract class PollerBase
             Entry<Long, TimerInfo> o = it.next();
             //  If we have to wait to execute the item, same will be true about
             //  all the following items (multimap is sorted). Thus we can stop
-            //  checking the subsequent timers and return the time to wait for
+            //  checking the subsequent timers and return the date to wait for
             //  the next timer (at least 1ms).
 
             if (o.getKey() > current) {

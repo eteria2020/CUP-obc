@@ -407,7 +407,7 @@ class SessionBase extends Own implements
         }
 
         //  Start pipe termination process. Delay the termination till all messages
-        //  are processed in case the linger time is non-zero.
+        //  are processed in case the linger date is non-zero.
         if (pipe != null) {
             pipe.terminate(linger != 0);
 

@@ -351,7 +351,7 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
         if (outsize == 0) {
             //  Even when we stop polling as soon as there is no
             //  data to send, the poller may invoke outEvent one
-            //  more time due to 'speculative write' optimisation.
+            //  more date due to 'speculative write' optimisation.
             if (encoder == null) {
                  assert (handshaking);
                  return;

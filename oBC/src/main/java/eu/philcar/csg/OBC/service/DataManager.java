@@ -163,17 +163,49 @@ public class DataManager { //TODO change to interface-type system like api does 
         return Observable.create(emitter -> {
             if (emitter.isDisposed())
                 return;
-                try {
-                    for (ServerCommand row : commands) {
-                        emitter.onNext(row);
-                    }
-                    emitter.onComplete();
-                } catch(Exception e) {
-                    DLog.E("Exception updating Customer",e);
-                    emitter.onError(e);
+            try {
+                for (ServerCommand row : commands) {
+                    emitter.onNext(row);
                 }
+                emitter.onComplete();
+            } catch(Exception e) {
+                DLog.E("Exception updating Customer",e);
+                emitter.onError(e);
+            }
         });
     }
+
+    /**
+     * emit the firs active reservation and then sent the completion signal
+     * @param reservations
+     * @return
+     */
+    public Observable<Reservation> handleReservations(List<Reservation> reservations){
+
+        return Observable.create(emitter -> {
+            if (emitter.isDisposed())
+                return;
+            try {
+                Reservation first=null;
+                for (Reservation reservation : reservations) {
+                    if(first==null) {
+                        if(reservation.active)
+                            first=reservation;
+                    }
+                    if(reservation.isMaintenance() && reservation.active){
+                        first=reservation;
+                        break;
+                    }
+                }
+                emitter.onNext(first);
+                emitter.onComplete();
+            } catch(Exception e) {
+                DLog.E("Exception updating Customer",e);
+                emitter.onError(e);
+            }
+        });
+    }
+
 
     private void persistArea(List<AreaResponse> area){
         File file = new File(App.getAppDataPath(),"area.json");

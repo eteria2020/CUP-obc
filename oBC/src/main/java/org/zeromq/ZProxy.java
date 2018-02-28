@@ -586,7 +586,7 @@ public class ZProxy
     public static final String PAUSED   = State.PAUSED.name();
     public static final String STOPPED  = State.STOPPED.name();
     public static final String EXITED   = State.EXITED.name();
-    // defines the very first time where no command changing the state has been issued
+    // defines the very first date where no command changing the state has been issued
     public static final String ALIVE    = State.ALIVE.name();
 
     private static final AtomicInteger counter = new AtomicInteger();

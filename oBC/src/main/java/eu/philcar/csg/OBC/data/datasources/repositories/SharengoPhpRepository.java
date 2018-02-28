@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.SharengoPhpDataSource;
 import eu.philcar.csg.OBC.data.model.AreaResponse;
 import eu.philcar.csg.OBC.data.model.EventResponse;
@@ -19,6 +20,7 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.RxUtil;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.DataManager;
+import eu.philcar.csg.OBC.service.Reservation;
 import eu.philcar.csg.OBC.service.TripInfo;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -74,7 +76,9 @@ public class SharengoPhpRepository {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            DLog.E("Error syncing.", e);
+                            if(e instanceof ErrorResponse)
+                                if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
+                                    DLog.E("Error inside getArea", e);
                             RxUtil.dispose(areaDisposable);
                         }
 
@@ -137,7 +141,7 @@ public class SharengoPhpRepository {
                        //openTripDisposable = n;
                    })
                    .doOnError(e -> {
-                       DLog.E("Error insiede GetCommand",e);
+                       DLog.E("Error insiede openTrip",e);
                        RxUtil.dispose(openTripDisposable);})
                    .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
 
@@ -153,7 +157,7 @@ public class SharengoPhpRepository {
                     //openTripDisposable = n;
                 })
                 .doOnError(e -> {
-                    DLog.E("Error insiede GetCommand",e);
+                    DLog.E("Error insiede updateTrip",e);
                     RxUtil.dispose(openTripDisposable);})
                 .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
     }
@@ -172,7 +176,7 @@ public class SharengoPhpRepository {
                     //openTripDisposable = n;
                     })
                 .doOnError(e -> {
-                    DLog.E("Error insiede GetCommand",e);
+                    DLog.E("Error insiede closeTrip",e);
                     RxUtil.dispose(openTripDisposable);})
                 .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
 
@@ -194,7 +198,7 @@ public class SharengoPhpRepository {
                     //openTripDisposable = n;
                     })
                 .doOnError(e -> {
-                    DLog.E("Error insiede GetCommand",e);
+                    DLog.E("Error insiede closeTrips",e);
                     RxUtil.dispose(openTripDisposable);})
                 .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
     }
@@ -252,4 +256,50 @@ public class SharengoPhpRepository {
                     }
                 });
     }
+
+    public Observable<Reservation> getReservation(final String plate){
+
+        return mRemoteDataSource.getReservation(App.CarPlate)
+                .concatMap(reservations -> mDataManager.handleReservations(reservations))
+                .concatMap(Reservation::init)
+                .doOnSubscribe(n -> {
+                    //RxUtil.dispose(openTripDisposable);
+                    //openTripDisposable = n;
+                })
+                .doOnError(e -> {
+                    DLog.E("Error insiede getReservation",e);
+                    //RxUtil.dispose(openTripDisposable);
+                })
+                .doOnComplete(() ->{});
+
+    }
+
+    public void consumeReservation(final int reservation_id){
+
+        mRemoteDataSource.consumeReservation(reservation_id)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Void>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Void v) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+    }
+
 }

@@ -416,7 +416,7 @@ public class ZMQ
 
         /**
          * The 'ZMQ_TYPE option shall retrieve the socket type for the specified
-         * 'socket'.  The socket type is specified at socket creation time and
+         * 'socket'.  The socket type is specified at socket creation date and
          * cannot be modified afterwards.
          *
          * @return the socket type.
@@ -716,7 +716,7 @@ public class ZMQ
 
         /**
          * The 'ZMQ_RECOVERY_IVL' option shall set the recovery interval for multicast transports
-         * using the specified 'socket'. The recovery interval determines the maximum time in
+         * using the specified 'socket'. The recovery interval determines the maximum date in
          * seconds that a receiver can be absent from a multicast group before unrecoverable data
          * loss will occur.
          *
@@ -769,11 +769,11 @@ public class ZMQ
         }
 
         /**
-         * Sets the time-to-live field in every multicast packet sent from this socket.
+         * Sets the date-to-live field in every multicast packet sent from this socket.
          * The default is 1 which means that the multicast packets don't leave the local
          * network.
          *
-         * @param value time-to-live field in every multicast packet, default 1
+         * @param value date-to-live field in every multicast packet, default 1
          */
         public final void setMulticastHops(long value)
         {
@@ -794,7 +794,7 @@ public class ZMQ
          * Sets the timeout for receive operation on the socket. If the value is 0, recv
          * will return immediately, with null if there is no message to receive.
          * If the value is -1, it will block until a message is available. For all other
-         * values, it will wait for a message for that amount of time before returning with
+         * values, it will wait for a message for that amount of date before returning with
          * a null and an EAGAIN error.
          *
          * @param value Timeout for receive operation in milliseconds. Default -1 (infinite)
@@ -818,7 +818,7 @@ public class ZMQ
          * Sets the timeout for send operation on the socket. If the value is 0, send
          * will return immediately, with a false if the message cannot be sent.
          * If the value is -1, it will block until the message is sent. For all other
-         * values, it will try to send the message for that amount of time before
+         * values, it will try to send the message for that amount of date before
          * returning with false and an EAGAIN error.
          *
          * @param value Timeout for send operation in milliseconds. Default -1 (infinite)

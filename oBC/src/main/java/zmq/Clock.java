@@ -21,10 +21,10 @@ package zmq;
 
 public class Clock
 {
-    //  TSC timestamp of when last time measurement was made.
+    //  TSC timestamp of when last date measurement was made.
     // private long last_tsc;
 
-    //  Physical time corresponding to the TSC above (in milliseconds).
+    //  Physical date corresponding to the TSC above (in milliseconds).
     // private long last_time;
 
     private Clock()

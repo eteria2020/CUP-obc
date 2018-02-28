@@ -129,7 +129,7 @@ public class AdvertisementService extends IntentService {
 				}
 			}
 			
-			// Persist last synchronization time
+			// Persist last synchronization date
 			SharedPreferences sharedPreferences = getSharedPreferences(App.COMMON_PREFERENCES, Context.MODE_PRIVATE);
 			if (sharedPreferences != null) {
 				Editor editor = sharedPreferences.edit();

@@ -409,7 +409,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		//animation for the blink of the alert in the top right corner
 		alertAnimation = new AlphaAnimation(0.0f, 1.0f);
-		alertAnimation.setDuration(500); //You can manage the time of the blink with this parameter
+		alertAnimation.setDuration(500); //You can manage the date of the blink with this parameter
 		alertAnimation.setStartOffset(200);
 		alertAnimation.setRepeatMode(Animation.REVERSE);
 		alertAnimation.setRepeatCount(Animation.INFINITE);
@@ -2043,7 +2043,7 @@ public class FMap extends FBase implements OnClickListener {
                 	String strTotalDistance = SKNavigationManager.getInstance().formatDistance((int) Math.round(totalDistance));
                 	txtTotalDistance.setText(distanceToHtml(strTotalDistance,false));
 
-                	// Total time
+                	// Total date
                 	TextView txtTotalTime =  (TextView)view.findViewById(R.id.txtTotalTime);
                 	int totalTime = skNavigationState.getCurrentAdviceTimeToDestination();
                 	txtTotalTime.setText(formatTime(totalTime));
@@ -2057,7 +2057,7 @@ public class FMap extends FBase implements OnClickListener {
                 	TextView txtNextStreet = (TextView)rootView.findViewById(R.id.txtNextStreet);
                 	txtNextStreet.setText(skNavigationState.getCurrentAdviceNextStreetName());
 
-                	//Arrival time
+                	//Arrival date
                 	Date eta = new Date();
                 	eta.setTime(eta.getTime() + totalTime*1000);
                 	TextView txtEta = (TextView)rootView.findViewById(R.id.txtEta);

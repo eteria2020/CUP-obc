@@ -1,6 +1,5 @@
 package eu.philcar.csg.OBC.service;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,27 +7,38 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.util.JsonWriter;
+import com.google.gson.annotations.SerializedName;
+
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.common.ExcludeSerialization;
+import eu.philcar.csg.OBC.data.model.ServerResponse;
 import eu.philcar.csg.OBC.db.Customers;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.helpers.DLog;
+import io.reactivex.Observable;
 
-public class Reservation {
-	
+public class Reservation  implements ServerResponse{
+	@ExcludeSerialization
 	private DLog dlog = new DLog(this.getClass());
 	
 	public int   id;
+	public String cards;
+	@ExcludeSerialization
 	public List<String> codes;
+	@SerializedName("time")
 	public long timestamp;
+	@SerializedName("length")
 	public long duration;
+	public boolean active;
+	@ExcludeSerialization
 	private long lastDebugTrace;
+	@ExcludeSerialization
 	private boolean local=false;
 	
-	
+	@ExcludeSerialization
 	private boolean _timedOut = false;
-	
-	public Date time;
+	@ExcludeSerialization
+	public Date date;
 	
 	public static Reservation createOutOfOrderReservation() {
 		int id=-1;
@@ -72,7 +82,7 @@ public class Reservation {
 						}
 					}
 						
-					Double dtimestamp = jobj.getDouble("time");
+					Double dtimestamp = jobj.getDouble("date");
 					long timestamp = dtimestamp.longValue();
 					long durata = jobj.getInt("length");
 					boolean attiva = jobj.getBoolean("active");
@@ -106,7 +116,7 @@ public class Reservation {
 							}
 						}
 
-						Double dtimestamp = jobj.getDouble("time");
+						Double dtimestamp = jobj.getDouble("date");
 						long timestamp = dtimestamp.longValue();
 						long durata = jobj.getInt("length");
 						boolean attiva = jobj.getBoolean("active");
@@ -152,7 +162,7 @@ public class Reservation {
 				ja.put(card);
 			}
 			jo.put("cards", ja);
-			jo.put("time",timestamp);
+			jo.put("date",timestamp);
 			jo.put("length", duration);
 			jo.put("active", true);
 		} catch(Exception e) {
@@ -163,18 +173,18 @@ public class Reservation {
 		
 	}
 	
-	public Reservation(int id, List<String> codes, long time, long duration) {
-		this(id,codes,time,duration,false);
+	public Reservation(int id, List<String> codes, long date, long duration) {
+		this(id,codes, date,duration,false);
 	}
 	
-	public Reservation(int id, List<String> codes, long time, long duration, boolean local) {
+	public Reservation(int id, List<String> codes, long date, long duration, boolean local) {
 		this.id = id;
 		this.codes = codes;
-		this.timestamp =time;
+		this.timestamp = date;
 		this.duration = duration;
 		this.local=local;
 
-		this.time = new Date(time*1000);
+		this.date = new Date(date *1000);
 
 	}
 	
@@ -237,7 +247,7 @@ public class Reservation {
     	if (this.duration!= r.duration)
     		return false;
     	
-    	if (this.time != r.time) 
+    	if (this.date != r.date)
     		return false;
     	
     	return true;
@@ -247,8 +257,26 @@ public class Reservation {
 	
 	@Override
 	public String toString() {
-		return "Id:" + id + ", timestamp:" + time.toString() + ", card:" + codes.toString() + ",duration:" + duration + ",local:" + local;
+		return "Id:" + id + ", timestamp:" + date.toString() + ", card:" + codes.toString() + ",duration:" + duration + ",local:" + local;
 	}
 
+
+	public Observable<Reservation> init(){
+		codes=new ArrayList<>();
+
+		if(cards!=null) {
+
+			try {
+				JSONArray ja = new JSONArray(cards);
+				for (int j = 0; j < ja.length(); j++) {
+					codes.add(ja.getString(j));
+				}
+			}catch (Exception e){
+				dlog.e("Exception while init Reservation",e);
+			}
+			date=new Date(timestamp*1000);
+		}
+		return Observable.just(this);
+	}
 	
 }

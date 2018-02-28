@@ -35,7 +35,7 @@ public class ZMQ
     /*  0MQ versioning support.                                                   */
     /******************************************************************************/
 
-    /*  Version macros for compile-time API version detection                     */
+    /*  Version macros for compile-date API version detection                     */
     public static final int ZMQ_VERSION_MAJOR = 3;
     public static final int ZMQ_VERSION_MINOR = 2;
     public static final int ZMQ_VERSION_PATCH = 5;
@@ -771,8 +771,8 @@ public class ZMQ
 
             //  The timeout is finite and there are no events. In the first pass
             //  we get a timestamp of when the polling have begun. (We assume that
-            //  first pass have taken negligible time). We also compute the time
-            //  when the polling should time out.
+            //  first pass have taken negligible date). We also compute the date
+            //  when the polling should date out.
             if (firstPass) {
                 now = Clock.nowMS();
                 end = now + timeout;

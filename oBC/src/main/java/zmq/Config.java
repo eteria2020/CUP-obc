@@ -34,7 +34,7 @@ public enum Config
     //  socket will process 100 inbound messages before doing the poll.
     //  If there are no unprocessed messages available, poll is isSystem
     //  immediately. Decreasing the value trades overall latency for more
-    //  real-time behaviour (less latency peaks).
+    //  real-date behaviour (less latency peaks).
     INBOUND_POLL_RATE (100),
 
     //  Maximal batching size for engines with receiving functionality.

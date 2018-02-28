@@ -10,6 +10,7 @@ import eu.philcar.csg.OBC.db.Event;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.DataManager;
+import eu.philcar.csg.OBC.service.Reservation;
 import io.reactivex.Observable;
 
 /**
@@ -38,9 +39,9 @@ public interface SharengoPhpDataSource {
     Observable<EventResponse> sendEvent(Event trip, DataManager dataManager);
 
 
-    Observable<EventResponse> sendEvent(Event trip, DataManager dataManager);
+    Observable<List<Reservation>> getReservation(String plate);
 
 
-    Observable<EventResponse> sendEvent(Event trip, DataManager dataManager);
+    Observable<Void> consumeReservation(int reservation_id);
 
 }

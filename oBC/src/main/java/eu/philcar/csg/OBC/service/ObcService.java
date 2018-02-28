@@ -34,6 +34,7 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
+import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoApi;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
@@ -311,7 +312,7 @@ public class ObcService extends Service implements OnTripCallback {
                 }
                 else
                     rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 1"}); //date -s 20120423.130000*/
-                dlog.d("timeCheckScheduler: rawGpsTime: " + new Date(carInfo.intGpsLocation.getTime()).toString() + " elapsed: " + (System.currentTimeMillis() - (carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000)) + " android time: " + android_time.toString() + " fixed gps time: " + gps_time.toString() +" Sharengo time: "+(sharengo_time!=null?sharengo_time.toString():" response code "+lastResponseCode));
+                dlog.d("timeCheckScheduler: rawGpsTime: " + new Date(carInfo.intGpsLocation.getTime()).toString() + " elapsed: " + (System.currentTimeMillis() - (carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000)) + " android date: " + android_time.toString() + " fixed gps date: " + gps_time.toString() +" Sharengo date: "+(sharengo_time!=null?sharengo_time.toString():" response code "+lastResponseCode));
 
                 rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time_zone 0"}); //date -s 20120423.130000
                 AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
@@ -481,7 +482,7 @@ public class ObcService extends Service implements OnTripCallback {
         }
 
         if (this.WITH_ZMQNOTIFY) {
-            zmqSubscriber = new ZmqSubscriber();
+            zmqSubscriber = new ZmqSubscriber(localHandler);
             localHandler.sendMessageDelayed(MessageFactory.zmqRestart(), 20000);
             //zmqSubscriber.Start(localHandler);
         }
@@ -511,7 +512,7 @@ public class ObcService extends Service implements OnTripCallback {
         criteria.setPowerRequirement(Criteria.POWER_HIGH);
 
 
-        setLocationMode(30000);  // If car is idle  30sec is min time between locations updates
+        setLocationMode(30000);  // If car is idle  30sec is min date between locations updates
         locationManager.addGpsStatusListener(gpsStatusListener);
 
         //Check if UI is active and if not restart the proper page
@@ -587,7 +588,7 @@ public class ObcService extends Service implements OnTripCallback {
         virtualBMSUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
         //Start scheduler for GPS query
         gpsCheckScheduler = Executors.newSingleThreadScheduledExecutor();
-        //Start schedule for time sync
+        //Start schedule for date sync
         timeCheckScheduler = Executors.newSingleThreadScheduledExecutor();
 
         // Start internal loop with period of  10 sec
@@ -644,7 +645,7 @@ public class ObcService extends Service implements OnTripCallback {
                         minutePrescaler = 0;
 
 
-                        //If there is  an open trip check if it exceeded a time cap
+                        //If there is  an open trip check if it exceeded a date cap
                         if (tripInfo != null && tripInfo.isOpen) {
                             int timecap = App.Instance.loadSplitTripConfig();
                             tripInfo.HandleMaxDurata(carInfo, timecap, ObcService.this);
@@ -1078,7 +1079,7 @@ public class ObcService extends Service implements OnTripCallback {
             privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
 
 
-            //Force time check for best time
+            //Force date check for best date
             localHandler.sendMessage(MessageFactory.sendTimeCheck());
 
             sendBeacon();
@@ -1863,11 +1864,38 @@ public class ObcService extends Service implements OnTripCallback {
 
     public void startDownloadReservations() {
         dlog.d("Start Downloading reservations");
-        HttpConnector http = new HttpConnector(this);
-        http.SetHandler(localHandler);
-        ReservationConnector rc = new ReservationConnector();
-        rc.setTarga(App.CarPlate);
-        http.Execute(rc);
+        phpRepository.getReservation(App.CarPlate)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Reservation>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Reservation reservation) {
+                        setReservation(reservation);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        if(e instanceof ErrorResponse)
+                            if (((ErrorResponse)e).errorType == ErrorResponse.ErrorType.EMPTY) {
+                                setReservation(null);
+                            }
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+//        HttpConnector http = new HttpConnector(this);
+//        http.SetHandler(localHandler);
+//        ReservationConnector rc = new ReservationConnector();
+//        rc.setTarga(App.CarPlate);
+//        http.Execute(rc);
     }
 
 
@@ -1982,7 +2010,7 @@ public class ObcService extends Service implements OnTripCallback {
 
         stopRemoteUpdateCycle();
 
-        setLocationMode(1000);  // During trips lower min time to 1 sec
+        setLocationMode(1000);  // During trips lower min date to 1 sec
         obc_io.setSecondaryGPS(1000);
 
         tripUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
@@ -2029,7 +2057,7 @@ public class ObcService extends Service implements OnTripCallback {
 
         tripUpdateScheduler = null;
 
-        setLocationMode(30000);  // If car is idle  30sec is min time between locations updates
+        setLocationMode(30000);  // If car is idle  30sec is min date between locations updates
         obc_io.setSecondaryGPS(10000);
     }
 
@@ -2618,7 +2646,8 @@ public class ObcService extends Service implements OnTripCallback {
                     break;
 
                 case MSG_SERVER_RESERVATION:
-                    ReservationConnector r = null;
+                    //Update retrofit
+                   /* ReservationConnector r = null;
                     try {
                         r = (ReservationConnector) msg.obj;
                     } catch (Exception e) {
@@ -2626,7 +2655,7 @@ public class ObcService extends Service implements OnTripCallback {
                         break;
                     }
 
-                    setReservation(r.getReservation());
+                    setReservation(r.getReservation());*/
                     break;
 
                 case MSG_SERVER_CHANGE_IP:

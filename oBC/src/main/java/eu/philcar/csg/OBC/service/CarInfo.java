@@ -703,7 +703,7 @@ public class CarInfo {
             jw.beginObject();
 
             String timestamp = (String) android.text.format.DateFormat.format("dd/MM/yyyy kk:mm:ss", new java.util.Date());
-            jw.name("time").value(timestamp);
+            jw.name("date").value(timestamp);
 
             jw.name("accuracy").value(location.getAccuracy());
 

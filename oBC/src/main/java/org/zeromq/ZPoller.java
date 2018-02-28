@@ -452,7 +452,7 @@ public class ZPoller implements Closeable
         for (ItemHolder holder : all) {
             pollItems.add(holder.item());
         }
-        // polling time
+        // polling date
         final int rc = poll(selector, timeout, pollItems);
 
         if (!dispatchEvents) {

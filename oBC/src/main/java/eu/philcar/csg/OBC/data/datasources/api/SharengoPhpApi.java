@@ -8,6 +8,7 @@ import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.server.ServerCommand;
+import eu.philcar.csg.OBC.service.Reservation;
 import io.reactivex.Observable;
 import retrofit2.adapter.rxjava2.Result;
 import retrofit2.http.GET;
@@ -53,10 +54,10 @@ public interface SharengoPhpApi {
                                                 @Query("json_data") String json_data);
 
     @GET("get_reservations.php")
-    Observable<Result<ReservationResponse>> getReservation(@Query("car_plate") String plate);
+    Observable<Result<List<Reservation>>> getReservation(@Query("car_plate") String plate);
 
     @GET("get_reservations.php")
-    Observable<Result<ReservationResponse>> consumeReservation(@Query("consumed") int reservation_id);
+    Observable<Result<Void>> consumeReservation(@Query("consumed") int reservation_id);
 
 
 }

@@ -8,6 +8,7 @@ public class ErrorResponse extends Throwable {
     public enum ErrorType{
         CUSTOM,
         NO_NETWORK,
+        EMPTY,
         SERVER_TIMEOUT,
         CONVERSION,
         HTTP,

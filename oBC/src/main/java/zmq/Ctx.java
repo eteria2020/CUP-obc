@@ -100,7 +100,7 @@ public class Ctx
     //  Maximum socket ID.
     private static AtomicInteger maxSocketId = new AtomicInteger(0);
 
-    //  Maximum number of sockets that can be opened at the same time.
+    //  Maximum number of sockets that can be opened at the same date.
     private int maxSockets;
 
     //  Number of I/O threads to launch.

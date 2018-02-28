@@ -44,10 +44,10 @@ public class Options
     //  Maximum tranfer rate [kb/s]. Default 100kb/s.
     int rate;
 
-    //  Reliability time interval [ms]. Default 10 seconds.
+    //  Reliability date interval [ms]. Default 10 seconds.
     int recoveryIvl;
 
-    // Sets the time-to-live field in every multicast packet sent.
+    // Sets the date-to-live field in every multicast packet sent.
     int multicastHops;
 
     // SO_SNDBUF and SO_RCVBUF to be passed to underlying transport sockets.
@@ -57,7 +57,7 @@ public class Options
     //  Socket type.
     int type;
 
-    //  Linger time, in milliseconds.
+    //  Linger date, in milliseconds.
     int linger;
 
     //  Minimum interval between attempts to reconnect, in milliseconds.

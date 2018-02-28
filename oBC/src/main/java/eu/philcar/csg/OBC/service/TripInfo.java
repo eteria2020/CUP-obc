@@ -21,7 +21,6 @@ import eu.philcar.csg.OBC.controller.map.FRadio;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
-import eu.philcar.csg.OBC.data.model.AreaResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.BusinessEmployees;
@@ -30,14 +29,11 @@ import eu.philcar.csg.OBC.db.Customers;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.db.DbManager;
-import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.CardRfid;
 import eu.philcar.csg.OBC.helpers.DLog;
-import eu.philcar.csg.OBC.helpers.RxUtil;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.interfaces.OnTripCallback;
-import eu.philcar.csg.OBC.server.TripsConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.server.ReservationConnector;
 import eu.philcar.csg.OBC.task.OdoController;
@@ -82,7 +78,7 @@ public class TripInfo {
     private static final String DEFAULT_PLATE = "XH123KM";
 
     @Inject
-    SharengoPhpRepository repositoryPhp;
+    SharengoPhpRepository phpRepository;
     @Inject
     EventRepository eventRepository;
 
@@ -277,11 +273,14 @@ public class TripInfo {
                         this.isMaintenance = App.reservation.isMaintenance();					
                         if (!App.reservation.isLocal()) {
                             //if (!this.isMaintenance) {
-                            HttpConnector rhttp = new HttpConnector(service);
+
+                            phpRepository.consumeReservation(App.reservation.id);
+
+                            /*HttpConnector rhttp = new HttpConnector(service);
                             ReservationConnector rc = new ReservationConnector();
                             rc.setTarga(App.CarPlate);
                             rc.setConsumed(App.reservation.id);
-                            rhttp.Execute(rc);
+                            rhttp.Execute(rc);*/
                             App.reservation = null;  //Cancella la prenotazione in locale
                             App.Instance.persistReservation();
                             //}
@@ -688,7 +687,7 @@ public class TripInfo {
 
         trip = buildOpenTrip();
         //Scrittura DB
-        repositoryPhp.openTrip(trip,this)
+        phpRepository.openTrip(trip,this)
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<TripResponse>() {
                     @Override
@@ -801,7 +800,7 @@ public class TripInfo {
         dlog.d("CloseCorsa: closing trip"+trip.toString());
         OptimizeDistanceCalc.Controller(OdoController.STOP);
 
-        repositoryPhp.closeTrip(trip)
+        phpRepository.closeTrip(trip)
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<TripResponse>() {
                     @Override
@@ -966,7 +965,7 @@ public class TripInfo {
     }
 
     private void sendUpdateTrip(Trip trip){
-        repositoryPhp.updateServerTripData(trip)
+        phpRepository.updateServerTripData(trip)
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<TripResponse>() {
                     @Override
@@ -1075,7 +1074,7 @@ public class TripInfo {
                     Date newStart = new Date(); 
                     long diff = newStart.getTime() - App.getParkModeStarted().getTime();
                     trip.park_seconds += diff/1000;
-                    dlog.d("Splitting park mode time :" + (diff/1000) );
+                    dlog.d("Splitting park mode date :" + (diff/1000) );
                     App.Instance.setParkModeStarted(newStart);
                     App.parkMode = ParkMode.PARK_STARTED;
                     App.Instance.persistInSosta();					
@@ -1105,7 +1104,7 @@ public class TripInfo {
                 trip = buildOpenTrip();
                 trip.id_parent = id_parent;
                 trip.n_pin = n_pin;
-                repositoryPhp.openTrip(trip,this)
+                phpRepository.openTrip(trip,this)
                         .subscribeOn(Schedulers.io())
                         .subscribe(new Observer<TripResponse>() {
                             @Override

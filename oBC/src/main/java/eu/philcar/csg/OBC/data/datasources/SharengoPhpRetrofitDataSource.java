@@ -15,6 +15,7 @@ import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.DataManager;
+import eu.philcar.csg.OBC.service.Reservation;
 import io.reactivex.Observable;
 
 /**
@@ -158,5 +159,17 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
                     dataManager.updateEventSendingResponse(event);
                 });
 
+    }
+
+    @Override
+    public Observable<List<Reservation>> getReservation(String plate) {
+        return  mSharengoPhpApi.getReservation(plate)
+                .compose(this.handleRetrofitRequest());
+    }
+
+    @Override
+    public Observable<Void> consumeReservation(int reservation_id) {
+        return  mSharengoPhpApi.consumeReservation(reservation_id)
+                .compose(this.handleRetrofitRequest());
     }
 }
