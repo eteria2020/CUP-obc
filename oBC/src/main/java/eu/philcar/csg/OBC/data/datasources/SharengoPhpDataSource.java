@@ -37,4 +37,10 @@ public interface SharengoPhpDataSource {
 
     Observable<EventResponse> sendEvent(Event trip, DataManager dataManager);
 
+
+    Observable<EventResponse> sendEvent(Event trip, DataManager dataManager);
+
+
+    Observable<EventResponse> sendEvent(Event trip, DataManager dataManager);
+
 }

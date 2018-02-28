@@ -52,5 +52,11 @@ public interface SharengoPhpApi {
                                                 @Query("lon") double lon, @Query("lat") double lat, @Query("km") int km, @Query("battery") int battery, @Query("imei") String imei,
                                                 @Query("json_data") String json_data);
 
+    @GET("get_reservations.php")
+    Observable<Result<ReservationResponse>> getReservation(@Query("car_plate") String plate);
+
+    @GET("get_reservations.php")
+    Observable<Result<ReservationResponse>> consumeReservation(@Query("consumed") int reservation_id);
+
 
 }

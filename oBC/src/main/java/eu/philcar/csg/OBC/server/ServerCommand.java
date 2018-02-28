@@ -28,7 +28,7 @@ public class ServerCommand extends BaseResponse {
 
 	
 	
-	public static List<ServerCommand> createFromString(String str) {
+	public static List<ServerCommand> ocreateFromString(String str) {
 		ArrayList<ServerCommand> list = new ArrayList<ServerCommand>();
 		
 		if (str!=null && ! str.isEmpty()) {
