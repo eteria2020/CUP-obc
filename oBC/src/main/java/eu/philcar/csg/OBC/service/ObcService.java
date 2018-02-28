@@ -1685,6 +1685,9 @@ public class ObcService extends Service implements OnTripCallback {
                     obc_io.disableWatchdog();
                     SystemControl.doReboot();
                     break;
+                case "FORCE_REBOOT":
+                    SystemControl.ForceReboot();
+                    break;
 
                 case "SET_CONFIG":
                     dlog.d(ObcService.class.toString() + " executeServerCommands: Setting config :" + cmd.txtarg1);

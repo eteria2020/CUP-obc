@@ -304,7 +304,15 @@ public class SystemControl {
 		}
 	}
 	public static long rebootInProgress=0;
+	public static void ForceReboot(){
+		Runtime rt = Runtime.getRuntime();
+		try {
+			rt.exec(new String[]{"/system/xbin/su", "-c", "reboot"});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
+	}
 	public static void doReboot() {
 		//If there is another reboot in progress not older than 6 hour : ignore
 
