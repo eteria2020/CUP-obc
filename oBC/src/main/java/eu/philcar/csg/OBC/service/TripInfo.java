@@ -673,6 +673,10 @@ public class TripInfo {
             }
             App.Instance.persistCounterCleanlines();
         }
+        //check for charge
+        if(App.Charging && !carInfo.chargingPlug){
+            App.Charging=false;
+        }
         App.currentTripInfo = null;
 
         this.isOpen=false;
