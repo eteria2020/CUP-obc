@@ -101,7 +101,7 @@ public abstract class EncoderBase implements IEncoder
             //  is the chunk returned from here.
             //  As a consequence, large messages being sent won't block
             //  other engines running in the same I/O thread for excessive
-            //  amounts of date.
+            //  amounts of time.
             if (this.buffer.position() == 0 && toWrite >= bufferSize) {
                 Transfer t;
                 ByteBuffer b = ByteBuffer.wrap(writeBuf);

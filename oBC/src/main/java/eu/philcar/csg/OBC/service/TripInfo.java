@@ -1074,7 +1074,7 @@ public class TripInfo {
                     Date newStart = new Date(); 
                     long diff = newStart.getTime() - App.getParkModeStarted().getTime();
                     trip.park_seconds += diff/1000;
-                    dlog.d("Splitting park mode date :" + (diff/1000) );
+                    dlog.d("Splitting park mode time :" + (diff/1000) );
                     App.Instance.setParkModeStarted(newStart);
                     App.parkMode = ParkMode.PARK_STARTED;
                     App.Instance.persistInSosta();					

@@ -74,7 +74,7 @@
 -dontwarn android.os.ServiceManager
 -dontwarn com.android.internal.telephony.**
 -dontwarn com.skobbler.ngx.**
--dontwarn org.joda.date.**
+-dontwarn org.joda.time.**
 -dontwarn okio.**
 -dontwarn android.app.QueuedWork
 -dontwarn android.app.QueuedWork.**

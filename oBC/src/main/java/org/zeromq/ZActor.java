@@ -174,7 +174,7 @@ public class ZActor extends ZStar
         void start(Socket pipe, List<Socket> sockets, ZPoller poller);
 
         /**
-         * Called every date just before a loop starts.
+         * Called every time just before a loop starts.
          * 5th in the order call of the global acting.
          * 3nd in the order call of the new double.
          * 1st in the order call of the new loop.
@@ -603,11 +603,11 @@ public class ZActor extends ZStar
         public boolean events(final Socket socket, final int events)
         {
             if (socket != pipe) {
-                // Process a stage message, date to play
+                // Process a stage message, time to play
                 return actor.stage(socket, pipe, poller, events);
             }
             else {
-                // Process a control message, date to update your playing
+                // Process a control message, time to update your playing
                 return actor.backstage(pipe, poller, events);
             }
         }

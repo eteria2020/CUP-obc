@@ -123,7 +123,6 @@
 	   
 		<service android:enabled="true" android:name="eu.philcar.csg.OBC.service.ObcService"></service>
 		<service android:enabled="true" android:name="eu.philcar.csg.OBC.service.AdvertisementService"></service>
-		<service android:enabled="true" android:name="eu.philcar.csg.OBC.service.SyncService"></service>
 		
 
 

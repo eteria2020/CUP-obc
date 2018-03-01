@@ -63,7 +63,7 @@ public class ZLoop
         int times;
         IZLoopHandler handler;
         Object arg;
-        long when;               //  Clock date when alarm goes off
+        long when;               //  Clock time when alarm goes off
 
         public STimer(int delay, int times, IZLoopHandler handler,
                       Object arg)

@@ -299,22 +299,22 @@ public class ObcService extends Service implements OnTripCallback {
                 if(sharengo_time!=null && sharengo_time.getTime() > 1234567890000L){
 
                     dlog.d("timeCheckScheduler: imposto ora Sharengo "+sharengo_time.toString()+ "ora android: "+android_time.toString());
-                    rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(sharengo_time) + ";\n"}); //
-                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
+                    rt.exec(new String[]{"/system/xbin/su", "-c", "time -s " + sdf.format(sharengo_time) + ";\n"}); //
+                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //time -s 20120423.130000
 
                 }else if(carInfo.intGpsLocation.getTime()>1234567890000L) {
                     //if(android_time.getTime()<1234567890000L) {
                     dlog.d("timeCheckScheduler: imposto ora gps "+gps_time.toString()+ "ora android: "+android_time.toString());
-                    rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(gps_time) + ";\n"}); //
-                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
+                    rt.exec(new String[]{"/system/xbin/su", "-c", "time -s " + sdf.format(gps_time) + ";\n"}); //
+                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //time -s 20120423.130000
                     //}
 
                 }
                 else
-                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 1"}); //date -s 20120423.130000*/
-                dlog.d("timeCheckScheduler: rawGpsTime: " + new Date(carInfo.intGpsLocation.getTime()).toString() + " elapsed: " + (System.currentTimeMillis() - (carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000)) + " android date: " + android_time.toString() + " fixed gps date: " + gps_time.toString() +" Sharengo date: "+(sharengo_time!=null?sharengo_time.toString():" response code "+lastResponseCode));
+                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 1"}); //time -s 20120423.130000*/
+                dlog.d("timeCheckScheduler: rawGpsTime: " + new Date(carInfo.intGpsLocation.getTime()).toString() + " elapsed: " + (System.currentTimeMillis() - (carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000)) + " android time: " + android_time.toString() + " fixed gps time: " + gps_time.toString() +" Sharengo time: "+(sharengo_time!=null?sharengo_time.toString():" response code "+lastResponseCode));
 
-                rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time_zone 0"}); //date -s 20120423.130000
+                rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time_zone 0"}); //time -s 20120423.130000
                 AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                 am.setTimeZone(App.timeZone);
                 am = null;
@@ -512,7 +512,7 @@ public class ObcService extends Service implements OnTripCallback {
         criteria.setPowerRequirement(Criteria.POWER_HIGH);
 
 
-        setLocationMode(30000);  // If car is idle  30sec is min date between locations updates
+        setLocationMode(30000);  // If car is idle  30sec is min time between locations updates
         locationManager.addGpsStatusListener(gpsStatusListener);
 
         //Check if UI is active and if not restart the proper page
@@ -588,7 +588,7 @@ public class ObcService extends Service implements OnTripCallback {
         virtualBMSUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
         //Start scheduler for GPS query
         gpsCheckScheduler = Executors.newSingleThreadScheduledExecutor();
-        //Start schedule for date sync
+        //Start schedule for time sync
         timeCheckScheduler = Executors.newSingleThreadScheduledExecutor();
 
         // Start internal loop with period of  10 sec
@@ -645,7 +645,7 @@ public class ObcService extends Service implements OnTripCallback {
                         minutePrescaler = 0;
 
 
-                        //If there is  an open trip check if it exceeded a date cap
+                        //If there is  an open trip check if it exceeded a time cap
                         if (tripInfo != null && tripInfo.isOpen) {
                             int timecap = App.Instance.loadSplitTripConfig();
                             tripInfo.HandleMaxDurata(carInfo, timecap, ObcService.this);
@@ -1079,7 +1079,7 @@ public class ObcService extends Service implements OnTripCallback {
             privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
 
 
-            //Force date check for best date
+            //Force time check for best time
             localHandler.sendMessage(MessageFactory.sendTimeCheck());
 
             sendBeacon();
@@ -2010,7 +2010,7 @@ public class ObcService extends Service implements OnTripCallback {
 
         stopRemoteUpdateCycle();
 
-        setLocationMode(1000);  // During trips lower min date to 1 sec
+        setLocationMode(1000);  // During trips lower min time to 1 sec
         obc_io.setSecondaryGPS(1000);
 
         tripUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
@@ -2057,7 +2057,7 @@ public class ObcService extends Service implements OnTripCallback {
 
         tripUpdateScheduler = null;
 
-        setLocationMode(30000);  // If car is idle  30sec is min date between locations updates
+        setLocationMode(30000);  // If car is idle  30sec is min time between locations updates
         obc_io.setSecondaryGPS(10000);
     }
 

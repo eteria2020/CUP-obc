@@ -71,7 +71,7 @@ public abstract class DecoderBase implements IDecoder
         //  depending on how large is the chunk returned from here.
         //  As a consequence, large messages being received won't block
         //  other engines running in the same I/O thread for excessive
-        //  amounts of date.
+        //  amounts of time.
 
         ByteBuffer b;
         if (toRead >= bufsize) {

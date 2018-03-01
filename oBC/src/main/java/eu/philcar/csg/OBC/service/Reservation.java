@@ -82,7 +82,7 @@ public class Reservation  implements ServerResponse{
 						}
 					}
 						
-					Double dtimestamp = jobj.getDouble("date");
+					Double dtimestamp = jobj.getDouble("time");
 					long timestamp = dtimestamp.longValue();
 					long durata = jobj.getInt("length");
 					boolean attiva = jobj.getBoolean("active");
@@ -116,7 +116,7 @@ public class Reservation  implements ServerResponse{
 							}
 						}
 
-						Double dtimestamp = jobj.getDouble("date");
+						Double dtimestamp = jobj.getDouble("time");
 						long timestamp = dtimestamp.longValue();
 						long durata = jobj.getInt("length");
 						boolean attiva = jobj.getBoolean("active");
@@ -162,7 +162,7 @@ public class Reservation  implements ServerResponse{
 				ja.put(card);
 			}
 			jo.put("cards", ja);
-			jo.put("date",timestamp);
+			jo.put("time",timestamp);
 			jo.put("length", duration);
 			jo.put("active", true);
 		} catch(Exception e) {
@@ -173,18 +173,18 @@ public class Reservation  implements ServerResponse{
 		
 	}
 	
-	public Reservation(int id, List<String> codes, long date, long duration) {
-		this(id,codes, date,duration,false);
+	public Reservation(int id, List<String> codes, long time, long duration) {
+		this(id,codes, time,duration,false);
 	}
 	
-	public Reservation(int id, List<String> codes, long date, long duration, boolean local) {
+	public Reservation(int id, List<String> codes, long time, long duration, boolean local) {
 		this.id = id;
 		this.codes = codes;
-		this.timestamp = date;
+		this.timestamp = time;
 		this.duration = duration;
 		this.local=local;
 
-		this.date = new Date(date *1000);
+		this.date = new Date(time *1000);
 
 	}
 	
@@ -274,7 +274,7 @@ public class Reservation  implements ServerResponse{
 			}catch (Exception e){
 				dlog.e("Exception while init Reservation",e);
 			}
-			date=new Date(timestamp*1000);
+			date =new Date(timestamp*1000);
 		}
 		return Observable.just(this);
 	}

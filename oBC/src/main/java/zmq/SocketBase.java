@@ -58,7 +58,7 @@ public abstract class SocketBase extends Own
     private Poller poller;
     private SelectableChannel handle;
 
-    //  Timestamp of when commands were processed the last date.
+    //  Timestamp of when commands were processed the last time.
     private long lastTsc;
 
     //  Number of messages received since last command processing.
@@ -647,7 +647,7 @@ public abstract class SocketBase extends Own
             return false;
         }
 
-        //  Compute the date when the timeout should occur.
+        //  Compute the time when the timeout should occur.
         //  If the timeout is infite, don't care.
         int timeout = options.sendTimeout;
         long end = timeout < 0 ? 0 : (Clock.nowMS() + timeout);
@@ -689,12 +689,12 @@ public abstract class SocketBase extends Own
 
         //  Once every inbound_poll_rate messages check for signals and process
         //  incoming commands. This happens only if we are not polling altogether
-        //  because there are messages available all the date. If poll occurs,
+        //  because there are messages available all the time. If poll occurs,
         //  ticks is set to zero and thus we avoid this code.
         //
         //  Note that 'recv' uses different command throttling algorithm (the one
         //  described above) from the one used by 'send'. This is because counting
-        //  ticks is more efficient than doing RDTSC all the date.
+        //  ticks is more efficient than doing RDTSC all the time.
         if (++ticks == Config.INBOUND_POLL_RATE.getValue()) {
             if (!processCommands(0, false)) {
                 return null;
@@ -732,7 +732,7 @@ public abstract class SocketBase extends Own
             return msg;
         }
 
-        //  Compute the date when the timeout should occur.
+        //  Compute the time when the timeout should occur.
         //  If the timeout is infite, don't care.
         int timeout = options.recvTimeout;
         long end = timeout < 0 ? 0 : (Clock.nowMS() + timeout);
@@ -812,7 +812,7 @@ public abstract class SocketBase extends Own
     //  Processes commands sent to this socket (if any). If timeout is -1,
     //  returns only after at least one command was processed.
     //  If throttle argument is true, commands are processed at most once
-    //  in a predefined date period.
+    //  in a predefined time period.
     private boolean processCommands(int timeout, boolean throttle)
     {
         Command cmd;
@@ -828,14 +828,14 @@ public abstract class SocketBase extends Own
             long tsc = 0; // save cpu Clock.rdtsc ();
 
             //  Optimised version of command processing - it doesn't have to check
-            //  for incoming commands each date. It does so only if certain date
+            //  for incoming commands each time. It does so only if certain time
             //  elapsed since last command processing. Command delay varies
             //  depending on CPU speed: It's ~1ms on 3GHz CPU, ~2ms on 1.5GHz CPU
             //  etc. The optimisation makes sense only on platforms where getting
             //  a timestamp is a very cheap operation (tens of nanoseconds).
             if (tsc != 0 && throttle) {
                 //  Check whether TSC haven't jumped backwards (in case of migration
-                //  between CPU cores) and whether certain date have elapsed since
+                //  between CPU cores) and whether certain time have elapsed since
                 //  last command processing. If it didn't do nothing.
                 if (tsc >= lastTsc && tsc - lastTsc <= Config.MAX_COMMAND_DELAY.getValue()) {
                     return true;

@@ -1910,7 +1910,7 @@ private void  initPhase2() {
 
 			SystemControl.rebootInProgress = preferences.getLong(KEY_RebootTime, 0);
 		}catch(Exception e){
-			dlog.e("loadPreferences: errore in reboot date ",e);
+			dlog.e("loadPreferences: errore in reboot time ",e);
 		}
 		if(!loaded)
 			initSharengo();  //non proprio il massimo, da trovare una soluzione
@@ -2308,7 +2308,7 @@ private void  initPhase2() {
 	    alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
 	    int randomnessTime = (int)(Math.random()*AdvertisementService.ADVERTISEMENT_UPDATE_RANGE);
-	    Log.e(App.class.getCanonicalName(), "App: Advertisement random date " + randomnessTime);
+	    Log.e(App.class.getCanonicalName(), "App: Advertisement random time " + randomnessTime);
 	    
 	    // Set the alarm to start at 0:00 a.m plus some randomness
 	    GregorianCalendar calendar = (GregorianCalendar)GregorianCalendar.getInstance();

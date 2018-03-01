@@ -152,7 +152,7 @@ public class ZStar implements ZAgent
 
     }
 
-    // party date easily isSystem. Wait for the specified amount of date
+    // party time easily isSystem. Wait for the specified amount of time
     public static void party(long time, TimeUnit unit)
     {
         LockSupport.parkNanos(TimeUnit.NANOSECONDS.convert(time, unit));
@@ -396,7 +396,7 @@ public class ZStar implements ZAgent
                 }
                 // Sober again ...
 
-                // show is over, date to close
+                // show is over, time to close
                 chef.close();
                 if (producer != null) {
                     // this is a self-generated context, destroy it
@@ -524,7 +524,7 @@ public class ZStar implements ZAgent
 
         /**
          * Is the set on fire ?
-         * @return true if it is date to leave the place.
+         * @return true if it is time to leave the place.
          */
         boolean fire();
     }
@@ -559,7 +559,7 @@ public class ZStar implements ZAgent
     {
         /**
          * Called when the show is about to start.
-         * Can be a useful point in the whole process from date to date.
+         * Can be a useful point in the whole process from time to time.
          *
          * @param ctx        the context provided in the creation step
          * @param fortune    the creator of stars

@@ -133,7 +133,7 @@ public class FPdfViewer extends FBase {
     }
 
     /*
-    control if the pdf file is in local and check the date
+    control if the pdf file is in local and check the time
      */
     public File[] checkPdf() throws ParseException {
         File folder = new File(Environment.getExternalStorageDirectory() + directory);

@@ -25,7 +25,6 @@ import eu.philcar.csg.OBC.injection.module.ApplicationModule;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoService;
 import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.service.ObcService;
-import eu.philcar.csg.OBC.service.SyncService;
 import eu.philcar.csg.OBC.service.TripInfo;
 
 @Singleton
@@ -38,7 +37,6 @@ import eu.philcar.csg.OBC.service.TripInfo;
 )
 public interface ApplicationComponent {
 
-    void inject(SyncService syncService);
     void inject(SystemControl.TestConnection testConnection);
     void inject(SystemControl.Shutdown shutdown);
     void inject(CarInfo carInfo);

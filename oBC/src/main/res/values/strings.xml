@@ -98,7 +98,7 @@
     <string name="instruction_close_1">Collect your things.Have you switched off lights and rolled up windows?</string>
     <string name="instruction_close_2">Press the N button on the dashboard</string>
     <string name="instruction_close_3">Pull up the hand brake</string>
-    <string name="instruction_close_4">Leave the car.Doors will close automatically in the date shown in the right</string>
+    <string name="instruction_close_4">Leave the car.Doors will close automatically in the time shown in the right</string>
     <string name="instruction_close_4_note">If you change your mind let the doors close, and then open a new rent session</string>
     <string name="instruction_close_5">Be careful, a vehicle not closed correctly can mean additional costs and penalties</string>
 
@@ -111,7 +111,7 @@
 
     <string name="push_to_cancel">Push to\ncancel</string>
 
-    <string name="goodbye_instructions">You can leave. The doors will automatically close it the date shown in the right.\n\nIf you change your mind let the doors close, and then open a new rent session</string>
+    <string name="goodbye_instructions">You can leave. The doors will automatically close it the time shown in the right.\n\nIf you change your mind let the doors close, and then open a new rent session</string>
 
 
     <string name="menu_rent_end">End rent</string>
@@ -130,7 +130,7 @@
     <string name="menu_park_mode_resume_shutdown_engine">Resume rent (switch off engine first)</string>
     <string name="menu_park_mode_suspend">Suspend rent</string>
     <string name="menu_park_mode_suspend_off">Suspend rent (not available)</string>
-    <string name="menu_park_mode_suspend_instructions">You\'re parked. Now you can quit. Doors will close automatically at the date indicated on the right. After the break, please use command OPEN DOORS on your phone or your card to get back in the car</string>
+    <string name="menu_park_mode_suspend_instructions">You\'re parked. Now you can quit. Doors will close automatically at the time indicated on the right. After the break, please use command OPEN DOORS on your phone or your card to get back in the car</string>
     <string name="menu_park_mode_suspend_shutdown_engine">Suspend rent (switch off engine first)</string>
     <string name="milan">Milano</string>
     <string name="minutes_saved">Minutes saved&#58;</string>
