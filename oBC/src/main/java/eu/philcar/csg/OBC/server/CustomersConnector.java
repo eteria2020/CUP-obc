@@ -19,7 +19,7 @@ import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Customers;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.helpers.DLog;
-
+@Deprecated
 public class CustomersConnector implements RemoteEntityInterface {
 
 	private DLog dlog = new DLog(this.getClass());

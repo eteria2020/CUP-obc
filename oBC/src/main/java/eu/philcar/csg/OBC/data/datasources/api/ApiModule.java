@@ -66,7 +66,7 @@ public class ApiModule {
     @Singleton
     SharengoPhpApi provideSharengoPhpApi(@ApplicationContext Context context) {
 
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+       /* HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         if (BuildConfig.DEBUG) {
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         } else {
@@ -74,7 +74,7 @@ public class ApiModule {
         }
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(logging);
+        httpClient.addInterceptor(logging);*/
 
         Gson gson = new GsonBuilder()
                 .addSerializationExclusionStrategy(new SerializationExclusionStrategy())
@@ -84,12 +84,32 @@ public class ApiModule {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(context.getString(R.string.endpointSharengoPhp))
                 //.baseUrl("http:gr3dcomunication.com/sharengo/")
-                .client(httpClient.build())
+                .client(provideOkHttpClient())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
         return retrofit.create(SharengoPhpApi.class);
+    }
+
+    @Provides
+    @Singleton
+    SharengoBeaconApi provideSharengoBeaconApi(@ApplicationContext Context context) {
+
+        Gson gson = new GsonBuilder()
+                .addSerializationExclusionStrategy(new SerializationExclusionStrategy())
+                .create();
+
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(context.getString(R.string.endpointSharengoBeacon))
+                //.baseUrl("http:gr3dcomunication.com/sharengo/")
+                .client(provideOkHttpClient())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        return retrofit.create(SharengoBeaconApi.class);
     }
 
     @Provides
@@ -188,6 +208,47 @@ public class ApiModule {
                                         }
                                     }
         );
+        httpClient.readTimeout(20, TimeUnit.SECONDS);
+        httpClient.connectTimeout(20, TimeUnit.SECONDS);
+
+        return httpClient.build();
+    }
+
+    @Provides
+    @Singleton
+    OkHttpClient provideOkHttpClient(){
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        if (BuildConfig.DEBUG) {
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        } else {
+            logging.setLevel(HttpLoggingInterceptor.Level.NONE);
+        }
+
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
+
+
+        /*httpClient.addInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request original = chain.request();
+                HttpUrl originalHttpUrl = original.url();
+
+                HttpUrl url = originalHttpUrl.newBuilder()
+                        //.addQueryParameter("apikey", "your-actual-api-key")
+                        .build();
+
+                // Request customization: add request headers
+                Request.Builder requestBuilder = original.newBuilder()
+                        .url(url)
+                        .header("Authorization", Credentials.basic("francesco.galatro@gmail.com", "508c82b943ae51118d905553b8213c8a"));
+
+                Request request = requestBuilder.build();
+                return chain.proceed(request);
+            }
+        });*/
+
         httpClient.readTimeout(20, TimeUnit.SECONDS);
         httpClient.connectTimeout(20, TimeUnit.SECONDS);
 

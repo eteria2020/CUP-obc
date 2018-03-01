@@ -7,6 +7,7 @@ import eu.philcar.csg.OBC.data.model.CommandResponse;
 import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.Event;
+import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.DataManager;
@@ -43,5 +44,7 @@ public interface SharengoPhpDataSource {
 
 
     Observable<Void> consumeReservation(int reservation_id);
+
+    Observable<List<Poi>> getPois(long lastupdate);
 
 }

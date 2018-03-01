@@ -52,7 +52,7 @@ public class SharengoApiRepository {
         needUpdateCustomer=false;
 
         if(!RxUtil.isRunning(customerDisposable)) {
-            mRemoteDataSource.getCustomer(mDataManager.getMaxLastupdate())
+            mRemoteDataSource.getCustomer(mDataManager.getMaxCustomerLastupdate())
                     .concatMap(n -> mDataManager.saveCustomer(n))
                     .subscribeOn(Schedulers.io())
                     .subscribe(new Observer<Customer>() {
@@ -69,7 +69,7 @@ public class SharengoApiRepository {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            DLog.E("Error syncing.", e);
+                            DLog.E("Error syncing getCustomer", e);
                             RxUtil.dispose(customerDisposable);
                         }
 
@@ -115,7 +115,7 @@ public class SharengoApiRepository {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            DLog.E("Error syncing.", e);
+                            DLog.E("Error syncing getEmployee", e);
                             RxUtil.dispose(employeeDisposable);
                         }
 
@@ -160,7 +160,7 @@ public class SharengoApiRepository {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            DLog.E("Error syncing.", e);
+                            DLog.E("Error syncing getConfig", e);
                             RxUtil.dispose(configDisposable);
                         }
 

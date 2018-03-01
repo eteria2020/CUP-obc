@@ -16,7 +16,7 @@ import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.BusinessEmployees;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.helpers.DLog;
-
+@Deprecated
 public class BusinessEmployeeConnector implements RemoteEntityInterface {
 
 	private DLog dlog = new DLog(this.getClass());

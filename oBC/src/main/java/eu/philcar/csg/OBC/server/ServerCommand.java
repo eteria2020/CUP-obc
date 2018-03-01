@@ -21,7 +21,7 @@ public class ServerCommand extends BaseResponse {
 	public int    intarg2;
 	public String    txtarg1;
 	public String    txtarg2;
-	public long queued;
+	public double queued;
 	public int ttl;
 	public String payload;
 

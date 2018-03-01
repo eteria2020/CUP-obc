@@ -19,7 +19,7 @@ import io.reactivex.Observable;
 
 public class Reservation  implements ServerResponse{
 	@ExcludeSerialization
-	private DLog dlog = new DLog(this.getClass());
+	private static final DLog dlog = new DLog(Reservation.class);
 	
 	public int   id;
 	public String cards;

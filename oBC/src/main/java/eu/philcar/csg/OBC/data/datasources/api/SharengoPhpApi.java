@@ -6,6 +6,7 @@ import eu.philcar.csg.OBC.data.model.AreaResponse;
 import eu.philcar.csg.OBC.data.model.CommandResponse;
 import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
+import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.Reservation;
@@ -58,6 +59,9 @@ public interface SharengoPhpApi {
 
     @GET("get_reservations.php")
     Observable<Result<Void>> consumeReservation(@Query("consumed") int reservation_id);
+
+    @GET("get_pois.php")
+    Observable<Result<List<Poi>>> getPois(@Query("lastupdate")long lastupdate);
 
 
 }

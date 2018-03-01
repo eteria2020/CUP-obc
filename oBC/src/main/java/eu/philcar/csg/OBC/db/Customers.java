@@ -17,9 +17,6 @@ import com.j256.ormlite.support.ConnectionSource;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.helpers.DLog;
-import eu.philcar.csg.OBC.server.CustomersConnector;
-import eu.philcar.csg.OBC.server.HttpConnector;
-import eu.philcar.csg.OBC.server.HttpsConnector;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;

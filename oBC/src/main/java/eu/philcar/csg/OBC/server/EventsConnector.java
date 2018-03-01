@@ -12,7 +12,7 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.db.Event;
 import eu.philcar.csg.OBC.helpers.DLog;
 
-
+@Deprecated
 public class EventsConnector implements RemoteEntityInterface {
 
 	private DLog dlog = new DLog(this.getClass());

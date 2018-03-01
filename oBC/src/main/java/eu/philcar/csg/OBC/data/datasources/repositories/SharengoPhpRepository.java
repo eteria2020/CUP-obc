@@ -15,6 +15,7 @@ import eu.philcar.csg.OBC.data.model.AreaResponse;
 import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.Event;
+import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.RxUtil;
@@ -114,7 +115,9 @@ public class SharengoPhpRepository {
                     //RxUtil.dispose(commandDisposable);
                     commandDisposable = n;})
                 .doOnError(e -> {
-                    DLog.E("Error insiede GetCommand",e);
+                    if(e instanceof ErrorResponse)
+                        if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
+                            DLog.E("Error insiede GetCommand",e);
                     RxUtil.dispose(commandDisposable);})
                 .doOnComplete(() -> RxUtil.dispose(commandDisposable));
 
@@ -300,6 +303,32 @@ public class SharengoPhpRepository {
                     }
                 });
 
+    }
+
+    public void getPois(){
+         mRemoteDataSource.getPois(mDataManager.getMaxPoiLastupdate())
+                .concatMap(n -> mDataManager.savePoi(n))
+                 .subscribeOn(Schedulers.io())
+                 .subscribe(new Observer<Poi>() {
+                     @Override
+                     public void onSubscribe(@NonNull Disposable d) {
+
+                     }
+
+                     @Override
+                     public void onNext(@NonNull Poi poi) {
+                     }
+
+                     @Override
+                     public void onError(@NonNull Throwable e) {
+                         DLog.E("Error syncing getCustomer", e);
+                     }
+
+                     @Override
+                     public void onComplete() {
+                         DLog.I("Synced successfully!");
+                     }
+                 });
     }
 
 }

@@ -15,7 +15,7 @@ import eu.philcar.csg.OBC.interfaces.OnTripCallback;
 import eu.philcar.csg.OBC.service.TripInfo;
 
 
-
+@Deprecated
 public class TripsConnector implements RemoteEntityInterface {
 
 	private DLog dlog = new DLog(this.getClass());

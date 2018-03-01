@@ -21,7 +21,7 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.service.TripInfo;
 
 
-
+@Deprecated
 public class BeaconConnector implements RemoteEntityInterface {
 
 	private DLog dlog = new DLog(this.getClass());

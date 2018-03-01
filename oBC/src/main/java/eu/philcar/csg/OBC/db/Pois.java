@@ -14,10 +14,6 @@ import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.support.ConnectionSource;
 
 import eu.philcar.csg.OBC.helpers.DLog;
-import eu.philcar.csg.OBC.server.CustomersConnector;
-import eu.philcar.csg.OBC.server.HttpConnector;
-import eu.philcar.csg.OBC.server.HttpsConnector;
-import eu.philcar.csg.OBC.server.PoisConnector;
 
 public class Pois extends DbTable<Poi,Integer> {
 
@@ -141,17 +137,17 @@ public class Pois extends DbTable<Poi,Integer> {
 	}
 	
 
-	
+	@Deprecated
 	public void startDownload(Context ctx, Handler handler) {
 		Calendar calendar = Calendar.getInstance();
 		int day = calendar.get(Calendar.DAY_OF_WEEK);
 		if(day == Calendar.MONDAY) {
 			DLog.D("Start pois download..");
-			PoisConnector cn = new PoisConnector();
-			cn.setLastUpdate(mostRecent());
-			HttpsConnector http = new HttpsConnector(ctx);
-			http.SetHandler(handler);
-			http.Execute(cn);
+//			PoisConnector cn = new PoisConnector();
+//			cn.setLastUpdate(mostRecent());
+//			HttpsConnector http = new HttpsConnector(ctx);
+//			http.SetHandler(handler);
+//			http.Execute(cn);
 		}
 	}
 	

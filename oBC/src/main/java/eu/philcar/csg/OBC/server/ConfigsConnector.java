@@ -20,7 +20,7 @@ import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.helpers.DLog;
 import android.os.Debug;
 import android.text.format.DateFormat;
-
+@Deprecated
 public class ConfigsConnector implements RemoteEntityInterface {
 
 	private DLog dlog = new DLog(this.getClass());

@@ -24,6 +24,7 @@ import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Customers;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Event;
+import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.ServerCommand;
@@ -87,6 +88,12 @@ public class DataManager { //TODO change to interface-type system like api does 
     public void saveArea(List<AreaResponse> area){
 
         persistArea(area);
+    }
+
+    public Observable<Poi> savePoi(List<Poi> pois) {
+
+        return  mDbManager.getPoisDao().createOrUpdateMany(pois);
+
     }
 
     public void updateBeginSentDone(Trip trip){
@@ -225,8 +232,12 @@ public class DataManager { //TODO change to interface-type system like api does 
     }
 
 
-    public long getMaxLastupdate(){
+    public long getMaxCustomerLastupdate(){
         return mDbManager.getClientiDao().mostRecentTimestamp();
+    }
+
+    public long getMaxPoiLastupdate(){
+        return mDbManager.getPoisDao().mostRecent();
     }
 
 //        new Function<ResponseCustomer>, ObservableSource<? extends ResponseCustomer>>() {

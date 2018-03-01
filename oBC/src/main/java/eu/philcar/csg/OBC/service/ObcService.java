@@ -38,7 +38,9 @@ import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoApi;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoBeaconRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
+import eu.philcar.csg.OBC.data.model.BeaconResponse;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
@@ -56,21 +58,14 @@ import eu.philcar.csg.OBC.helpers.Clients;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
+import eu.philcar.csg.OBC.helpers.RxUtil;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.interfaces.OnTripCallback;
 import eu.philcar.csg.OBC.server.AdminsConnector;
-import eu.philcar.csg.OBC.server.AreaConnector;
-import eu.philcar.csg.OBC.server.BusinessEmployeeConnector;
-import eu.philcar.csg.OBC.server.CallCenterConnector;
-import eu.philcar.csg.OBC.server.CommandsConnector;
-import eu.philcar.csg.OBC.server.ConfigsConnector;
 import eu.philcar.csg.OBC.server.Connectors;
 import eu.philcar.csg.OBC.server.HttpsConnector;
-import eu.philcar.csg.OBC.server.NotifiesConnector;
 import eu.philcar.csg.OBC.server.ServerCommand;
-import eu.philcar.csg.OBC.server.CustomersConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
-import eu.philcar.csg.OBC.server.ReservationConnector;
 import eu.philcar.csg.OBC.server.UdpServer;
 import eu.philcar.csg.OBC.server.UploaderLog;
 import eu.philcar.csg.OBC.server.ZmqRequester;
@@ -238,6 +233,8 @@ public class ObcService extends Service implements OnTripCallback {
     SharengoPhpRepository phpRepository;
     @Inject
     EventRepository eventRepository;
+    @Inject
+    SharengoBeaconRepository beaconRepository;
 
 
     //ENCAPSULATED OBJECTS
@@ -563,8 +560,7 @@ public class ObcService extends Service implements OnTripCallback {
         startDownloadEmployees();
 
 
-        Pois pois = App.Instance.dbManager.getPoisDao();
-        pois.startDownload(this, localHandler);
+        startPoiDownload();
 
         startAreaPolygonDownload(this, null);
 
@@ -610,12 +606,13 @@ public class ObcService extends Service implements OnTripCallback {
                     //If HTTP query is enabled schedule an HTTP notifies download
                     if (WITH_HTTP_NOTIFIES&& notifiesPrescaler++>4 && tripInfo != null && tripInfo.isOpen && (App.parkMode == null || !App.parkMode.isOn()) ) {
                         notifiesPrescaler=0;
-                        HttpConnector http = new HttpConnector(ObcService.this);
-                        http.SetHandler(localHandler);
-                        NotifiesConnector nc = new NotifiesConnector();
-                        nc.setTarga(App.CarPlate);
-                        nc.setBeacon(carInfo.getJson(false));
-                        http.Execute(nc);
+                        sendBeacon(carInfo.getJson(false));
+//                        HttpConnector http = new HttpConnector(ObcService.this);
+//                        http.SetHandler(localHandler);
+//                        NotifiesConnector nc = new NotifiesConnector();
+//                        nc.setTarga(App.CarPlate);
+//                        nc.setBeacon(carInfo.getJson(false));
+//                        http.Execute(nc);
                     }
 
                     //If there is no open trip or the car is in park mode  ensure display backlight is off
@@ -1141,13 +1138,82 @@ public class ObcService extends Service implements OnTripCallback {
             dlog.d("Sending beacon : " + msg);
             //udpServer.sendBeacon(msg);
 
-            NotifiesConnector nc = new NotifiesConnector();
-            nc.setTarga(App.CarPlate);
-            nc.setBeacon(msg);
+            beaconRepository.sendBeacon(msg).subscribeOn(Schedulers.io())
+                    .subscribe(new Observer<BeaconResponse>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d){
+                        }
 
-            HttpConnector httpConnector = new HttpConnector(ObcService.this);
-            httpConnector.HttpMethod = HttpConnector.METHOD_GET;
-            httpConnector.Execute(nc);
+                        @Override
+                        public void onNext(@NonNull BeaconResponse beaconResponse) {
+                            DLog.D("BeaconResponse is: " + beaconResponse.toString());
+                            parseServerNotify(beaconResponse.getJson());
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                        }
+
+                        @Override
+                        public void onComplete() {
+                        }
+                    });
+
+//            NotifiesConnector nc = new NotifiesConnector();
+//            nc.setTarga(App.CarPlate);
+//            nc.setBeacon(msg);
+//
+//            HttpConnector httpConnector = new HttpConnector(ObcService.this);
+//            httpConnector.HttpMethod = HttpConnector.METHOD_GET;
+//            httpConnector.Execute(nc);
+
+        }
+
+    }
+
+    public void sendBeacon(String beacon) {
+
+        if (!App.hasNetworkConnection()) {
+            dlog.w("No connection. Beacon aborted");
+            return;
+        }
+
+//        String msg = carInfo.getJson(true);
+        if (beacon != null) {
+            dlog.d("Sending beacon : " + beacon);
+            //udpServer.sendBeacon(msg);
+
+            beaconRepository.sendBeacon(beacon).subscribeOn(Schedulers.io())
+                    .subscribe(new Observer<BeaconResponse>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(@NonNull BeaconResponse beaconResponse) {
+                            DLog.D("BeaconResponse is: " + beaconResponse.toString());
+                            parseServerNotify(beaconResponse.getJson());
+
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            DLog.I("Synced successfully!");
+                        }
+                    });
+
+//            NotifiesConnector nc = new NotifiesConnector();
+//            nc.setTarga(App.CarPlate);
+//            nc.setBeacon(msg);
+//
+//            HttpConnector httpConnector = new HttpConnector(ObcService.this);
+//            httpConnector.HttpMethod = HttpConnector.METHOD_GET;
+//            httpConnector.Execute(nc);
 
         }
 
@@ -1862,6 +1928,12 @@ public class ObcService extends Service implements OnTripCallback {
         phpRepository.getArea();
     }
 
+    public void startPoiDownload() {
+        DLog.D("Start poi download..");
+
+        phpRepository.getPois();
+    }
+
     public void startDownloadReservations() {
         dlog.d("Start Downloading reservations");
         phpRepository.getReservation(App.CarPlate)
@@ -1902,16 +1974,6 @@ public class ObcService extends Service implements OnTripCallback {
     public void startDownloadCommands() {
 
             dlog.d("Start Downloading comandi");
-            HttpConnector http = new HttpConnector(this);
-            http.SetHandler(localHandler);
-            CommandsConnector rc = new CommandsConnector();
-            rc.setTarga(App.CarPlate);
-            http.Execute(rc);
-
-
-    }
-
-    public void startDownloadCommandsNew(){
         phpRepository.getCommands(App.CarPlate)
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<ServerCommand>() {
@@ -1927,7 +1989,6 @@ public class ObcService extends Service implements OnTripCallback {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        DLog.E("Error syncing.", e);
                     }
 
                     @Override
@@ -1935,7 +1996,16 @@ public class ObcService extends Service implements OnTripCallback {
                         DLog.I("Synced successfully!");
                     }
                 });
+//            HttpConnector http = new HttpConnector(this);
+//            http.SetHandler(localHandler);
+//            CommandsConnector rc = new CommandsConnector();
+//            rc.setTarga(App.CarPlate);
+//            http.Execute(rc);
+
+
     }
+
+
 
 
     public void startDownloadAdmins() {
@@ -2061,16 +2131,16 @@ public class ObcService extends Service implements OnTripCallback {
         obc_io.setSecondaryGPS(10000);
     }
 
-
+@Deprecated
     void startCallCenterCall(Messenger replyTo, String number) {
         try {
-            CallCenterConnector ccc = new CallCenterConnector();
+            /*CallCenterConnector ccc = new CallCenterConnector();
             ccc.setTripInfo(App.currentTripInfo);
             ccc.setMobileNumber(number);
 
             HttpConnector httpConnector = new HttpConnector(this);
             httpConnector.setMessenger(replyTo);
-            httpConnector.Execute(ccc);
+            httpConnector.Execute(ccc);*/
 
 
         } catch (Exception e) {
@@ -2323,20 +2393,20 @@ public class ObcService extends Service implements OnTripCallback {
                     obc_io.addAdminCard(obj.AdminsList);
                     break;
 
-                case Connectors.MSG_DN_CLIENTI:
+                case Connectors.MSG_DN_CLIENTI:/*
                     CustomersConnector cc = (CustomersConnector) msg.obj;
                     if (cc.getReceivedRecords() > 0) {
                         startDownloadCustomers();
-                    }
+                    }*/
                     break;
 
-                /*case Connectors.MSG_DN_CONFIGS:
+                case Connectors.MSG_DN_CONFIGS:/*
                     ConfigsConnector cfgc = (ConfigsConnector) msg.obj;
                     if (cfgc.ConfigsString != null) {
                         App.Instance.setConfig(cfgc.ConfigsString, null);
-                    }
+                    }*/
                     break;
-                    */
+
 
             }
 
@@ -2508,7 +2578,7 @@ public class ObcService extends Service implements OnTripCallback {
 
                 case MSG_CUSTOMER_SOS:
                     eventRepository.eventSos((String) msg.obj);
-                    startCallCenterCall(msg.replyTo, (String) msg.obj);
+                    //startCallCenterCall(msg.replyTo, (String) msg.obj);
                     break;
 
 
@@ -2610,12 +2680,12 @@ public class ObcService extends Service implements OnTripCallback {
                     break;
 
                 case MSG_SERVER_HTTPNOTIFY:
-                    String response = ((NotifiesConnector) msg.obj).response;
-                    notifyServerMessage(msg.arg1, msg.arg2, response);
+                    /*String response = ((NotifiesConnector) msg.obj).response;
+                    notifyServerMessage(msg.arg1, msg.arg2, response);*/
                     break;
 
                 case MSG_SERVER_COMMAND:
-                    if (msg.obj != null) {
+                    /*if (msg.obj != null) {
                         List<ServerCommand> list = null;
                         try {
                             CommandsConnector cc = (CommandsConnector) msg.obj;
@@ -2627,7 +2697,7 @@ public class ObcService extends Service implements OnTripCallback {
                         }
 
                         executeServerCommands(list);
-                    }
+                    }*/
                     break;
 
                 case MSG_SERVER_COMMAND_NEW:

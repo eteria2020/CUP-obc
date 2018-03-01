@@ -11,6 +11,7 @@ import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.DbRecord;
 import eu.philcar.csg.OBC.db.Event;
+import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.ServerCommand;
@@ -170,6 +171,12 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
     @Override
     public Observable<Void> consumeReservation(int reservation_id) {
         return  mSharengoPhpApi.consumeReservation(reservation_id)
+                .compose(this.handleRetrofitRequest());
+    }
+
+    @Override
+    public Observable<List<Poi>> getPois(long lastupdate) {
+        return mSharengoPhpApi.getPois(lastupdate)
                 .compose(this.handleRetrofitRequest());
     }
 }
