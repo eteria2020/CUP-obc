@@ -10,7 +10,7 @@ import eu.philcar.csg.OBC.data.model.ServerResponse;
 import eu.philcar.csg.OBC.service.DataManager;
 
 @DatabaseTable(tableName = "poi", daoClass = Pois.class )  
-public class Poi extends DbRecord<ServerResponse> {
+public class Poi extends DbRecord<ServerResponse> implements CustomOp{
 	
 	@DatabaseField(id = true)
 	public int id;
@@ -65,5 +65,12 @@ public class Poi extends DbRecord<ServerResponse> {
 	@Override
 	public void handleResponse(ServerResponse e, DataManager manager, int callOrder) {
 
+	}
+
+	@Override
+	public void onDbWrite() {
+		brand="";
+		type_group="";
+		attivo=true;
 	}
 }

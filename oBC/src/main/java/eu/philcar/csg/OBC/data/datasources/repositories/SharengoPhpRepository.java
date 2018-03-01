@@ -144,7 +144,9 @@ public class SharengoPhpRepository {
                        //openTripDisposable = n;
                    })
                    .doOnError(e -> {
-                       DLog.E("Error insiede openTrip",e);
+                       if(e instanceof ErrorResponse)
+                           if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
+                               DLog.E("Error insiede openTrip",e);
                        RxUtil.dispose(openTripDisposable);})
                    .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
 
@@ -270,6 +272,8 @@ public class SharengoPhpRepository {
                     //openTripDisposable = n;
                 })
                 .doOnError(e -> {
+                    if(e instanceof ErrorResponse)
+                        if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
                     DLog.E("Error insiede getReservation",e);
                     //RxUtil.dispose(openTripDisposable);
                 })
