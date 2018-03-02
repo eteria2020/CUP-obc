@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.SharengoDataSource;
 import eu.philcar.csg.OBC.data.model.ConfigResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
@@ -69,7 +70,8 @@ public class SharengoApiRepository {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            DLog.E("Error syncing getCustomer", e);
+                            if(e instanceof ErrorResponse)
+                                DLog.E("Error syncing getCustomer", ((ErrorResponse)e).error);
                             RxUtil.dispose(customerDisposable);
                         }
 
@@ -115,7 +117,8 @@ public class SharengoApiRepository {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            DLog.E("Error syncing getEmployee", e);
+                            if(e instanceof ErrorResponse)
+                            DLog.E("Error syncing getEmployee", ((ErrorResponse)e).error);
                             RxUtil.dispose(employeeDisposable);
                         }
 
@@ -160,7 +163,8 @@ public class SharengoApiRepository {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            DLog.E("Error syncing getConfig", e);
+                            if(e instanceof ErrorResponse)
+                                DLog.E("Error syncing getConfig", ((ErrorResponse)e).error);
                             RxUtil.dispose(configDisposable);
                         }
 

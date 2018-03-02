@@ -18,11 +18,16 @@ public class ErrorResponse extends Throwable {
     public ErrorType errorType;
     public String rawMessage;
     public Integer httpStatus;
+    public Throwable error;
 
     public ErrorResponse(){}
 
     public ErrorResponse(ErrorType errorType){
         this.errorType = errorType;
+    }
+    public ErrorResponse(ErrorType errorType, Throwable error){
+        this.errorType = errorType;
+        this.error =error;
     }
 
     /*@Override

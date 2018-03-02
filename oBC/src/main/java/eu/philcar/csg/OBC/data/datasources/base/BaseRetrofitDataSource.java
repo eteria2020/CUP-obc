@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.db.DbRecord;
+import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.service.DataManager;
 import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
@@ -26,18 +27,18 @@ public abstract class BaseRetrofitDataSource {
 
                 if (throwable instanceof IOException) {
                     if (throwable instanceof ConnectException) {
-                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK));
+                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK,throwable));
                     } else if (throwable instanceof SocketTimeoutException) {
-                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.SERVER_TIMEOUT));
+                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.SERVER_TIMEOUT,throwable));
                     } else if (throwable instanceof UnknownHostException) {
-                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK));
+                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK,throwable));
                     } else if (throwable instanceof EOFException) {
-                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.EMPTY));
+                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.EMPTY,throwable));
                     }else{
-                            return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED));
+                            return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED,throwable));
                     }
                 } else {
-                    return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED));
+                    return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED,throwable));
                 }
             }
             else {
@@ -67,5 +68,36 @@ public abstract class BaseRetrofitDataSource {
 
         record.handleResponse(response, manager, callOrder);
 
+    }
+
+    protected void handleErorResponse(Throwable e){
+        if(e instanceof ErrorResponse){
+            ErrorResponse er = (ErrorResponse) e;
+            switch (er.errorType){
+                case HTTP:
+                    DLog.E("Retrofit Exception HTTP ",er.error);
+                    break;
+                case EMPTY:
+                    DLog.D("Retrofit Response EMPTY ");
+                    break;
+                case CUSTOM:
+                    DLog.E("Retrofit Exception CUSTOM ",er.error);
+                    break;
+                case CONVERSION:
+                    DLog.E("Retrofit Exception CONVERSION ",er.error);
+                    break;
+                case NO_NETWORK:
+                    DLog.E("Retrofit Exception NO_NETWORK ",er.error);
+                    break;
+                case UNEXPECTED:
+                    DLog.E("Retrofit Exception UNEXPECTED ",er.error);
+                    break;
+                case SERVER_TIMEOUT:
+                    DLog.E("Retrofit  Exception SERVER_TIMEOUT ",er.error);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }

@@ -274,7 +274,7 @@ public class SharengoPhpRepository {
                 .doOnError(e -> {
                     if(e instanceof ErrorResponse)
                         if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
-                    DLog.E("Error insiede getReservation",e);
+                            DLog.E("Error insiede getReservation",e);
                     //RxUtil.dispose(openTripDisposable);
                 })
                 .doOnComplete(() ->{});
@@ -325,7 +325,6 @@ public class SharengoPhpRepository {
 
                      @Override
                      public void onError(@NonNull Throwable e) {
-                         DLog.E("Error syncing getCustomer", e);
                      }
 
                      @Override
