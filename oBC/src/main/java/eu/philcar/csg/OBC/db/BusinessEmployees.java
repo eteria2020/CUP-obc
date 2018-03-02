@@ -38,7 +38,7 @@ public class BusinessEmployees extends DbTable<BusinessEmployee, Integer> {
 		return null;
 	}
 
-	public Observable<BusinessEmployee> setCustomers(final Collection<BusinessEmployee> customers){
+	public Observable<BusinessEmployee> setEmployee(final Collection<BusinessEmployee> customers){
 		return Observable.create(emitter -> {
 			if (emitter.isDisposed()) return;
 
@@ -49,7 +49,7 @@ public class BusinessEmployees extends DbTable<BusinessEmployee, Integer> {
 				}
 				emitter.onComplete();
 			} catch(Exception e) {
-				DLog.E("Exception updating Customer",e);
+				DLog.E("Exception setting Employee",e);
 				emitter.onError(e);
 			}
 		});

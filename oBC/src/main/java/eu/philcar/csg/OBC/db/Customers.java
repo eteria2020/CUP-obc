@@ -156,7 +156,7 @@ public class Customers extends DbTable<Customer,Integer> {
                 }
                 emitter.onComplete();
             } catch(Exception e) {
-                DLog.E("Exception updating Customer",e);
+                DLog.E("Exception setting Customer",e);
                 emitter.onError(e);
             }
         });

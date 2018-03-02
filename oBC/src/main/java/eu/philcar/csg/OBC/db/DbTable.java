@@ -40,7 +40,7 @@ public class DbTable<tableClass, pk>  extends BaseDaoImpl<tableClass, pk>{
 					}
 					emitter.onComplete();
 				} catch(Exception e) {
-					DLog.E("Exception updating Customer",e);
+					DLog.E("Exception updating Many",e);
 					emitter.onError(e);
 				}
 
@@ -56,6 +56,8 @@ public class DbTable<tableClass, pk>  extends BaseDaoImpl<tableClass, pk>{
 		return Observable.create(emitter -> {
 			if (emitter.isDisposed())
 				return;
+
+			callBatchTasks((Callable<Void>) () -> {
 				try {
 					if(collection instanceof CustomOp){
 						((CustomOp) collection).onDbWrite();
@@ -65,10 +67,11 @@ public class DbTable<tableClass, pk>  extends BaseDaoImpl<tableClass, pk>{
 
 					emitter.onComplete();
 				} catch(Exception e) {
-					DLog.E("Exception updating Customer",e);
+					DLog.E("Exception updating One",e);
 					emitter.onError(e);
 				}
-
+				return null;
+			});
 
 		});
 	}

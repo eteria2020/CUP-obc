@@ -264,6 +264,7 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 
 	@Override
 	public void onDbWrite() {
+		isEnctypted=false;
 		encrypt();
 	}
 

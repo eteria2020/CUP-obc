@@ -66,6 +66,7 @@ public class SharengoApiRepository {
                         public void onNext(@NonNull Customer ribot) {
                             //TODO schedule new call in case of >10000
                             needUpdateCustomer=true;
+
                         }
 
                         @Override

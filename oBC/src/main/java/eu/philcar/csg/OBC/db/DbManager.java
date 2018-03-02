@@ -210,6 +210,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 	public  Events getEventiDao() {
 		try {
 			Events c = getDao(Event.class);
+			c.setAutoCommit(true);
 			return c;
 		} catch (Exception e) {
 
@@ -222,6 +223,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 	public  Pois getPoisDao() {
 		try {
 			Pois c = getDao(Poi.class);
+			c.setAutoCommit(true);
 			return c;
 		} catch (Exception e) {
 

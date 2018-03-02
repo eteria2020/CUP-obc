@@ -176,7 +176,7 @@ public class DataManager { //TODO change to interface-type system like api does 
                 }
                 emitter.onComplete();
             } catch(Exception e) {
-                DLog.E("Exception updating Customer",e);
+                DLog.E("Exception handling commands",e);
                 emitter.onError(e);
             }
         });
@@ -207,7 +207,7 @@ public class DataManager { //TODO change to interface-type system like api does 
                 emitter.onNext(first);
                 emitter.onComplete();
             } catch(Exception e) {
-                DLog.E("Exception updating Customer",e);
+                DLog.E("Exception handling reservation",e);
                 emitter.onError(e);
             }
         });
