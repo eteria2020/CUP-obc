@@ -60,7 +60,7 @@ public class SharengoBeaconRepository {
                       //RxUtil.dispose(commandDisposable);
                       beaconDisposable = n;})
                   .doOnError(e -> {
-                      DLog.E("Error insiede sendBeacon",e);
+                      DLog.E("Error insiede sendBeacon",((ErrorResponse)e).error);
                       RxUtil.dispose(beaconDisposable);})
                   .doOnComplete(() -> RxUtil.dispose(beaconDisposable));
 

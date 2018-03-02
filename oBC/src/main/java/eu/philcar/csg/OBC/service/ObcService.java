@@ -75,6 +75,7 @@ import eu.philcar.csg.OBC.task.OldLogCleamup;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 import eu.philcar.csg.OBC.task.UDPServer;
 import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -1938,6 +1939,7 @@ public class ObcService extends Service implements OnTripCallback {
         dlog.d("Start Downloading reservations");
         phpRepository.getReservation(App.CarPlate)
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Reservation>() {
                     @Override
                     public void onSubscribe(Disposable d) {
