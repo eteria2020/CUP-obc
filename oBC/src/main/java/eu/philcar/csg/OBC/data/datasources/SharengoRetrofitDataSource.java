@@ -25,18 +25,21 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
     @Override
     public Observable<List<Customer>> getCustomer(long lastupdate) {
         return  mSharengoApi.getCustomer(lastupdate)
-                .compose(this.handleRetrofitRequest());
+                .compose(this.handleRetrofitRequest())
+                .doOnError(this::handleErorResponse);
     }
 
     @Override
     public Observable<List<BusinessEmployee>> getBusinessEmployees() {
         return  mSharengoApi.getBusinessEmployees()
-                .compose(this.handleRetrofitRequest());
+                .compose(this.handleRetrofitRequest())
+                .doOnError(this::handleErorResponse);
     }
 
     @Override
     public Observable<ConfigResponse> getConfig(String car_plate) {
         return  mSharengoApi.getConfigs(car_plate)
-                .compose(this.handleRetrofitRequest());
+                .compose(this.handleRetrofitRequest())
+                .doOnError(this::handleErorResponse);
     }
 }
