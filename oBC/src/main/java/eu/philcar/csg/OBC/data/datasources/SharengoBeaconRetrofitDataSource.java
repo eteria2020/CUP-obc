@@ -1,5 +1,7 @@
 package eu.philcar.csg.OBC.data.datasources;
 
+import java.net.URLEncoder;
+
 import eu.philcar.csg.OBC.data.datasources.api.SharengoBeaconApi;
 import eu.philcar.csg.OBC.data.datasources.base.BaseRetrofitDataSource;
 import eu.philcar.csg.OBC.data.model.BeaconResponse;
@@ -19,6 +21,12 @@ public class SharengoBeaconRetrofitDataSource extends BaseRetrofitDataSource imp
 
     @Override
     public Observable<BeaconResponse> sendBeacon(String plate, String beacon) {
+
+        try{
+            beacon= URLEncoder.encode(beacon,"UTF-8");
+        }catch (Exception e){
+
+        }
 
         return  mSharengoBeaconApi.sendBeacon(plate,beacon)
                 .compose(this.handleRetrofitRequest());

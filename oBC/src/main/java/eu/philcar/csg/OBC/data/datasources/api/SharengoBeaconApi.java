@@ -17,5 +17,5 @@ public interface SharengoBeaconApi {
     //http://core.sharengo.it:7600/notifies?
 
     @GET("notifies")
-    Observable<Result<BeaconResponse>> sendBeacon(@Query("plate") String plate, @Query("beaconText") String beacon);
+    Observable<Result<BeaconResponse>> sendBeacon(@Query("plate") String plate, @Query(value = "beaconText", encoded=true) String beacon);
 }
