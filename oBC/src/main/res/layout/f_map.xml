@@ -68,8 +68,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
 			android:layout_alignTop="@+id/llTray"
-			android:layout_marginEnd="16dp"
-			android:layout_toStartOf="@+id/fmapENDB">
+			android:layout_marginEnd="16dp">
 
 		</FrameLayout>
 

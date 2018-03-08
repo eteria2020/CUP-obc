@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        vmtest {
+            keyAlias 'Sharengo.user'
+            keyPassword 'Sharengo1'
+            storeFile file('D:/Mobile Workspace/Android Workspace/key/sharengo.keystore.jks')
+            storePassword 'Sharengo1'
+        }
+    }
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
 useLibrary 'org.apache.http.legacy'
@@ -9,15 +17,33 @@ useLibrary 'org.apache.http.legacy'
         minSdkVersion 17
         targetSdkVersion 26
         multiDexEnabled true
-        ndk{
+        ndk {
             abiFilters "armeabi-v7a"// add your required cpu architecture
         }
     }
-
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+        }
+        vmtest {
+            resValue "string", "endpointSharengo", "https://api.localhost.it:8123/"
+            resValue "string", "endpointSharengoBeacon", "http://api.localhost.it:7600/"
+            resValue "string", "endpointSharengoPhp", "http://api.localhost.it/api/"
+            signingConfig signingConfigs.vmtest
+            debuggable true
+        }
+        debug {
+            resValue "string", "endpointSharengo", "https://api.sharengo.it:8123/"
+            resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
+            resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
+            signingConfig signingConfigs.vmtest
+        }
+        stage {
+            resValue "string", "endpointSharengo", "https://corestage.sharengo.it:8123/"
+            resValue "string", "endpointSharengoBeacon", "http://corestage.sharengo.it:7600/"
+            resValue "string", "endpointSharengoPhp", "http://corestage.sharengo.it/api/"
+            debuggable true
         }
     }
     compileOptions {
@@ -27,12 +53,9 @@ useLibrary 'org.apache.http.legacy'
 }
 
 dependencies {
-
     final RETROFIT_VERSION = '2.3.0'
     final DAGGER_VERSION = '2.5'
-
     def daggerCompiler = "com.google.dagger:dagger-compiler:$DAGGER_VERSION"
-
     compile project(':sDKTools')
     compile 'com.android.support:support-v4:26.1.0'
     compile files('libs/acra-4.5.0.jar')
@@ -49,19 +72,14 @@ dependencies {
     compile files('libs/additionnal.jar')
     compile files('libs/mail.jar')
     compile 'com.github.barteksc:android-pdf-viewer:2.8.1'
-
-    compile group: 'com.j256.ormlite', name: 'ormlite-core', version: '4.48'
-
-    compile group: 'com.j256.ormlite', name: 'ormlite-android', version: '4.48'
-
+    compile 'com.j256.ormlite:ormlite-core:4.48'
+    compile 'com.j256.ormlite:ormlite-android:4.48'
     compile 'com.squareup.okhttp3:logging-interceptor:3.9.0'
-
     compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
     compile "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
     compile "com.squareup.retrofit2:adapter-rxjava2:$RETROFIT_VERSION"
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
     compile 'io.reactivex.rxjava2:rxjava:2.1.0'
-
     compile "com.google.dagger:dagger:$DAGGER_VERSION"
     //Required by Dagger2
     annotationProcessor daggerCompiler

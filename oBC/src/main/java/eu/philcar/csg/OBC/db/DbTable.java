@@ -29,25 +29,30 @@ public class DbTable<tableClass, pk>  extends BaseDaoImpl<tableClass, pk>{
 		return Observable.create(emitter -> {
 			if (emitter.isDisposed())
 				return;
-			callBatchTasks((Callable<Void>) () -> {
-				try {
-					for (tableClass row : collection) {
-						if(row instanceof CustomOp){
-							((CustomOp) row).onDbWrite();
+			try {
+				callBatchTasks((Callable<Void>) () -> {
+					try {
+						for (tableClass row : collection) {
+							if (row instanceof CustomOp) {
+								((CustomOp) row).onDbWrite();
+							}
+							int result = createOrUpdate(row).getNumLinesChanged();
+							if (result >= 0) emitter.onNext(row);
 						}
-						int result = createOrUpdate(row).getNumLinesChanged();
-						if (result >= 0) emitter.onNext(row);
+						emitter.onComplete();
+					} catch (Exception e) {
+						DLog.E("Exception updating Many", e);
+						emitter.onError(e);
 					}
-					emitter.onComplete();
-				} catch(Exception e) {
-					DLog.E("Exception updating Many",e);
-					emitter.onError(e);
-				}
 
-				return null;
+					return null;
 
 
-			});
+				});
+			}catch (Exception e){
+				DLog.E("Exception while updating many",e);
+				emitter.onError(e);
+			}
 
 		});
 	}
