@@ -121,27 +121,15 @@ public class FMaintenance extends FBase {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		Events.Maintenance("Show");
-		//App.Charging = true;
+		/*App.Charging = true;
+		App.Instance.persistCharging();*/
 		//askPin();
 		((AWelcome)getActivity()).sendMessage(MessageFactory.requestCarInfo());
 		view = inflater.inflate(R.layout.f_maintenance, container, false);
 
-		((View)view.findViewById(R.id.finsNextIB)).setVisibility(View.INVISIBLE);
-		((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.VISIBLE);
+		((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.GONE);
 
-		((Button)view.findViewById(R.id.finsNextIB)).setOnLongClickListener(new View.OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
 
-				if(App.Charging) {
-					dlog.d("Skipped FMaintenance");
-					Events.Maintenance("Skip");
-				}
-				dlog.d("Closing FMaintenance");
-				return true;
-			}
-		});
 
 
 		((Button)view.findViewById(R.id.btnEndCharging)).setOnClickListener(new OnClickListener() {
@@ -150,8 +138,15 @@ public class FMaintenance extends FBase {
 				dlog.d("Pushed EndCharging");
 				((AWelcome)getActivity()).sendMessage(MessageFactory.sendEndCharging());
 				Events.Maintenance("EndCharging");
-				((TextView)view.findViewById(R.id.tvEndCharging)).setText("Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.");
+				((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_wait);
 
+			}
+		});
+
+		view.findViewById(R.id.fmaintSOSB).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(getActivity(), ASOS.class));
 			}
 		});
 
@@ -170,9 +165,9 @@ public class FMaintenance extends FBase {
 
 
 		((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
-		((TextView)view.findViewById(R.id.tvEndCharging)).setText("Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.");
+		((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_wait);
 
-		new CountDownTimer(4000,1000) {
+		/*new CountDownTimer(4000,1000) {
 			@Override
 			public void onTick(long millisUntilFinished) {
 				((TextView)view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished/1000)+ " s");
@@ -181,12 +176,11 @@ public class FMaintenance extends FBase {
 			@Override
 			public void onFinish() {
 				((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.INVISIBLE);
-				((View)view.findViewById(R.id.finsNextIB)).setVisibility(View.VISIBLE);
 
 
 			}
 
-		}.start();
+		}.start();*/
 
 		handler.postDelayed(new Runnable() {
 			@Override
@@ -209,11 +203,11 @@ public class FMaintenance extends FBase {
 		dlog.d("update App.Charging: "+App.Charging+" chargingPlug: "+carinfo.chargingPlug);
 		if (App.Charging && !carinfo.chargingPlug) {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(true);
-			((TextView)view.findViewById(R.id.tvEndCharging)).setText("TERMINA RICARICA: L'auto sarà nuovamente disponible al noleggio a meno di altre condizioni di allarme, ricordati di mettere il cavo nel bagagliaio");
+			((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_done);
 		} else {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
 			if (carinfo.chargingPlug)
-				((TextView)view.findViewById(R.id.tvEndCharging)).setText("IMPOSSIBILE TERMINARE RICARCA: spina ancora inserita");
+				((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_plug_insert);
 			else
 				((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
 		}

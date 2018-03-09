@@ -84,6 +84,7 @@ import eu.philcar.csg.OBC.service.Reservation;
 import eu.philcar.csg.OBC.service.ServiceConnector;
 import eu.philcar.csg.OBC.service.TripInfo;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Application;
@@ -1248,6 +1249,7 @@ public void loadRadioSetup() {
 		initPhase2();
 }
 
+	@SuppressLint("HandlerLeak")
 	private final Handler localHandler = new Handler() {
 
 		@Override
@@ -1429,7 +1431,7 @@ private void  initPhase2() {
 							float z = pAcc[2]-acc[2];
 							
 							
-							float module = FloatMath.sqrt(x*x+y*y+z*z);
+							float module = (float) Math.sqrt(x*x+y*y+z*z);
 							
 							if (module>1 && App.AlarmEnabled && App.currentTripInfo==null) {
 							  dlog.d("Motion alarm. Module=" + module);

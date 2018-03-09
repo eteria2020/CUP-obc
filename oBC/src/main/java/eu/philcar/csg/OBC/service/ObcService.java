@@ -2362,12 +2362,12 @@ public class ObcService extends Service implements OnTripCallback {
                     break;
 
                 case MSG_CAR_INFO:
-                    Bundle b = carInfo.getBundle();
+                    //Bundle b = carInfo.getBundle();
                     try {
-                        Message rmsg = Message.obtain(null, MSG_CAR_INFO);
-                        rmsg.setData(b);
-                        msg.replyTo.send(rmsg);
-                    } catch (RemoteException e) {
+                        Message rmsg = MessageFactory.notifyCarInfoUpdate(carInfo);
+                        //rmsg.setData(b);
+                        sendAll(rmsg);
+                    } catch (Exception e) {
                         DLog.E("Error sending to client", e);
                     }
                     break;
