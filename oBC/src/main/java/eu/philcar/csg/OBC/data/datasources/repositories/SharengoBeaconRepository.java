@@ -58,11 +58,16 @@ public class SharengoBeaconRepository {
                     //.doOnNext(n -> mDataManager.saveArea(n))
                   .doOnSubscribe(n -> {
                       //RxUtil.dispose(commandDisposable);
-                      beaconDisposable = n;})
+                      //beaconDisposable = n;
+                  })
                   .doOnError(e -> {
                       DLog.E("Error insiede sendBeacon",((ErrorResponse)e).error);
-                      RxUtil.dispose(beaconDisposable);})
-                  .doOnComplete(() -> RxUtil.dispose(beaconDisposable));
+                      //RxUtil.dispose(beaconDisposable);
+                  })
+                  .doOnComplete(() -> {
+                      //RxUtil.dispose(beaconDisposable);
+
+                  });
 
         //}
     }

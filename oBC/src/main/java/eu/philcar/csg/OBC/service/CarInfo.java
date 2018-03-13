@@ -42,6 +42,9 @@ import android.os.SystemClock;
 import android.text.format.DateFormat;
 import android.util.JsonWriter;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import javax.inject.Inject;
 
 public class CarInfo {
@@ -750,14 +753,34 @@ public class CarInfo {
 
     }
 
+    private void appendJsonGson(com.google.gson.stream.JsonWriter jw, String key, Object value) {
+        try {
+
+            if (value instanceof Boolean) {
+                jw.name(key).value((boolean) value);
+            } else if (value instanceof Integer) {
+                jw.name(key).value((int) value);
+            } else if (value instanceof Float) {
+                jw.name(key).value((float) value);
+            } else if (value instanceof String) {
+                jw.name(key).value((String) value);
+            }
+
+
+        } catch (IOException e) {
+            dlog.e("Exception while append json", e);
+        }
+
+    }
+
     private double gpsRound(double value) {
         return Math.round(value * 100000D) / 100000D;
     }
 
+    //TODO not optimized
     public String getJson(boolean longVersion) {
         StringWriter sw = new StringWriter();
         JsonWriter jw = new JsonWriter(sw);
-
         //Per chiudere da remoto una corsa (da app utente finale) dobbiamo essere nell'ultima schermata, essere in area accettabile e non in sosta.
         boolean enableRemoteClose = App.isCloseable && App.checkParkArea(latitude, longitude) && (App.getParkModeStarted() == null);
 
@@ -856,6 +879,113 @@ public class CarInfo {
 
         String jsonStr = sw.toString();
         return jsonStr;
+    }
+
+    public String getJsonGson(boolean longVersion) {
+        try {
+            StringWriter sw = new StringWriter();
+            Gson gson = new Gson();
+            com.google.gson.stream.JsonWriter jw = new Gson().newJsonWriter(new StringWriter());
+            //Per chiudere da remoto una corsa (da app utente finale) dobbiamo essere nell'ultima schermata, essere in area accettabile e non in sosta.
+            boolean enableRemoteClose = App.isCloseable && App.checkParkArea(latitude, longitude) && (App.getParkModeStarted() == null);
+
+            try {
+
+                for (String key : allData.keySet()) {
+                    if (key != "GPSBOX") {
+                        if (key.equalsIgnoreCase("SOC")) {
+                            appendJsonGson(jw, key, batteryLevel);
+                        } else
+                            appendJsonGson(jw, key, allData.get(key));
+                    }
+                }
+
+
+                if (App.mockLocation != null) {
+                    jw.name("lon").value(gpsRound(App.mockLocation.getLongitude()));
+                    jw.name("lat").value(gpsRound(App.mockLocation.getLatitude()));
+                } else {
+                    jw.name("lon").value(gpsRound(longitude));
+                    jw.name("lat").value(gpsRound(latitude));
+                }
+
+                jw.name("GPS").value(App.UseExternalGPS ? "EXT" : "INT");
+                jw.name("SOC").value(batteryLevel);
+                //jw.name("batterySafety").value(batterySafety);
+                jw.name("cputemp").value(App.getCpuTemp());
+
+                jw.name("on_trip").value(App.currentTripInfo != null ? 1 : 0);
+
+                jw.name("closeEnabled").value(enableRemoteClose);
+                jw.name("parkEnabled").value(!App.motoreAvviato && App.getParkModeStarted() != null);
+                jw.name("parking").value(App.getParkModeStarted() != null && App.parkMode.isOn());
+                jw.name("charging").value(App.Charging);
+                jw.name("noGPS").value(App.getNoGPSAlarm());
+                jw.name("PPStatus").value(this.chargingPlug);
+                if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
+                    jw.name("id_trip").value(App.currentTripInfo.trip.remote_id);
+                }
+
+
+                if (intGpsLocation != null) {
+                    jw.name("int_lon").value(gpsRound(intGpsLocation.getLongitude()));
+                    jw.name("int_lat").value(gpsRound(intGpsLocation.getLatitude()));
+                    jw.name("int_time").value(intGpsLocation.getTime());
+                }
+
+                if (extGpsLocation != null) {
+                    jw.name("ext_lon").value(gpsRound(extGpsLocation.getLongitude()));
+                    jw.name("ext_lat").value(gpsRound(extGpsLocation.getLatitude()));
+                    jw.name("ext_time").value(extGpsLocation.getTime());
+                }
+
+
+                jw.name("log_tx_time").value(log_sdf.format(new Date()));
+
+                if (longVersion) {
+                    updateTrips();
+
+                    jw.name("fwVer").value(fw_version.equals("") ? App.fw_version : fw_version);
+                    jw.name("swVer").value(App.sw_Version);
+                    jw.name("sdkVer").value(sdk_version);
+                    jw.name("hwVer").value(android.os.Build.MODEL + " " + android.os.Build.DEVICE + " " + android.os.Build.ID);
+                    jw.name("gsmVer").value(android.os.Build.getRadioVersion());
+                    jw.name("clock").value(DateFormat.format("dd/MM/yyyy kk:mm:ss", new Date()).toString());
+
+                    jw.name("IMEI").value(App.IMEI);
+                    jw.name("SIM_SN").value(App.SimSerialNumber);
+
+                    jw.name("wlsize").value(App.whiteListSize);
+
+                    jw.name("offLineTrips").value(tripsToSend);
+                    jw.name("openTrips").value(tripsOpened);
+
+                    if (App.mockLocation == null) {
+                        String gpsInfo = getGpsJson();
+                        jw.name("gps_info").value(gpsInfo);
+                    }
+
+                    jw.name("Versions").value(App.Versions.toJson());
+
+                    if (allData.containsKey("GPSBOX"))
+                        jw.name("GPSBOX").value(allData.getString("GPSBOX"));
+
+
+                }
+
+
+                jw.endObject();
+
+                jw.close();
+            } catch (IOException e) {
+                DLog.E("Error creating json:", e);
+            }
+
+            String jsonStr = sw.toString();
+            return jsonStr;
+        }catch (Exception e){
+            dlog.e("Esception serializing beacon with gson",e);
+        }
     }
 
     public String getJson_GPRS(boolean longVersion) {
