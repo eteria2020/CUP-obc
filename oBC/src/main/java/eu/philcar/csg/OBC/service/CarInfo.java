@@ -24,15 +24,14 @@ import org.json.JSONObject;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
+import eu.philcar.csg.OBC.data.model.Beacon;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.db.Trips;
-import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.task.OdoController;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 
-import android.app.Application;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -41,9 +40,6 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.text.format.DateFormat;
 import android.util.JsonWriter;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 import javax.inject.Inject;
 
@@ -56,28 +52,28 @@ public class CarInfo {
 
     private Handler serviceHandler;
 
-    public String id = "";
+    private String id = "";
 
     public String VIN = "";
 
 
-    public int speed = 0;
+    private int speed = 0;
 
 
     public int batteryLevel = App.fuel_level;
     public int bmsSOC = App.fuel_level;
     public int bmsSOC_GPRS = App.fuel_level;
     public float SOCR = App.fuel_level, virtualSOC = App.fuel_level;
-    public int km = 0;
-    public float voltage = 0;
-    public int isKeyOn = 0;
-    public static String keyStatus = "";
-    public String gear = "";
+    private int km = 0;
+    private float voltage = 0;
+    private int isKeyOn = 0;
+    private String keyStatus = "";
+    private String gear = "";
     private boolean batterySafety = false;
     private boolean lastBatterySafety = batterySafety;
     private Date lastBatterySafetyTx = new Date();
-    public int outAmp = 0;
-    public Long timestampCurrent = null;
+    private int outAmp = 0;
+    private Long timestampCurrent = null;
     public Long lastForceReady=System.currentTimeMillis();
 
 
@@ -91,27 +87,39 @@ public class CarInfo {
     public float currVoltage = App.max_voltage;
 
 
-    public boolean ready;
-    public boolean brakes;
-    public boolean chargingPlug;
+    private boolean ready;
+    private boolean brakes;
+    private boolean chargingPlug;
     public double currentAmpere = App.currentAmp;
     public double chargingAmpere = App.chargingAmp;
     public double maxAmpere = App.maxAmp;
 
-    public String fw_version = "";
-    public String sdk_version = "";
+    private String fw_version = "";
+    private String sdk_version = "";
     public String versions = "";
     private static Boolean sent = false;
 
     public Location location;
 
     public Location intGpsLocation = new Location(LocationManager.GPS_PROVIDER);
-    public Location extGpsLocation = new Location(LocationManager.GPS_PROVIDER);
+    public Location extGpsLocation = new Location(LocationManager.GPS_PROVIDER){
+        @Override
+        public void setLatitude(double latitude) {
+            super.setLatitude(latitude);
+            beacon.setExt_lat(latitude);
+        }
+
+        @Override
+        public void setLongitude(double longitude) {
+            super.setLongitude(longitude);
+            beacon.setExt_lon(longitude);
+        }
+    };
     public Location ntwkLocation = new Location(LocationManager.NETWORK_PROVIDER);
 
 
-    public double longitude;
-    public double latitude;
+    private double longitude;
+    private double latitude;
     public double accuracy;
 
     public long lastLocationChange;
@@ -127,6 +135,8 @@ public class CarInfo {
     public int rangeKm = (App.fuel_level <= 50 ? Math.max(App.fuel_level - 10, 0) : App.fuel_level);
 
     public Bundle allData;
+
+    private Beacon beacon;
 
 
     public ServiceLocationListener serviceLocationListener;
@@ -165,6 +175,7 @@ public class CarInfo {
                 if(checkLastBatterySafety(newBatterySafety)){
                     dlog.d("setBatterySafety: set new BS to" + newBatterySafety);
                     batterySafety=newBatterySafety;
+                    beacon.setBatterySafety(batterySafety);
                 }else{
                     dlog.d("setBatterySafety: wait to set new battery safety lastBStime"+lastBatterySafetyTx.toString());
                 }
@@ -175,6 +186,7 @@ public class CarInfo {
 
 
         batterySafety = newBatterySafety;
+        beacon.setBatterySafety(batterySafety);
     }
 
     public void setBatteryLevel(int batteryLevel) {
@@ -188,13 +200,14 @@ public class CarInfo {
         dlog.d("setBatteryLevel: first "+this.batteryLevel +" target: "+batteryLevel);
 
         if (this.batteryLevel - batteryLevel>= 5) {
-            this.batteryLevel = (Math.round(this.batteryLevel > batteryLevel ? this.batteryLevel - 5 : this.batteryLevel + 5));
+            this.batteryLevel = (this.batteryLevel > batteryLevel ? this.batteryLevel - 5 : this.batteryLevel + 5);
         } else
-            this.batteryLevel = (Math.round(batteryLevel));
+            this.batteryLevel = (batteryLevel);
 
         //this.batteryLevel=99;//FOR DEVELOP PURPOSE
 
         App.Instance.setBatteryLevel(this.batteryLevel);
+        beacon.setSOC(this.batteryLevel);
         dlog.d("setBatteryLevel: result "+this.batteryLevel);
     }
 
@@ -203,8 +216,8 @@ public class CarInfo {
         if (App.mockLocation != null) {
             location = App.mockLocation;
             long a=loc.getTime();
-            longitude = App.mockLocation.getLongitude();
-            latitude = App.mockLocation.getLatitude();
+            setLongitude(App.mockLocation.getLongitude());
+            setLatitude(App.mockLocation.getLatitude());
             accuracy = App.mockLocation.getAccuracy();
             App.lastLocation = App.mockLocation;
             return;
@@ -215,10 +228,10 @@ public class CarInfo {
             location = loc;
             long a=loc.getTime();
             String time = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS").format(location.getTime());
-            if (longitude != loc.getLongitude() || latitude != loc.getLatitude()) {
+            if (getLongitude() != loc.getLongitude() || getLatitude() != loc.getLatitude()) {
                 lastLocationChange = System.nanoTime();
-                longitude = loc.getLongitude();
-                latitude = loc.getLatitude();
+                setLongitude(loc.getLongitude());
+                setLatitude(loc.getLatitude());
                 accuracy = loc.getAccuracy();
             }
 
@@ -230,6 +243,7 @@ public class CarInfo {
 
     }
 
+    @Deprecated
     public boolean handleUpdate(Bundle b) {
         int i;
         boolean forceBeacon = false;
@@ -246,8 +260,8 @@ public class CarInfo {
 
             if (key.equalsIgnoreCase("keyOn")) {
                 int k = b.getBoolean(key) ? 1 : 0;
-                if (k != isKeyOn) {
-                    isKeyOn = k;
+                if (k != getIsKeyOn()) {
+                    setIsKeyOn(k);
                     eventRepository.eventKey(k);
 
                 }
@@ -256,14 +270,14 @@ public class CarInfo {
             if (key.equalsIgnoreCase("PackAmp")) {
 
                 int k = b.getInt(key);
-                outAmp = k;
+                setOutAmp(k);
 
 
             }
 
             if (key.equalsIgnoreCase("timestampAmp")) {
 
-                timestampCurrent = b.getLong(key);
+                setTimestampCurrent(b.getLong(key));
 
 
             } else if (key.equalsIgnoreCase("SOC")) {
@@ -284,7 +298,7 @@ public class CarInfo {
                 else
                     rangeKm = batteryLevel;
             } else if (key.equalsIgnoreCase("Speed")) {
-                speed = (int) Math.round(b.getFloat(key));
+                setSpeed((int) Math.round(b.getFloat(key)));
             }
 /*			
 			else if (key.equalsIgnoreCase("RPM")) {
@@ -299,31 +313,31 @@ public class CarInfo {
                 i = b.getInt(key);
                 if (i >= 0)
                     App.Instance.setKm(i);
-                km = i;
+                setKm(i);
             } else if (key.equalsIgnoreCase("MotV")) {
-                voltage = b.getFloat(key);
+                setVoltage(b.getFloat(key));
             } else if (key.equalsIgnoreCase("VIN")) {
-                id = b.getString(key);
-                eventRepository.CarPlateChange(App.CarPlate,id);
-                App.Instance.setCarPlate(id);
+                setId(b.getString(key));
+                eventRepository.CarPlateChange(App.CarPlate, getId());
+                App.Instance.setCarPlate(getId());
             } else if (key.equalsIgnoreCase("VER")) {
                 App.Instance.setFwVersion(b.getString(key));
             } else if (key.equalsIgnoreCase("keyStatus")) {
-                this.keyStatus = b.getString(key);
+                this.setKeyStatus(b.getString(key));
             } else if (key.equalsIgnoreCase("GearStatus")) {
                 String str = b.getString(key);
-                if (!this.gear.equals(str)) {
-                    this.gear = str;
+                if (!this.getGear().equals(str)) {
+                    this.setGear(str);
                     eventRepository.eventGear(str);
                 }
             } else if (key.equalsIgnoreCase("PPStatus")) {
                 boolean v = b.getBoolean(key);
-                if (v != this.chargingPlug) {
-                    this.chargingPlug = v;
+                if (v != this.isChargingPlug()) {
+                    this.setChargingPlug(v);
                     eventRepository.eventCharge(v ? 1 : 0);
                 }
 
-                if (!App.Charging && this.chargingPlug) {
+                if (!App.Charging && this.isChargingPlug()) {
                     App.Charging = true;
                     serviceHandler.sendMessage(MessageFactory.notifyStartCharging(this));
                     App.Instance.persistCharging();
@@ -332,14 +346,14 @@ public class CarInfo {
 
             } else if (key.equalsIgnoreCase("ReadyOn")) {
                 boolean v = b.getBoolean(key);
-                if (v != this.ready) {
-                    this.ready = v;
+                if (v != this.isReady()) {
+                    this.setReady(v);
                     eventRepository.eventReady(v ? 1 : 0);
                 }
             } else if (key.equalsIgnoreCase("BrakesOn")) {
-                this.brakes = b.getBoolean(key);
+                this.setBrakes(b.getBoolean(key));
             } else if (key.equalsIgnoreCase("SDKVer")) {
-                this.sdk_version = b.getString(key);
+                this.setSdk_version(b.getString(key));
             } else if (key.equalsIgnoreCase("Versions")) {
                 this.versions = b.getString(key);
             } else if (key.equalsIgnoreCase("GPSBOX")) {
@@ -403,9 +417,9 @@ public class CarInfo {
 
             if (key.equalsIgnoreCase("keyOn")) {
                 i = b.getBoolean(key) ? 1 : 0;
-                if (i != isKeyOn) {
+                if (i != getIsKeyOn()) {
                     hasChanged = true;
-                    isKeyOn = i;
+                    setIsKeyOn(i);
                     eventRepository.eventKey(i);
 
                     if(i==1&& App.currentTripInfo!=null && App.currentTripInfo.isOpen && App.pinChecked && App.getParkModeStarted()==null && !App.isClosing && System.currentTimeMillis()-lastForceReady>5000){        //Ask Rosco if good idea
@@ -417,9 +431,9 @@ public class CarInfo {
             } else if (key.equalsIgnoreCase("PackAmp")) {
 
                 i = b.getInt(key);
-                if (i != outAmp) {
+                if (i != getOutAmp()) {
                     hasChanged = true;
-                    outAmp = i;
+                    setOutAmp(i);
                 }
 
 
@@ -434,9 +448,9 @@ public class CarInfo {
 
             } else if (key.equalsIgnoreCase("timestampAmp")) {
                 l = b.getLong(key);
-                if (l != timestampCurrent) {
+                if (l != getTimestampCurrent()) {
                     hasChanged = true;
-                    timestampCurrent = l;
+                    setTimestampCurrent(l);
                 }
 
 
@@ -463,9 +477,9 @@ public class CarInfo {
                 }
             } else if (key.equalsIgnoreCase("Speed")) {
                 i = (int) Math.round(b.getFloat(key));
-                if (i != speed) {
+                if (i != getSpeed()) {
                     hasChanged = true;
-                    speed = i;
+                    setSpeed(i);
                 }
             }
 /*
@@ -479,24 +493,24 @@ public class CarInfo {
 */
             else if (key.equalsIgnoreCase("Km")) {
                 i = b.getInt(key);
-                if (i >= 0 && i != km) {
+                if (i >= 0 && i != getKm()) {
                     hasChanged = true;
                     App.Instance.setKm(i);
-                    km = i;
+                    setKm(i);
                 }
             } else if (key.equalsIgnoreCase("MotV")) {
                 f = b.getFloat(key);
-                if (f != voltage) {
+                if (f != getVoltage()) {
                     hasChanged = true;
-                    voltage = b.getFloat(key);
+                    setVoltage(b.getFloat(key));
                 }
             } else if (key.equalsIgnoreCase("VIN")) {
                 s = b.getString(key);
                 if (!s.equals(App.CarPlate)) {
                     hasChanged = true;
-                    id = s;
-                    eventRepository.CarPlateChange(App.CarPlate,id);
-                    App.Instance.setCarPlate(id);
+                    setId(s);
+                    eventRepository.CarPlateChange(App.CarPlate, getId());
+                    App.Instance.setCarPlate(getId());
                     if(App.canRestartZMQ) {
                         App.canRestartZMQ=false;
                         serviceHandler.sendMessage(MessageFactory.zmqRestart());
@@ -507,28 +521,29 @@ public class CarInfo {
                 s = b.getString(key);
                 if (!s.equals(App.fw_version)) {
                     hasChanged = true;
+                    setFw_version(s);
                     App.Instance.setFwVersion(s);
                 }
             } else if (key.equalsIgnoreCase("keyStatus")) {
                 s = b.getString(key);
-                if (!s.equals(keyStatus)) {
+                if (!s.equals(getKeyStatus())) {
                     hasChanged = true;
-                    this.keyStatus = b.getString(key);
+                    setKeyStatus(b.getString(key));
                 }
             } else if (key.equalsIgnoreCase("GearStatus")) {
                 s = b.getString(key);
-                if (!this.gear.equals(s)) {
+                if (!this.getGear().equals(s)) {
                     hasChanged = true;
-                    this.gear = s;
+                    setGear(s);
                     eventRepository.eventGear(s);
                 }
             } else if (key.equalsIgnoreCase("PPStatus")) {
                 bo = b.getBoolean(key);
-                if (bo != this.chargingPlug) {
-                    this.chargingPlug = bo;
+                if (bo != this.isChargingPlug()) {
+                    this.setChargingPlug(bo);
                     eventRepository.eventCharge(bo ? 1 : 0);
 
-                    if (!App.Charging && this.chargingPlug ) {
+                    if (!App.Charging && this.isChargingPlug()) {
 
                         App.Charging = true;
                         serviceHandler.sendMessage(MessageFactory.notifyStartCharging(this));
@@ -539,22 +554,22 @@ public class CarInfo {
                 }
             } else if (key.equalsIgnoreCase("ReadyOn")) {
                 bo = b.getBoolean(key);
-                if (bo != this.ready) {
+                if (bo != this.isReady()) {
                     hasChanged = true;
-                    this.ready = bo;
+                    this.setReady(bo);
                     eventRepository.eventReady(bo ? 1 : 0);
                 }
             } else if (key.equalsIgnoreCase("BrakesOn")) {
                 bo = b.getBoolean(key);
-                if (bo != this.ready) {
+                if (bo != this.isReady()) {
                     hasChanged = true;
-                    this.brakes = bo;
+                    this.setBrakes(bo);
                 }
             } else if (key.equalsIgnoreCase("SDKVer")) {
                 s = b.getString(key);
-                if (!s.equals(this.sdk_version)) {
+                if (!s.equals(this.getSdk_version())) {
                     hasChanged = true;
-                    this.sdk_version = s;
+                    this.setSdk_version(s);
                 }
             } else if (key.equalsIgnoreCase("Versions")) {
                 s = b.getString(key);
@@ -782,7 +797,7 @@ public class CarInfo {
         StringWriter sw = new StringWriter();
         JsonWriter jw = new JsonWriter(sw);
         //Per chiudere da remoto una corsa (da app utente finale) dobbiamo essere nell'ultima schermata, essere in area accettabile e non in sosta.
-        boolean enableRemoteClose = App.isCloseable && App.checkParkArea(latitude, longitude) && (App.getParkModeStarted() == null);
+        boolean enableRemoteClose = App.isCloseable && App.checkParkArea(getLatitude(), getLongitude()) && (App.getParkModeStarted() == null);
 
         try {
             jw.beginObject();
@@ -801,8 +816,8 @@ public class CarInfo {
                 jw.name("lon").value(gpsRound(App.mockLocation.getLongitude()));
                 jw.name("lat").value(gpsRound(App.mockLocation.getLatitude()));
             } else {
-                jw.name("lon").value(gpsRound(longitude));
-                jw.name("lat").value(gpsRound(latitude));
+                jw.name("lon").value(gpsRound(getLongitude()));
+                jw.name("lat").value(gpsRound(getLatitude()));
             }
 
             jw.name("GPS").value(App.UseExternalGPS ? "EXT" : "INT");
@@ -817,7 +832,7 @@ public class CarInfo {
             jw.name("parking").value(App.getParkModeStarted() != null && App.parkMode.isOn());
             jw.name("charging").value(App.Charging);
             jw.name("noGPS").value(App.getNoGPSAlarm());
-            jw.name("PPStatus").value(this.chargingPlug);
+            jw.name("PPStatus").value(this.isChargingPlug());
             if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
                 jw.name("id_trip").value(App.currentTripInfo.trip.remote_id);
             }
@@ -841,9 +856,9 @@ public class CarInfo {
             if (longVersion) {
                 updateTrips();
 
-                jw.name("fwVer").value(fw_version.equals("") ? App.fw_version : fw_version);
+                jw.name("fwVer").value(getFw_version().equals("") ? App.fw_version : getFw_version());
                 jw.name("swVer").value(App.sw_Version);
-                jw.name("sdkVer").value(sdk_version);
+                jw.name("sdkVer").value(getSdk_version());
                 jw.name("hwVer").value(android.os.Build.MODEL + " " + android.os.Build.DEVICE + " " + android.os.Build.ID);
                 jw.name("gsmVer").value(android.os.Build.getRadioVersion());
                 jw.name("clock").value(DateFormat.format("dd/MM/yyyy kk:mm:ss", new Date()).toString());
@@ -883,45 +898,31 @@ public class CarInfo {
 
     public String getJsonGson(boolean longVersion) {
         try {
-            StringWriter sw = new StringWriter();
-            Gson gson = new Gson();
-            com.google.gson.stream.JsonWriter jw = new Gson().newJsonWriter(new StringWriter());
+
+
             //Per chiudere da remoto una corsa (da app utente finale) dobbiamo essere nell'ultima schermata, essere in area accettabile e non in sosta.
-            boolean enableRemoteClose = App.isCloseable && App.checkParkArea(latitude, longitude) && (App.getParkModeStarted() == null);
+            boolean enableRemoteClose = App.isCloseable && App.checkParkArea(getLatitude(), getLongitude()) && (App.getParkModeStarted() == null);
 
             try {
 
-                for (String key : allData.keySet()) {
-                    if (key != "GPSBOX") {
-                        if (key.equalsIgnoreCase("SOC")) {
-                            appendJsonGson(jw, key, batteryLevel);
-                        } else
-                            appendJsonGson(jw, key, allData.get(key));
-                    }
-                }
 
 
-                if (App.mockLocation != null) {
-                    jw.name("lon").value(gpsRound(App.mockLocation.getLongitude()));
-                    jw.name("lat").value(gpsRound(App.mockLocation.getLatitude()));
-                } else {
-                    jw.name("lon").value(gpsRound(longitude));
-                    jw.name("lat").value(gpsRound(latitude));
-                }
 
-                jw.name("GPS").value(App.UseExternalGPS ? "EXT" : "INT");
-                jw.name("SOC").value(batteryLevel);
+
+
+                beacon.setGPS(App.UseExternalGPS ? "EXT" : "INT");
+                //beacon.setSOC(batteryLevel);
                 //jw.name("batterySafety").value(batterySafety);
-                jw.name("cputemp").value(App.getCpuTemp());
+                //jw.name("cputemp").value(App.getCpuTemp());
 
-                jw.name("on_trip").value(App.currentTripInfo != null ? 1 : 0);
+                beacon.setOn_trip(App.currentTripInfo != null ? 1 : 0);
 
-                jw.name("closeEnabled").value(enableRemoteClose);
-                jw.name("parkEnabled").value(!App.motoreAvviato && App.getParkModeStarted() != null);
-                jw.name("parking").value(App.getParkModeStarted() != null && App.parkMode.isOn());
-                jw.name("charging").value(App.Charging);
-                jw.name("noGPS").value(App.getNoGPSAlarm());
-                jw.name("PPStatus").value(this.chargingPlug);
+                beacon.setCloseEnabled(enableRemoteClose);
+                beacon.setParkEnabled(!App.motoreAvviato && App.getParkModeStarted() != null);
+                beacon.setParking(App.getParkModeStarted() != null && App.parkMode.isOn());
+                beacon.setCharging(App.Charging);
+                beacon.setNoGPS(App.getNoGPSAlarm());
+
                 if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
                     jw.name("id_trip").value(App.currentTripInfo.trip.remote_id);
                 }
@@ -945,9 +946,9 @@ public class CarInfo {
                 if (longVersion) {
                     updateTrips();
 
-                    jw.name("fwVer").value(fw_version.equals("") ? App.fw_version : fw_version);
+                    jw.name("fwVer").value(getFw_version().equals("") ? App.fw_version : getFw_version());
                     jw.name("swVer").value(App.sw_Version);
-                    jw.name("sdkVer").value(sdk_version);
+                    jw.name("sdkVer").value(getSdk_version());
                     jw.name("hwVer").value(android.os.Build.MODEL + " " + android.os.Build.DEVICE + " " + android.os.Build.ID);
                     jw.name("gsmVer").value(android.os.Build.getRadioVersion());
                     jw.name("clock").value(DateFormat.format("dd/MM/yyyy kk:mm:ss", new Date()).toString());
@@ -993,7 +994,7 @@ public class CarInfo {
         JsonWriter jw = new JsonWriter(sw);
 
         //Per chiudere da remoto una corsa (da app utente finale) dobbiamo essere nell'ultima schermata, essere in area accettabile e non in sosta.
-        boolean enableRemoteClose = App.isCloseable && App.checkParkArea(latitude, longitude) && (App.getParkModeStarted() == null);
+        boolean enableRemoteClose = App.isCloseable && App.checkParkArea(getLatitude(), getLongitude()) && (App.getParkModeStarted() == null);
 
         try {
             jw.beginObject();
@@ -1010,8 +1011,8 @@ public class CarInfo {
                 jw.name("lon").value(gpsRound(App.mockLocation.getLongitude()));
                 jw.name("lat").value(gpsRound(App.mockLocation.getLatitude()));
             } else {
-                jw.name("lon").value(gpsRound(longitude));
-                jw.name("lat").value(gpsRound(latitude));
+                jw.name("lon").value(gpsRound(getLongitude()));
+                jw.name("lat").value(gpsRound(getLatitude()));
             }
 
             jw.name("GPS").value(App.UseExternalGPS ? "EXT" : "INT");
@@ -1047,9 +1048,9 @@ public class CarInfo {
             if (longVersion) {
                 updateTrips();
 
-                jw.name("fwVer").value(fw_version.equals("") ? App.fw_version : fw_version);
+                jw.name("fwVer").value(getFw_version().equals("") ? App.fw_version : getFw_version());
                 jw.name("swVer").value(App.sw_Version);
-                jw.name("sdkVer").value(sdk_version);
+                jw.name("sdkVer").value(getSdk_version());
                 jw.name("hwVer").value(android.os.Build.MODEL + " " + android.os.Build.DEVICE + " " + android.os.Build.ID);
                 jw.name("gsmVer").value(android.os.Build.getRadioVersion());
                 jw.name("clock").value(DateFormat.format("dd/MM/yyyy kk:mm:ss", new Date()).toString());
@@ -1099,6 +1100,150 @@ public class CarInfo {
 
 
         return b;
+    }
+
+    public int getIsKeyOn() {
+        return isKeyOn;
+    }
+
+    public void setIsKeyOn(int isKeyOn) {
+        this.isKeyOn = isKeyOn;
+        beacon.setKeyOn(this.isKeyOn);
+    }
+
+    public int getOutAmp() {
+        return outAmp;
+    }
+
+    public void setOutAmp(int outAmp) {
+        this.outAmp = outAmp;
+        beacon.setPackAmp(this.outAmp);
+    }
+
+    public Long getTimestampCurrent() {
+        return timestampCurrent;
+    }
+
+    public void setTimestampCurrent(Long timestampCurrent) {
+        this.timestampCurrent = timestampCurrent;
+        beacon.setTimestampAmp(this.timestampCurrent);
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+        beacon.setSpeed(this.speed);
+    }
+
+    public int getKm() {
+        return km;
+    }
+
+    public void setKm(int km) {
+        this.km = km;
+        beacon.setKm(this.km);
+    }
+
+    public float getVoltage() {
+        return voltage;
+    }
+
+    public void setVoltage(float voltage) {
+        this.voltage = voltage;
+        beacon.setMotV(this.voltage);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+        beacon.setVIN(this.id);
+    }
+
+    public String getFw_version() {
+        return fw_version;
+    }
+
+    public void setFw_version(String fw_version) {
+        this.fw_version = fw_version;
+        beacon.setFwVer(this.fw_version);
+    }
+
+    public String getKeyStatus() {
+        return keyStatus;
+    }
+
+    public void setKeyStatus(String keyStatus) {
+        this.keyStatus = keyStatus;
+        beacon.setKeyStatus(this.keyStatus);
+    }
+
+    public String getGear() {
+        return gear;
+    }
+
+    public void setGear(String gear) {
+        this.gear = gear;
+        beacon.setGearStatus(this.gear);
+    }
+
+    public boolean isChargingPlug() {
+        return chargingPlug;
+    }
+
+    public void setChargingPlug(boolean chargingPlug) {
+        this.chargingPlug = chargingPlug;
+        beacon.setPPStatus(this.chargingPlug);
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
+        beacon.setReadyOn(this.ready);
+    }
+
+    public boolean isBrakes() {
+        return brakes;
+    }
+
+    public void setBrakes(boolean brakes) {
+        this.brakes = brakes;
+        beacon.setReadyOn(this.brakes);
+    }
+
+    public String getSdk_version() {
+        return sdk_version;
+    }
+
+    public void setSdk_version(String sdk_version) {
+        this.sdk_version = sdk_version;
+        beacon.setSdkVer(this.sdk_version);
+    }
+
+    private double getLongitude() {
+        return longitude;
+    }
+
+    private void setLongitude(double longitude) {
+        this.longitude = longitude;
+        beacon.setLon(this.longitude);
+    }
+
+    private double getLatitude() {
+        return latitude;
+    }
+
+    private void setLatitude(double latitude) {
+        this.latitude = latitude;
+        beacon.setLat(this.latitude);
     }
 	
 	/*

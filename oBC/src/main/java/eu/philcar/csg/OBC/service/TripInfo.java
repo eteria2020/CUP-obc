@@ -793,8 +793,8 @@ public class TripInfo {
         trip.end_timestamp = System.currentTimeMillis()/1000;
 
         if (carInfo!=null) {
-            trip.end_lat = carInfo.latitude;
-            trip.end_lon = carInfo.longitude;
+            trip.end_lat = carInfo.getLatitude();
+            trip.end_lon = carInfo.getLongitude();
         }
 
         dlog.d("CloseCorsa: closing trip"+trip.toString());
@@ -845,8 +845,8 @@ public class TripInfo {
         trip.end_timestamp = System.currentTimeMillis()/1000;
 
         if (carInfo!=null) {
-            trip.end_lat = carInfo.latitude;
-            trip.end_lon = carInfo.longitude;
+            trip.end_lat = carInfo.getLatitude();
+            trip.end_lon = carInfo.getLongitude();
         }
 
         dlog.d("CloseCorsa: closing trip"+trip.toString());

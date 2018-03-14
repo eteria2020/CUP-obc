@@ -12,7 +12,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -35,7 +34,6 @@ import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
-import eu.philcar.csg.OBC.data.datasources.api.SharengoApi;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoBeaconRepository;
@@ -58,14 +56,12 @@ import eu.philcar.csg.OBC.helpers.Clients;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
-import eu.philcar.csg.OBC.helpers.RxUtil;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.interfaces.OnTripCallback;
 import eu.philcar.csg.OBC.server.AdminsConnector;
 import eu.philcar.csg.OBC.server.Connectors;
 import eu.philcar.csg.OBC.server.HttpsConnector;
 import eu.philcar.csg.OBC.server.ServerCommand;
-import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.server.UdpServer;
 import eu.philcar.csg.OBC.server.UploaderLog;
 import eu.philcar.csg.OBC.server.ZmqRequester;
@@ -493,7 +489,7 @@ public class ObcService extends Service implements OnTripCallback {
         //Create and init data structures
 
         carInfo = new CarInfo(localHandler);
-        carInfo.id = App.CarPlate;
+        carInfo.setId(App.CarPlate);
 
         tripInfo = new TripInfo(this);
         tripInfo.init();
@@ -675,9 +671,9 @@ public class ObcService extends Service implements OnTripCallback {
                     //retrieve all can data
                     carInfo.cellVoltageValue = getCellVoltages();
                     carInfo.bmsSOC = getSOCValue();
-                    carInfo.outAmp = getCurrentValue();
+                    carInfo.setOutAmp(getCurrentValue());
 
-                    if( carInfo.outAmp==350 || carInfo.outAmp==-1037){
+                    if( carInfo.getOutAmp() ==350 || carInfo.getOutAmp() ==-1037){
                         ampError=true;
                         if(canAmpAnomalies++==3 ){
                             eventRepository.CanAnomalies("350 Amp");
@@ -823,9 +819,9 @@ public class ObcService extends Service implements OnTripCallback {
                         }
 
 
-                    dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "% outAmp: "+carInfo.outAmp);
+                    dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "% outAmp: "+ carInfo.getOutAmp());
                     //check car bms usage
-                    if (carInfo.currVoltage <= 0 || (carInfo.outAmp>= 25 && carInfo.outAmp!=350)){
+                    if (carInfo.currVoltage <= 0 || (carInfo.getOutAmp() >= 25 && carInfo.getOutAmp() !=350)){
                         carInfo.setBatteryLevel((Math.min(carInfo.batteryLevel,Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS))));
                         dlog.d("virtualBMSUpdateScheduler: value "+ (carInfo.currVoltage<=0?"packVoltage null":"outAmp greater than 25")+" ignoring virtual data.");
                         dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
@@ -1399,7 +1395,7 @@ public class ObcService extends Service implements OnTripCallback {
             return;
 
         //TODO: FORZATURA DA RIMUOVERE UNA VOLTA RISOLTO IL PROBLEMA AGGIORNAMENTO DALL AUTO
-        if (false && (carInfo.keyStatus.equalsIgnoreCase("ON") || carInfo.keyStatus.equalsIgnoreCase("ACC"))) {
+        if (false && (carInfo.getKeyStatus().equalsIgnoreCase("ON") || carInfo.getKeyStatus().equalsIgnoreCase("ACC"))) {
 
             if (!App.motoreAvviato) {
                 dlog.d("set motore avviato:" + App.motoreAvviato);
@@ -1470,13 +1466,14 @@ public class ObcService extends Service implements OnTripCallback {
             dlog.d("CarInfo created");
         }
 
-        if (carInfo.handleUpdate(b))
-            sendBeacon();
+        //Use BetterHandleUpdate
+        /*if (carInfo.handleUpdate(b))
+            sendBeacon();*/
 
 
         if (b.containsKey("PackAmp") && b.containsKey("timestampAmp")) {
 
-            if (!carInfo.chargingPlug) {
+            if (!carInfo.isChargingPlug()) {
 
                 carInfo.currentAmpere += ((double) b.getInt("PackAmp") * 1000) / (double) b.getLong("timestampAmp");
                 App.Instance.setCurrentAmp(carInfo.currentAmpere);
@@ -2252,7 +2249,7 @@ public class ObcService extends Service implements OnTripCallback {
             return true;
         }
 
-        return App.checkParkArea(this.carInfo.latitude, this.carInfo.longitude);
+        return App.checkParkArea(this.carInfo.getLatitude(), this.carInfo.getLongitude());
     }
 
     public void scheduleSelfCloseTrip(int seconds, boolean beforePin) {
@@ -2812,7 +2809,7 @@ public class ObcService extends Service implements OnTripCallback {
 
 
                     dlog.d("Received endCharging message");
-                    if (!carInfo.chargingPlug && App.Charging) {
+                    if (!carInfo.isChargingPlug() && App.Charging) {
                         App.Charging = false;
                         App.Instance.persistCharging();
                         if(FMaintenance.Instance!=null)
@@ -2836,7 +2833,7 @@ public class ObcService extends Service implements OnTripCallback {
                     break;
                 case ObcService.MSG_CAR_START_CHARGING:
 
-                    if (carInfo.chargingPlug) {
+                    if (carInfo.isChargingPlug()) {
                         carInfo.chargingAmpere = carInfo.currentAmpere;
                     }
                     break;

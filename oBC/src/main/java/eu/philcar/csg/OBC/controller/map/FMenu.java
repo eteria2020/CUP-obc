@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +26,6 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.controller.welcome.FDamages;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
-import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
@@ -358,7 +356,7 @@ public class FMenu extends FBase implements OnClickListener {
 								
 				switch (App.parkMode) {
 				case PARK_OFF: 		// (FALSE, NULL, OFF)
-					if( CarInfo.keyStatus != null && !CarInfo.keyStatus.equalsIgnoreCase("OFF") && App.checkKeyOff) {
+					if( CarInfo.getKeyStatus() != null && !CarInfo.getKeyStatus().equalsIgnoreCase("OFF") && App.checkKeyOff) {
 						UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end_key_on, null,
 								R.drawable.button_rent_pause_pushed, R.string.menu_park_mode_suspend_key_on, null,
 								R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this,

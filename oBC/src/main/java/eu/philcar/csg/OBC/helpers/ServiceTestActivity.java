@@ -36,7 +36,6 @@ import javax.inject.Inject;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
-import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.devices.UsbSerialConnection;
 import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.service.MessageFactory;
@@ -245,7 +244,7 @@ public class ServiceTestActivity extends Activity {
 		cellsVoltage=cellsVoltage.concat("SOC2: "+ carInfo.virtualSOC +"%\n");
 		cellsVoltage=cellsVoltage.concat("SOCR : "+ carInfo.SOCR +"\n");
 		cellsVoltage=cellsVoltage.concat("SOCAdmin: "+ carInfo.batteryLevel +"%\n");
-		cellsVoltage=cellsVoltage.concat("outAmp: "+ carInfo.outAmp +"A\n");
+		cellsVoltage=cellsVoltage.concat("outAmp: "+ carInfo.getOutAmp() +"A\n");
 		cellsVoltage=cellsVoltage.concat("Battery Safety: "+ carInfo.isBatterySafety() +"\n");
 		//cellsVoltage=cellsVoltage.concat("CurrentValue: "+ carInfo.current +"A\n");
 
@@ -255,15 +254,15 @@ public class ServiceTestActivity extends Activity {
 		//((TextView)findViewById(R.id.tvCellsInfo)).setText(cellsVoltage);
 		((TextView)findViewById(R.id.tvCellsInfo)).setText(cellsVoltage);
 
-		((TextView)findViewById(R.id.tvSpeed)).setText(""+carInfo.speed);
+		((TextView)findViewById(R.id.tvSpeed)).setText(""+ carInfo.getSpeed());
 		((TextView)findViewById(R.id.tvFuelLevel)).setText(""+carInfo.bmsSOC);
-		((TextView)findViewById(R.id.tvTarga)).setText(""+carInfo.id);
-		cellsVoltage=cellsVoltage.concat("outAmp: "+ carInfo.outAmp +"A\n");
-		((TextView)findViewById(R.id.tvQuadro)).setText((carInfo.isKeyOn>0)?"ON":"OFF");
-		((TextView)findViewById(R.id.tvFW)).setText(carInfo.fw_version);
+		((TextView)findViewById(R.id.tvTarga)).setText(""+ carInfo.getId());
+		cellsVoltage=cellsVoltage.concat("outAmp: "+ carInfo.getOutAmp() +"A\n");
+		((TextView)findViewById(R.id.tvQuadro)).setText((carInfo.getIsKeyOn() >0)?"ON":"OFF");
+		((TextView)findViewById(R.id.tvFW)).setText(carInfo.getFw_version());
 		//((TextView)findViewById(R.id.tvAvolt)).setText(""+carInfo.analogVoltage);
-		((TextView)findViewById(R.id.tvMvolt)).setText(""+carInfo.voltage);
-		((TextView)findViewById(R.id.tvKm)).setText(""+carInfo.km);
+		((TextView)findViewById(R.id.tvMvolt)).setText(""+ carInfo.getVoltage());
+		((TextView)findViewById(R.id.tvKm)).setText(""+ carInfo.getKm());
 	
 		
 		
@@ -304,7 +303,7 @@ public class ServiceTestActivity extends Activity {
 		cellsVoltage=cellsVoltage.concat("Low voltage cells : "+ carInfo.isCellLowVoltage +" ("+ carInfo.lowCells +")\n");
 		cellsVoltage=cellsVoltage.concat("SOCR : "+ carInfo.SOCR +"\n");
 		cellsVoltage=cellsVoltage.concat("SOCAdmin: "+ carInfo.batteryLevel +"%\n");
-		cellsVoltage=cellsVoltage.concat("outAmp: "+ carInfo.outAmp +"A\n");
+		cellsVoltage=cellsVoltage.concat("outAmp: "+ carInfo.getOutAmp() +"A\n");
 		cellsVoltage=cellsVoltage.concat("CurrentAmp: "+ carInfo.currentAmpere +"A\n");
 		cellsVoltage=cellsVoltage.concat("ChargingAmp: "+ carInfo.chargingAmpere +"A\n");
 		cellsVoltage=cellsVoltage.concat("maxAmp: "+ carInfo.maxAmpere +"A\n");
