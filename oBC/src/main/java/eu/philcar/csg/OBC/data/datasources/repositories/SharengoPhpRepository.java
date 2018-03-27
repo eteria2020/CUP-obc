@@ -80,13 +80,13 @@ public class SharengoPhpRepository {
                             if(e instanceof ErrorResponse)
                                 if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
                                     DLog.E("Error inside getArea", e);
-                            RxUtil.dispose(areaDisposable);
+                            //RxUtil.dispose(areaDisposable);
                         }
 
                         @Override
                         public void onComplete() {
                             DLog.I("Synced successfully!");
-                            RxUtil.dispose(areaDisposable);
+                            //RxUtil.dispose(areaDisposable);
                             App.Instance.initAreaPolygon();
                         }
                     });
@@ -118,8 +118,11 @@ public class SharengoPhpRepository {
                     if(e instanceof ErrorResponse)
                         if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
                             DLog.E("Error insiede GetCommand",e);
-                    RxUtil.dispose(commandDisposable);})
-                .doOnComplete(() -> RxUtil.dispose(commandDisposable));
+                    //RxUtil.dispose(commandDisposable);
+                })
+                .doOnComplete(() -> {
+            RxUtil.dispose(commandDisposable);
+                });
 
 
     }
@@ -147,8 +150,11 @@ public class SharengoPhpRepository {
                        if(e instanceof ErrorResponse)
                            if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
                                DLog.E("Error insiede openTrip",e);
-                       RxUtil.dispose(openTripDisposable);})
-                   .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
+                       //RxUtil.dispose(openTripDisposable);
+                       })
+                   .doOnComplete(() -> {
+                        //RxUtil.dispose(openTripDisposable);
+                    });
 
 
 
@@ -163,8 +169,11 @@ public class SharengoPhpRepository {
                 })
                 .doOnError(e -> {
                     DLog.E("Error insiede updateTrip",e);
-                    RxUtil.dispose(openTripDisposable);})
-                .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
+                    //RxUtil.dispose(openTripDisposable);
+                })
+                .doOnComplete(() -> {
+                    //RxUtil.dispose(openTripDisposable);
+                });
     }
 
 
@@ -182,8 +191,11 @@ public class SharengoPhpRepository {
                     })
                 .doOnError(e -> {
                     DLog.E("Error insiede closeTrip",e);
-                    RxUtil.dispose(openTripDisposable);})
-                .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
+                    //RxUtil.dispose(openTripDisposable);
+                })
+                .doOnComplete(() -> {
+            //RxUtil.dispose(openTripDisposable);
+                });
 
 
 
@@ -204,8 +216,11 @@ public class SharengoPhpRepository {
                     })
                 .doOnError(e -> {
                     DLog.E("Error insiede closeTrips",e);
-                    RxUtil.dispose(openTripDisposable);})
-                .doOnComplete(() -> RxUtil.dispose(openTripDisposable));
+                    //RxUtil.dispose(openTripDisposable);
+                })
+                .doOnComplete(() -> {
+            //RxUtil.dispose(openTripDisposable);
+                });
     }
 
     public void sendEvent(final Event event){
@@ -294,6 +309,8 @@ public class SharengoPhpRepository {
                     @Override
                     public void onNext(Void v) {
 
+                        App.reservation = null;  //Cancella la prenotazione in locale
+                        App.Instance.persistReservation();
                     }
 
                     @Override

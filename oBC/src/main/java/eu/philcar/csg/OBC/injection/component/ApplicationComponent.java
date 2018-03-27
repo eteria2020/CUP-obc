@@ -6,6 +6,7 @@ import android.content.Context;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.controller.map.FHome;
@@ -38,6 +39,7 @@ import eu.philcar.csg.OBC.service.TripInfo;
 public interface ApplicationComponent {
 
     void inject(SystemControl.TestConnection testConnection);
+    void inject(App app);
     void inject(SystemControl.Shutdown shutdown);
     void inject(CarInfo carInfo);
     void inject(FSOS fsos);

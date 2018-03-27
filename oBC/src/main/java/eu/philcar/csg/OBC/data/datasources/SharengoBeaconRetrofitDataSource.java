@@ -29,6 +29,7 @@ public class SharengoBeaconRetrofitDataSource extends BaseRetrofitDataSource imp
         }
 
         return  mSharengoBeaconApi.sendBeacon(plate,beacon)
-                .compose(this.handleRetrofitRequest());
+                .compose(this.handleRetrofitRequest())
+                .doOnError(this::handleErorResponse);
     }
 }

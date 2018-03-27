@@ -6,6 +6,7 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
+import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.db.DbRecord;
 import eu.philcar.csg.OBC.helpers.DLog;
@@ -72,6 +73,7 @@ public abstract class BaseRetrofitDataSource {
 
     protected void handleErorResponse(Throwable e){
         if(e instanceof ErrorResponse){
+            App.onFailedApi((ErrorResponse) e);
             ErrorResponse er = (ErrorResponse) e;
             switch (er.errorType){
                 case HTTP:
@@ -93,11 +95,15 @@ public abstract class BaseRetrofitDataSource {
                     DLog.E("Retrofit Exception UNEXPECTED ",er.error);
                     break;
                 case SERVER_TIMEOUT:
-                    DLog.E("Retrofit  Exception SERVER_TIMEOUT ",er.error);
+                    DLog.E("Retrofit Exception SERVER_TIMEOUT ",er.error);
                     break;
                 default:
                     break;
             }
         }
+    }
+
+    protected void hanldeCompletation(){
+     App.setNetworkStable(true);
     }
 }

@@ -27,6 +27,7 @@ import dagger.Provides;
 import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.data.common.SerializationExclusionStrategy;
+import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.injection.ApplicationContext;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -150,10 +151,9 @@ public class ApiModule {
 
             CertificateFactory cf = CertificateFactory.getInstance("X509");
             Certificate caServer;
-            InputStream cert = context.getAssets().open("client_car1.p12");
-//                    context.getResources().openRawResource(R.raw.client);
+            //                    context.getResources().openRawResource(R.raw.client);
             InputStream cert2 = context.getAssets().open("ca.cer");
-            try {
+            try (InputStream cert = context.getAssets().open("client_car1.p12")) {
                 // Key
                 KeyStore keyStore = KeyStore.getInstance("PKCS12");
                 keyStore.load(cert, "x9aStp:k4:".toCharArray());
@@ -173,12 +173,10 @@ public class ApiModule {
                 SSLContext sslContext = SSLContext.getInstance("SSL");
                 sslContext.init(keyManagers, trustManagers, null);
 
-                httpClient.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager)trustAllCerts[0]);
-            } finally {
-                cert.close();
+                httpClient.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
             }
         }catch (Exception e){
-
+            DLog.E("Exception while providing OKHTTPCLIENTTrusted",e);
         }
 
         /*httpClient.addInterceptor(new Interceptor() {

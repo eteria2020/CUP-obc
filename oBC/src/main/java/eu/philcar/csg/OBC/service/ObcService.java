@@ -60,7 +60,6 @@ import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.interfaces.OnTripCallback;
 import eu.philcar.csg.OBC.server.AdminsConnector;
 import eu.philcar.csg.OBC.server.Connectors;
-import eu.philcar.csg.OBC.server.HttpsConnector;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.server.UdpServer;
 import eu.philcar.csg.OBC.server.UploaderLog;
@@ -603,7 +602,7 @@ public class ObcService extends Service implements OnTripCallback {
                     //If HTTP query is enabled schedule an HTTP notifies download
                     if (WITH_HTTP_NOTIFIES&& notifiesPrescaler++>4 && tripInfo != null && tripInfo.isOpen && (App.parkMode == null || !App.parkMode.isOn()) ) {
                         notifiesPrescaler=0;
-                        sendBeacon(carInfo.getJson(false));
+                        sendBeacon(carInfo.getJsonGson(false));
 //                        HttpConnector http = new HttpConnector(ObcService.this);
 //                        http.SetHandler(localHandler);
 //                        NotifiesConnector nc = new NotifiesConnector();
@@ -1130,7 +1129,7 @@ public class ObcService extends Service implements OnTripCallback {
             return;
         }
 
-        String msg = carInfo.getJson(true);
+        String msg = carInfo.getJsonGson(true);
         if (msg != null) {
             dlog.d("Sending beacon : " + msg);
             //udpServer.sendBeacon(msg);
@@ -1226,7 +1225,8 @@ public class ObcService extends Service implements OnTripCallback {
 //TODO change with foreach
 
         if (msg.what != ObcService.MSG_CAR_INFO &&
-                msg.what != ObcService.MSG_RADIO_SEEK_INFO)
+                msg.what != ObcService.MSG_RADIO_SEEK_INFO &&
+                msg.what != ObcService.MSG_CAR_LOCATION)
             dlog.i("Sending to " + clients.size() + " clients MSG id " + msg.what);
 
         try {
@@ -1333,7 +1333,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     public void notifyCard(String id, String event, boolean ObcIohandled, boolean forced) {
         DbManager dbm = App.Instance.dbManager;
-        Customers clienti = dbm.getClientiDao();
+        //Customers clienti = dbm.getClientiDao();
 
         if (id != null && event != null)
             dlog.d(ObcService.class.toString() + " notifyCard: id:" + id + ", event:" + event);
@@ -1792,7 +1792,7 @@ public class ObcService extends Service implements OnTripCallback {
 
                 case "ADMINS_UPDATE":
                     dlog.d(ObcService.class.toString() + " executeServerCommands: Update admins cards list");
-                    startDownloadAdmins();
+                    //startDownloadAdmins();
                     break;
 
                 case "ADMINS_CLEAN":
@@ -2006,14 +2006,14 @@ public class ObcService extends Service implements OnTripCallback {
 
 
 
-
+    @Deprecated
     public void startDownloadAdmins() {
-        dlog.d("Start Downloading admins");
+        /*dlog.d("Start Downloading admins");
         HttpsConnector http = new HttpsConnector(this);
         http.SetHandler(privateHandler);
         AdminsConnector rc = new AdminsConnector();
         rc.setCarPlate(App.CarPlate);
-        http.Execute(rc);
+        http.Execute(rc);*/
     }
 
     public void startCleanAdmins() {
@@ -2104,7 +2104,7 @@ public class ObcService extends Service implements OnTripCallback {
                     }
 
                     if (WITH_UDPSERVER)
-                        udpServer.sendBeacon(carInfo.getJson(false));
+                        udpServer.sendBeacon(carInfo.getJsonGson(false));
 
                 } catch (Exception e) {
                     dlog.e("Exception inside tripUpdateScheduler", e);
@@ -2256,7 +2256,7 @@ public class ObcService extends Service implements OnTripCallback {
 
         if(App.currentTripInfo==null)
             return;//no openTrip
-        if (App.getParkModeStarted() == null&&!beforePin) {
+        if (App.getParkModeStarted() == null && !beforePin) {
             App.askClose.putInt("id", App.currentTripInfo.trip.remote_id);
             App.askClose.putBoolean("close", true);
             App.Instance.persistAskClose();
@@ -2646,7 +2646,7 @@ public class ObcService extends Service implements OnTripCallback {
                         eventRepository.selfCloseTrip(App.currentTripInfo.trip.remote_id, msg.arg1);
 
 
-                        ObcService.this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, false);
+                        ObcService.this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, (msg.arg1>0 && !App.pinChecked));
                     } else {
                         dlog.w("MSG_TRIP_SELFCLOSE discarded");
                     }

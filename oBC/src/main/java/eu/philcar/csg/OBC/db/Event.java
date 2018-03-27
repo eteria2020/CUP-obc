@@ -82,4 +82,26 @@ public class Event extends DbRecord<EventResponse> {
 		}
 		manager.updateEventSendingResponse(this);
 	}
+
+	@Override
+	public String toString() {
+		return "Event{" +
+				"id=" + id +
+				", timestamp=" + timestamp +
+				", event=" + event +
+				", label='" + label + '\'' +
+				", intval=" + intval +
+				", txtval='" + txtval + '\'' +
+				", id_customer=" + id_customer +
+				", id_trip=" + id_trip +
+				", level=" + level +
+				", lon=" + lon +
+				", lat=" + lat +
+				", km=" + km +
+				", battery=" + battery +
+				", sent=" + sent +
+				", sending_error=" + sending_error +
+				", json_data='" + json_data + '\'' +
+				'}';
+	}
 }

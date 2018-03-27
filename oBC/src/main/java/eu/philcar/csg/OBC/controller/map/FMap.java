@@ -54,6 +54,7 @@ import com.skobbler.ngx.map.SKMapSurfaceView;
 import com.skobbler.ngx.map.SKMapSurfaceView.SKOrientationIndicatorType;
 import com.skobbler.ngx.map.SKMapViewHolder;
 import com.skobbler.ngx.map.SKPOICluster;
+import com.skobbler.ngx.map.SKPolyline;
 import com.skobbler.ngx.map.SKScreenPoint;
 import com.skobbler.ngx.map.realreach.SKRealReachSettings;
 import com.skobbler.ngx.navigation.SKNavigationListener;
@@ -1449,9 +1450,24 @@ public class FMap extends FBase implements OnClickListener {
 
 			return false;
 		}
-
-
+		drawPolyline();
 		return true;
+	}
+	private void drawPolyline(){
+		int identifier = 500;
+		List<SKPolyline> areas = App.getSKPolyline();
+		for(SKPolyline area : areas){
+			area.setColor(new float[]{ 22/255f, 164/255f, 71/255f, 1f});
+						// Set properties for the outline
+			area.setOutlineColor(new float[]{ 22/255f, 164/255f, 71/255f, 1f});
+			area.setOutlineSize(3);
+			area.setOutlineDottedPixelsSolid(1);
+			area.setOutlineDottedPixelsSkip(1);
+			area.setLineSize(2);
+			area.setIdentifier(identifier++);
+			mapView.addPolyline(area);
+
+		}
 	}
 	
 	private void drawFuelStationsOnMap() {
@@ -1679,7 +1695,7 @@ public class FMap extends FBase implements OnClickListener {
         mapView.getMapSettings().setOrientationIndicatorType(SKOrientationIndicatorType.CUSTOM_IMAGE);
         mapView.getMapSettings().setHouseNumbersShown(true);
         mapView.getMapSettings().setImportantPoisShown(true);
-        mapView.getMapSettings().setInertiaPanningEnabled(true);
+        mapView.getMapSettings().setInertiaPanningEnabled(false);
         mapView.getMapSettings().setMapZoomingEnabled(true);
         mapView.getMapSettings().setMapRotationEnabled(true);
         mapView.getMapSettings().setCompassShown(true);
@@ -1709,7 +1725,7 @@ public class FMap extends FBase implements OnClickListener {
 		mapView.getMapSettings().setOrientationIndicatorType(SKOrientationIndicatorType.CUSTOM_IMAGE);
 		mapView.getMapSettings().setHouseNumbersShown(true);
 		mapView.getMapSettings().setImportantPoisShown(true);
-		mapView.getMapSettings().setInertiaPanningEnabled(true);
+		mapView.getMapSettings().setInertiaPanningEnabled(false);
 		mapView.getMapSettings().setMapZoomingEnabled(true);
 		mapView.getMapSettings().setMapRotationEnabled(true);
 		mapView.getMapSettings().setCompassShown(true);
@@ -2665,6 +2681,7 @@ public class FMap extends FBase implements OnClickListener {
 				try{
 					drawPOIS();
 					//drawChargingStation();
+					drawPolyline();
 				}catch(OutOfMemoryError e){
 					dlog.e("drawPois: out of memory ",e);
 				}catch(Exception e){

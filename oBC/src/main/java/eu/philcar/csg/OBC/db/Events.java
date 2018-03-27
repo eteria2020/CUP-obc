@@ -346,7 +346,7 @@ public class Events extends DbTable<Event,Integer> {
 	
 	
 	public boolean spedisciOffline(Context context, Handler handler, SharengoPhpRepository phpRepository) {
-		HttpConnector http;
+		//HttpConnector http;
 		List<Event> list = getEventsToSend();
 		
 		if (list==null) 

@@ -877,6 +877,7 @@ public class Hik_io implements LowLevelInterface {
 			 b.putBoolean("ChCommStatus", bi.chargerCommunicationStatus == BatteryInfo.CHARGER_COMMUNICATION_ON);
 			 b.putString("PackStatus",  getPackageStatusName(bi.packageStatus));
 			 b.putFloatArray("CellsInfo",bi.cellVoltageValue);
+			 b.putIntArray("sensorTempValue",bi.sensorTempValue);
 			 
 			 b.putInt("ChStatus",bi.chargerAvaliableStatus);
 		 } else {

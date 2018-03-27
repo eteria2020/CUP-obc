@@ -41,6 +41,8 @@ import android.os.SystemClock;
 import android.text.format.DateFormat;
 import android.util.JsonWriter;
 
+import com.google.gson.Gson;
+
 import javax.inject.Inject;
 
 public class CarInfo {
@@ -67,7 +69,7 @@ public class CarInfo {
     private int km = 0;
     private float voltage = 0;
     private int isKeyOn = 0;
-    private String keyStatus = "";
+    private static String keyStatus = "";
     private String gear = "";
     private boolean batterySafety = false;
     private boolean lastBatterySafety = batterySafety;
@@ -106,13 +108,19 @@ public class CarInfo {
         @Override
         public void setLatitude(double latitude) {
             super.setLatitude(latitude);
-            beacon.setExt_lat(latitude);
+            beacon.setExt_lat(gpsRound(latitude));
         }
 
         @Override
         public void setLongitude(double longitude) {
             super.setLongitude(longitude);
-            beacon.setExt_lon(longitude);
+            beacon.setExt_lon(gpsRound(longitude));
+        }
+
+        @Override
+        public void setTime(long time) {
+            super.setTime(time);
+            beacon.setExt_time(time);
         }
     };
     public Location ntwkLocation = new Location(LocationManager.NETWORK_PROVIDER);
@@ -134,7 +142,7 @@ public class CarInfo {
 
     public int rangeKm = (App.fuel_level <= 50 ? Math.max(App.fuel_level - 10, 0) : App.fuel_level);
 
-    public Bundle allData;
+    public final Bundle allData;
 
     private Beacon beacon;
 
@@ -161,6 +169,7 @@ public class CarInfo {
         serviceHandler = handler;
         serviceLocationListener = new ServiceLocationListener();
         allData = new Bundle();
+        beacon = new Beacon();
     }
 
 
@@ -204,7 +213,7 @@ public class CarInfo {
         } else
             this.batteryLevel = (batteryLevel);
 
-        //this.batteryLevel=99;//FOR DEVELOP PURPOSE
+        this.batteryLevel=99;//FOR DEVELOP PURPOSE
 
         App.Instance.setBatteryLevel(this.batteryLevel);
         beacon.setSOC(this.batteryLevel);
@@ -792,7 +801,8 @@ public class CarInfo {
         return Math.round(value * 100000D) / 100000D;
     }
 
-    //TODO not optimized
+
+    @Deprecated
     public String getJson(boolean longVersion) {
         StringWriter sw = new StringWriter();
         JsonWriter jw = new JsonWriter(sw);
@@ -897,19 +907,13 @@ public class CarInfo {
     }
 
     public String getJsonGson(boolean longVersion) {
+        Gson gson = new Gson();
         try {
-
 
             //Per chiudere da remoto una corsa (da app utente finale) dobbiamo essere nell'ultima schermata, essere in area accettabile e non in sosta.
             boolean enableRemoteClose = App.isCloseable && App.checkParkArea(getLatitude(), getLongitude()) && (App.getParkModeStarted() == null);
 
             try {
-
-
-
-
-
-
                 beacon.setGPS(App.UseExternalGPS ? "EXT" : "INT");
                 //beacon.setSOC(batteryLevel);
                 //jw.name("batterySafety").value(batterySafety);
@@ -924,69 +928,56 @@ public class CarInfo {
                 beacon.setNoGPS(App.getNoGPSAlarm());
 
                 if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
-                    jw.name("id_trip").value(App.currentTripInfo.trip.remote_id);
+                    beacon.setId_trip(App.currentTripInfo.trip.remote_id);
                 }
 
 
                 if (intGpsLocation != null) {
-                    jw.name("int_lon").value(gpsRound(intGpsLocation.getLongitude()));
-                    jw.name("int_lat").value(gpsRound(intGpsLocation.getLatitude()));
-                    jw.name("int_time").value(intGpsLocation.getTime());
+                    beacon.setInt_lon(gpsRound(intGpsLocation.getLongitude()));
+                    beacon.setInt_lat(gpsRound(intGpsLocation.getLatitude()));
+                    beacon.setInt_time(intGpsLocation.getTime());
                 }
 
-                if (extGpsLocation != null) {
-                    jw.name("ext_lon").value(gpsRound(extGpsLocation.getLongitude()));
-                    jw.name("ext_lat").value(gpsRound(extGpsLocation.getLatitude()));
-                    jw.name("ext_time").value(extGpsLocation.getTime());
-                }
-
-
-                jw.name("log_tx_time").value(log_sdf.format(new Date()));
+                beacon.setLog_tx_time(log_sdf.format(new Date()));
 
                 if (longVersion) {
                     updateTrips();
 
-                    jw.name("fwVer").value(getFw_version().equals("") ? App.fw_version : getFw_version());
-                    jw.name("swVer").value(App.sw_Version);
-                    jw.name("sdkVer").value(getSdk_version());
-                    jw.name("hwVer").value(android.os.Build.MODEL + " " + android.os.Build.DEVICE + " " + android.os.Build.ID);
-                    jw.name("gsmVer").value(android.os.Build.getRadioVersion());
-                    jw.name("clock").value(DateFormat.format("dd/MM/yyyy kk:mm:ss", new Date()).toString());
+                    //beacon.setFwVer(getFw_version().equals("") ? App.fw_version : getFw_version());
+                    beacon.setSwVer(App.sw_Version);
+                    //beacon.setSdkVer(getSdk_version());
+                    beacon.setHwVer(android.os.Build.MODEL + " " + android.os.Build.DEVICE + " " + android.os.Build.ID);
+                    beacon.setGsmVer(android.os.Build.getRadioVersion());
+                    beacon.setClock(DateFormat.format("dd/MM/yyyy kk:mm:ss", new Date()).toString());
 
-                    jw.name("IMEI").value(App.IMEI);
-                    jw.name("SIM_SN").value(App.SimSerialNumber);
+                    beacon.setIMEI(App.IMEI);
+                    beacon.setSIM_SN(App.SimSerialNumber);
 
-                    jw.name("wlsize").value(App.whiteListSize);
+                    beacon.setWlsize(App.whiteListSize);
 
-                    jw.name("offLineTrips").value(tripsToSend);
-                    jw.name("openTrips").value(tripsOpened);
+                    beacon.setOffLineTrips((int)tripsToSend);
+                    beacon.setOpenTrips((int)tripsOpened);
 
                     if (App.mockLocation == null) {
                         String gpsInfo = getGpsJson();
-                        jw.name("gps_info").value(gpsInfo);
+                        beacon.setGps_info(gpsInfo);
                     }
 
-                    jw.name("Versions").value(App.Versions.toJson());
+                    beacon.setVersions(gson.toJson(App.versions));
 
                     if (allData.containsKey("GPSBOX"))
-                        jw.name("GPSBOX").value(allData.getString("GPSBOX"));
+                        beacon.setGPSBOX(allData.getString("GPSBOX"));
 
 
                 }
-
-
-                jw.endObject();
-
-                jw.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 DLog.E("Error creating json:", e);
             }
 
-            String jsonStr = sw.toString();
-            return jsonStr;
         }catch (Exception e){
             dlog.e("Esception serializing beacon with gson",e);
         }
+        return gson.toJson(beacon);
     }
 
     public String getJson_GPRS(boolean longVersion) {
@@ -1092,8 +1083,9 @@ public class CarInfo {
     public Bundle getBundle() {
         Bundle b = new Bundle();
         try {
-            Bundle a = allData;
-            b.putAll(a);
+            synchronized (allData) {
+                b.putAll(allData);
+            }
         } catch (Exception e) {
             dlog.e("Exception while retrieving all data ", e);
         }
@@ -1174,13 +1166,13 @@ public class CarInfo {
         beacon.setFwVer(this.fw_version);
     }
 
-    public String getKeyStatus() {
+    public static String getKeyStatus() {
         return keyStatus;
     }
 
-    public void setKeyStatus(String keyStatus) {
-        this.keyStatus = keyStatus;
-        beacon.setKeyStatus(this.keyStatus);
+    private void setKeyStatus(String keyStatus) {
+        CarInfo.keyStatus = keyStatus;
+        beacon.setKeyStatus(CarInfo.keyStatus);
     }
 
     public String getGear() {
@@ -1216,7 +1208,7 @@ public class CarInfo {
 
     public void setBrakes(boolean brakes) {
         this.brakes = brakes;
-        beacon.setReadyOn(this.brakes);
+        beacon.setBrakesOn(this.brakes);
     }
 
     public String getSdk_version() {
@@ -1228,20 +1220,20 @@ public class CarInfo {
         beacon.setSdkVer(this.sdk_version);
     }
 
-    private double getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    private void setLongitude(double longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
         beacon.setLon(this.longitude);
     }
 
-    private double getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    private void setLatitude(double latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
         beacon.setLat(this.latitude);
     }
@@ -1286,7 +1278,7 @@ public class CarInfo {
             }
 
             intGpsLocation = loc;
-
+            //dlog.d("NEW LOCATION UPDATE"+loc);
             if (!App.UseExternalGPS) {
                 setLocation(loc);
             }

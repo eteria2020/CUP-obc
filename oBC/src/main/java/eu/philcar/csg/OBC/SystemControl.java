@@ -172,7 +172,7 @@ public class SystemControl {
 	    ConnectivityManager connectivityManager  = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 	    
-	    boolean ok= (activeNetworkInfo != null);
+	    boolean ok= (activeNetworkInfo != null && App.isNetworkStable());
 	    
 	    if (ok) {
 	    	if (countFailedTests>0) {

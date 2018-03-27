@@ -14,8 +14,10 @@ public class Beacon {
     private String Versions;
     private double ext_lon;
     private double ext_lat;
+    private long ext_time;
     private double int_lon;
     private double int_lat;
+    private long int_time;
     private double lon;
     private double lat;
     private String fwVer;
@@ -56,6 +58,7 @@ public class Beacon {
     private int offLineTrips;
     private int PackV;
     private Boolean closeEnabled;
+    private String log_tx_time;
     @ExcludeSerialization
     private int keyOn;
     @ExcludeSerialization
@@ -68,7 +71,70 @@ public class Beacon {
     private String GearStatus;
     @ExcludeSerialization
     private Boolean BrakesOn;
+    @ExcludeSerialization
+    private String clock;
+    @ExcludeSerialization
+    private String SIM_SN;
+    @ExcludeSerialization
+    private int openTrips;
+    @ExcludeSerialization
+    private String GPSBOX;
 
+    public String getGPSBOX() {
+        return GPSBOX;
+    }
+
+    public void setGPSBOX(String GPSBOX) {
+        this.GPSBOX = GPSBOX;
+    }
+
+    public int getOpenTrips() {
+        return openTrips;
+    }
+
+    public void setOpenTrips(int openTrips) {
+        this.openTrips = openTrips;
+    }
+
+    public String getSIM_SN() {
+        return SIM_SN;
+    }
+
+    public void setSIM_SN(String SIM_SN) {
+        this.SIM_SN = SIM_SN;
+    }
+
+    public String getClock() {
+        return clock;
+    }
+
+    public void setClock(String clock) {
+        this.clock = clock;
+    }
+
+    public String getLog_tx_time() {
+        return log_tx_time;
+    }
+
+    public void setLog_tx_time(String log_tx_time) {
+        this.log_tx_time = log_tx_time;
+    }
+
+    public long getExt_time() {
+        return ext_time;
+    }
+
+    public void setExt_time(long ext_time) {
+        this.ext_time = ext_time;
+    }
+
+    public long getInt_time() {
+        return int_time;
+    }
+
+    public void setInt_time(long int_time) {
+        this.int_time = int_time;
+    }
 
     public Boolean getCloseEnabled() {
         return closeEnabled;

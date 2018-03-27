@@ -147,7 +147,7 @@ public class AMainOBC extends ABase implements LocationListener {
 		Boolean inside=true;
 		try{
 		if (App.lastLocation!=null)
-		 	inside =	App.checkParkArea(App.lastLocation.getLatitude(), App.lastLocation.getLongitude());
+		 	inside = App.checkParkArea(App.lastLocation.getLatitude(), App.lastLocation.getLongitude());
 		}catch(Exception e){
 			dlog.e("Exception while checking inside area ",e);
 		}

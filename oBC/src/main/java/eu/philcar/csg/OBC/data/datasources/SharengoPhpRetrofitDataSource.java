@@ -42,7 +42,8 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
     public Observable<List<AreaResponse>> getArea(String plate, String md5) {
         return  mSharengoPhpApi.getArea(plate,md5)
                 .compose(this.handleRetrofitRequest())
-                .doOnError(this::handleErorResponse);
+                .doOnError(this::handleErorResponse)
+                .doOnComplete(this::hanldeCompletation);
     }
 
     /**
@@ -65,21 +66,9 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
      */
     @Override
     public Observable<TripResponse> openTrip(final Trip trip, final DataManager dataManager) {
-        if(trip.id_parent==0) {
-            return mSharengoPhpApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat, trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin)
-                    .compose(this.handleRetrofitRequest())
-                    .doOnError(this::handleErorResponse)
-                    .doOnError(e -> {
-                        trip.recharge = 0; //server result
-                        trip.offline = true;
-                        dataManager.updateTripSetOffline(trip);
-                    })
-                    .concatMap(t -> {
-                        this.handleResponsePersistance(trip, t, dataManager, Trip.OPEN_TRIP);
-                        return Observable.just(t);
-                    });
-        }else{
-            return mSharengoPhpApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat, trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin, trip.id_parent)
+
+            return mSharengoPhpApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat,
+                    trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin, trip.id_parent==0?null:String.valueOf(trip.id_parent))
                     .compose(this.handleRetrofitRequest())
                     .doOnError(this::handleErorResponse)
                     .doOnError(e -> {
@@ -92,7 +81,6 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
                         return Observable.just(t);
                     });
         }
-    }
 
     /**
      * open trip wothout blocking the chain, it return the Trip not the TripResponse
@@ -114,23 +102,20 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
      */
     @Override
     public Observable<TripResponse> updateTrip(final Trip trip) {
-        if(trip.id_parent==0) {
-            return mSharengoPhpApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat, trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin)
+
+            return mSharengoPhpApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat,
+                    trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin,trip.id_parent==0?null:String.valueOf(trip.id_parent))
                     .compose(this.handleRetrofitRequest())
                     .doOnError(this::handleErorResponse);
-        }else{
-            return mSharengoPhpApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat, trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin, trip.id_parent)
-                    .compose(this.handleRetrofitRequest())
-                    .doOnError(this::handleErorResponse);
-        }
+
     }
 
 
 
     @Override
     public Observable<TripResponse> closeTrip(final Trip trip,final DataManager dataManager) {
-        if(trip.id_parent!=0) {
-            return mSharengoPhpApi.closeTrip(2,trip.remote_id, trip.plate, trip.id_customer, trip.end_timestamp, trip.end_km, trip.end_battery, trip.end_lon, trip.end_lat, trip.warning, trip.int_cleanliness, trip.ext_cleanliness, trip.park_seconds, trip.n_pin, trip.id_parent)
+            return mSharengoPhpApi.closeTrip(2,trip.remote_id, trip.plate, trip.id_customer, trip.end_timestamp, trip.end_km, trip.end_battery, trip.end_lon, trip.end_lat,
+                    trip.warning, trip.int_cleanliness, trip.ext_cleanliness, trip.park_seconds, trip.n_pin, trip.id_parent==0?null:String.valueOf(trip.id_parent))
                     .compose(this.handleRetrofitRequest())
                     .doOnError(this::handleErorResponse)
                     .doOnError(e ->{
@@ -141,20 +126,6 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
                         trip.handleResponse(tripResponse,dataManager,Trip.CLOSE_TRIP);
                         return Observable.just(tripResponse);
                     });
-
-        }else {
-            return mSharengoPhpApi.closeTrip(2,trip.remote_id, trip.plate, trip.id_customer, trip.end_timestamp, trip.end_km, trip.end_battery, trip.end_lon, trip.end_lat, trip.warning, trip.int_cleanliness, trip.ext_cleanliness, trip.park_seconds, trip.n_pin)
-                    .compose(this.handleRetrofitRequest())
-                    .doOnError(this::handleErorResponse)
-                    .doOnError(e ->{
-                        trip.offline=true;
-                        dataManager.updateTripSetOffline(trip);
-                    })
-                    .concatMap(tripResponse -> {
-                        trip.handleResponse(tripResponse,dataManager,Trip.CLOSE_TRIP);
-                        return Observable.just(tripResponse);
-                    });
-        }
     }
 
     @Override

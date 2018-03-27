@@ -18,8 +18,6 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.helpers.DLog;
-import eu.philcar.csg.OBC.server.HttpConnector;
-import eu.philcar.csg.OBC.service.TripInfo;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -153,7 +151,7 @@ public class Trips extends DbTable<Trip,Integer> {
 	
 	
 	public boolean sendOffline(Context context, Handler handler, SharengoPhpRepository phpRepository) {
-		HttpConnector http;
+		//HttpConnector http;
 		List<Trip> list = getTripsToSend();
 
 		

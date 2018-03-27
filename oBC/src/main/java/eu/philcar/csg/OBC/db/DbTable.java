@@ -50,8 +50,8 @@ public class DbTable<tableClass, pk>  extends BaseDaoImpl<tableClass, pk>{
 
 				});
 			}catch (Exception e){
-				DLog.E("Exception while updating many",e);
-				emitter.onError(e);
+				DLog.E("Exception while updating many " +emitter,e);
+				//emitter.onError(e);
 			}
 
 		});
@@ -61,22 +61,28 @@ public class DbTable<tableClass, pk>  extends BaseDaoImpl<tableClass, pk>{
 		return Observable.create(emitter -> {
 			if (emitter.isDisposed())
 				return;
+			try {
 
-			callBatchTasks((Callable<Void>) () -> {
-				try {
-					if(collection instanceof CustomOp){
-						((CustomOp) collection).onDbWrite();
+
+				callBatchTasks((Callable<Void>) () -> {
+					try {
+						if (collection instanceof CustomOp) {
+							((CustomOp) collection).onDbWrite();
+						}
+						int result = createOrUpdate(collection).getNumLinesChanged();
+						if (result >= 0) emitter.onNext(collection);
+
+						emitter.onComplete();
+					} catch (Exception e) {
+						DLog.E("Exception updating One", e);
+						emitter.onError(e);
 					}
-					int result = createOrUpdate(collection).getNumLinesChanged();
-					if (result >= 0) emitter.onNext(collection);
-
-					emitter.onComplete();
-				} catch(Exception e) {
-					DLog.E("Exception updating One",e);
-					emitter.onError(e);
-				}
-				return null;
-			});
+					return null;
+				});
+			}catch (IllegalStateException e){
+				DLog.E("Exception updating collection",e);
+				emitter.onError(e);
+			}
 
 		});
 	}

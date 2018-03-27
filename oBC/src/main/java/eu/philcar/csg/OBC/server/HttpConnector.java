@@ -54,6 +54,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.SystemClock;
 
+@Deprecated
 public class HttpConnector {
 	private DLog dlog = new DLog(this.getClass());
 	

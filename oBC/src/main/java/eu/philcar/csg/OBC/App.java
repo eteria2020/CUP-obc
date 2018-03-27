@@ -41,11 +41,14 @@ import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
 import com.Hik.Mercury.SDK.Manager.CANManager;
+import com.skobbler.ngx.SKCoordinate;
 import com.skobbler.ngx.SKMaps;
 import com.skobbler.ngx.SKMapsInitSettings;
 import com.skobbler.ngx.SKPrepareMapTextureListener;
 import com.skobbler.ngx.SKPrepareMapTextureThread;
 import com.skobbler.ngx.map.SKMapViewStyle;
+import com.skobbler.ngx.map.SKPolygon;
+import com.skobbler.ngx.map.SKPolyline;
 import com.skobbler.ngx.navigation.SKAdvisorSettings;
 import com.skobbler.ngx.packages.SKPackage;
 import com.skobbler.ngx.packages.SKPackageManager;
@@ -64,6 +67,7 @@ import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 import ch.qos.logback.core.util.StatusPrinter;
 import eu.philcar.csg.OBC.controller.map.util.GeoUtils;
+import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.api.ApiModule;
 import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.db.DbManager;
@@ -78,8 +82,6 @@ import eu.philcar.csg.OBC.helpers.SkobblerSearch;
 import eu.philcar.csg.OBC.injection.component.ApplicationComponent;
 import eu.philcar.csg.OBC.injection.component.DaggerApplicationComponent;
 import eu.philcar.csg.OBC.injection.module.ApplicationModule;
-import eu.philcar.csg.OBC.server.AreaConnector;
-import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.server.SslConnection;
 import eu.philcar.csg.OBC.service.AdvertisementService;
 import eu.philcar.csg.OBC.service.ObcService;
@@ -129,6 +131,7 @@ import android.util.FloatMath;
 import android.util.Log;
 import android.widget.Toast;
 
+import javax.inject.Inject;
 
 
 @ReportsCrashes(
@@ -147,6 +150,7 @@ public class App extends MultiDexApplication {
 	private DLog dlog = new DLog(this.getClass());
 
 	public static App Instance;
+	public static Versions versions = new Versions();
 
 	ApplicationComponent mApplicationComponent;
 
@@ -154,6 +158,46 @@ public class App extends MultiDexApplication {
 		Instance = this;
 		initSharengo();
 
+	}
+
+
+	public static void onFailedApi(ErrorResponse e) {
+		if(e.errorType != ErrorResponse.ErrorType.EMPTY) {
+			if (hasNetworkConnection()) {
+				if (SystemClock.elapsedRealtime() - getDiffLastApiError() < 60 * 1000) {//1min
+					if (++networkExceptions > 60) {
+						setNetworkStable(false);
+					}
+				}
+				setLastApiError(SystemClock.elapsedRealtime());
+
+
+			} else {
+				setNetworkStable(false);
+			}
+
+		}
+	}
+
+	public static boolean isNetworkStable() {
+		return networkStable || getDiffLastApiError()>20*60*1000;//20 min
+	}
+
+	public static void setNetworkStable(boolean networkStable) {
+		App.networkStable = networkStable;
+	}
+
+	public static long getLastApiError() {
+		return lastApiError;
+	}
+
+
+	public static long getDiffLastApiError() {
+		return SystemClock.elapsedRealtime() - lastApiError;
+	}
+
+	public static void setLastApiError(long lastApiError) {
+		App.lastApiError = lastApiError;
 	}
 
 	public static boolean hasNetworkConnection() {
@@ -304,7 +348,7 @@ public class App extends MultiDexApplication {
 			URL_ZMQNotifier = "tcp://185.58.119.117:8001";
 			URL_AdsBuilder = "http://manage.sharengo.it/banner2.php";
 			URL_AdsBuilderCar = "http://manage.sharengo.it/banner2_offline.php";
-			URL_AdsBuilderStart = "http://manage.sharengo.it/dev/banner4_offline.php";
+			URL_AdsBuilderStart = "http://manage.sharengo.it/banner4_offline.php";
 			URL_AdsBuilderEnd = "http://manage.sharengo.it/banner5_offline.php";
 			URL_Time = "http://core.sharengo.it/api/get_date.php";
 			IP_UDP_Beacon = "185.58.119.117";
@@ -388,7 +432,7 @@ public class App extends MultiDexApplication {
 
 	public static final String COMMON_PREFERENCES = "eu.philcar.csg.preferences";
 //	public static final String USE_NAVIGATOR = COMMON_PREFERENCES + ".use_navigator";
-
+	@Inject
 	public DbManager dbManager;
 
 	private ServiceConnector serviceConnector;
@@ -520,6 +564,8 @@ public class App extends MultiDexApplication {
 	public static String timeZone;
 
 	private static boolean hasNetworkConnection=false;
+	private static boolean networkStable = true;
+	private static long		lastApiError = 0;
 	public static Date    lastNetworkOn = new Date();
 
 	public static Date    AppStartupTime = new Date(), AppScheduledReboot=new Date();
@@ -569,6 +615,7 @@ public class App extends MultiDexApplication {
 
 	public static String AreaPolygonMD5;
 	public static ArrayList<double[]> AreaPolygons;
+	public static List<List<SKCoordinate>> nodes;
 
 	//public static final double[] polygon = new double[]{46.091832, 13.235410, 46.096125, 13.234584, 46.097628, 13.239723, 46.092658, 13.240678};	// Udine
 	//public static final double[] polygon = new double[]{45.402867 , 9.276161, 45.402867 , 9.053406, 45.542358 , 9.053406, 45.542358 , 9.276161};		// Milano
@@ -1117,8 +1164,9 @@ public void loadRadioSetup() {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		getComponent().inject(this);
 
-
+		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
 
 
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -1164,6 +1212,7 @@ public void loadRadioSetup() {
 		dlog.i("CPU_ABI: " +Build.CPU_ABI);
 		dlog.i("RADIO: " +Build.getRadioVersion());
 		dlog.i("ANDROID VERSION: " +Build.VERSION.SDK_INT);
+
 		/*
 		File skmaps = new File("/sdcard/skmaps.zip");
 		if ( skmaps.exists()) {
@@ -1393,13 +1442,13 @@ private void  initPhase2() {
 		initAreaPolygon();
 
 		
-		dbManager =  DbManager.getInstance(this);
-		dbManager.getReadableDatabase();
+		//dbManager =  DbManager.getInstance(this);
+		//dbManager.getReadableDatabase();
 		
 		
 		
 		
-		Trips corse = dbManager.getCorseDao();
+		//Trips corse = dbManager.getCorseDao();
 		//corse.sendOffline(this, null);
 
 		
@@ -1414,7 +1463,7 @@ private void  initPhase2() {
         serviceConnector.startService();
     
         // start handler which starts pending-intent after Application-Crash
-	    Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
+
 	    
 	    // TODO: enable the line below to schedule advertisement updates
 	    //scheduleAdvertisementUpdate();
@@ -2017,8 +2066,8 @@ private void  initPhase2() {
 
 		StringBuilder sb = new StringBuilder();
 	    try {
-	    	
-			InputStream ims = new FileInputStream(areaFile);	
+
+			InputStream ims = new FileInputStream(areaFile);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(ims));
 			String str;
 			while ((str=reader.readLine())!=null) {
@@ -2076,12 +2125,86 @@ private void  initPhase2() {
 			}
 		}
 		
+	decodeAreaPolygonSkobbler(json);
+	}
 
+	public static void decodeAreaPolygonSkobbler(String json) {
+
+
+		// Set the polygon's nodes
+		nodes = new ArrayList<List<SKCoordinate>>();
+
+		JSONArray jArray;
+		try {
+
+			jArray = new JSONArray(json);
+		} catch (JSONException e) {
+			DLog.E("decodeAreaPolygon : ", e);
+			return ;
+		}
+
+
+
+		int n = jArray.length();
+
+		for (int i = 0; i < n; i++) {
+
+			try {
+				JSONObject jobj = jArray.getJSONObject(i);
+				JSONArray jarr = jobj.getJSONArray("coordinates");
+				int x  = jarr.length();
+				List<SKCoordinate> node =new ArrayList<>();
+
+				for (int j=0;j<x;j+=3) {
+					node.add(new SKCoordinate(jarr.getDouble(j ), jarr.getDouble(j+ 1)));
+				}
+				nodes.add(node);
+
+			} catch (Exception e) {
+
+			}
+		}
+
+		// Render the polygon on the map
+
+
+
+	}
+
+	public static List<SKPolygon> getSKPoligon(){
+    	List<SKPolygon> result = new ArrayList<>();
+    	for(List<SKCoordinate> node : nodes){
+
+			SKPolygon polygon = new SKPolygon();
+			polygon.setNodes(node);
+			// Set the outline size
+			polygon.setOutlineSize(3);
+			// Set colors used to render the polygon
+			polygon.setOutlineColor(new float[]{ 1f, 0f, 0f, 1f});
+			polygon.setColor(new float[]{ 1f, 0f, 0f, 0.2f});
+			polygon.setIdentifier(10);
+
+			result.add(polygon);
+		}
+		return result;
+    }
+	public static List<SKPolyline> getSKPolyline(){
+		List<SKPolyline> result = new ArrayList<>();
+		for(List<SKCoordinate> node : nodes){
+			SKPolyline polyline = new SKPolyline();
+
+			polyline.setNodes(node);
+			// Set the outline size
+
+
+			result.add(polyline);
+		}
+		return result;
 	}
 	
 	public DbManager  getDbManager() {
-		if (dbManager==null)
-			dbManager =  DbManager.getInstance(this);
+		/*if (dbManager==null)
+			dbManager =  DbManager.getInstance(this);*/
 		
 		
 		return dbManager;

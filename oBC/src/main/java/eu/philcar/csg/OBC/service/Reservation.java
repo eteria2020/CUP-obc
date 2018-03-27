@@ -42,7 +42,7 @@ public class Reservation  implements ServerResponse{
 	
 	public static Reservation createOutOfOrderReservation() {
 		int id=-1;
-		Customers customers = DbManager.getInstance(App.Instance).getClientiDao();
+		Customers customers = App.Instance.getDbManager().getClientiDao();// DbManager.getInstance(App.Instance).getClientiDao();
 		
 		if (customers==null)
 			return null;

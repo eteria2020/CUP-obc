@@ -46,6 +46,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.ASOS;
@@ -274,10 +275,10 @@ public class FDriveMessage_new extends FBase {
 
 
 
-		new CountDownTimer(4000,1000) {
+		new CountDownTimer(3100,1000) {
 				@Override
 			     public void onTick(long millisUntilFinished) {
-			    	 ((TextView)view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished/1000)+ " s");
+			    	 ((TextView)view.findViewById(R.id.tvCountdown)).setText(String.format(Locale.ITALY,"%d s", (millisUntilFinished / 1000)));
 			     }
 
 				@Override

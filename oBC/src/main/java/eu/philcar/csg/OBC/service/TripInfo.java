@@ -33,8 +33,7 @@ import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.CardRfid;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.UrlTools;
-import eu.philcar.csg.OBC.interfaces.OnTripCallback;
-import eu.philcar.csg.OBC.server.HttpConnector;
+import io.reactivex.Observable;
 import eu.philcar.csg.OBC.server.ReservationConnector;
 import eu.philcar.csg.OBC.task.OdoController;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
@@ -232,7 +231,7 @@ public class TripInfo {
 
         // Getting DB
         DbManager dbm = App.Instance.dbManager;
-        HttpConnector http;
+        //HttpConnector http;
 
         Customers customers = dbm.getClientiDao();
         Customer customer = customers.getClienteByCardCode(code);
@@ -281,8 +280,6 @@ public class TripInfo {
                             rc.setTarga(App.CarPlate);
                             rc.setConsumed(App.reservation.id);
                             rhttp.Execute(rc);*/
-                            App.reservation = null;  //Cancella la prenotazione in locale
-                            App.Instance.persistReservation();
                             //}
                         } else {
                             dlog.d(TripInfo.class.toString()+" handleCard: Local out of order reservation");
@@ -300,15 +297,10 @@ public class TripInfo {
 
                 cardCode = code;					
 
-                if (OpenTripNew(carInfo, customer,service)) {
-                    obc_io.setLcd(null, " Auto in uso");
-                    obc_io.setDoors(null, 1,customer.info_display);  //Sole se trip registrata su db apri le portiere
-                    //obc_io.setEngine(null, 1); //TODO: RIMUOVERE!!!! Il motore si dovr? abilitare solo dopo il check del pin
-                    obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
-                    obc_io.setTag(null,cardCode);
+                if (OpenTripNew(carInfo, customer,service, obc_io)) {
+
                     eventRepository.eventRfid(1, code+" "+event);
                     hasBeenStopped =false;
-                    service.sendBeacon();
                     dlog.d(TripInfo.class.toString() + " handleCard: Car opened ");
                     OptimizeDistanceCalc.init(); // momo inizializzare il tutto per poter calcolare la distanza percorsa.
                 } else
@@ -320,20 +312,7 @@ public class TripInfo {
                 http.Execute(cc);*/
 
                 // Prepara un messaggio ritardato che chiude l'auto se non viene abilitata la trip entro un timeout
-                service.scheduleSelfCloseTrip(300,true);
 
-                service.getHandler().sendMessage(MessageFactory.RadioVolume(1));
-                service.getHandler().sendMessage(MessageFactory.RadioVolume(0));
-
-                service.setDisplayStatus(true,0);
-
-
-                FRadio.savedInstance = null;
-
-                service.getHandler().sendMessage(MessageFactory.startRemoteUpdateCycle());
-
-                App.pinChecked = false;
-                App.Instance.persistPinChecked();
 
                 if(!processing) {
                     processing=true;
@@ -422,20 +401,13 @@ public class TripInfo {
                         dlog.d("handleCard: corsa non chiudibile");
                         return null;
                     }
-                    if (service.checkParkArea() || closeType ==CloseType.forced) {
+                    if (service.checkParkArea() || closeType == CloseType.forced) {
 
-                        cardCode="";
-                        obc_io.setLcd(null, "   Auto Libera");
-                        obc_io.setDoors(null, 0,"ARRIVEDERCI");
-                        obc_io.setEngine(null, 0);
-                        obc_io.setLed(null, LowLevelInterface.ID_LED_GREEN, LowLevelInterface.ID_LED_ON);			
-                        obc_io.setTag(null,"*");
-                        dlog.d(TripInfo.class.toString()+" handleCard: Pending trips. END RENT, disable engine and close doors");
 
 
 
                         eventRepository.eventRfid(2, code);
-                        CloseTrip(carInfo);
+                        CloseTrip(carInfo, obc_io, service);
 
                         /*TripsConnector cc = new TripsConnector(this);
 
@@ -463,7 +435,7 @@ public class TripInfo {
                     } else {
                         dlog.d("Unable to close trip, out of operative area");
 
-                        Toast.makeText(App.Instance.getBaseContext(), "Out of Operative Area", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(App.Instance.getBaseContext(), "Out of Operative Area", Toast.LENGTH_SHORT).show();
                         obc_io.setLcd(null, "   FUORI AREA");
                         return null;
                     }
@@ -554,7 +526,7 @@ public class TripInfo {
                 content.close();
             } else {
 
-                dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode));
+                dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode) + " url "+Url);
                 App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
                 return;
             }
@@ -674,7 +646,7 @@ public class TripInfo {
         return trip;
     }
 
-    public boolean OpenTripNew(CarInfo carInfo, Customer customer, final OnTripCallback callback) {
+    public boolean OpenTripNew(CarInfo carInfo, Customer customer, final ObcService service, final LowLevelInterface obc_io) {
 
         if (carInfo==null || customer==null) {
             dlog.e(TripInfo.class.toString()+" OpenTrip:  carInfo or customer == NULL");
@@ -687,7 +659,37 @@ public class TripInfo {
 
         trip = buildOpenTrip();
         //Scrittura DB
-        phpRepository.openTrip(trip,this)
+        Observable.just(1)
+                .map(n->{
+                    if(service!=null)
+                        service.onTripResult(TripInfo.this);
+
+                    obc_io.setLcd(null, " Auto in uso");
+                    obc_io.setDoors(null, 1,customer.info_display);  //Sole se trip registrata su db apri le portiere
+                    //obc_io.setEngine(null, 1); //TODO: RIMUOVERE!!!! Il motore si dovr? abilitare solo dopo il check del pin
+                    obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
+                    obc_io.setTag(null,cardCode);
+
+                    service.scheduleSelfCloseTrip(300,true);
+
+                    service.getHandler().sendMessage(MessageFactory.RadioVolume(1));
+                    service.getHandler().sendMessage(MessageFactory.RadioVolume(0));
+
+                    service.setDisplayStatus(true,0);
+
+
+                    FRadio.savedInstance = null;
+
+                    service.getHandler().sendMessage(MessageFactory.startRemoteUpdateCycle());
+
+                    App.pinChecked = false;
+                    App.Instance.persistPinChecked();
+
+                    service.sendBeacon();
+                    return  n;
+                })
+                .concatMap(f->phpRepository.openTrip(trip,this))
+
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<TripResponse>() {
                     @Override
@@ -698,8 +700,7 @@ public class TripInfo {
                     @Override
                     public void onNext(@NonNull TripResponse tripResponse) {
 
-                            if(callback!=null)
-                                callback.onTripResult(TripInfo.this);
+
 
                     }
 
@@ -753,9 +754,9 @@ public class TripInfo {
 
     }
 
-    public void CloseTrip(CarInfo carInfo) {
+    public void CloseTrip(CarInfo carInfo, LowLevelInterface obc_io, ObcService service) {
 
-        CloseCorsaNew(carInfo);
+        CloseCorsaNew(carInfo, obc_io, service);
 
         if(App.pinChecked && App.currentTripInfo.trip.int_cleanliness==0 && App.currentTripInfo.trip.ext_cleanliness==0){
             App.CounterCleanlines++;
@@ -800,7 +801,28 @@ public class TripInfo {
         dlog.d("CloseCorsa: closing trip"+trip.toString());
         OptimizeDistanceCalc.Controller(OdoController.STOP);
 
-        phpRepository.closeTrip(trip)
+        Observable.just(1)
+                .map(n ->{
+                    cardCode="";
+                    obc_io.setLcd(null, "   Auto Libera");
+                    obc_io.setDoors(null, 0,"ARRIVEDERCI");
+                    obc_io.setEngine(null, 0);
+                    obc_io.setLed(null, LowLevelInterface.ID_LED_GREEN, LowLevelInterface.ID_LED_ON);
+                    obc_io.setTag(null,"*");
+                    dlog.d(TripInfo.class.toString()+" handleCard: Pending trips. END RENT, disable engine and close doors");
+
+                    service.setDisplayStatus(false,15);
+                    service.getHandler().sendMessage(MessageFactory.RadioVolume(0));
+                    FRadio.savedInstance = null;
+                    SuspendRfid(obc_io,"  Auto libera");
+                    service.removeSelfCloseTrip();
+                    service.getHandler().sendMessage(MessageFactory.stopRemoteUpdateCycle());
+                    App.pinChecked = false;
+                    App.Instance.persistPinChecked();
+                    service.sendBeacon();
+                    return n;
+                })
+                .concatMap(n-> phpRepository.closeTrip(trip))
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<TripResponse>() {
                     @Override
@@ -810,9 +832,6 @@ public class TripInfo {
 
                     @Override
                     public void onNext(@NonNull TripResponse tripResponse) {
-                        //handled inside deeper closeTrip
-
-                        //Callback unused
 
                     }
 
@@ -1084,7 +1103,7 @@ public class TripInfo {
                 int id_parent = trip.id_parent;
                 int n_pin = trip.n_pin;
                 //Se ? passata la durata massima chiudi la trip amministrativamente...
-                CloseCorsaNew(carInfo);
+                CloseCorsaMaxDurata(carInfo);
                 //CloseCorsa(carInfo);
 
                 //.... inva la corsa incapsulandola in un oggeto tripinfo separato per evitare modifiche

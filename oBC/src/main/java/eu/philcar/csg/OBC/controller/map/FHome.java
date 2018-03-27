@@ -586,6 +586,7 @@ public class FHome extends FBase implements OnClickListener {
         if (carInfo == null)
             return;
 
+        refreshConnectionStatus();
 
         int SOC = carInfo.batteryLevel;
 
@@ -789,31 +790,36 @@ public class FHome extends FBase implements OnClickListener {
 
         @Override
         public void onReceive(Context c, Intent i) {
+            refreshConnectionStatus();
 
-            try {
-                if (getActivity() == null && c==null)
-                    return;
-                boolean status = SystemControl.hasNetworkConnection(c!=null?c:getActivity(),eventRepository);
-
-                if (status) {
-                    if (animQueue.contains("3g")) {
-                        animQueue.remove("3g");
-                    }
-
-                } else {
-                    if (!animQueue.contains("3g")) {
-                        animQueue.add("3g");
-                    }
-                    if (no3gwarning.getAnimation() == null)
-                        no3gwarning.startAnimation(alertAnimation);
-                }
-            }catch(Exception e){
-                dlog.e("Exception while handling connectivity broadcast",e);
-            }
         }
 
 
     };
+
+    private void refreshConnectionStatus(){
+        try {
+            if (getActivity() == null && getActivity()==null)
+                return;
+            boolean status = App.hasNetworkConnection();
+
+            if (status) {
+                if (animQueue.contains("3g")) {
+                    animQueue.remove("3g");
+                }
+
+            } else {
+                if (!animQueue.contains("3g")) {
+                    animQueue.add("3g");
+                }
+                if (no3gwarning.getAnimation() == null)
+                    no3gwarning.startAnimation(alertAnimation);
+            }
+        }catch(Exception e){
+            dlog.e("Exception while refreshing ConnectionStatus",e);
+        }
+    }
+
 /**
  * With a given URL and type (END-START...) load the Banner ID, if present Use the downloaded one otherwise download it.
  * After Put the ID inside the App variable to share the current banner

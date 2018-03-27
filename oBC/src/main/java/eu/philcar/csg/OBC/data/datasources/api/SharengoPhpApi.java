@@ -31,7 +31,7 @@ public interface SharengoPhpApi {
     @GET("pushcorsa-convenzioni.php")
     Observable<Result<TripResponse>> openTrip(@Query("cmd") int cmd_type, @Query("id_veicolo") String plate, @Query("id_cliente") int customerId, @Query("ora") long beginTimestamp, @Query("km") int km, @Query("carburante") int soc,
                                               @Query("lon") double beginLon, @Query("lat") double beginLat, @Query("warning") String warning, @Query("pulizia_int") int intCleanliness, @Query("pulizia_ext") int extCleanliness,
-                                              @Query("mac") String macAddress, @Query("imei") String imei, @Query("n_pin") int nPin, @Query("id_parent") int id_parent);
+                                              @Query("mac") String macAddress, @Query("imei") String imei, @Query("n_pin") int nPin, @Query("id_parent") String id_parent);
     @GET("pushcorsa-convenzioni.php")
     Observable<Result<TripResponse>> openTrip(@Query("cmd") int cmd_type, @Query("id_veicolo") String plate, @Query("id_cliente") int customerId, @Query("ora") long beginTimestamp, @Query("km") int km, @Query("carburante") int soc,
                                              @Query("lon") double beginLon, @Query("lat") double beginLat, @Query("warning") String warning, @Query("pulizia_int") int intCleanliness, @Query("pulizia_ext") int extCleanliness,
@@ -46,7 +46,7 @@ public interface SharengoPhpApi {
     @GET("pushcorsa-convenzioni.php")
     Observable<Result<TripResponse>> closeTrip(@Query("cmd") int cmd_type,@Query("id") int remote_id, @Query("id_veicolo") String plate, @Query("id_cliente") int customerId, @Query("ora") long endTimestamp, @Query("km") int km, @Query("carburante") int soc,
                                                @Query("lon") double endLon, @Query("lat") double endLat, @Query("warning") String warning, @Query("pulizia_int") int intCleanliness, @Query("pulizia_ext") int extCleanliness,
-                                               @Query("park_seconds") int park_seconds, @Query("n_pin") int nPin, @Query("id_parent") int id_parent);
+                                               @Query("park_seconds") int park_seconds, @Query("n_pin") int nPin, @Query("id_parent") String id_parent);
 
     @GET("pushevent.php")
     Observable<Result<EventResponse>> sendEvent(@Query("event_id") int event_id, @Query("label") String label, @Query("car_plate") String car_plate, @Query("customer_id") int customer_id,
