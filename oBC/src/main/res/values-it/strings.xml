@@ -40,7 +40,7 @@
     <string name="error_http_code_failure">Connession fallita con risposta HTTP</string>
     <string name="error_malformed_url">URL errato nella richiesta</string>
     <string name="error_parsing_invalid_type">Tipo non valido nell\'indirizzo</string>
-    <string name="error_parsing_missing_address">Parametro-address non trovato</string>
+    <string name="error_parsing_missing_addresse">Parametro-address non trovato</string>
     <string name="error_parsing_missing_geometry">Parametro-geometry non trovato</string>
     <string name="error_parsing_missing_latitude">Parametro-latitude non trovato</string>
     <string name="error_parsing_missing_location">Parametro-location non trovato</string>
@@ -236,5 +236,11 @@
     <string name="alert_bonus_park">Da questo momento puoi guadagnare 5 minuti bonus lasciando l’auto da ricaricare in uno dei parcheggi indicati sul navigatore</string>
     <string name="music_hint">Collega il cavo AUX per ascoltare la musica dal tuo cellulare</string>
     <string name="pin_business">Hai usato il pin business</string>
+    <string name="menu_rent_end_key_on">Si prega di spegnere il quadro prima di poter terminare il noleggioo</string>
+    <string name="menu_park_mode_suspend_key_on">Si prega di spegnere il quadro prima di poter lasciare la macchina in sosta</string>
+    <string name="button_video_tutorial">ISTRUZIONI</string>
+    <string name="button_assicurazione">ASSICURAZIONE</string>
+    <string name="button_libretto">LIBRETTO</string>
+
 
 </resources>

@@ -414,7 +414,7 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 
 			}
 		}else{
-			localHandler.postDelayed(skipRemoteCheck,10000);
+			localHandler.postDelayed(skipRemoteCheck,2000);
 		}
 	}
 

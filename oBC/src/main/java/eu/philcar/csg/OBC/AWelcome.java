@@ -95,7 +95,8 @@ public class AWelcome extends ABase {
 		serviceConnector.unregister();
 		serviceConnector.disconnect();
 	}
-	
+
+	@Override
 	public void sendMessage(Message msg) {
 		serviceConnector.send(msg);
 	}

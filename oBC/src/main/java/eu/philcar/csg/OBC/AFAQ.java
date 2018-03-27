@@ -52,6 +52,7 @@ public class AFAQ  extends ABase {
         serviceConnector.connect(Clients.FAQ);
     }
 
+    @Override
     public void sendMessage(Message msg) {
         serviceConnector.send(msg);
     }

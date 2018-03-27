@@ -28,6 +28,7 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
@@ -48,6 +49,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -153,13 +155,16 @@ public class FHome extends FBase implements OnClickListener {
 
         tts=new ProTTS(getActivity());
 
-
+        ((Button) view.findViewById(R.id.fmapVideo)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapSOSB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapSearchB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapRadioB)).setOnClickListener(this);
-        ((Button) view.findViewById(R.id.fmapMusicB)).setOnClickListener(this);
+       // ((Button) view.findViewById(R.id.fmapMusicB)).setOnClickListener(this);
         //((Button) view.findViewById(R.id.fmapFuelStationsB)).setOnClickListener(this); rimosso su richiesta mkt
         ((Button) view.findViewById(R.id.fmapCancelB)).setOnClickListener(this);
+        ((Button) view.findViewById(R.id.fmapParkB)).setOnClickListener(this);
+        ((Button) view.findViewById(R.id.fmapAssicurazione)).setOnClickListener(this);
+        ((Button) view.findViewById(R.id.fmapLibretto)).setOnClickListener(this);
 
         dayTV = (TextView) view.findViewById(R.id.fmap_date_TV);
         timeTV = (TextView) view.findViewById(R.id.fmap_hour_TV);
@@ -367,10 +372,12 @@ public class FHome extends FBase implements OnClickListener {
      * */
     @Override
     public void onDestroy() {
+        ((Button) rootView.findViewById(R.id.fmapVideo)).setOnClickListener(null);
         ((Button) rootView.findViewById(R.id.fmapSOSB)).setOnClickListener(null);
         ((Button) rootView.findViewById(R.id.fmapSearchB)).setOnClickListener(null);
         ((Button) rootView.findViewById(R.id.fmapRadioB)).setOnClickListener(null);
         ((Button) rootView.findViewById(R.id.fmapCancelB)).setOnClickListener(null);
+        ((Button) rootView.findViewById(R.id.fmapParkB)).setOnClickListener(null);
         rootView=null;
         tvRange=null;
         fmapRange=null;
@@ -408,6 +415,9 @@ public class FHome extends FBase implements OnClickListener {
 
         switch (v.getId()) {
 
+            case R.id.fmapVideo://SOS
+                ((ABase) getActivity()).pushBackFragment(FVideo.newInstance(), FVideo.class.getName(), true);
+                break;
 
             case R.id.fmapSOSB://SOS
                 startActivity(new Intent(getActivity(), ASOS.class));
@@ -423,9 +433,12 @@ public class FHome extends FBase implements OnClickListener {
                 break;
 
             case R.id.fmapCancelB://End Trip
-                ((ABase) getActivity()).pushFragment(FMenu.newInstance(), FMenu.class.getName(), true);
+                ((ABase) getActivity()).pushFragment(FMenu.newInstance("CANCEL"), FMenu.class.getName(), true);
                 break;
 
+            case R.id.fmapParkB://End Trip
+                ((ABase) getActivity()).pushFragment(FMenu.newInstance("PARK"), FMenu.class.getName(), true);
+                break;
 
 
 
@@ -434,16 +447,26 @@ public class FHome extends FBase implements OnClickListener {
 
                 break;
 
-            case R.id.fmapMusicB:
-
+      /*    case R.id.fmapMusicB:
 
                 ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_AUX,30);
-                Toast.makeText(App.Instance.getApplicationContext(),getResources().getString(R.string.music_hint),Toast.LENGTH_LONG).show();
+                Toast.makeText(App.Instance.getApplicationContext(),getResources().getString(R.string.music_hint),Toast.LENGTH_LONG).show(); */
 
                 /*final Resources res = this.getResources();
                 final int id = Resources.getSystem().getIdentifier(
                         "config_ntpServer", "string","android");
                 final String defaultServer = res.getString(id);*/
+             //   break;
+
+
+            case R.id.fmapAssicurazione:
+                ((ABase) getActivity()).pushFragment(FPdfViewer.newInstance("ASSICURAZIONE"), FPdfViewer.class.getName(), true);
+                //startActivity(new Intent(getActivity(), FPdfViewer.class)); //pushfragment usare
+
+                break;
+            case R.id.fmapLibretto:
+                ((ABase) getActivity()).pushFragment(FPdfViewer.newInstance("LIBRETTO"), FPdfViewer.class.getName(), true);
+                //startActivity(new Intent(getActivity(), FPdfViewer.class)); //pushfragment usare
 
                 break;
             case R.id.fmapLeftBorderIV://Banner

@@ -199,7 +199,7 @@ public class ATGeocodingRequest extends AsyncTask<String, String, ArrayList<Geoc
 					geocodedLocation.address = jsonResult.getString("formatted_address");
 				} catch (JSONException e) {
 					e.printStackTrace();
-					publishProgress(context.getResources().getString(R.string.error_parsing_missing_address));
+					publishProgress(context.getResources().getString(R.string.error_parsing_missing_addresse));
 					return null;
 				}
 				

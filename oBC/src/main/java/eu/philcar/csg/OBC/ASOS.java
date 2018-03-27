@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.media.session.MediaSessionCompat;
 
 public class ASOS extends ABase {
 
@@ -50,7 +51,8 @@ public class ASOS extends ABase {
 		
 		serviceConnector.connect(Clients.SOS);
 	}
-	
+
+	@Override
 	public void sendMessage(Message msg) {
 		serviceConnector.send(msg);
 	}

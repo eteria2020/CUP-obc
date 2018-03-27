@@ -517,7 +517,7 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 	private void navigateTo(SKSearchResult result) {
 
 
-		
+
 		if (result!=null) {
 			dlog.d("navigateTo: set destination to "+ result.toString());
 			Location point = new Location("");

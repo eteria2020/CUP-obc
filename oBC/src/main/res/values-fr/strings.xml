@@ -49,7 +49,7 @@
     <string name="error_http_code_failure">Échec avec le code HTTP</string>
     <string name="error_malformed_url">URL malformées demande</string>
     <string name="error_parsing_invalid_type">Type non valide dans l\'adresse</string>
-    <string name="error_parsing_missing_address">Adresse paramètre introuvable</string>
+    <string name="error_parsing_missing_addresse">Adresse paramètre introuvable</string>
     <string name="error_parsing_missing_geometry">paramètre de géométrie non trouvé</string>
     <string name="error_parsing_missing_latitude">paramètre de latitude introuvable</string>
     <string name="error_parsing_missing_location">paramètre de localisation introuvable</string>
@@ -227,5 +227,10 @@
     <string name="alert_area">Attention, le véhicule est hors de la zone opérationnelle, il ne sera pas possible de fermer le voyage</string>
     <string name="alert_key">N\'oubliez pas d\'éteindre le tableau de bord en tournant la clé avant de quitter la voiture</string>
     <string name="alert_bonus_park">Désormais, vous pouvez gagner 5 minutes de bonus en laissant cette voiture être rechargée dans l\'un des parkings indiqués sur la carte</string>
+    <string name="menu_rent_end_key_on">Please turn off the car before ending the rent</string>
+    <string name="menu_park_mode_suspend_key_on">Please turn off the car before pausing the rent</string>
+    <string name="button_video_tutorial">TUTORIAL</string>
+    <string name="button_assicurazione">ASSICURAZIONE</string>
+    <string name="button_libretto">LIBRETTO</string>
 
 </resources>

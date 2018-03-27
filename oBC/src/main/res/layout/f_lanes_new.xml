@@ -123,15 +123,20 @@
         android:layout_below="@+id/fchn_top_V"
         android:layout_above="@+id/fchn_bottom_V">
 
+        <VideoView
+            android:id="@+id/video"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+
         <ImageView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
             android:id="@+id/imgfsIV"
-            android:layout_alignParentLeft="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
             android:src="@drawable/offline_welcome"
-            android:visibility="visible"
-            android:layout_alignParentTop="true" />
+            android:visibility="visible" />
     </RelativeLayout>
 
 </RelativeLayout>

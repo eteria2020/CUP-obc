@@ -28,6 +28,7 @@ import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.AMainOBC;
+import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Poi;
@@ -67,6 +68,7 @@ import eu.philcar.csg.OBC.server.ZmqSubscriber;
 import eu.philcar.csg.OBC.task.OldLogCleamup;
 import eu.philcar.csg.OBC.task.UDPServer;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -79,6 +81,7 @@ import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -137,6 +140,7 @@ public class ObcService extends Service implements OnTripCallback {
     public static final int MSG_CAR_LOCATION = 34;
     public static final int MSG_CAR_CAN_UPDATE = 35;
     public static final int MSG_CAR_START_CHARGING = 36;
+    public static final int MSG_CAR_KEY_CHECK = 37;
 
     public static final int MSG_CUSTOMER_INFO = 40;
     public static final int MSG_CUSTOMER_CHECKPIN = 41;
@@ -866,6 +870,7 @@ public class ObcService extends Service implements OnTripCallback {
                         } else {
                             intCount = 0;
                             lastIntGpsLocation.set(carInfo.intGpsLocation);
+                            App.resetGPSSwitchCount();
                         }
                     } else {
 
@@ -889,6 +894,7 @@ public class ObcService extends Service implements OnTripCallback {
                         } else {
                             extCount = 0;
                             lastExtGpsLocation.set(carInfo.extGpsLocation);
+                            App.resetGPSSwitchCount();
                         }
 
                     }
@@ -931,6 +937,12 @@ public class ObcService extends Service implements OnTripCallback {
         localHandler.sendMessageDelayed(MessageFactory.checkLogSize(),3000);
         dlog.d("Service created");
         isStarted = true;
+        /*
+        control if documenti of the veichele is present in the device before starting
+         */
+        if(App.hasNetworkConnection) {
+            new DocumentControl().execute();
+        }
     }
 
     @Override
@@ -1673,6 +1685,9 @@ public class ObcService extends Service implements OnTripCallback {
                     obc_io.disableWatchdog();
                     SystemControl.doReboot();
                     break;
+                case "FORCE_REBOOT":
+                    SystemControl.ForceReboot();
+                    break;
 
                 case "SET_CONFIG":
                     dlog.d(ObcService.class.toString() + " executeServerCommands: Setting config :" + cmd.txtarg1);
@@ -2153,6 +2168,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     private boolean startedReboot=false;
 
+    @SuppressLint("HandlerLeak")
     private final Handler privateHandler = new Handler() {
 
 
@@ -2199,6 +2215,7 @@ public class ObcService extends Service implements OnTripCallback {
     };
 
 
+    @SuppressLint("HandlerLeak")
     private final Handler localHandler = new Handler() {
 
         @Override
@@ -2500,6 +2517,10 @@ public class ObcService extends Service implements OnTripCallback {
                     App.Instance.initSharengo();
                     break;
 
+                case MSG_CAR_KEY_CHECK:
+                    App.checkKeyOff = (msg.arg1 == 1 ? true : false);
+                    App.Instance.checkKeyOff();
+                    break;
                 case MSG_SERVER_CHANGE_LOG:
                     App.saveLog = (msg.arg1 == 1 ? true : false);
                     App.Instance.persistSaveLog();
@@ -2746,7 +2767,22 @@ public class ObcService extends Service implements OnTripCallback {
         },15000);*/
     }
 
+    private class DocumentControl extends AsyncTask<URL, Integer, Long> {
 
 
+        @Override
+        protected Long doInBackground(URL... urls) {
 
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Long aLong) {
+
+            super.onPostExecute(aLong);
+            FPdfViewer P2 = new FPdfViewer().newInstance("LIBRETTO",false,true);
+            P2.control("ASSICURAZIONE");
+            P2.control("LIBRETTO");}
+
+    }
 }

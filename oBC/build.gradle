@@ -2,12 +2,15 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "26.0.0"
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         applicationId "eu.philcar.csg.OBC"
         minSdkVersion 17
         targetSdkVersion 19
+        ndk{
+            abiFilters "armeabi-v7a"// add your required cpu architecture
+        }
     }
 
     buildTypes {
@@ -38,4 +41,5 @@ dependencies {
     compile files('libs/activation.jar')
     compile files('libs/additionnal.jar')
     compile files('libs/mail.jar')
+    compile 'com.github.barteksc:android-pdf-viewer:2.8.1'
 }

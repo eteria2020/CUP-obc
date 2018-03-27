@@ -146,18 +146,13 @@
             </LinearLayout>
 
             <LinearLayout android:id="@+id/ll3G_HOME"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/sha_whiteroundedredbox"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
+                android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginBottom="13dp"
-                android:layout_gravity="bottom"
-                android:visibility="visible"
-                android:gravity="center_horizontal"
-                android:layout_marginLeft="9dp">
+                android:background="@drawable/sha_whiteroundedredbox"
+                android:orientation="horizontal"
+                android:visibility="invisible">
 
                 <ImageView
                     android:layout_width="22dp"
@@ -226,30 +221,76 @@ android:visibility="visible" />
             <Button android:id="@+id/fmapSearchB"
                 android:layout_width="140dp" android:layout_height="120dp" android:layout_alignParentLeft="true" android:layout_alignParentTop="true"
                 android:layout_gravity="center_vertical"
-                android:text="@string/button_navigator" android:textColor="@color/text_green" android:textSize="18sp" android:textStyle="bold" android:background="@drawable/sel_button_nav"
-                android:layout_weight="1"
-                android:layout_marginLeft="25dp" />
-
-            <Button android:id="@+id/fmapRadioB"
-                android:layout_width="140dp" android:layout_height="120dp" android:layout_alignBottom="@+id/fmapSearchB" android:layout_alignTop="@+id/fmapSearchB"
-                android:layout_gravity="center_vertical" android:layout_toRightOf="@+id/fmapSearchB" android:background="@drawable/sel_button_radio" android:paddingTop="65dp" android:text="@string/button_radio" android:textColor="@color/text_green" android:textSize="18sp" android:textStyle="bold"
-                android:layout_weight="1"
-                android:layout_marginLeft="25dp" />
-
-            <Button android:id="@+id/button5"
-                android:layout_width="140dp" android:layout_height="120dp" android:layout_alignBottom="@+id/fmapSearchB" android:layout_alignTop="@+id/fmapSearchB"
-                android:layout_gravity="center_vertical" android:layout_toRightOf="@+id/fmapRadioB"
-                android:textColor="@color/text_green" android:textSize="16sp" android:textStyle="bold" android:background="@drawable/sel_button_nav_white" android:visibility="visible"
-                android:layout_weight="1"
-                android:layout_marginLeft="25dp" />
-
-            <Button android:id="@+id/fmapCancelB"
-                android:layout_width="140dp"
-                  android:layout_height="120dp" android:layout_alignBottom="@+id/fmapSearchB" android:layout_alignParentRight="true" android:layout_alignTop="@+id/fmapSearchB" android:layout_gravity="center_vertical"
-                android:text="@string/button_break" android:textColor="@color/text_green" android:textSize="18sp" android:textStyle="bold" android:background="@drawable/sel_button_sosta"
+                android:text="@string/button_navigator"
+                android:textColor="@color/text_green"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:background="@drawable/sel_button_nav"
                 android:layout_weight="1"
                 android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp" />
+                android:gravity="bottom|center"
+                android:paddingBottom="20dp"/>
+
+            <Button android:id="@+id/fmapRadioB"
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:layout_alignBottom="@+id/fmapSearchB"
+                android:layout_alignTop="@+id/fmapSearchB"
+                android:layout_gravity="center_vertical"
+                android:layout_toRightOf="@+id/fmapSearchB"
+                android:background="@drawable/sel_button_radio"
+                android:paddingTop="65dp"
+                android:text="@string/button_radio"
+                android:textColor="@color/text_green"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_weight="1"
+                android:layout_marginLeft="25dp"
+                android:gravity="bottom|center"
+                android:paddingBottom="20dp"/>
+
+            <Button
+                android:id="@+id/fmapCancelB"
+                android:layout_width="158dp"
+                android:layout_height="120dp"
+                android:layout_alignBottom="@+id/fmapSearchB"
+                android:layout_alignTop="@+id/fmapSearchB"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="25dp"
+                android:layout_toRightOf="@+id/fmapRadioB"
+                android:layout_weight="1"
+                android:background="@drawable/sel_button_cancel_red_menu"
+                android:gravity="bottom|center"
+                android:paddingBottom="20dp"
+                android:radius="6dp"
+                android:text="@string/button_end"
+                android:textAlignment="center"
+                android:textColor="@color/text_green"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/fmapParkB"
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:layout_alignBottom="@+id/fmapSearchB"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@+id/fmapSearchB"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_weight="1"
+                android:background="@drawable/sel_button_sosta"
+                android:gravity="bottom|center"
+                android:paddingBottom="20dp"
+                android:text="@string/button_park"
+                android:textAlignment="viewEnd"
+                android:textAllCaps="false"
+                android:textColor="@color/text_green"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -259,70 +300,72 @@ android:visibility="visible" />
             android:layout_marginTop="55dp">
 
             <Button
-                android:id="@+id/fmapMusicB"
+                android:id="@+id/bbb"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
                 android:layout_alignBottom="@+id/fmapSearchB"
                 android:layout_alignTop="@+id/fmapSearchB"
                 android:layout_gravity="center_vertical"
+                android:layout_marginLeft="25dp"
                 android:layout_toRightOf="@+id/fmapRadioB"
+                android:layout_weight="1"
+                android:background="@drawable/sel_button_nav_white"
                 android:textColor="@color/text_green"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:visibility="visible"
-                android:layout_weight="1"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/fmapVideo"
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:layout_alignBottom="@+id/fmapSearchB"
+                android:layout_alignTop="@+id/fmapSearchB"
+                android:layout_gravity="center_vertical"
                 android:layout_marginLeft="25dp"
-                android:text="MUSIC"
-                android:background="@drawable/sel_button_music" />
+                android:layout_toRightOf="@+id/fmapRadioB"
+                android:layout_weight="1"
+                android:background="@drawable/sel_button_video_menu"
+                android:text="@string/button_video_tutorial"
+                android:textColor="@color/text_green"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="visible" />
 
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/fmapLibretto"
                 android:layout_width="140dp"
                 android:layout_height="120dp"
                 android:layout_alignBottom="@+id/fmapSearchB"
                 android:layout_alignTop="@+id/fmapSearchB"
                 android:layout_gravity="center_vertical"
-                android:layout_toRightOf="@+id/fmapRadioB"
-                android:textColor="@color/text_green"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/sel_button_nav_white"
-                android:visibility="visible"
-                android:layout_weight="1"
-                android:layout_marginLeft="25dp" />
-
-            <Button
-                android:id="@+id/button4"
-                android:layout_width="140dp"
-                android:layout_height="120dp"
-                android:layout_alignBottom="@+id/fmapSearchB"
-                android:layout_alignTop="@+id/fmapSearchB"
-                android:layout_gravity="center_vertical"
-                android:layout_toRightOf="@+id/fmapRadioB"
-                android:textColor="@color/text_green"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/sel_button_nav_white"
-                android:visibility="visible"
-                android:layout_weight="1"
-                android:layout_marginLeft="25dp" />
-
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="140dp"
-                android:layout_height="120dp"
-                android:layout_alignBottom="@+id/fmapSearchB"
-                android:layout_alignTop="@+id/fmapSearchB"
-                android:layout_gravity="center_vertical"
-                android:layout_toRightOf="@+id/fmapRadioB"
-                android:textColor="@color/text_green"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/sel_button_nav_white"
-                android:visibility="visible"
-                android:layout_weight="1"
                 android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp" />
+                android:layout_toRightOf="@+id/fmapRadioB"
+                android:layout_weight="1"
+                android:background="@drawable/sel_button_libretto_menu"
+                android:text="@string/button_libretto"
+                android:textColor="@color/text_green"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/fmapAssicurazione"
+                android:layout_width="140dp"
+                android:layout_height="120dp"
+                android:layout_alignBottom="@+id/fmapSearchB"
+                android:layout_alignTop="@+id/fmapSearchB"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_toRightOf="@+id/fmapRadioB"
+                android:layout_weight="1"
+                android:background="@drawable/sel_button_assicurazione_menu"
+                android:text="@string/button_assicurazione"
+                android:textColor="@color/text_green"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="visible" />
         </LinearLayout>
     </LinearLayout>
 

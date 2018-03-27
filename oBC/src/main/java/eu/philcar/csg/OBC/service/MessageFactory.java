@@ -68,6 +68,16 @@ public class MessageFactory {
 		msg.arg1= 1;
 		return msg;
 	}
+	public static Message enableKeycheck() {
+		Message msg  =  Message.obtain(null, ObcService.MSG_CAR_KEY_CHECK);
+		msg.arg1= 1;
+		return msg;
+	}
+	public static Message disableKeycheck() {
+		Message msg  =  Message.obtain(null, ObcService.MSG_CAR_KEY_CHECK);
+		msg.arg1= 0;
+		return msg;
+	}
 	public static Message disableLog() {
 		Message msg  =  Message.obtain(null, ObcService.MSG_SERVER_CHANGE_LOG);
 		msg.arg1= 0;

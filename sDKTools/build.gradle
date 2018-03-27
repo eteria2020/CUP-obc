@@ -2,9 +2,12 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
+        ndk{
+            abiFilters "armeabi-v7a"// add your required cpu architecture
+        }
     }
 
     buildTypes {
