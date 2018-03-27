@@ -1,6 +1,7 @@
 package eu.philcar.csg.OBC.controller.welcome;
 
 import eu.philcar.csg.OBC.ABase;
+import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
@@ -12,6 +13,7 @@ import eu.philcar.csg.OBC.service.MessageFactory;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -201,13 +203,13 @@ public class FMaintenance extends FBase {
 		if(!FMaintenance.this.isVisible()){
 			return;
 		}
-		dlog.d("update App.Charging: "+App.Charging+" chargingPlug: "+carinfo.chargingPlug);
-		if (App.Charging && !carinfo.chargingPlug) {
+		dlog.d("update App.Charging: "+App.Charging+" chargingPlug: "+ carinfo.isChargingPlug());
+		if (App.Charging && !carinfo.isChargingPlug()) {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(true);
 			((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_done);
 		} else {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
-			if (carinfo.chargingPlug)
+			if (carinfo.isChargingPlug())
 				((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_plug_insert);
 			else
 				((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);

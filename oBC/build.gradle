@@ -23,8 +23,9 @@ useLibrary 'org.apache.http.legacy'
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+            signingConfig signingConfigs.vmtest
         }
         vmtest {
             resValue "string", "endpointSharengo", "https://api.localhost.it:8123/"
@@ -43,6 +44,7 @@ useLibrary 'org.apache.http.legacy'
             resValue "string", "endpointSharengo", "https://corestage.sharengo.it:8123/"
             resValue "string", "endpointSharengoBeacon", "http://corestage.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://corestage.sharengo.it/api/"
+            signingConfig signingConfigs.vmtest
             debuggable true
         }
     }
