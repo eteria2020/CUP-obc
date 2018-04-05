@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.skobbler.ngx.SKCoordinate;
 
 import java.io.InputStream;
 import java.security.KeyStore;

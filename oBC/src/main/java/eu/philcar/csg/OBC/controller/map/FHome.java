@@ -85,6 +85,11 @@ public class FHome extends FBase implements OnClickListener {
     }
 
 
+
+    private final static int  MSG_CLOSE_SOC_ALERT = 8;
+    private final static int  MSG_OPEN_SOC_ALERT = 9;
+
+
     private View rootView;
 
     private boolean seenA =false, seenB = false;
@@ -97,12 +102,13 @@ public class FHome extends FBase implements OnClickListener {
     private static boolean animToggle=true, animFull=false;
     private TextView dayTV, timeTV, tvRange;
     private FrameLayout  fmapAlarm, fmapRange;
+    private CarInfo localCarInfo;
     private ImageView parkingStatusIV, adIV, no3gIV; // parkingDirectionIV,
    // private View  outsideAreaWarning;
 
     private List<String> animQueue =new ArrayList<String>();
     private Uri uri;
-    private static int  lastInside=0;//0:no anim 1:anim3g 2:animArea 3:animBoth
+    private static int statusAlertSOC=0, lastInside=0;//0 none played | 1 played 20km | 2 player 5km  //0:no anim 1:anim3g 2:animArea 3:animBoth
     private static Boolean RequestBanner=false;
     private long updateArea=0;
 
@@ -177,6 +183,7 @@ public class FHome extends FBase implements OnClickListener {
         ((Button) view.findViewById(R.id.fmapParkB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapAssicurazione)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapLibretto)).setOnClickListener(this);
+        view.findViewById(R.id.fmapAlertCloseBTN).setOnClickListener(this);
 
         dayTV = (TextView) view.findViewById(R.id.fmap_date_TV);
         timeTV = (TextView) view.findViewById(R.id.fmap_hour_TV);
@@ -417,6 +424,8 @@ public class FHome extends FBase implements OnClickListener {
             tts=null;
         }
 
+        statusAlertSOC = 0;
+
     }
 
 /**
@@ -520,7 +529,11 @@ public class FHome extends FBase implements OnClickListener {
                     }
                 }
                 break;
+            case R.id.fmapAlertCloseBTN:
 
+                localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
+
+                break;
         }
     }
 
@@ -583,52 +596,88 @@ public class FHome extends FBase implements OnClickListener {
  * */
     public void updateCarInfo(CarInfo carInfo) {
 
-        if (carInfo == null)
-            return;
+        try{
 
-        refreshConnectionStatus();
+            if (carInfo == null)
+                return;
 
-        int SOC = carInfo.batteryLevel;
+            localCarInfo = carInfo;
+            refreshConnectionStatus();
 
-        // if Soc==0 means that software has just started, or it is a demo kit or we lost some connection
-        // don't show anything for now
-        if (SOC == 0) {
-            fmapAlarm.setVisibility(View.VISIBLE);
-            fmapRange.setVisibility(View.GONE);
-            return;
-        }
+            int SOC = carInfo.batteryLevel;
 
-
-        if(SOC<15) {
-            if(!seenA) {
-
-                seenA=true;
-                rootView.findViewById(R.id.ivDamages).setBackgroundResource(R.drawable.outofcharge);
-
+            // if Soc==0 means that software has just started, or it is a demo kit or we lost some connection
+            // don't show anything for now
+            if (SOC == 0) {
+                fmapAlarm.setVisibility(View.VISIBLE);
+                fmapRange.setVisibility(View.GONE);
+                return;
             }
 
+            if (FHome.this.isVisible())
+                if(SOC<15) {
 
-        }else
-        if(SOC<=30) {
-            if(!seenB) {
-                //drawChargingStation();
-                seenB=true;
-                rootView.findViewById(R.id.ivDamages).setBackgroundResource(R.drawable.almostoutofcharge);
+                    if (statusAlertSOC <= 1) {
+                        dlog.d("Display popup 5km");
+                        statusAlertSOC = 2;
+                        eventRepository.eventSoc(SOC, "Popup 5km");
+                        rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+                        rootView.findViewById(R.id.ivDamages).setBackgroundResource(R.drawable.outofcharge);
+                        ((FrameLayout) (rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_redalertbox);
+                        ((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
+                        ((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_5km);
+                        localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
+                        //((AMainOBC) getActivity()).player.inizializePlayer();
+                        if (App.USE_TTS_ALERT)
+                            queueTTS(getActivity().getResources().getString(R.string.alert_5km));
+                        else
+                            playAlertAdvice(R.raw.alert_tts_5km, " alert 5km");
+                    }
+                }else
+                if(SOC<=30) {
+                    if (statusAlertSOC <= 0) {
+                        dlog.d("Display popup 20km");
+
+                        statusAlertSOC = 1;
+                        eventRepository.eventSoc(SOC, "Popup 20km");
+                        rootView.findViewById(R.id.ivDamages).setBackgroundResource(R.drawable.almostoutofcharge);
+                        rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+                        ((FrameLayout) (rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_orangealertbox);
+                        ((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
+
+                        ((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_20km);
+                        //localHandler.sendEmptyMessageDelayed(MSG_CLOSE_SOC_ALERT, 20000);
+                        //(rootView.findViewById(R.id.fmapAlertSOCFL)).invalidate(); testinva
+
+                        //((AMainOBC) getActivity()).player.inizializePlayer();
+                        if (App.USE_TTS_ALERT)
+                            queueTTS(getActivity().getResources().getString(R.string.alert_20km));
+                        else
+                            playAlertAdvice(R.raw.alert_tts_20km, " alert 20km");
+                    }
+
+                }
+
+
+            if (SOC <= 30) {
+                if (SOC > 15)
+                    rootView.findViewById(R.id.ivDamages).setBackgroundResource(R.drawable.almostoutofcharge);
+                else
+                    rootView.findViewById(R.id.ivDamages).setBackgroundResource(R.drawable.outofcharge);
+                fmapAlarm.setVisibility(View.VISIBLE);
+                fmapRange.setVisibility(View.GONE);
+            } else {
+                localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
+                rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
+                fmapAlarm.setVisibility(View.GONE);
+                fmapRange.setVisibility(View.VISIBLE);
             }
-
-        }
-
-
-        if (SOC <= 30) {
-            fmapAlarm.setVisibility(View.VISIBLE);
-            fmapRange.setVisibility(View.GONE);
-        } else {
-            fmapAlarm.setVisibility(View.GONE);
             tvRange.setText((SOC>=50?SOC:SOC-10) + " Km");
-            fmapRange.setVisibility(View.VISIBLE);
+
+
+        }catch(Exception e){
+            dlog.e("Exception while handling carInfo",e);
         }
-
-
     }
 /***
  * Update the information related to the bonus near a poi
@@ -759,6 +808,7 @@ public class FHome extends FBase implements OnClickListener {
 /**
  * Handle message to update the time
  * */
+    @SuppressLint("HandlerLeak")
     private Handler localHandler = new Handler() {
 
         @Override
@@ -775,6 +825,25 @@ public class FHome extends FBase implements OnClickListener {
                 case AMainOBC.MSG_UPDATE_TIME:
                     if (msg.obj != null && timeTV != null) {
                         timeTV.setText((String) msg.obj);
+                    }
+                    break;
+                case MSG_CLOSE_SOC_ALERT:
+
+                    localHandler.removeMessages(MSG_CLOSE_SOC_ALERT);
+                    rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
+                    //rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
+                    break;
+                case MSG_OPEN_SOC_ALERT:
+                    localHandler.removeMessages(MSG_OPEN_SOC_ALERT);
+                    if(localCarInfo!=null && localCarInfo.batteryLevel<=15) {
+                        rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+                        rootView.findViewById(R.id.ivDamages).setBackgroundResource(R.drawable.outofcharge);
+                        ((rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_redalertbox);
+                        ((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
+                        ((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_5km);
+                        localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
+                        rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+                        //rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
                     }
                     break;
 

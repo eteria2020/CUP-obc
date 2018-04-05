@@ -19,6 +19,7 @@ import com.j256.ormlite.stmt.UpdateBuilder;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.controller.map.FRadio;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
+import eu.philcar.csg.OBC.data.common.ExcludeSerialization;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.data.model.TripResponse;
@@ -46,7 +47,6 @@ import android.os.Bundle;
 import android.os.Message;
 import android.os.PowerManager.WakeLock;
 import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -237,11 +237,32 @@ public class TripInfo {
         Customer customer = customers.getClienteByCardCode(code);
 
         // If the Card is unknown, send a visual alert and do nothing
-        if (customer==null) {			
-            obc_io.setLcd(null,"SCONOSCIUTA");
-            dlog.d(TripInfo.class.toString()+" handleCard: Card unknown :" + code);
-            eventRepository.eventRfid(0, code);
-            return null;
+        if (customer==null) {
+            if(App.reservation!=null && App.reservation.getCustomer_id()!=null){
+             customer = new Customer(true);
+             customer.id =  Integer.parseInt(App.reservation.getCustomer_id());
+             customer.name = App.reservation.getName();
+             customer.surname = App.reservation.getSurname();
+             customer.mobile = App.reservation.getMobile();
+             customer.enabled = true;
+             customer.language = "";
+             customer.info_display = "";
+             customer.update_timestamp =0;
+             customer.pin = App.reservation.getPin();
+             customer.card_code = App.reservation.getCard_code();
+             customer.encrypt();
+             try {
+                 customers.createOrUpdate(customer);
+             }catch (Exception e){
+                 dlog.e("Exception while creating customer from reservation",e);
+             }
+
+            }else {
+                obc_io.setLcd(null, "SCONOSCIUTA");
+                dlog.d(TripInfo.class.toString() + " handleCard: Card unknown :" + code);
+                eventRepository.eventRfid(0, code);
+                return null;
+            }
         }
 
         customer.decrypt();

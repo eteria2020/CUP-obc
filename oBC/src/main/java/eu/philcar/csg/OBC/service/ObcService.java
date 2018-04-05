@@ -476,7 +476,7 @@ public class ObcService extends Service implements OnTripCallback {
 
         if (this.WITH_ZMQNOTIFY) {
             zmqSubscriber = new ZmqSubscriber(localHandler);
-            localHandler.sendMessageDelayed(MessageFactory.zmqRestart(), 20000);
+            localHandler.sendMessageDelayed(MessageFactory.zmqRestart(), 10000);
             //zmqSubscriber.Start(localHandler);
         }
 
@@ -1654,6 +1654,7 @@ public class ObcService extends Service implements OnTripCallback {
                     //clienti.startWhitelistDownload(this, localHandler);
                     break;
 
+                case "START_TRIP":
                 case "OPEN_TRIP":
                     if (App.currentTripInfo == null)
                         this.notifyCard(cmd.txtarg1, "OPEN", false, false);
@@ -2935,9 +2936,9 @@ public class ObcService extends Service implements OnTripCallback {
             public void run() {
                 try {
 
-                    if(System.currentTimeMillis()/1000- App.currentTripInfo.trip.begin_timestamp<60*5 || carInfo.batteryLevel>=25 || App.lastLocation==null )
+                   /* if(System.currentTimeMillis()/1000- App.currentTripInfo.trip.begin_timestamp<60*5 || carInfo.batteryLevel>=25 || App.lastLocation==null )
                         return;
-
+                   */
                     for(Poi singlePoi : PoiList){
                         if(App.lastLocation.distanceTo(singlePoi.getLoc())<=90){
                                 sendAll(MessageFactory.notifyTripPoiUpdate(1,singlePoi));

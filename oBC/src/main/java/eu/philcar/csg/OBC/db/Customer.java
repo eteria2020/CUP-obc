@@ -84,6 +84,7 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 			isEnctypted=false;
 	}
 
+	@Deprecated
 	public Customer() {
 	}
 

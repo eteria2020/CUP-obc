@@ -11,9 +11,9 @@ import com.google.gson.annotations.SerializedName;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.common.ExcludeSerialization;
+import eu.philcar.csg.OBC.data.model.Pin;
 import eu.philcar.csg.OBC.data.model.ServerResponse;
 import eu.philcar.csg.OBC.db.Customers;
-import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.helpers.DLog;
 import io.reactivex.Observable;
 
@@ -34,6 +34,12 @@ public class Reservation  implements ServerResponse{
 	private long lastDebugTrace;
 	@ExcludeSerialization
 	private boolean local=false;
+	private String customer_id;
+	private String name;
+	private String surname;
+	private String mobile;
+	private String pin;
+	private String card_code;
 	
 	@ExcludeSerialization
 	private boolean _timedOut = false;
@@ -251,10 +257,56 @@ public class Reservation  implements ServerResponse{
     		return false;
     	
     	return true;
-    				
-    	
     }
-	
+
+	public String getCustomer_id() {
+		return customer_id;
+	}
+
+	public void setCustomer_id(String customer_id) {
+		this.customer_id = customer_id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSurname() {
+		return surname;
+	}
+
+	public void setSurname(String surname) {
+		this.surname = surname;
+	}
+
+	public String getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+
+	public String getPin() {
+		return pin;
+	}
+
+	public void setPin(String pin) {
+		this.pin = pin;
+	}
+
+	public String getCard_code() {
+		return card_code;
+	}
+
+	public void setCard_code(String card_code) {
+		this.card_code = card_code;
+	}
+
 	@Override
 	public String toString() {
 		return "Id:" + id + ", timestamp:" + date.toString() + ", card:" + codes.toString() + ",duration:" + duration + ",local:" + local;

@@ -15,10 +15,13 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
@@ -41,6 +44,8 @@ import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
 import com.Hik.Mercury.SDK.Manager.CANManager;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.skobbler.ngx.SKCoordinate;
 import com.skobbler.ngx.SKMaps;
 import com.skobbler.ngx.SKMapsInitSettings;
@@ -69,6 +74,8 @@ import ch.qos.logback.core.util.StatusPrinter;
 import eu.philcar.csg.OBC.controller.map.util.GeoUtils;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.api.ApiModule;
+import eu.philcar.csg.OBC.data.model.AreaResponse;
+import eu.philcar.csg.OBC.data.model.LatLng;
 import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Events;
@@ -90,6 +97,11 @@ import eu.philcar.csg.OBC.service.Reservation;
 import eu.philcar.csg.OBC.service.ServiceConnector;
 import eu.philcar.csg.OBC.service.TripInfo;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -323,7 +335,7 @@ public class App extends MultiDexApplication {
 			URL_Time = "http://corestage.sharengo.it/api/get_date.php";
 			IP_UDP_Beacon = "185.81.1.24";
 			Port_UDP_Beacon = 7600;
-			APP_DATA_PATH="/csg-stage/";
+			APP_DATA_PATH=getString(R.string.app_data_path);
 		}
 		else {
 			URL_Area = "http://core.sharengo.it/api/zone/json.php?";
@@ -616,6 +628,7 @@ public class App extends MultiDexApplication {
 	public static String AreaPolygonMD5;
 	public static ArrayList<double[]> AreaPolygons;
 	public static List<List<SKCoordinate>> nodes;
+	public static List<List<SKCoordinate>> polyline;
 
 	//public static final double[] polygon = new double[]{46.091832, 13.235410, 46.096125, 13.234584, 46.097628, 13.239723, 46.092658, 13.240678};	// Udine
 	//public static final double[] polygon = new double[]{45.402867 , 9.276161, 45.402867 , 9.053406, 45.542358 , 9.053406, 45.542358 , 9.276161};		// Milano
@@ -2052,7 +2065,7 @@ private void  initPhase2() {
 				String str;
 				while ((str = reader.readLine())!=null) {
 					writer.write(str);
-				};
+				}
 				writer.close(); reader.close();
 				oms.close();ims.close();
 			} catch (IOException e) {
@@ -2128,13 +2141,55 @@ private void  initPhase2() {
 	decodeAreaPolygonSkobbler(json);
 	}
 
+	private static Observable<AreaResponse>stringToAreaResponse(String json){
+		Type listType = new TypeToken<List<AreaResponse>>(){}.getType();
+		Gson gson = new Gson();
+		return Observable.fromIterable(gson.fromJson(json,listType));
+	}
+
+	private static Observable<AreaResponse>decodeStringToAreaResponse(String json){
+    	return Observable.just(json)
+				.concatMap(App::stringToAreaResponse);
+	}
+
 	public static void decodeAreaPolygonSkobbler(String json) {
-
-
-		// Set the polygon's nodes
 		nodes = new ArrayList<List<SKCoordinate>>();
+		polyline = new ArrayList<List<SKCoordinate>>();
 
-		JSONArray jArray;
+    	decodeStringToAreaResponse(json) //Area response out now we have to select the maxLat  min and max
+				.concatMap(AreaResponse::initPoints)
+				.concatMap(AreaResponse::initEnvelop)
+				.filter(AreaResponse::insideItaly)
+				.sorted()
+				.take(5)
+				.subscribeOn(Schedulers.computation())
+				.observeOn(Schedulers.io())
+				.subscribe(new Observer<AreaResponse>() {
+					@Override
+					public void onSubscribe(Disposable d) {
+
+					}
+
+					@Override
+					public void onNext(AreaResponse areaResponse) {
+						polyline.add(areaResponse.getEnvelope());
+					}
+
+					@Override
+					public void onError(Throwable e) {
+
+					}
+
+					@Override
+					public void onComplete() {
+
+					}
+				});
+
+
+
+
+		/*JSONArray jArray;
 		try {
 
 			jArray = new JSONArray(json);
@@ -2142,8 +2197,6 @@ private void  initPhase2() {
 			DLog.E("decodeAreaPolygon : ", e);
 			return ;
 		}
-
-
 
 		int n = jArray.length();
 
@@ -2154,16 +2207,78 @@ private void  initPhase2() {
 				JSONArray jarr = jobj.getJSONArray("coordinates");
 				int x  = jarr.length();
 				List<SKCoordinate> node =new ArrayList<>();
+				List<SKCoordinate> envelope =new ArrayList<>();
+				SKCoordinate min = null;
+				SKCoordinate max = null;
+				SKCoordinate maxLat = new SKCoordinate(0,0);
 
 				for (int j=0;j<x;j+=3) {
-					node.add(new SKCoordinate(jarr.getDouble(j ), jarr.getDouble(j+ 1)));
+					SKCoordinate point = new SKCoordinate(0,0);
+					try {
+						point = new SKCoordinate(jarr.getDouble(j), jarr.getDouble(j+1));
+						if(point.getLongitude() == 10.925045013428)
+							DLog.E("Mhh è modena");
+						if(min == null)
+							min = new SKCoordinate(point.getLongitude(),point.getLatitude());
+						if(max== null) {
+							max = new SKCoordinate(point.getLongitude(), point.getLatitude());
+							maxLat = point;
+						}
+
+						if(point.getLatitude()<min.getLatitude()){
+							min.setLatitude(point.getLatitude());
+						}else if(point.getLatitude()>max.getLatitude()) {
+							max.setLatitude(point.getLatitude());
+							maxLat = point;
+						}
+
+						if(point.getLongitude()<min.getLongitude()){
+							min.setLongitude(point.getLongitude());
+						}else if(point.getLongitude()>max.getLongitude())
+							max.setLongitude(point.getLongitude());
+
+					}catch (NumberFormatException e){
+						DLog.E("Exception parsing coordinate while init Points",e);
+					}
+
+
+
+
+					node.add(point);
 				}
+
+				//Keep only the biggest area on screen
+
+
+
+				envelope.clear();
+				Double offset = 0.005;
+				//Set the start of the Polyline as the max lat
+				int indexMaxLat = node.indexOf(maxLat);
+				for( int k =indexMaxLat;k<node.size()-1;k++){
+					envelope.add(node.get(k));
+				}
+				for (int k = 0; k <indexMaxLat; k++){
+					envelope.add(node.get(k));
+				}
+				envelope.add(new SKCoordinate(node.get(indexMaxLat).getLongitude(),node.get(indexMaxLat).getLatitude()+Double.MIN_VALUE));
+				envelope.add(new SKCoordinate(node.get(indexMaxLat).getLongitude(),node.get(indexMaxLat).getLatitude()+offset ));
+				envelope.add(new SKCoordinate( max.getLongitude()+offset*1.25,max.getLatitude()+offset));//1
+				envelope.add(new SKCoordinate( max.getLongitude()+offset*1.25,min.getLatitude()-offset));//2
+				envelope.add(new SKCoordinate( min.getLongitude()-offset*1.25,min.getLatitude()-offset));//3
+				envelope.add(new SKCoordinate( min.getLongitude()-offset*1.25,max.getLatitude()+offset));//4
+				envelope.add(new SKCoordinate(node.get(indexMaxLat).getLongitude(),node.get(indexMaxLat).getLatitude()+offset+Double.MIN_VALUE));//5
+				envelope.add(node.get(indexMaxLat));
+
+
 				nodes.add(node);
+				polyline.add(envelope);
 
 			} catch (Exception e) {
 
+				DLog.E("WTF Exception in ",e);
 			}
-		}
+		}*/
 
 		// Render the polygon on the map
 
@@ -2192,6 +2307,20 @@ private void  initPhase2() {
 		List<SKPolyline> result = new ArrayList<>();
 		for(List<SKCoordinate> node : nodes){
 			SKPolyline polyline = new SKPolyline();
+
+			polyline.setNodes(node);
+			// Set the outline size
+
+
+			result.add(polyline);
+		}
+		return result;
+	}
+
+	public static List<SKPolygon> getSKPolylineEnvelope(){
+		List<SKPolygon> result = new ArrayList<>();
+		for(List<SKCoordinate> node : polyline){
+			SKPolygon polyline = new SKPolygon();
 
 			polyline.setNodes(node);
 			// Set the outline size

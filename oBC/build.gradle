@@ -11,7 +11,8 @@ android {
     }
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
-useLibrary 'org.apache.http.legacy'
+    flavorDimensions "default"
+    useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "eu.philcar.csg.OBC"
         minSdkVersion 17
@@ -23,11 +24,16 @@ useLibrary 'org.apache.http.legacy'
     }
     buildTypes {
         release {
+            resValue "string", "app_data_path", "/csg/"
+            resValue "string", "endpointSharengo", "https://api.sharengo.it:8123/"
+            resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
+            resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             signingConfig signingConfigs.vmtest
         }
         vmtest {
+            resValue "string", "app_data_path", "/csg-vm/"
             resValue "string", "endpointSharengo", "https://api.localhost.it:8123/"
             resValue "string", "endpointSharengoBeacon", "http://api.localhost.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://api.localhost.it/api/"
@@ -35,12 +41,14 @@ useLibrary 'org.apache.http.legacy'
             debuggable true
         }
         debug {
+            resValue "string", "app_data_path", "/csg/"
             resValue "string", "endpointSharengo", "https://api.sharengo.it:8123/"
             resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
             signingConfig signingConfigs.vmtest
         }
         stage {
+            resValue "string", "app_data_path", "/csg-stage/"
             resValue "string", "endpointSharengo", "https://corestage.sharengo.it:8123/"
             resValue "string", "endpointSharengoBeacon", "http://corestage.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://corestage.sharengo.it/api/"
@@ -51,6 +59,12 @@ useLibrary 'org.apache.http.legacy'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    productFlavors {
+        produzione {
+        }
+        develop {
+        }
     }
 }
 
@@ -83,11 +97,8 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.1.0'
     implementation "com.google.dagger:dagger:$DAGGER_VERSION"
-
-
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-
     //Required by Dagger2
     annotationProcessor daggerCompiler
     testAnnotationProcessor daggerCompiler

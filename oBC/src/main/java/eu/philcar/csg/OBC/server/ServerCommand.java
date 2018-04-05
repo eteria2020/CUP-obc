@@ -83,7 +83,20 @@ public class ServerCommand extends BaseResponse {
 		}
 		return list;
 	}
-	
-	
-	
+
+	@Override
+	public String toString() {
+		return "ServerCommand{" +
+				"comandoRaw='" + comandoRaw + '\'' +
+				", id=" + id +
+				", command='" + command + '\'' +
+				", intarg1=" + intarg1 +
+				", intarg2=" + intarg2 +
+				", txtarg1='" + txtarg1 + '\'' +
+				", txtarg2='" + txtarg2 + '\'' +
+				", queued=" + queued +
+				", ttl=" + ttl +
+				", payload='" + payload + '\'' +
+				'}';
+	}
 }

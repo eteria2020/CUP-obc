@@ -54,6 +54,7 @@ import com.skobbler.ngx.map.SKMapSurfaceView;
 import com.skobbler.ngx.map.SKMapSurfaceView.SKOrientationIndicatorType;
 import com.skobbler.ngx.map.SKMapViewHolder;
 import com.skobbler.ngx.map.SKPOICluster;
+import com.skobbler.ngx.map.SKPolygon;
 import com.skobbler.ngx.map.SKPolyline;
 import com.skobbler.ngx.map.SKScreenPoint;
 import com.skobbler.ngx.map.realreach.SKRealReachSettings;
@@ -1455,17 +1456,16 @@ public class FMap extends FBase implements OnClickListener {
 	}
 	private void drawPolyline(){
 		int identifier = 500;
-		List<SKPolyline> areas = App.getSKPolyline();
-		for(SKPolyline area : areas){
-			area.setColor(new float[]{ 22/255f, 164/255f, 71/255f, 1f});
+		List<SKPolygon> areas = App.getSKPolylineEnvelope();
+		for(SKPolygon area : areas){
+			area.setColor(new float[]{ 22/255f, 164/255f, 71/255f, 25/100f});
 						// Set properties for the outline
-			area.setOutlineColor(new float[]{ 22/255f, 164/255f, 71/255f, 1f});
-			area.setOutlineSize(3);
+			area.setOutlineColor(new float[]{ 22/255f, 164/255f, 71/255f, 25/100f});
+			area.setOutlineSize(0);
 			area.setOutlineDottedPixelsSolid(1);
 			area.setOutlineDottedPixelsSkip(1);
-			area.setLineSize(2);
 			area.setIdentifier(identifier++);
-			mapView.addPolyline(area);
+			mapView.addPolygon(area);
 
 		}
 	}
@@ -2377,6 +2377,7 @@ public class FMap extends FBase implements OnClickListener {
 
 
 
+	@SuppressLint("HandlerLeak")
 	private  Handler localHandler = new Handler()  {
 
 		@Override

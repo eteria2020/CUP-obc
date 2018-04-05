@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.data.model.Beacon;
 import eu.philcar.csg.OBC.db.Trip;
@@ -213,6 +214,7 @@ public class CarInfo {
         } else
             this.batteryLevel = (batteryLevel);
 
+        if(BuildConfig.FLAVOR.equals("develop"))
         this.batteryLevel=99;//FOR DEVELOP PURPOSE
 
         App.Instance.setBatteryLevel(this.batteryLevel);

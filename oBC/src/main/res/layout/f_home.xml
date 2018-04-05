@@ -199,18 +199,26 @@
         android:src="@drawable/car_banner_offline"
         android:contentDescription="@string/content_description" android:visibility="visible"/>
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/fmap_top_LL"
+        android:layout_toRightOf="@+id/fmapLeftBorderIV"
+        android:layout_toEndOf="@+id/fmapLeftBorderIV">
 
     <LinearLayout
         android:orientation="vertical"
+        android:id="@+id/fHomeMenuContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/fmap_top_LL"
-        android:layout_toRightOf="@+id/fmapLeftBorderIV"
-        android:layout_toEndOf="@+id/fmapLeftBorderIV"
         android:background="@color/text_green">
 
-        <View android:id="@+id/v1" android:layout_width="match_parent" android:layout_height="13dp" android:layout_alignParentTop="true" android:background="#fdee66"
-android:visibility="visible" />
+        <View android:id="@+id/v1"
+            android:layout_width="match_parent"
+            android:layout_height="13dp"
+            android:layout_alignParentTop="true"
+            android:background="#fdee66"
+            android:visibility="visible" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -293,6 +301,7 @@ android:visibility="visible" />
 
         </LinearLayout>
 
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -368,6 +377,10 @@ android:visibility="visible" />
                 android:visibility="visible" />
         </LinearLayout>
     </LinearLayout>
+        <include layout="@layout/layout_alert_popup"/>
+    </RelativeLayout>
+
+
 
     <RelativeLayout android:id="@+id/rlBody"
         android:layout_width="match_parent"

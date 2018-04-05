@@ -2,6 +2,7 @@ package eu.philcar.csg.OBC.data.datasources.repositories;
 
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -63,16 +64,27 @@ public class SharengoPhpRepository {
 
         if(!RxUtil.isRunning(areaDisposable)) {
             mRemoteDataSource.getArea(App.CarPlate,App.AreaPolygonMD5)
-                    .doOnNext(n -> mDataManager.saveArea(n))
+                    .concatMap(n -> mDataManager.saveArea(n))
+                    //Emit single Area Response at time
+                    .concatMap(Observable::fromIterable)
                     .subscribeOn(Schedulers.io())
-                    .subscribe(new Observer<List<AreaResponse>>() {
+                    .subscribe(new Observer<AreaResponse>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
                             areaDisposable = d;
+                            //App.polyline = new ArrayList<>();
                         }
 
+                        /**
+                         * here I have to parse the response and crate a sort of envelop for the map
+                         * @param areaResponse
+                         */
                         @Override
-                        public void onNext(@NonNull List<AreaResponse> ribot) {
+                        public void onNext(@NonNull AreaResponse areaResponse) {
+                            areaResponse.initPoints();
+                            areaResponse.initEnvelop();
+                            App.polyline.add(areaResponse.getEnvelope());
+
                         }
 
                         @Override
@@ -110,7 +122,17 @@ public class SharengoPhpRepository {
     public Observable<ServerCommand> getCommands(String plate) {
 
         return  mRemoteDataSource.getCommands(plate)
-                .flatMap(n -> mDataManager.handleCommands(n))
+                .flatMap(Observable::fromIterable)
+                .filter(command -> {
+                    if ((command.ttl<=0 || command.queued+command.ttl>System.currentTimeMillis()/1000) || command.command.equalsIgnoreCase("CLOSE_TRIP")) {
+
+                        DLog.D("Command accepted :"+command);
+                        return true;
+                    }else {
+                        DLog.D("Command timeout :"+command);
+                        return false;
+                    }
+                })
                 .doOnSubscribe(n -> {
                     //RxUtil.dispose(commandDisposable);
                     commandDisposable = n;})

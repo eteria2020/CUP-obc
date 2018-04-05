@@ -85,9 +85,9 @@ public class DataManager { //TODO change to interface-type system like api does 
 
     }
 
-    public void saveArea(List<AreaResponse> area){
+    public Observable<List<AreaResponse>> saveArea(List<AreaResponse> area){
 
-        persistArea(area);
+        return persistArea(area);
     }
 
     public Observable<Poi> savePoi(List<Poi> pois) {
@@ -214,7 +214,7 @@ public class DataManager { //TODO change to interface-type system like api does 
     }
 
 
-    private void persistArea(List<AreaResponse> area){
+    private Observable<List<AreaResponse>> persistArea(List<AreaResponse> area){
         File file = new File(App.getAppDataPath(),"area.json");
 
         String result;
@@ -229,6 +229,7 @@ public class DataManager { //TODO change to interface-type system like api does 
         } catch (IOException e) {
             DLog.E("File output error area.json",e);
         }
+        return Observable.just(area);
     }
 
 
