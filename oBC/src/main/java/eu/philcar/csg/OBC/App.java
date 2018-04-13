@@ -28,6 +28,7 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
@@ -1402,6 +1403,7 @@ private void  initPhase2() {
 			dlog.e("App package not found",e1);
 
 		}
+		setDNS();
 
 		try {
 			WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
@@ -1990,7 +1992,18 @@ private void  initPhase2() {
 		loadDefaultCity();
 		loadBmsCountTo90();
 	}
-	
+
+	public void setDNS(){
+		try {
+
+			Runtime rt = Runtime.getRuntime();
+			rt.exec(new String[]{"/system/xbin/su", "-c", "setprop net.dns1 208.67.222.222"});
+			rt.exec(new String[]{"/system/xbin/su", "-c", "setprop net.dns2 8.8.8.8"});
+
+		}catch(Exception e){
+			dlog.e("Impossible to set manually DNS ",e);
+		}
+	}
 	public static String getipAddress() { 
         try {
             for (Enumeration en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
@@ -2149,6 +2162,7 @@ private void  initPhase2() {
 
 	private static Observable<AreaResponse>decodeStringToAreaResponse(String json){
     	return Observable.just(json)
+				.delay(5, TimeUnit.SECONDS) //for faster boot purpose
 				.concatMap(App::stringToAreaResponse);
 	}
 

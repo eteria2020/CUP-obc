@@ -201,8 +201,8 @@ public class SystemControl {
 				rt.exec(new String[]{"/system/xbin/su","-c", "settings put global airplane_mode_on 1"});
 				Thread.sleep(2000);
 				rt.exec(new String[]{"/system/xbin/su","-c", "am broadcast -a android.intent.action.AIRPLANE_MODE --ez state true"});
-				Thread.sleep(5000);
 				dlog.d("...Disabled 3G");
+				Thread.sleep(15000);
 				rt.exec(new String[]{"/system/xbin/su","-c", "settings put global airplane_mode_on 0"});
 				Thread.sleep(2000);
 				rt.exec(new String[]{"/system/xbin/su","-c", "am broadcast -a android.intent.action.AIRPLANE_MODE --ez state true"});

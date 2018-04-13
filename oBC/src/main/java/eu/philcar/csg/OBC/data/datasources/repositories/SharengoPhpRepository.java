@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -272,31 +273,39 @@ public class SharengoPhpRepository {
                 });
     }
 
-    public void sendEvents(final Collection<Event> event){
-        mDataManager.saveEvents(event)
-                .concatMap(e -> mRemoteDataSource.sendEvent(e,mDataManager))
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<EventResponse>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
+    private static boolean sendingEvents;
+    public void sendEvents(final List<Event> event){
+        if(!sendingEvents)
+            Observable.interval(60,TimeUnit.SECONDS)
+                    .take(event.size())
+                    .concatMap(i->Observable.just(event.get(i.intValue())))
+                    .concatMap(mDataManager::saveEvent)
+            /*mDataManager.saveEvents(event)
+                    .delay(10, TimeUnit.SECONDS)*/
+                    .concatMap(e -> mRemoteDataSource.sendEvent(e,mDataManager))
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Observer<EventResponse>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            sendingEvents = true;
+                        }
 
-                    }
+                        @Override
+                        public void onNext(EventResponse eventResponse) {
+                            DLog.D("Receiver Event response");
+                        }
 
-                    @Override
-                    public void onNext(EventResponse eventResponse) {
+                        @Override
+                        public void onError(Throwable e) {
+                            sendingEvents = false;
+                        }
 
-                    }
+                        @Override
+                        public void onComplete() {
+                            sendingEvents = false;
 
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
+                        }
+                    });
     }
 
     public Observable<Reservation> getReservation(final String plate){

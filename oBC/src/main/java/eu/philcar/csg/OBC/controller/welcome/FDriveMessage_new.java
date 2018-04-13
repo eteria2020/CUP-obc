@@ -208,7 +208,7 @@ public class FDriveMessage_new extends FBase {
 					@Override
 					public void run() {
 						try {
-							loadBanner(App.URL_AdsBuilderCar, "START", false);
+							loadBanner(App.URL_AdsBuilderStart, "START", false);
 							getActivity().runOnUiThread(new Runnable() {
 								@Override
 								public void run() {

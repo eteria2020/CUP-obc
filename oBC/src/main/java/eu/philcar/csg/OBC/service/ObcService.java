@@ -476,7 +476,7 @@ public class ObcService extends Service implements OnTripCallback {
 
         if (this.WITH_ZMQNOTIFY) {
             zmqSubscriber = new ZmqSubscriber(localHandler);
-            localHandler.sendMessageDelayed(MessageFactory.zmqRestart(), 10000);
+            localHandler.sendMessageDelayed(MessageFactory.zmqRestart(), 15000);
             //zmqSubscriber.Start(localHandler);
         }
 
@@ -568,6 +568,9 @@ public class ObcService extends Service implements OnTripCallback {
 
         //Start download configs
         startDownloadConfigs();
+
+        //Start download model
+        startDownloadModel();
 
         //Start dequeueing  trips  and events
         privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
@@ -1093,6 +1096,9 @@ public class ObcService extends Service implements OnTripCallback {
                 eventRepository.Reboot("No 3G Reboot");
                 SystemControl.doReboot();
             } else {
+
+                App.Instance.setDNS();
+
                 if (WITH_AUTORESET3G) {
                     SystemControl.Reset3G(this);
                 }
@@ -1129,8 +1135,8 @@ public class ObcService extends Service implements OnTripCallback {
             return;
         }
 
-        String msg = carInfo.getJsonGson(true);
-        if (msg != null) {
+        sendBeacon(carInfo.getJsonGson(true));
+        /*if (msg != null) {
             dlog.d("Sending beacon : " + msg);
             //udpServer.sendBeacon(msg);
 
@@ -1163,7 +1169,7 @@ public class ObcService extends Service implements OnTripCallback {
 //            httpConnector.HttpMethod = HttpConnector.METHOD_GET;
 //            httpConnector.Execute(nc);
 
-        }
+        }*/
 
     }
 
@@ -2031,6 +2037,17 @@ public class ObcService extends Service implements OnTripCallback {
         http.Execute(rc);*/
     }
 
+
+    public void startDownloadModel() {
+        dlog.d("Start Downloading model");
+        apiRepository.getModel();
+        /*HttpsConnector http = new HttpsConnector(this);
+        http.SetHandler(privateHandler);
+        ConfigsConnector rc = new ConfigsConnector();
+        rc.setCarPlate(App.CarPlate);
+        http.Execute(rc);*/
+    }
+
     public void notifyServerMessage(int what, int value, String response) {
         dlog.d("Handle notifyServerMessage : " + what + " => " + value);
         switch (what) {
@@ -2316,10 +2333,10 @@ public class ObcService extends Service implements OnTripCallback {
             privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
             privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
 
-            if(fourHurScheduler%2==0) {
+            //if(fourHurScheduler%2==0) {
                 localHandler.sendMessage(MessageFactory.zmqRestart());
                 App.canRestartZMQ=true;
-            }
+            //}
             if(App.currentTripInfo==null && System.currentTimeMillis()- App.AppScheduledReboot.getTime()>24*60*60*1000 && !startedReboot){
                 startedReboot=true;
                 if(App.reservation!=null) {

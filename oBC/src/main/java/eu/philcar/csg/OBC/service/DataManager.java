@@ -19,6 +19,7 @@ import eu.philcar.csg.OBC.data.datasources.api.SharengoService;
 import eu.philcar.csg.OBC.data.model.AreaResponse;
 import eu.philcar.csg.OBC.data.model.CommandResponse;
 import eu.philcar.csg.OBC.data.model.ConfigResponse;
+import eu.philcar.csg.OBC.data.model.ModelResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Customers;
@@ -82,6 +83,12 @@ public class DataManager { //TODO change to interface-type system like api does 
     public void saveConfig(ConfigResponse customer) {
 
         App.Instance.setConfig(customer.getJson(),null);
+
+    }
+
+    public void saveModel(ModelResponse model) {
+
+        DLog.D("Model car is" + model.toString());
 
     }
 

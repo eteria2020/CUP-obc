@@ -9,11 +9,13 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.SharengoDataSource;
 import eu.philcar.csg.OBC.data.model.ConfigResponse;
+import eu.philcar.csg.OBC.data.model.ModelResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.RxUtil;
 import eu.philcar.csg.OBC.service.DataManager;
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -30,6 +32,7 @@ public class SharengoApiRepository {
     private Disposable customerDisposable;
     private Disposable employeeDisposable;
     private Disposable configDisposable;
+    private Disposable modelDisposable;
 
     @Inject
     public SharengoApiRepository(DataManager mDataManager, SharengoDataSource mRemoteDataSource) {
@@ -173,6 +176,51 @@ public class SharengoApiRepository {
                         public void onComplete() {
                             DLog.I("Synced successfully!");
                             RxUtil.dispose(configDisposable);
+                        }
+                    });
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                      MODEL                                                 //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public void stopModel(){
+        if (modelDisposable != null)
+            modelDisposable.dispose();
+    }
+
+    public void getModel(){
+
+        if(!RxUtil.isRunning(modelDisposable)) {
+            mRemoteDataSource.getModel(App.CarPlate)
+                    .concatMap(Observable::fromIterable)
+                    .doOnNext(n -> mDataManager.saveModel(n))
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Observer<ModelResponse>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
+                            modelDisposable = d;
+                        }
+
+                        @Override
+                        public void onNext(@NonNull ModelResponse ribot) {
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            if(e instanceof ErrorResponse)
+                                DLog.E("Error syncing getConfig", ((ErrorResponse)e).error);
+                            RxUtil.dispose(modelDisposable);
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            DLog.I("Synced successfully!");
+                            RxUtil.dispose(modelDisposable);
                         }
                     });
         }

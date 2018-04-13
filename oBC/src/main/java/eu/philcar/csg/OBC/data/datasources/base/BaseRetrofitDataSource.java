@@ -13,11 +13,22 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.service.DataManager;
 import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import retrofit2.Response;
 import retrofit2.adapter.rxjava2.Result;
 
 public abstract class BaseRetrofitDataSource {
+
+    private CompositeDisposable mSubscriptions;
+
+    protected void addDisposable(Disposable d){
+        if(mSubscriptions == null || mSubscriptions.isDisposed()) {
+            mSubscriptions = new CompositeDisposable();
+        }
+        mSubscriptions.add(d);
+    }
 
     protected <T> ObservableTransformer<Result<T>, T> handleRetrofitRequest() {
 

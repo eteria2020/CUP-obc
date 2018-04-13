@@ -3,6 +3,7 @@ package eu.philcar.csg.OBC.data.datasources.api;
 import java.util.List;
 
 import eu.philcar.csg.OBC.data.model.ConfigResponse;
+import eu.philcar.csg.OBC.data.model.ModelResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
 import io.reactivex.Observable;
@@ -25,4 +26,8 @@ public interface SharengoApi {
 
     @GET("configs")
     Observable<Result<ConfigResponse>> getConfigs(@Query("car_plate") String car_plate);
+
+
+    @GET("carmodel")
+    Observable<Result<List<ModelResponse>>> getModel(@Query("plate") String car_plate);
 }
