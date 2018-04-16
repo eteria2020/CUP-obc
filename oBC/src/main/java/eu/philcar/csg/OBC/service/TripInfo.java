@@ -33,6 +33,8 @@ import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.server.TripsConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.server.ReservationConnector;
+import eu.philcar.csg.OBC.task.OdoController;
+import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 
 import android.os.Bundle;
 import android.os.Message;
@@ -128,6 +130,7 @@ public class TripInfo {
                 customer.decrypt();
                 isOpen = true;
                 cardCode = customer.card_code;
+                OptimizeDistanceCalc.init(); //change to retrive data from sharedPreferences
             } catch (SQLException e) {
                 dlog.e("Error retriving customer:",e);
             } catch (Exception e) {
@@ -148,7 +151,7 @@ public class TripInfo {
     /**
      * Manage card action.
      * TODO Refactor extracting this method to a specific Class.
-     * 
+     *
      * @param code
      * @param event
      * @param carInfo
@@ -277,7 +280,8 @@ public class TripInfo {
                     Events.eventRfid(1, code+" "+event);
                     hasBeenStopped =false;
                     service.sendBeacon();
-                    dlog.d(TripInfo.class.toString()+" handleCard: Car opened ");
+                    dlog.d(TripInfo.class.toString() + " handleCard: Car opened ");
+                    OptimizeDistanceCalc.init(); // momo inizializzare il tutto per poter calcolare la distanza percorsa.
                 } else
                     obc_io.setLcd(null,"Errore sistema");
 
@@ -350,7 +354,7 @@ public class TripInfo {
                         service.setDisplayStatus(false,15);
                         service.sendBeacon();
 
-
+                        OptimizeDistanceCalc.Controller(OdoController.PAUSE); // momo metti in pausa il calcolo, la macchina e' ferma
                         return MessageFactory.notifyTripParkModeCardBegin();
                     } else {    //customer rientra
 
@@ -645,10 +649,10 @@ public class TripInfo {
 
         this.customer = customer;
         this.isOpen=true;
-
-        trip = trips.Begin(App.CarPlate,customer, carInfo.location, App.fuel_level, App.km);
-
-
+        if(OptimizeDistanceCalc.totalDistance != 0)
+             trip = trips.Begin(App.CarPlate,customer, carInfo.location, App.fuel_level, (int) OptimizeDistanceCalc.totalDistance/1000);
+        else
+            trip = trips.Begin(App.CarPlate,customer, carInfo.location, App.fuel_level, 0);
 
         App.currentTripInfo = this;
 
@@ -673,6 +677,7 @@ public class TripInfo {
 
         this.isOpen=false;
         this.isMaintenance = false;
+        OptimizeDistanceCalc.Controller(OdoController.STOP);
     }
 
 
@@ -686,7 +691,10 @@ public class TripInfo {
 
 
         trip.end_battery = App.fuel_level;
-        trip.end_km =  App.km;
+        if(OptimizeDistanceCalc.totalDistance != 0)
+            trip.end_km = (int) OptimizeDistanceCalc.totalDistance/1000;
+        else
+            trip.end_km=0;
         trip.end_time = new Date();
         trip.end_timestamp = System.currentTimeMillis()/1000;
 
@@ -720,7 +728,9 @@ public class TripInfo {
             App.Instance.setParkModeStarted(new Date());
             App.Instance.persistParkModeStarted();
             rmsg.arg1 = 1;
-        } else if (mode==0 && App.getParkModeStarted()!=null) {
+            OptimizeDistanceCalc.Controller(OdoController.PAUSE);
+        } else if (mode == 0 && App.getParkModeStarted() != null) {
+            OptimizeDistanceCalc.resume();
             dlog.d("Stopping park mode");
             long diff = (new Date()).getTime() - App.getParkModeStarted().getTime();
             if (hasBeenStopped) {
@@ -918,8 +928,10 @@ public class TripInfo {
                 // Apri una nuova trip che sostituisce la precedente
                 DbManager dbm = App.Instance.dbManager;
                 Trips trips = dbm.getCorseDao();
-
-                trip = trips.Begin(App.CarPlate,customer, carInfo.location, App.fuel_level, App.km);
+                if(OptimizeDistanceCalc.totalDistance != 0)
+                    trip = trips.Begin(App.CarPlate, customer, carInfo.location, App.fuel_level, (int) OptimizeDistanceCalc.totalDistance/1000);
+                else
+                    trip = trips.Begin(App.CarPlate, customer, carInfo.location, App.fuel_level, 0);
                 dlog.d("New trip: " + trip.toString());
                 trip.id_parent = id_parent;
                 trip.n_pin = n_pin;

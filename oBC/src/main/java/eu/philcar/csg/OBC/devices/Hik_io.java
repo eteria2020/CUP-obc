@@ -46,6 +46,9 @@ import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.Reservation;
+//import eu.philcar.csg.OBC.task.DataLogger;
+import eu.philcar.csg.OBC.task.OdoController;
+import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 
 //import eu.philcar.csg.OBC.R;
 
@@ -1130,7 +1133,10 @@ public class Hik_io implements LowLevelInterface {
 	            b.putInt("Km", vehileOdoMeter);;
 				obcService.notifyCarInfo(b);
 
-	            
+				if(vehileOdoMeter>0){
+					OptimizeDistanceCalc.Controller(OdoController.RUNonChangeOdo,vehileOdoMeter);
+				}
+
 	        }
 
 	        @Override
@@ -1339,8 +1345,9 @@ public class Hik_io implements LowLevelInterface {
 	        @Override
 	        public void onSensorTempValueChange(int sensorIndex, int tempValue) throws RemoteException {
 	            // TODO Auto-generated method stub
-	            super.onSensorTempValueChange(sensorIndex, tempValue);
-	           /* dlog.i("onSensorTempValueChange(sensorIndex, tempValue):("
+				super.onSensorTempValueChange(sensorIndex, tempValue);
+				obcService.setOnSensorTempValue(sensorIndex,tempValue);
+				/* dlog.i("onSensorTempValueChange(sensorIndex, tempValue):("
 	                    + sensorIndex + "," + tempValue + ")");*/
 	        }
 

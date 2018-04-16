@@ -37,6 +37,7 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.CarInfo;
+import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -159,7 +160,7 @@ public class FHome extends FBase implements OnClickListener {
         ((Button) view.findViewById(R.id.fmapSOSB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapSearchB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapRadioB)).setOnClickListener(this);
-       // ((Button) view.findViewById(R.id.fmapMusicB)).setOnClickListener(this);
+        ((Button) view.findViewById(R.id.ODO)).setOnClickListener(this); // momo debug
         //((Button) view.findViewById(R.id.fmapFuelStationsB)).setOnClickListener(this); rimosso su richiesta mkt
         ((Button) view.findViewById(R.id.fmapCancelB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapParkB)).setOnClickListener(this);
@@ -425,6 +426,11 @@ public class FHome extends FBase implements OnClickListener {
 
             case R.id.fmapSearchB://Search
                 ((ABase) getActivity()).pushBackFragment(FMap.newInstance(), FMap.class.getName(), true);
+
+                break;
+
+            case R.id.ODO://Search
+                ((ABase) getActivity()).pushFragment(OptimizeDistanceCalc.newInstance(), OptimizeDistanceCalc.class.getName(), true);
 
                 break;
 

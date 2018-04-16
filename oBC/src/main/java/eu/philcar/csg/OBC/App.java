@@ -83,6 +83,7 @@ import eu.philcar.csg.OBC.service.ParkMode;
 import eu.philcar.csg.OBC.service.Reservation;
 import eu.philcar.csg.OBC.service.ServiceConnector;
 import eu.philcar.csg.OBC.service.TripInfo;
+import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Application;
@@ -452,6 +453,7 @@ public class App extends Application {
 	}
 
 	public static int   km=0;
+	public static int   km2=0;
 	public static long  whiteListSize=0;
 	public static int   tabletBatteryTemperature=0;
 	public static int   tabletBatteryLevel=0;
@@ -1104,7 +1106,7 @@ public void loadRadioSetup() {
 
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		StatusPrinter.print(lc);
-
+		OptimizeDistanceCalc.context = getApplicationContext();
 		//configureLogbackDirectly(getAppLogPath(),"logtest");
 		//SystemControl.InsertAPN(this, "");
 
@@ -1572,7 +1574,8 @@ private void  initPhase2() {
 	}
 
 	public  void setKm( int km) {
-
+		if(OptimizeDistanceCalc.totalDistance != 0)
+			km = (int) OptimizeDistanceCalc.totalDistance/1000; // momo
 		if (km==App.km || km==0)
 			return;
 

@@ -311,7 +311,6 @@ public class SystemControl {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 	public static void doReboot() {
 		//If there is another reboot in progress not older than 6 hour : ignore

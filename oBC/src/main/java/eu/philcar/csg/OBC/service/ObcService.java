@@ -4,6 +4,8 @@ package eu.philcar.csg.OBC.service;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -19,8 +21,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 
 import org.acra.ACRA;
+import org.joda.time.LocalDateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -65,7 +70,9 @@ import eu.philcar.csg.OBC.server.UdpServer;
 import eu.philcar.csg.OBC.server.UploaderLog;
 import eu.philcar.csg.OBC.server.ZmqRequester;
 import eu.philcar.csg.OBC.server.ZmqSubscriber;
+//import eu.philcar.csg.OBC.task.DataLogger;
 import eu.philcar.csg.OBC.task.OldLogCleamup;
+import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 import eu.philcar.csg.OBC.task.UDPServer;
 
 import android.annotation.SuppressLint;
@@ -84,6 +91,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -93,6 +101,8 @@ import android.os.PowerManager.WakeLock;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.telephony.SmsManager;
+
+import com.google.gson.Gson;
 
 public class ObcService extends Service implements OnTripCallback {
 
@@ -230,6 +240,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     ScheduledExecutorService serverUpdateScheduler;
     ScheduledExecutorService tripUpdateScheduler;
+    ScheduledExecutorService dataLoggerScheduler;
     ScheduledExecutorService tripPoiUpdateScheduler;
     ScheduledExecutorService virtualBMSUpdateScheduler;
     ScheduledExecutorService gpsCheckScheduler;
@@ -547,6 +558,7 @@ public class ObcService extends Service implements OnTripCallback {
         privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
         privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
 
+        dataLoggerScheduler = Executors.newSingleThreadScheduledExecutor();
         // Start scheduler for server query
         serverUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
         //Start scheduler for CAN query
@@ -825,15 +837,29 @@ public class ObcService extends Service implements OnTripCallback {
                     sendAll(msg);*/
 
 
-
-
-
                 } catch (Exception e) {
                     dlog.e("virtualBMSUpdateScheduler error", e);
                 }
             }
 
         }, 15, 120, TimeUnit.SECONDS);
+
+        dataLoggerScheduler.scheduleAtFixedRate(new Runnable() {
+
+          //  private DataLogger dataLogger = new DataLogger();
+
+            @Override
+            public void run() {
+                try {
+
+                    Run();
+
+                } catch (Exception e) {
+                    dlog.e("Data logger error", e);
+                }
+            }
+
+        }, 10, 10, TimeUnit.SECONDS);
 
         gpsCheckScheduler.scheduleAtFixedRate(new Runnable() {
 
@@ -2782,7 +2808,236 @@ public class ObcService extends Service implements OnTripCallback {
             super.onPostExecute(aLong);
             FPdfViewer P2 = new FPdfViewer().newInstance("LIBRETTO",false,true);
             P2.control("ASSICURAZIONE");
-            P2.control("LIBRETTO");}
+            P2.control("LIBRETTO");
+        }
 
     }
+
+
+
+
+    public static String FileName;
+    public static SimpleDateFormat fileDate;
+    public static String directory = Environment.getExternalStorageDirectory() + "/DataLogger/";
+    public static JSONObject j =  new JSONObject();
+    public int Sec = 15;
+    public int [] SensorTempValue = {-3000,-3000,-3000,-3000,-3000,-3000,-3000};
+
+    public void Run() throws JSONException {
+        SimpleDateFormat d2 = new SimpleDateFormat("yyyyMMdd");
+        String TodayDate = d2.format(new Date());
+        if(FileName != null)
+        {
+            if(Integer.parseInt(FileName) < Integer.parseInt(TodayDate)  ) {
+                deleteOldLog();
+                File file= new File (directory+FileName +".json");
+                FileWriter output= null;
+                try {
+                    output = new FileWriter(file,true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    output.write(']');
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                FileName = TodayDate;
+                getData();
+            }else{
+                FileName = TodayDate;
+                getData();
+            }
+
+        } else{
+           // fileDate = new SimpleDateFormat(d2.toString());
+            FileName = TodayDate;
+            getData();
+        }
+
+    }
+    public void deleteOldLog(){
+        SimpleDateFormat d2 = new SimpleDateFormat("yyyyMMdd");
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MONTH, -1);
+        int LastmonthDate = Integer.parseInt(d2.format(cal.getTime()));
+        File folder = new File(directory);
+        if (folder.exists()) {
+            File[] fList = folder.listFiles();
+
+            if (fList.length > 0) {
+                for(int i =0; i<fList.length; i++){
+                   int x =  Integer.parseInt(fList[i].getName().replace(".json",""));
+                   if(Integer.parseInt(fList[i].getName().replace(".json","")) < LastmonthDate)
+                   {
+                       fList[i].delete();
+                   }
+                }
+
+            }
+
+
+                }else
+                    return;
+
+
+
+
+        }
+
+
+
+
+    public void setOnSensorTempValue(int index, int onSensorTempValue) {
+        this.SensorTempValue[index] = onSensorTempValue;
+    }
+
+    @SuppressLint("DefaultLocale")
+    public void getData() throws JSONException {
+
+        for (int i = 0; i < Data.values().length; i++) {
+            getValue(Data.values()[i]);
+        }
+        Gson js = new Gson();
+        float[] Vcell = getCellVoltages();
+        float max = Vcell[0];
+        float min = Vcell[0];
+        float Vcell_sum = 0;
+        for (int i = 0; i < Vcell.length; i++) {
+            Vcell_sum = Vcell_sum+Vcell[i];
+            if (Vcell[i] > max) {
+                max = Vcell[i];
+            }
+            if (Vcell[i] < min) {
+                min = Vcell[i];
+            }
+        }
+        setData(Data.V_MAX_CELL.toString(), String.format("%.02f",max));
+        setData(Data.V_MIN_CELL.toString(), String.format("%.02f",min));
+        try {
+          //  Vcell = js.toJson();
+            setData(Data.V_BATTERY.toString(), String.format("%.02f",Vcell_sum));
+        } catch (Exception e) {
+            //Vcell = "-1";
+
+            setData(Data.V_BATTERY.toString(),String.valueOf("-1"));
+        }
+        int i =0;
+        float meanTEMP = 0;
+        for(int c=0; c< 7; c++)
+        {
+            if(SensorTempValue[c] > -10 && SensorTempValue[c] <45 )
+            {
+                i = i+1;
+                meanTEMP = meanTEMP + SensorTempValue[c];
+            }
+        }
+        if(i>0){
+            meanTEMP = meanTEMP / i;
+            setData(Data.MEAN_TEMP.toString(),  String.format("%.02f",meanTEMP));
+        } else
+            setData(Data.MEAN_TEMP.toString(),  "-3000");
+
+        try {
+            SaveToFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @SuppressLint("DefaultLocale")
+    public void getValue(Data data) throws JSONException {
+        switch (data){
+            case KM:
+                setData(data.toString(), String.format("%.02f",OptimizeDistanceCalc.totalDistance/1000));
+                break;
+
+            case SOC:
+                try {
+                    setData(data.toString(), String.valueOf(getSOCValue()));
+                }catch (Exception e){
+                    setData(data.toString(), String.valueOf(-1));
+                }
+                break;
+
+            case AMPER:
+                try {
+                    int AMP = getCurrentValue();
+                    setData(data.toString(), String.valueOf(AMP));
+                }catch (Exception e){
+                    setData(data.toString(), String.valueOf(-1));
+                }
+                break;
+
+            case TIME:
+                setData(data.toString(), String.valueOf(LocalDateTime.now()));
+                break;
+
+            case MEAN_TEMP:
+                //   setData(data.toString(), String.valueOf(LocalDateTime.now().getHourOfDay())+':'+LocalDateTime.now().getMinuteOfHour());
+
+                break;
+
+            case V_BATTERY:
+                //  setData(data.toString(), getCellVoltages().toString());
+                break;
+
+            case V_MAX_CELL:
+
+                break;
+
+            case V_MIN_CELL:
+                break;
+
+            case KM_FROM_TRIP_BEG:
+                setData(data.toString(), String.format("%.02f",OptimizeDistanceCalc.tripDistanceValue/1000));
+                break;
+            default:
+
+        }
+    }
+    public void setData(String name, String value) throws JSONException {
+        j.put(name,value);
+    }
+
+    public void SaveToFile() throws IOException {
+
+
+        File file= new File (directory+FileName +".json");
+        FileWriter output;
+        if(file.exists()) {
+            output = new FileWriter(file,true);
+            output.write(','+j.toString());
+        }
+        else {
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+            output = new FileWriter(file);
+            output.write('['+j.toString());
+        }
+
+        output.close();
+
+    }
+
+
+    public enum  Data{
+        TIME,
+        V_BATTERY,
+        AMPER,
+        V_MAX_CELL,
+        V_MIN_CELL,
+        MEAN_TEMP,
+        SOC,
+        KM,
+        KM_FROM_TRIP_BEG
+    }
+
+
 }

@@ -28,6 +28,8 @@ import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.UrlTools;
+import eu.philcar.csg.OBC.task.OdoController;
+import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 
 import android.location.Location;
 import android.location.LocationListener;
@@ -993,6 +995,9 @@ public class CarInfo {
 
 
         public void onLocationChanged(Location loc) {
+            if(loc != null) {
+                OptimizeDistanceCalc.Controller(OdoController.RUNonChangGps,loc);
+            }
 
             intGpsLocation = loc;
 

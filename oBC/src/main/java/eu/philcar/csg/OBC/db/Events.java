@@ -23,6 +23,7 @@ import eu.philcar.csg.OBC.server.TripsConnector;
 import eu.philcar.csg.OBC.server.EventsConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.service.TripInfo;
+import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 
 public class Events extends DbTable<Event,Integer> {
 
@@ -282,8 +283,11 @@ public class Events extends DbTable<Event,Integer> {
 		
 		event.intval = intValue;
 		event.txtval = strValue;
-		
-		event.km = App.km;
+
+		if(OptimizeDistanceCalc.totalDistance != 0)
+			event.km = (int) OptimizeDistanceCalc.totalDistance; // momo
+		else
+			event.km = 0;
 		event.battery = App.fuel_level;
 		
 		if (App.currentTripInfo!=null  && App.currentTripInfo.trip!=null) {
