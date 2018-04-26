@@ -18,6 +18,11 @@ import com.j256.ormlite.stmt.UpdateBuilder;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.controller.map.FRadio;
+import eu.philcar.csg.OBC.data.common.ErrorResponse;
+import eu.philcar.csg.OBC.data.common.ExcludeSerialization;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
+import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.BusinessEmployees;
 import eu.philcar.csg.OBC.db.Customer;
@@ -25,19 +30,23 @@ import eu.philcar.csg.OBC.db.Customers;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.db.DbManager;
-import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.CardRfid;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.UrlTools;
-import eu.philcar.csg.OBC.server.TripsConnector;
-import eu.philcar.csg.OBC.server.HttpConnector;
+import io.reactivex.Observable;
 import eu.philcar.csg.OBC.server.ReservationConnector;
+import eu.philcar.csg.OBC.task.OdoController;
+import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.PowerManager.WakeLock;
-import android.widget.Toast;
+import android.support.annotation.NonNull;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -49,6 +58,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import javax.inject.Inject;
 
 /**
  * This Class represents all information of a Trip
@@ -64,6 +75,11 @@ public class TripInfo {
     }
 
     private static final String DEFAULT_PLATE = "XH123KM";
+
+    @Inject
+    SharengoPhpRepository phpRepository;
+    @Inject
+    EventRepository eventRepository;
 
     // Properties
     public Customer customer;
@@ -87,12 +103,23 @@ public class TripInfo {
     // Standard Log Object
     private DLog  dlog = new DLog(TripInfo.class);
 
+    private final Context mContext;
+
+    public TripInfo(Context context) {
+        mContext = context;
+        App.get(mContext).getComponent().inject(this);
+
+    }
+
     /**
      * Class Initializer
      * 
      * @throws SQLException
      * @throws Exception
      */
+
+
+
     public void init() {
         // Getting data from DB
         DbManager dbm = App.Instance.dbManager;
@@ -128,6 +155,7 @@ public class TripInfo {
                 customer.decrypt();
                 isOpen = true;
                 cardCode = customer.card_code;
+                OptimizeDistanceCalc.init(); //change to retrive data from sharedPreferences
             } catch (SQLException e) {
                 dlog.e("Error retriving customer:",e);
             } catch (Exception e) {
@@ -148,7 +176,7 @@ public class TripInfo {
     /**
      * Manage card action.
      * TODO Refactor extracting this method to a specific Class.
-     * 
+     *
      * @param code
      * @param event
      * @param carInfo
@@ -184,8 +212,8 @@ public class TripInfo {
             if(card!=null && !isOpen){
                 dlog.d("Passaggio card doorsOnly apertura porte in corso! id card: "+card.toString());
                 obc_io.setDoors(null, 1,"Porte Aperte");  //Sole se trip registrata su db apri le portiere
-                Events.eventRfid(6, code + " "+ card.getName());
-                Events.eventCleanliness(0, 0);
+                eventRepository.eventRfid(6, code + " "+ card.getName());
+                eventRepository.eventCleanliness(0, 0);
                 return null;
             }
         }
@@ -203,17 +231,38 @@ public class TripInfo {
 
         // Getting DB
         DbManager dbm = App.Instance.dbManager;
-        HttpConnector http;
+        //HttpConnector http;
 
         Customers customers = dbm.getClientiDao();
         Customer customer = customers.getClienteByCardCode(code);
 
         // If the Card is unknown, send a visual alert and do nothing
-        if (customer==null) {			
-            obc_io.setLcd(null,"SCONOSCIUTA");
-            dlog.d(TripInfo.class.toString()+" handleCard: Card unknown :" + code);
-            Events.eventRfid(0, code);
-            return null;
+        if (customer==null) {
+            if(App.reservation!=null && App.reservation.getCustomer_id()!=null){
+             customer = new Customer(true);
+             customer.id =  Integer.parseInt(App.reservation.getCustomer_id());
+             customer.name = App.reservation.getName();
+             customer.surname = App.reservation.getSurname();
+             customer.mobile = App.reservation.getMobile();
+             customer.enabled = true;
+             customer.language = "";
+             customer.info_display = "";
+             customer.update_timestamp =0;
+             customer.pin = App.reservation.getPin();
+             customer.card_code = App.reservation.getCard_code();
+             customer.encrypt();
+             try {
+                 customers.createOrUpdate(customer);
+             }catch (Exception e){
+                 dlog.e("Exception while creating customer from reservation",e);
+             }
+
+            }else {
+                obc_io.setLcd(null, "SCONOSCIUTA");
+                dlog.d(TripInfo.class.toString() + " handleCard: Card unknown :" + code);
+                eventRepository.eventRfid(0, code);
+                return null;
+            }
         }
 
         customer.decrypt();
@@ -244,17 +293,18 @@ public class TripInfo {
                         this.isMaintenance = App.reservation.isMaintenance();					
                         if (!App.reservation.isLocal()) {
                             //if (!this.isMaintenance) {
-                            HttpConnector rhttp = new HttpConnector(service);
+
+                            phpRepository.consumeReservation(App.reservation.id);
+
+                            /*HttpConnector rhttp = new HttpConnector(service);
                             ReservationConnector rc = new ReservationConnector();
                             rc.setTarga(App.CarPlate);
                             rc.setConsumed(App.reservation.id);
-                            rhttp.Execute(rc);
-                            App.reservation = null;  //Cancella la prenotazione in locale
-                            App.Instance.persistReservation();
+                            rhttp.Execute(rc);*/
                             //}
                         } else {
                             dlog.d(TripInfo.class.toString()+" handleCard: Local out of order reservation");
-                            Events.TripOutOfOrder(code);
+                            eventRepository.TripOutOfOrder(code);
                         }
 
                     } else {    //... altrimenti segnala che ? prenotata e non fare nulla
@@ -268,39 +318,22 @@ public class TripInfo {
 
                 cardCode = code;					
 
-                if (OpenTrip(carInfo, customer)) {
-                    obc_io.setLcd(null, " Auto in uso");
-                    obc_io.setDoors(null, 1,customer.info_display);  //Sole se trip registrata su db apri le portiere
-                    //obc_io.setEngine(null, 1); //TODO: RIMUOVERE!!!! Il motore si dovr? abilitare solo dopo il check del pin
-                    obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
-                    obc_io.setTag(null,cardCode);
-                    Events.eventRfid(1, code+" "+event);
+                if (OpenTripNew(carInfo, customer,service, obc_io)) {
+
+                    eventRepository.eventRfid(1, code+" "+event);
                     hasBeenStopped =false;
-                    service.sendBeacon();
-                    dlog.d(TripInfo.class.toString()+" handleCard: Car opened ");
+                    dlog.d(TripInfo.class.toString() + " handleCard: Car opened ");
+                    OptimizeDistanceCalc.init(); // momo inizializzare il tutto per poter calcolare la distanza percorsa.
                 } else
                     obc_io.setLcd(null,"Errore sistema");
 
-                TripsConnector cc = new TripsConnector(this, service);
+               /* TripsConnector cc = new TripsConnector(this, service);
 
                 http = new HttpConnector(service);
-                http.Execute(cc);
+                http.Execute(cc);*/
 
                 // Prepara un messaggio ritardato che chiude l'auto se non viene abilitata la trip entro un timeout
-                service.scheduleSelfCloseTrip(300,true);
 
-                service.getHandler().sendMessage(MessageFactory.RadioVolume(1));
-                service.getHandler().sendMessage(MessageFactory.RadioVolume(0));
-
-                service.setDisplayStatus(true,0);
-
-
-                FRadio.savedInstance = null;
-
-                service.getHandler().sendMessage(MessageFactory.startRemoteUpdateCycle());
-
-                App.pinChecked = false;
-                App.Instance.persistPinChecked();
 
                 if(!processing) {
                     processing=true;
@@ -338,8 +371,8 @@ public class TripInfo {
                         obc_io.setDoors(null, 0,"IN SOSTA");
                         obc_io.setEngine(null, 0);
                         obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
-                        Events.eventRfid(3, code);
-                        Events.eventParkBegin();
+                        eventRepository.eventRfid(3, code);
+                        eventRepository.eventParkBegin();
                         hasBeenStopped = true;
                         App.parkMode = ParkMode.PARK_STARTED;
                         App.Instance.persistInSosta();
@@ -350,7 +383,7 @@ public class TripInfo {
                         service.setDisplayStatus(false,15);
                         service.sendBeacon();
 
-
+                        OptimizeDistanceCalc.Controller(OdoController.PAUSE); // momo metti in pausa il calcolo, la macchina e' ferma
                         return MessageFactory.notifyTripParkModeCardBegin();
                     } else {    //customer rientra
 
@@ -363,9 +396,9 @@ public class TripInfo {
                             dlog.d("End Park forced trip close");
                         }
                         obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
-                        obc_io.setTag(null,cardCode);						
-                        Events.eventRfid(4, code);
-                        Events.eventParkEnd();
+                        obc_io.setTag(null,cardCode);
+                        eventRepository.eventRfid(4, code);
+                        eventRepository.eventParkEnd();
                         App.parkMode = ParkMode.PARK_ENDED;
                         App.Instance.persistInSosta();
 
@@ -389,27 +422,20 @@ public class TripInfo {
                         dlog.d("handleCard: corsa non chiudibile");
                         return null;
                     }
-                    if (service.checkParkArea() || closeType ==CloseType.forced) {
-
-                        cardCode="";
-                        obc_io.setLcd(null, "   Auto Libera");
-                        obc_io.setDoors(null, 0,"ARRIVEDERCI");
-                        obc_io.setEngine(null, 0);
-                        obc_io.setLed(null, LowLevelInterface.ID_LED_GREEN, LowLevelInterface.ID_LED_ON);			
-                        obc_io.setTag(null,"*");
-                        dlog.d(TripInfo.class.toString()+" handleCard: Pending trips. END RENT, disable engine and close doors");
+                    if (service.checkParkArea() || closeType == CloseType.forced) {
 
 
 
-                        Events.eventRfid(2, code);
-                        CloseTrip(carInfo);
 
-                        TripsConnector cc = new TripsConnector(this);
+                        eventRepository.eventRfid(2, code);
+                        CloseTrip(carInfo, obc_io, service);
+
+                        /*TripsConnector cc = new TripsConnector(this);
 
                         http = new HttpConnector(service);
                         http.SetHandler(service.getPrivateHandler());
                         dlog.d("Sending close trip");
-                        http.Execute(cc);
+                        http.Execute(cc);*/
 
                         service.setDisplayStatus(false,15);
                         service.getHandler().sendMessage(MessageFactory.RadioVolume(0));						
@@ -430,7 +456,7 @@ public class TripInfo {
                     } else {
                         dlog.d("Unable to close trip, out of operative area");
 
-                        Toast.makeText(App.Instance.getBaseContext(), "Out of Operative Area", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(App.Instance.getBaseContext(), "Out of Operative Area", Toast.LENGTH_SHORT).show();
                         obc_io.setLcd(null, "   FUORI AREA");
                         return null;
                     }
@@ -442,7 +468,7 @@ public class TripInfo {
 
                 obc_io.setLcd(null,"AUTO IN USO");
                 dlog.d(TripInfo.class.toString()+" handleCard: Different card, nothing to do");
-                Events.eventRfid(5, code);
+                eventRepository.eventRfid(5, code);
                 return null;
             }
 
@@ -467,7 +493,7 @@ public class TripInfo {
 
 
 
-        if (!App.hasNetworkConnection) {
+        if (!App.hasNetworkConnection()) {
             dlog.w(" loadBanner: nessuna connessione");
             App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
             return;
@@ -521,7 +547,7 @@ public class TripInfo {
                 content.close();
             } else {
 
-                dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode));
+                dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode) + " url "+Url);
                 App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
                 return;
             }
@@ -630,6 +656,98 @@ public class TripInfo {
 
     }
 
+    private Trip buildOpenTrip(){
+        int km =0;
+        if(OptimizeDistanceCalc.totalDistance != 0)
+            km =  (int) OptimizeDistanceCalc.totalDistance/1000;
+
+        Trip trip = new Trip(this.customer.id,App.CarPlate,new Date(), DbManager.getTimestamp(), App.fuel_level, km);
+        trip.setBeginLocation(App.lastLocation);
+
+        return trip;
+    }
+
+    public boolean OpenTripNew(CarInfo carInfo, Customer customer, final ObcService service, final LowLevelInterface obc_io) {
+
+        if (carInfo==null || customer==null) {
+            dlog.e(TripInfo.class.toString()+" OpenTrip:  carInfo or customer == NULL");
+            return false;
+        }
+
+
+        this.customer = customer;
+        this.isOpen=true;
+
+        trip = buildOpenTrip();
+        //Scrittura DB
+        Observable.just(1)
+                .map(n->{
+                    if(service!=null)
+                        service.onTripResult(TripInfo.this);
+
+                    obc_io.setLcd(null, " Auto in uso");
+                    obc_io.setDoors(null, 1,customer.info_display);  //Sole se trip registrata su db apri le portiere
+                    //obc_io.setEngine(null, 1); //TODO: RIMUOVERE!!!! Il motore si dovr? abilitare solo dopo il check del pin
+                    obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
+                    obc_io.setTag(null,cardCode);
+
+                    service.scheduleSelfCloseTrip(300,true);
+
+                    service.getHandler().sendMessage(MessageFactory.RadioVolume(1));
+                    service.getHandler().sendMessage(MessageFactory.RadioVolume(0));
+
+                    service.setDisplayStatus(true,0);
+
+
+                    FRadio.savedInstance = null;
+
+                    service.getHandler().sendMessage(MessageFactory.startRemoteUpdateCycle());
+
+                    App.pinChecked = false;
+                    App.Instance.persistPinChecked();
+
+                    service.sendBeacon();
+                    return  n;
+                })
+                .concatMap(f->phpRepository.openTrip(trip,this))
+
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<TripResponse>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull TripResponse tripResponse) {
+
+
+
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        if( e instanceof ErrorResponse){
+
+                            dlog.e("Error inside Trip Opening "+((ErrorResponse) e).errorType ,e);
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+
+
+
+        App.currentTripInfo = this;
+
+        dlog.d("OpenTrip: "+this.toString());
+        return (trip!=null);
+
+    }
+
+    @Deprecated
     public boolean OpenTrip(CarInfo carInfo, Customer customer) {
 
         if (carInfo==null || customer==null) {
@@ -645,10 +763,10 @@ public class TripInfo {
 
         this.customer = customer;
         this.isOpen=true;
-
-        trip = trips.Begin(App.CarPlate,customer, carInfo.location, App.fuel_level, App.km);
-
-
+        if(OptimizeDistanceCalc.totalDistance != 0)
+             trip = trips.Begin(App.CarPlate,customer, carInfo.location, App.fuel_level, (int) OptimizeDistanceCalc.totalDistance/1000);
+        else
+            trip = trips.Begin(App.CarPlate,customer, carInfo.location, App.fuel_level, 0);
 
         App.currentTripInfo = this;
 
@@ -657,26 +775,30 @@ public class TripInfo {
 
     }
 
-    public void CloseTrip(CarInfo carInfo) {
+    public void CloseTrip(CarInfo carInfo, LowLevelInterface obc_io, ObcService service) {
 
-        CloseCorsa(carInfo);
+        CloseCorsaNew(carInfo, obc_io, service);
 
         if(App.pinChecked && App.currentTripInfo.trip.int_cleanliness==0 && App.currentTripInfo.trip.ext_cleanliness==0){
             App.CounterCleanlines++;
             if(App.CounterCleanlines>=5){
                 App.CounterCleanlines=0;
-                Events.eventCleanliness(0, 0);
+                eventRepository.eventCleanliness(0, 0);
             }
             App.Instance.persistCounterCleanlines();
+        }
+        //check for charge
+        if(App.Charging && !carInfo.isChargingPlug()){
+            App.Charging=false;
         }
         App.currentTripInfo = null;
 
         this.isOpen=false;
         this.isMaintenance = false;
+        OptimizeDistanceCalc.Controller(OdoController.STOP);
     }
 
-
-    public void CloseCorsa(CarInfo carInfo) {
+    public void CloseCorsaMaxDurata(CarInfo carInfo) {
         //TODO: gestire se non ? aperta
 
         if (trip==null) {
@@ -691,8 +813,126 @@ public class TripInfo {
         trip.end_timestamp = System.currentTimeMillis()/1000;
 
         if (carInfo!=null) {
-            trip.end_lat = carInfo.latitude;
-            trip.end_lon = carInfo.longitude;
+            trip.end_lat = carInfo.getLatitude();
+            trip.end_lon = carInfo.getLongitude();
+        }
+
+        dlog.d("CloseCorsa: closing trip"+trip.toString());
+
+        phpRepository.closeTrip(trip)
+
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<TripResponse>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull TripResponse tripResponse) {
+
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+    }
+
+    public void CloseCorsaNew(CarInfo carInfo, LowLevelInterface obc_io, ObcService service) {
+        //TODO: gestire se non ? aperta
+
+        if (trip==null) {
+            dlog.e("CloseTrip: trip == NULL");
+            return;
+        }
+
+        int km =0;
+        if(OptimizeDistanceCalc.totalDistance != 0)
+            km =  (int) OptimizeDistanceCalc.totalDistance/1000;
+
+        trip.end_battery = App.fuel_level;
+        trip.end_km =  km;
+        trip.end_time = new Date();
+        trip.end_timestamp = System.currentTimeMillis()/1000;
+
+        if (carInfo!=null) {
+            trip.end_lat = carInfo.getLatitude();
+            trip.end_lon = carInfo.getLongitude();
+        }
+
+        dlog.d("CloseCorsa: closing trip"+trip.toString());
+        OptimizeDistanceCalc.Controller(OdoController.STOP);
+
+        Observable.just(1)
+                .map(n ->{
+                    cardCode="";
+                    obc_io.setLcd(null, "   Auto Libera");
+                    obc_io.setDoors(null, 0,"ARRIVEDERCI");
+                    obc_io.setEngine(null, 0);
+                    obc_io.setLed(null, LowLevelInterface.ID_LED_GREEN, LowLevelInterface.ID_LED_ON);
+                    obc_io.setTag(null,"*");
+                    dlog.d(TripInfo.class.toString()+" handleCard: Pending trips. END RENT, disable engine and close doors");
+
+                    service.setDisplayStatus(false,15);
+                    service.getHandler().sendMessage(MessageFactory.RadioVolume(0));
+                    FRadio.savedInstance = null;
+                    SuspendRfid(obc_io,"  Auto libera");
+                    service.removeSelfCloseTrip();
+                    service.getHandler().sendMessage(MessageFactory.stopRemoteUpdateCycle());
+                    App.pinChecked = false;
+                    App.Instance.persistPinChecked();
+                    service.sendBeacon();
+                    return n;
+                })
+                .concatMap(n-> phpRepository.closeTrip(trip))
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<TripResponse>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull TripResponse tripResponse) {
+
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+    }
+
+    @Deprecated
+    public void CloseCorsa(CarInfo carInfo) {
+        //TODO: gestire se non ? aperta
+
+        if (trip==null) {
+            dlog.e("CloseTrip: trip == NULL");
+            return;
+        }
+
+
+        trip.end_battery = App.fuel_level;
+        if(OptimizeDistanceCalc.totalDistance != 0)
+            trip.end_km = (int) OptimizeDistanceCalc.totalDistance/1000;
+        else
+            trip.end_km=0;
+        trip.end_time = new Date();
+        trip.end_timestamp = System.currentTimeMillis()/1000;
+
+        if (carInfo!=null) {
+            trip.end_lat = carInfo.getLatitude();
+            trip.end_lon = carInfo.getLongitude();
         }
 
         dlog.d("CloseCorsa: closing trip"+trip.toString());
@@ -720,7 +960,9 @@ public class TripInfo {
             App.Instance.setParkModeStarted(new Date());
             App.Instance.persistParkModeStarted();
             rmsg.arg1 = 1;
-        } else if (mode==0 && App.getParkModeStarted()!=null) {
+            OptimizeDistanceCalc.Controller(OdoController.PAUSE);
+        } else if (mode == 0 && App.getParkModeStarted() != null) {
+            OptimizeDistanceCalc.resume();
             dlog.d("Stopping park mode");
             long diff = (new Date()).getTime() - App.getParkModeStarted().getTime();
             if (hasBeenStopped) {
@@ -797,9 +1039,7 @@ public class TripInfo {
             UpdateCorsa();
             try {
                 if(notify) {
-                    HttpConnector hConnector = new HttpConnector(App.Instance.getApplicationContext());
-                    TripsConnector tc = new TripsConnector(this);
-                    hConnector.Execute(tc);
+                    sendUpdateTrip(trip);
                 }
             }catch(Exception e){
                 dlog.e("Exception while trying to update server trip",e);
@@ -808,6 +1048,32 @@ public class TripInfo {
         } else
             return false;
 
+    }
+
+    private void sendUpdateTrip(Trip trip){
+        phpRepository.updateServerTripData(trip)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<TripResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(TripResponse tripResponse) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
 
@@ -904,26 +1170,50 @@ public class TripInfo {
                 int id_parent = trip.id_parent;
                 int n_pin = trip.n_pin;
                 //Se ? passata la durata massima chiudi la trip amministrativamente...
-                CloseCorsa(carInfo);
+                CloseCorsaMaxDurata(carInfo);
+                //CloseCorsa(carInfo);
 
                 //.... inva la corsa incapsulandola in un oggeto tripinfo separato per evitare modifiche
-                TripInfo tripInfo =  new TripInfo();
+                /*TripInfo tripInfo =  new TripInfo(mContext);
                 tripInfo.trip = trip;
                 TripsConnector cc = new TripsConnector(tripInfo);
 
                 HttpConnector http = new HttpConnector(App.Instance);
                 http.SetHandler(service.getPrivateHandler());
-                http.Execute(cc);				
+                http.Execute(cc);	*/
 
                 // Apri una nuova trip che sostituisce la precedente
-                DbManager dbm = App.Instance.dbManager;
-                Trips trips = dbm.getCorseDao();
+//                DbManager dbm = App.Instance.dbManager;
+//                Trips trips = dbm.getCorseDao();
 
-                trip = trips.Begin(App.CarPlate,customer, carInfo.location, App.fuel_level, App.km);
-                dlog.d("New trip: " + trip.toString());
+
+                trip = buildOpenTrip();
                 trip.id_parent = id_parent;
                 trip.n_pin = n_pin;
-                UpdateCorsa();
+                phpRepository.openTrip(trip,this)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(new Observer<TripResponse>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(@NonNull TripResponse tripResponse) {
+
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+                            }
+
+                            @Override
+                            public void onComplete() {
+                            }
+                        });
+                //trip = trips.Begin(App.CarPlate,customer, carInfo.location, App.fuel_level, App.km);
+                dlog.d("New trip: " + trip.toString());
+                //UpdateCorsa();
 
                 //Do not send now, it will collide with previous trip closure. After sending will be scheduled.
 

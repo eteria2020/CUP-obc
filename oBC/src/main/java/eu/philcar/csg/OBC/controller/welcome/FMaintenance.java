@@ -1,28 +1,23 @@
 package eu.philcar.csg.OBC.controller.welcome;
 
 import eu.philcar.csg.OBC.ABase;
-import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
-import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.controller.FBase;
-import eu.philcar.csg.OBC.controller.map.FMap;
-import eu.philcar.csg.OBC.db.Events;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.helpers.DLog;
-import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.service.MessageFactory;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.text.Html;
+import android.support.annotation.Nullable;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,14 +25,16 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import javax.inject.Inject;
 
 public class FMaintenance extends FBase {
 
 	private DLog dlog = new DLog(this.getClass());
+	@Inject
+	EventRepository eventRepository;
 
 	public  static FMaintenance Instance;
 	private Handler handler = new Handler();
@@ -76,7 +73,7 @@ public class FMaintenance extends FBase {
 				dialog.dismiss();
 				((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
 				dlog.d("Skipped FMaintenance");
-				Events.Maintenance("Skip");
+				eventRepository.Maintenance("Skip");
 			}
 		});
 
@@ -100,14 +97,14 @@ public class FMaintenance extends FBase {
 						}
 
 						if (npwd>0) {
-							Events.Maintenance("Enter");
+							eventRepository.Maintenance("Enter");
 							dlog.d("Entering FMaintenance");
 							d.dismiss();
 						} else {
 							input.setText("");
 							Toast.makeText(FMaintenance.this.getActivity(), "PIN errato", Toast.LENGTH_SHORT).show();;
 							dlog.d("Wrong pin");
-							Events.Maintenance("Wrong pin");
+							eventRepository.Maintenance("Wrong pin");
 						}
 					}
 				});
@@ -119,27 +116,23 @@ public class FMaintenance extends FBase {
 	}
 
 	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		App.get(getActivity()).getComponent().inject(this);
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		Events.Maintenance("Show");
+		//App.Charging = true;
+		eventRepository.Maintenance("Show");
 		askPin();
 		((AWelcome)getActivity()).sendMessage(MessageFactory.requestCarInfo());
 		view = inflater.inflate(R.layout.f_maintenance, container, false);
 
-		((View)view.findViewById(R.id.finsNextIB)).setVisibility(View.INVISIBLE);
-		((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.VISIBLE);
+		((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.GONE);
 
-		((Button)view.findViewById(R.id.finsNextIB)).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
 
-				if(App.Charging) {
-					dlog.d("Skipped FMaintenance");
-					Events.Maintenance("Skip");
-				}
-				dlog.d("Closing FMaintenance");
-			}
-		});
 
 
 		((Button)view.findViewById(R.id.btnEndCharging)).setOnClickListener(new OnClickListener() {
@@ -147,9 +140,16 @@ public class FMaintenance extends FBase {
 			public void onClick(View v) {
 				dlog.d("Pushed EndCharging");
 				((AWelcome)getActivity()).sendMessage(MessageFactory.sendEndCharging());
-				Events.Maintenance("EndCharging");
-				((TextView)view.findViewById(R.id.tvEndCharging)).setText("Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.");
+                eventRepository.Maintenance("EndCharging");
+				((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_wait);
 
+			}
+		});
+
+		view.findViewById(R.id.fmaintSOSB).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(getActivity(), ASOS.class));
 			}
 		});
 
@@ -168,9 +168,9 @@ public class FMaintenance extends FBase {
 
 
 		((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
-		((TextView)view.findViewById(R.id.tvEndCharging)).setText("Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.");
+		((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_wait);
 
-		new CountDownTimer(4000,1000) {
+		/*new CountDownTimer(4000,1000) {
 			@Override
 			public void onTick(long millisUntilFinished) {
 				((TextView)view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished/1000)+ " s");
@@ -179,12 +179,11 @@ public class FMaintenance extends FBase {
 			@Override
 			public void onFinish() {
 				((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.INVISIBLE);
-				((View)view.findViewById(R.id.finsNextIB)).setVisibility(View.VISIBLE);
 
 
 			}
 
-		}.start();
+		}.start();*/
 
 		handler.postDelayed(new Runnable() {
 			@Override
@@ -204,14 +203,14 @@ public class FMaintenance extends FBase {
 		if(!FMaintenance.this.isVisible()){
 			return;
 		}
-		dlog.d("update App.Charging: "+App.Charging+" chargingPlug: "+carinfo.chargingPlug);
-		if (App.Charging && carinfo.chargingPlug==false) {
+		dlog.d("update App.Charging: "+App.Charging+" chargingPlug: "+ carinfo.isChargingPlug());
+		if (App.Charging && !carinfo.isChargingPlug()) {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(true);
-			((TextView)view.findViewById(R.id.tvEndCharging)).setText("TERMINA RICARICA: L'auto sar� nuovamente disponible al noleggio a meno di altre condizioni di allarme");
+			((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_done);
 		} else {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
-			if (carinfo.chargingPlug)
-				((TextView)view.findViewById(R.id.tvEndCharging)).setText("IMPOSSIBILE TERMINARE RICARCA: spina ancora inserita");
+			if (carinfo.isChargingPlug())
+				((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_plug_insert);
 			else
 				((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
 		}
@@ -233,13 +232,13 @@ public class FMaintenance extends FBase {
 	public void onPause() {
 		super.onPause();
 		Instance=null;
-		dialog.dismiss();
+		//dialog.dismiss();
 	}
 
 	@Override
 	public void onDestroy() {
 		Instance=null;
-		dialog.dismiss();
+		//dialog.dismiss();
 		super.onDestroy();
 	}
 }

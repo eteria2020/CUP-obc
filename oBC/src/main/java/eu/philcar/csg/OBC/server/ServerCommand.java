@@ -7,10 +7,11 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.service.Reservation;
 
-public class ServerCommand {
+public class ServerCommand extends BaseResponse {
 
 	public String comandoRaw;
 	
@@ -20,9 +21,11 @@ public class ServerCommand {
 	public int    intarg2;
 	public String    txtarg1;
 	public String    txtarg2;
-	public long queued;
+	public double queued;
 	public int ttl;
 	public String payload;
+
+
 	
 	
 	public static List<ServerCommand> createFromString(String str) {
@@ -80,7 +83,20 @@ public class ServerCommand {
 		}
 		return list;
 	}
-	
-	
-	
+
+	@Override
+	public String toString() {
+		return "ServerCommand{" +
+				"comandoRaw='" + comandoRaw + '\'' +
+				", id=" + id +
+				", command='" + command + '\'' +
+				", intarg1=" + intarg1 +
+				", intarg2=" + intarg2 +
+				", txtarg1='" + txtarg1 + '\'' +
+				", txtarg2='" + txtarg2 + '\'' +
+				", queued=" + queued +
+				", ttl=" + ttl +
+				", payload='" + payload + '\'' +
+				'}';
+	}
 }

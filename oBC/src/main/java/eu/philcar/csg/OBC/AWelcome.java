@@ -150,7 +150,7 @@ public class AWelcome extends ABase {
 					((OnTripCallback) frag).onTripResult((TripInfo) msg.obj);
 
 				} else {
-					DLog.E(AWelcome.class.getName() + "Impossible cast a OnTripCallback  :");
+					DLog.I(AWelcome.class.getName() + " Impossible cast a OnTripCallback  :" + frag);
 				}
 				break;
 				

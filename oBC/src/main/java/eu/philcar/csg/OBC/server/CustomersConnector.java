@@ -3,10 +3,8 @@ package eu.philcar.csg.OBC.server;
 
 
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -21,9 +19,7 @@ import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Customers;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.helpers.DLog;
-import android.os.Debug;
-import android.text.format.DateFormat;
-
+@Deprecated
 public class CustomersConnector implements RemoteEntityInterface {
 
 	private DLog dlog = new DLog(this.getClass());
@@ -57,7 +53,7 @@ public class CustomersConnector implements RemoteEntityInterface {
 		}
 		
 		public String GetRemoteUrl() {
-			if (!App.hasNetworkConnection) {
+			if (!App.hasNetworkConnection()) {
 				dlog.w("Customers : No network");
 				return null;
 			}

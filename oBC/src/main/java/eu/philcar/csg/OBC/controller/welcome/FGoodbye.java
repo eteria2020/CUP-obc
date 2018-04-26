@@ -397,7 +397,7 @@ public class FGoodbye extends FBase {
 
 
 
-		if (!App.hasNetworkConnection) {
+		if (!App.hasNetworkConnection()) {
 			dlog.e(" loadBanner: nessuna connessione");
 			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;

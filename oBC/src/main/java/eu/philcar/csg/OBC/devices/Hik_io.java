@@ -9,6 +9,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.FragmentManager;
+import android.webkit.JavascriptInterface;
 
 import com.Hik.Mercury.SDK.Audio.AudioInfo;
 import com.Hik.Mercury.SDK.Audio.AudioObserver;
@@ -37,7 +38,10 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.helpers.Converts;
@@ -46,6 +50,9 @@ import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.Reservation;
+//import eu.philcar.csg.OBC.task.DataLogger;
+import eu.philcar.csg.OBC.task.OdoController;
+import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 
 //import eu.philcar.csg.OBC.R;
 
@@ -63,7 +70,9 @@ public class Hik_io implements LowLevelInterface {
 	private DLog dlog = new DLog(this.getClass());
 	
 	private static final boolean WITH_RADIO = true;
-	
+
+	@Inject
+	EventRepository eventRepository;
 	
 	private CANManager mCANManager;
 	private BTManager mBTManager;
@@ -113,6 +122,8 @@ public class Hik_io implements LowLevelInterface {
 		ledStatuses[LeaseInfoItaly.LED_INDEX_LED2][1]=LeaseInfoItaly.LED_STATUS_LIGHT_OFF;
 		ledStatuses[LeaseInfoItaly.LED_INDEX_LED3][1]=LeaseInfoItaly.LED_STATUS_LIGHT_OFF;
 		ledStatuses[LeaseInfoItaly.LED_INDEX_LED4][1]=LeaseInfoItaly.LED_STATUS_LIGHT_OFF;
+
+		App.get(service).getComponent().inject(this);
 	}
 
 	
@@ -149,8 +160,8 @@ public class Hik_io implements LowLevelInterface {
 		if (mLeaseManager!=null) {
 			mLeaseManager.attachLeaseInfoObserver(mLeaseObserver);
 			int status = mLeaseManager.GetLeaseStatus();
-			int memberId = mLeaseManager.GetLeaseMerberID();			
-			Events.LeaseInfo(status, memberId);
+			int memberId = mLeaseManager.GetLeaseMerberID();
+			eventRepository.LeaseInfo(status, memberId);
 		}
 		
 		if (WITH_RADIO) {
@@ -866,6 +877,7 @@ public class Hik_io implements LowLevelInterface {
 			 b.putBoolean("ChCommStatus", bi.chargerCommunicationStatus == BatteryInfo.CHARGER_COMMUNICATION_ON);
 			 b.putString("PackStatus",  getPackageStatusName(bi.packageStatus));
 			 b.putFloatArray("CellsInfo",bi.cellVoltageValue);
+			 b.putIntArray("sensorTempValue",bi.sensorTempValue);
 			 
 			 b.putInt("ChStatus",bi.chargerAvaliableStatus);
 		 } else {
@@ -984,7 +996,7 @@ public class Hik_io implements LowLevelInterface {
 	    		Bundle b = new Bundle();
 	    		b.putInt("LEASE", result);
 	    		b.putInt("LEASEID", memberID);
-	    		Events.LeaseInfo(result, memberID);
+				eventRepository.LeaseInfo(result, memberID);
 	    	}
 	    	
 	    }
@@ -1130,7 +1142,10 @@ public class Hik_io implements LowLevelInterface {
 	            b.putInt("Km", vehileOdoMeter);;
 				obcService.notifyCarInfo(b);
 
-	            
+				if(vehileOdoMeter>0){
+					OptimizeDistanceCalc.Controller(OdoController.RUNonChangeOdo,vehileOdoMeter);
+				}
+
 	        }
 
 	        @Override
@@ -1339,8 +1354,9 @@ public class Hik_io implements LowLevelInterface {
 	        @Override
 	        public void onSensorTempValueChange(int sensorIndex, int tempValue) throws RemoteException {
 	            // TODO Auto-generated method stub
-	            super.onSensorTempValueChange(sensorIndex, tempValue);
-	           /* dlog.i("onSensorTempValueChange(sensorIndex, tempValue):("
+				super.onSensorTempValueChange(sensorIndex, tempValue);
+				obcService.setOnSensorTempValue(sensorIndex,tempValue);
+				/* dlog.i("onSensorTempValueChange(sensorIndex, tempValue):("
 	                    + sensorIndex + "," + tempValue + ")");*/
 	        }
 

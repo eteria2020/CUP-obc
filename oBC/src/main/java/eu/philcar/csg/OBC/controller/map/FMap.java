@@ -54,6 +54,8 @@ import com.skobbler.ngx.map.SKMapSurfaceView;
 import com.skobbler.ngx.map.SKMapSurfaceView.SKOrientationIndicatorType;
 import com.skobbler.ngx.map.SKMapViewHolder;
 import com.skobbler.ngx.map.SKPOICluster;
+import com.skobbler.ngx.map.SKPolygon;
+import com.skobbler.ngx.map.SKPolyline;
 import com.skobbler.ngx.map.SKScreenPoint;
 import com.skobbler.ngx.map.realreach.SKRealReachSettings;
 import com.skobbler.ngx.navigation.SKNavigationListener;
@@ -108,6 +110,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AMainOBC;
@@ -116,6 +120,7 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
@@ -136,6 +141,8 @@ public class FMap extends FBase implements OnClickListener {
 		return fm;
 	}
 
+	@Inject
+	EventRepository eventRepository;
 	private DLog dlog = new DLog(this.getClass());
 
 	public final static int  BASE_TOLLERANCE = 50;					// Circle radius in meters (for fuel station on-map-tap)
@@ -255,6 +262,7 @@ public class FMap extends FBase implements OnClickListener {
 		context=getActivity();
 		player=new AudioPlayer(getActivity());
         App.isCloseable = false;
+        App.get(getActivity()).getComponent().inject(this);
 
 
     }
@@ -544,7 +552,7 @@ public class FMap extends FBase implements OnClickListener {
 			updateParkAreaStatus(activity.isInsideParkArea(), activity.getRotationToParkAngle());
 		}
 
-		if(App.first_UP_poi && App.hasNetworkConnection){
+		if(App.first_UP_poi && App.hasNetworkConnection()){
 			new Thread(new Runnable() {
 				public void run() {
 					dlog.d(FMap.class.toString()+" onCreateView: Primo aggiornamento Poi");
@@ -555,7 +563,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		}
 
-		if((new Date().getTime()- App.update_Poi.getTime())>3*60*60*1000 && App.hasNetworkConnection && !App.first_UP_poi) {    //3600000 = 1 ora
+		if((new Date().getTime()- App.update_Poi.getTime())>3*60*60*1000 && App.hasNetworkConnection() && !App.first_UP_poi) {    //3600000 = 1 ora
 
 
 			new Thread(new Runnable() {
@@ -690,7 +698,7 @@ public class FMap extends FBase implements OnClickListener {
 			fmapRange.setVisibility(View.INVISIBLE);
 
 
-		if(!SystemControl.hasNetworkConnection(getActivity())){
+		if(!SystemControl.hasNetworkConnection(getActivity(),eventRepository)){
 			if(!animQueue.contains("3g"))
 				animQueue.add("3g");
 			if(no3gwarning.getAnimation()==null)
@@ -994,7 +1002,7 @@ public class FMap extends FBase implements OnClickListener {
 					animQueue.remove("area");
 				}
 				if(lastInside!=0 && lastInside!=1)
-					Events.outOfArea(false);
+					eventRepository.outOfArea(false);
 				lastInside=0;
 
 
@@ -1102,7 +1110,7 @@ public class FMap extends FBase implements OnClickListener {
 					if (statusAlertSOC <= 1) {
 						dlog.d("Display popup 5km");
 						statusAlertSOC = 2;
-						Events.eventSoc(SOC, "Popup 5km");
+						eventRepository.eventSoc(SOC, "Popup 5km");
 						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
 						rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
 						((FrameLayout) (rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_redalertbox);
@@ -1134,7 +1142,7 @@ public class FMap extends FBase implements OnClickListener {
 						dlog.d("Display popup 20km");
 
 						statusAlertSOC = 1;
-						Events.eventSoc(SOC, "Popup 20km");
+						eventRepository.eventSoc(SOC, "Popup 20km");
 						rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
 						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
 						((FrameLayout) (rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_orangealertbox);
@@ -1443,9 +1451,23 @@ public class FMap extends FBase implements OnClickListener {
 
 			return false;
 		}
-
-
+		drawPolyline();
 		return true;
+	}
+	private void drawPolyline(){
+		int identifier = 500;
+		List<SKPolygon> areas = App.getSKPolylineEnvelope();
+		for(SKPolygon area : areas){
+			area.setColor(new float[]{ 22/255f, 164/255f, 71/255f, 25/100f});
+						// Set properties for the outline
+			area.setOutlineColor(new float[]{ 22/255f, 164/255f, 71/255f, 25/100f});
+			area.setOutlineSize(0);
+			area.setOutlineDottedPixelsSolid(1);
+			area.setOutlineDottedPixelsSkip(1);
+			area.setIdentifier(identifier++);
+			mapView.addPolygon(area);
+
+		}
 	}
 	
 	private void drawFuelStationsOnMap() {
@@ -1673,7 +1695,7 @@ public class FMap extends FBase implements OnClickListener {
         mapView.getMapSettings().setOrientationIndicatorType(SKOrientationIndicatorType.CUSTOM_IMAGE);
         mapView.getMapSettings().setHouseNumbersShown(true);
         mapView.getMapSettings().setImportantPoisShown(true);
-        mapView.getMapSettings().setInertiaPanningEnabled(true);
+        mapView.getMapSettings().setInertiaPanningEnabled(false);
         mapView.getMapSettings().setMapZoomingEnabled(true);
         mapView.getMapSettings().setMapRotationEnabled(true);
         mapView.getMapSettings().setCompassShown(true);
@@ -1703,7 +1725,7 @@ public class FMap extends FBase implements OnClickListener {
 		mapView.getMapSettings().setOrientationIndicatorType(SKOrientationIndicatorType.CUSTOM_IMAGE);
 		mapView.getMapSettings().setHouseNumbersShown(true);
 		mapView.getMapSettings().setImportantPoisShown(true);
-		mapView.getMapSettings().setInertiaPanningEnabled(true);
+		mapView.getMapSettings().setInertiaPanningEnabled(false);
 		mapView.getMapSettings().setMapZoomingEnabled(true);
 		mapView.getMapSettings().setMapRotationEnabled(true);
 		mapView.getMapSettings().setCompassShown(true);
@@ -2355,6 +2377,7 @@ public class FMap extends FBase implements OnClickListener {
 
 
 
+	@SuppressLint("HandlerLeak")
 	private  Handler localHandler = new Handler()  {
 
 		@Override
@@ -2659,6 +2682,7 @@ public class FMap extends FBase implements OnClickListener {
 				try{
 					drawPOIS();
 					//drawChargingStation();
+					drawPolyline();
 				}catch(OutOfMemoryError e){
 					dlog.e("drawPois: out of memory ",e);
 				}catch(Exception e){
@@ -3244,7 +3268,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		@Override
 		public void onReceive(Context c, Intent i) {
-			boolean status = SystemControl.hasNetworkConnection(c);
+			boolean status = SystemControl.hasNetworkConnection(c,eventRepository);
 
 			if (status) {
 				if (animQueue.contains("3g")) {
@@ -3276,7 +3300,7 @@ public class FMap extends FBase implements OnClickListener {
 			return;
 		}
 
-		if (!App.hasNetworkConnection) {
+		if (!App.hasNetworkConnection()) {
 			dlog.e(FMap.class.toString()+" loadBanner: nessuna connessione");
 			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;

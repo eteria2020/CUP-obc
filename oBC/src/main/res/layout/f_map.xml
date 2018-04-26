@@ -68,8 +68,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
 			android:layout_alignTop="@+id/llTray"
-			android:layout_marginEnd="16dp"
-			android:layout_toStartOf="@+id/fmapENDB">
+			android:layout_marginEnd="16dp">
 
 		</FrameLayout>
 
@@ -292,65 +291,27 @@
 		android:contentDescription="@string/content_description"
 		android:visibility="visible" />
 
+<RelativeLayout
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_alignParentRight="true"
+	android:layout_alignParentEnd="true"
+	android:layout_below="@+id/fmap_top_LL"
+	android:layout_above="@+id/fmap_bottom_V"
+	android:layout_toRightOf="@+id/fmapLeftBorderIV"
+	android:layout_toEndOf="@+id/fmapLeftBorderIV" >
 
 	<FrameLayout android:id="@+id/fmapMapMV"
-		android:layout_width="match_parent" android:layout_height="match_parent"
-		android:layout_alignParentRight="true" android:layout_alignParentEnd="true"
-		android:layout_below="@+id/fmap_top_LL" android:layout_above="@+id/fmap_bottom_V"
-		android:layout_toRightOf="@+id/fmapLeftBorderIV"
-		android:layout_toEndOf="@+id/fmapLeftBorderIV" android:background="#CCCCCC" >
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="#CCCCCC" >
 
 	</FrameLayout>
 
-	<FrameLayout
-		android:layout_width="500dp"
-		android:layout_height="315dp"
-		android:layout_gravity="center"
-		android:background="@drawable/sha_redalertbox"
-		android:id="@+id/fmapAlertSOCFL"
-		android:visibility="gone"
-		android:layout_alignParentRight="false"
-		android:layout_below="@+id/txtNextStreet"
-		android:layout_alignLeft="@+id/fmapMapMV"
-		android:layout_marginLeft="140dp"
-		android:layout_marginTop="20dp">
+	<include layout="@layout/layout_alert_popup"/>
+</RelativeLayout>
 
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text=" Attenzione!"
-			android:id="@+id/fmapAlertTitleTV"
-			android:layout_gravity="center_horizontal|top"
-			android:textStyle="bold"
-			android:textSize="40sp"
-			android:textColor="#fdef2c"
-			android:layout_marginTop="10dp" />
 
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/alert_5km"
-			android:id="@+id/fmapAlertDescTV"
-			android:layout_gravity="center"
-			android:gravity="center"
-			android:textColor="@color/white"
-			android:textSize="33sp"
-			android:layout_marginLeft="12dp"
-			android:layout_marginRight="12dp"
-			android:layout_marginTop="20dp"
-			android:textStyle="bold" />
-
-		<ImageButton
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/fmapAlertCloseBTN"
-			android:layout_gravity="right|top"
-			android:background="@android:color/transparent"
-			android:padding="15dp"
-			android:src="@drawable/button_close"
-			android:layout_marginTop="8dp"
-			android:layout_marginRight="8dp" />
-	</FrameLayout>
 
 	<RelativeLayout
 		android:orientation="vertical"

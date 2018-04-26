@@ -5,12 +5,19 @@ import java.sql.SQLException;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.injection.ApplicationContext;
+
+@Singleton
 public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public static final String DB_NAME = "sharengo.db";
@@ -35,7 +42,8 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 		return System.currentTimeMillis()/1000;
 	}
 
-	public DbManager(Context context) {
+	@Inject
+	public DbManager(@ApplicationContext Context context) {
 		//super(context, new File( Environment.getExternalStorageDirectory(),DB_NAME).toString(), null, DATABASE_VERSION);
 		super(context, getDbName(), null, DATABASE_VERSION);
 	}
@@ -167,7 +175,8 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 	public  Customers getClientiDao() {
 		try {
 			Customers c = getDao(Customer.class);
-			c.setAutoCommit(true);
+
+			//c.setAutoCommit(true);
 			return  c;
 		} catch (Exception e) {
 
@@ -180,7 +189,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 	public BusinessEmployees getDipendentiDao() {
 		try {
 			BusinessEmployees b = getDao(BusinessEmployee.class);
-			b.setAutoCommit(true);
+			//b.setAutoCommit(true);
 			return  b;
 		} catch (Exception e) {
 
@@ -192,7 +201,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 	public  Trips getCorseDao() {
 		try {
 			Trips c = getDao(Trip.class);
-			c.setAutoCommit(true);
+			//c.setAutoCommit(true);
 			return c;
 		} catch (Exception e) {
 
@@ -205,6 +214,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 	public  Events getEventiDao() {
 		try {
 			Events c = getDao(Event.class);
+			//c.setAutoCommit(true);
 			return c;
 		} catch (Exception e) {
 
@@ -217,6 +227,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 	public  Pois getPoisDao() {
 		try {
 			Pois c = getDao(Poi.class);
+			//c.setAutoCommit(true);
 			return c;
 		} catch (Exception e) {
 

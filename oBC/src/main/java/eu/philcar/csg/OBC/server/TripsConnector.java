@@ -15,7 +15,7 @@ import eu.philcar.csg.OBC.interfaces.OnTripCallback;
 import eu.philcar.csg.OBC.service.TripInfo;
 
 
-
+@Deprecated
 public class TripsConnector implements RemoteEntityInterface {
 
 	private DLog dlog = new DLog(this.getClass());
@@ -47,7 +47,7 @@ public class TripsConnector implements RemoteEntityInterface {
 
 	public String GetRemoteUrl() {
 	
-		if (!App.hasNetworkConnection) {
+		if (!App.hasNetworkConnection()) {
 			dlog.w("Trips : No network");
 			return null;
 		}

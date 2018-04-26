@@ -1,45 +1,124 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 19
+    signingConfigs {
+        vmtest {
+            keyAlias 'Sharengo.user'
+            keyPassword 'Sharengo1'
+            storeFile file('D:/Mobile Workspace/Android Workspace/key/sharengo.keystore.jks')
+            storePassword 'Sharengo1'
+        }
+    }
+    compileSdkVersion 26
     buildToolsVersion "26.0.2"
-
+    flavorDimensions "default"
+    useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "eu.philcar.csg.OBC"
         minSdkVersion 17
-        targetSdkVersion 19
-        ndk{
+        targetSdkVersion 26
+        multiDexEnabled true
+        ndk {
             abiFilters "armeabi-v7a"// add your required cpu architecture
         }
     }
-
     buildTypes {
         release {
-            minifyEnabled true
+            resValue "string", "app_data_path", "/csg/"
+            resValue "string", "endpointSharengo", "https://api.sharengo.it:8123/"
+            resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
+            resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
+            minifyEnabled false
+            debuggable false
+            signingConfig signingConfigs.vmtest
+
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            multiDexKeepProguard file('multidex-proguard-rules.pro')
+        }
+        vmtest {
+            resValue "string", "app_data_path", "/csg-vm/"
+            resValue "string", "endpointSharengo", "https://api.localhost.it:8123/"
+            resValue "string", "endpointSharengoBeacon", "http://api.localhost.it:7600/"
+            resValue "string", "endpointSharengoPhp", "http://api.localhost.it/api/"
+            signingConfig signingConfigs.vmtest
+            debuggable true
+
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+            multiDexKeepProguard file('multidex-proguard-rules.pro')
+        }
+        debug {
+            resValue "string", "app_data_path", "/csg/"
+            resValue "string", "endpointSharengo", "https://api.sharengo.it:8123/"
+            resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
+            resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
+            signingConfig signingConfigs.vmtest
+            debuggable true
+
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            multiDexKeepProguard file('multidex-proguard-rules.pro')
+        }
+        stage {
+            resValue "string", "app_data_path", "/csg-stage/"
+            resValue "string", "endpointSharengo", "https://corestage.sharengo.it:8123/"
+            resValue "string", "endpointSharengoBeacon", "http://corestage.sharengo.it:7600/"
+            resValue "string", "endpointSharengoPhp", "http://corestage.sharengo.it/api/"
+            signingConfig signingConfigs.vmtest
+            debuggable true
+
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            multiDexKeepProguard file('multidex-proguard-rules.pro')
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    productFlavors {
+        produzione {
+        }
+        develop {
+        }
     }
 }
 
 dependencies {
-    compile project(':sDKTools')
-    compile 'com.android.support:support-v4:19.1.0'
-    compile files('libs/acra-4.5.0.jar')
-    compile files('libs/edm.jar')
-    compile files('libs/hikmercurysdk.jar')
-    compile files('libs/logback-android-1.1.1-2.jar')
-    compile files('libs/okhttp-3.0.0-RC1.jar')
-    compile files('libs/okio-1.6.0.jar')
-    compile files('libs/ormlite-android-4.48.jar')
-    compile files('libs/ormlite-core-4.48.jar')
-    compile files('libs/rc.jar')
-    compile files('libs/slf4j-api-1.7.6.jar')
-    compile files('libs/activation.jar')
-    compile files('libs/additionnal.jar')
-    compile files('libs/mail.jar')
-    compile 'com.github.barteksc:android-pdf-viewer:2.8.1'
+    final RETROFIT_VERSION = '2.3.0'
+    final DAGGER_VERSION = '2.5'
+    def daggerCompiler = "com.google.dagger:dagger-compiler:$DAGGER_VERSION"
+    implementation project(':sDKTools')
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation files('libs/acra-4.5.0.jar')
+    implementation files('libs/edm.jar')
+    implementation files('libs/hikmercurysdk.jar')
+    //implementation files('libs/logback-android-1.1.1-2.jar')
+    //compile files('libs/okhttp-3.0.0-RC1.jar')
+    //compile files('libs/okio-1.6.0.jar')
+    //compile files('libs/ormlite-android-4.48.jar')
+    //compile files('libs/ormlite-core-4.48.jar')
+    implementation files('libs/rc.jar')
+    //implementation files('libs/slf4j-api-1.7.6.jar')
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    implementation 'com.github.tony19:logback-android:1.1.1-10'
+
+    implementation files('libs/activation.jar')
+    implementation files('libs/additionnal.jar')
+    implementation files('libs/mail.jar')
+    implementation 'com.github.barteksc:android-pdf-viewer:2.8.1'
+    implementation 'com.j256.ormlite:ormlite-core:4.48'
+    implementation 'com.j256.ormlite:ormlite-android:4.48'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+    implementation "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
+    implementation "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$RETROFIT_VERSION"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.0'
+    implementation "com.google.dagger:dagger:$DAGGER_VERSION"
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    //Required by Dagger2
+    annotationProcessor daggerCompiler
+    testAnnotationProcessor daggerCompiler
+    androidTestAnnotationProcessor daggerCompiler
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }

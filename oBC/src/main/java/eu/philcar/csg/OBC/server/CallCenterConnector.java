@@ -18,7 +18,7 @@ import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.RemoteEntityInterface.eDirection;
 import eu.philcar.csg.OBC.service.TripInfo;
-
+@Deprecated
 public class CallCenterConnector implements RemoteEntityInterface {
 
 	

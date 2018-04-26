@@ -49,7 +49,8 @@ public class ProTTS implements TextToSpeech.OnInitListener{
 
     }
     private void reinizializePlayer() {
-
+        player.stop();
+        player.shutdown();
         player=null;
         utteranceListener=null;
 

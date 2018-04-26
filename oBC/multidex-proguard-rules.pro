@@ -1,0 +1,3 @@
+-dontwarn ch.qos.logback.**
+-keep class  ch.qos.logback.** { *; }
+-keep interface ch.qos.logback.** { *; }

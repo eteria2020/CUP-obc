@@ -236,11 +236,15 @@
     <string name="alert_bonus_park">Da questo momento puoi guadagnare 5 minuti bonus lasciando l’auto da ricaricare in uno dei parcheggi indicati sul navigatore</string>
     <string name="music_hint">Collega il cavo AUX per ascoltare la musica dal tuo cellulare</string>
     <string name="pin_business">Hai usato il pin business</string>
-    <string name="menu_rent_end_key_on">Si prega di spegnere il quadro prima di poter terminare il noleggioo</string>
+    <string name="menu_rent_end_key_on">Si prega di spegnere il quadro prima di poter terminare il noleggio</string>
     <string name="menu_park_mode_suspend_key_on">Si prega di spegnere il quadro prima di poter lasciare la macchina in sosta</string>
     <string name="button_video_tutorial">ISTRUZIONI</string>
     <string name="button_assicurazione">ASSICURAZIONE</string>
     <string name="button_libretto">LIBRETTO</string>
+    <string name="maintenance_instruction"><b>STACCA IL CAVO DI RICARICA: </b> per iniziare la corsa stacca il cavo di carica collegato alla presa e <u> mettilo nel baule dell\'auto </u> ( il pulsante di apertura del baule è posto fra i sedili )</string>
+    <string name="maintenance_status_done"><b>TERMINA RICARICA:</b> Clicca su termina ricarica per continuare col noleggio</string>
+    <string name="maintenance_status_plug_insert"><b>IMPOSSIBILE TERMINARE RICARCA:</b> spina ancora inserita</string>
+    <string name="maintenance_status_wait">Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.</string>
 
 
 </resources>

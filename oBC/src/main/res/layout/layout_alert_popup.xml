@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+        android:layout_width="500dp"
+        android:layout_height="315dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/sha_redalertbox"
+        android:id="@+id/fmapAlertSOCFL"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" Attenzione!"
+            android:id="@+id/fmapAlertTitleTV"
+            android:layout_gravity="center_horizontal|top"
+            android:textStyle="bold"
+            android:textSize="40sp"
+            android:textColor="#fdef2c"
+            android:layout_marginTop="10dp" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fmapAlertCloseBTN"
+            android:layout_gravity="right|top"
+            android:background="@android:color/transparent"
+            android:padding="15dp"
+            android:src="@drawable/button_close"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="8dp" />
+
+        <TextView
+            android:id="@+id/fmapAlertDescTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="@string/alert_5km"
+            android:textColor="@color/white"
+            android:textSize="33sp"
+            android:textStyle="bold" />
+</FrameLayout>

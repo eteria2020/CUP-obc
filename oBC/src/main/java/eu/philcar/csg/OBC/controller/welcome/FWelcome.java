@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,11 +25,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
@@ -44,17 +50,35 @@ public class FWelcome extends FBase {
 		return fw;
 	}
 
-	private  RelativeLayout fwcm_whole_RL;
+
+	@Inject
+	EventRepository eventRepository;
+
+	@BindView(R.id.fwcm_whole_RL)
+	protected   RelativeLayout fwcm_whole_RL;
 	private DLog dlog = new DLog(this.getClass());
-	private  LinearLayout welcomeLL;
-	private  LinearLayout bannerLL;
-	private  LinearLayout flagsLL;
-	private  TextView nameTV;
-	private  TextView tvCarPlate, tvDateTime, tvFleet;
-	private  ImageButton fwelItalianIB;
-	private  ImageButton fwelEnglishIB;
-	private  ImageButton fwelFrenchIB;
-	private  ImageButton fwelChineseIB;
+	@BindView(R.id.fwelWelcomeLL)
+	protected  LinearLayout welcomeLL;
+	@BindView(R.id.fwelBannerLL)
+	protected  LinearLayout bannerLL;
+	@BindView(R.id.fwelLanguageLL)
+	protected  LinearLayout flagsLL;
+	@BindView(R.id.fwel_name_TV)
+	protected  TextView nameTV;
+	@BindView(R.id.tvCarPlate)
+	protected  TextView tvCarPlate;
+	@BindView(R.id.tvDateTime)
+	protected  TextView tvDateTime;
+	@BindView(R.id.tvFleet)
+	protected  TextView  tvFleet;
+	@BindView(R.id.fwelItalianIB)
+	protected  ImageButton fwelItalianIB;
+	@BindView(R.id.fwelEnglishIB)
+	protected  ImageButton fwelEnglishIB;
+	@BindView(R.id.fwelFrenchIB)
+	protected  ImageButton fwelFrenchIB;
+	@BindView(R.id.fwelchineseIB)
+	protected  ImageButton fwelChineseIB;
 	private  SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm", Locale.getDefault());
 	
 	private int logoTaps =0;
@@ -67,9 +91,19 @@ public class FWelcome extends FBase {
 
 
 	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		App.get(getActivity()).getComponent().inject(this);
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		
+
+
 		View view = inflater.inflate(R.layout.f_welcome, container, false);
+
+		ButterKnife.bind( this,view);
+
 		dlog.d("OnCreareView FWelcome");
 
 		
@@ -127,7 +161,7 @@ public class FWelcome extends FBase {
 			}			
 		});
 		
-		welcomeLL = (LinearLayout)view.findViewById(R.id.fwelWelcomeLL);
+		/*welcomeLL = (LinearLayout)view.findViewById(R.id.fwelWelcomeLL);
 		bannerLL = (LinearLayout)view.findViewById(R.id.fwelBannerLL);
 		flagsLL = (LinearLayout)view.findViewById(R.id.fwelLanguageLL);
 		nameTV = (TextView)view.findViewById(R.id.fwel_name_TV);
@@ -137,7 +171,7 @@ public class FWelcome extends FBase {
 		tvCarPlate = (TextView)view.findViewById(R.id.tvCarPlate);
 		tvDateTime = (TextView)view.findViewById(R.id.tvDateTime);
 		tvFleet = (TextView)view.findViewById(R.id.tvFleet);
-		fwcm_whole_RL=(RelativeLayout)view.findViewById(R.id.fwcm_whole_RL);
+		fwcm_whole_RL=(RelativeLayout)view.findViewById(R.id.fwcm_whole_RL);*/
 				
 		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 		((TextView)view.findViewById(R.id.fwel_welcome_TV)).setTypeface(font);
@@ -212,15 +246,15 @@ public class FWelcome extends FBase {
 		        String pwd =  input.getText().toString();
 		        App.isAdmin=0;
 		        //TODO: use external config for password in hashed form
-		        if (pwd.equals("Selip16")) App.isAdmin=1;
+		        if (pwd.equals("Jupiter18")) App.isAdmin=1;
 		        if (pwd.equals("pamal17"))  App.isAdmin=2;
 		        	
 		        if (App.isAdmin>0) {
-		        	Events.DiagnosticPage(App.isAdmin);
+					eventRepository.DiagnosticPage(App.isAdmin);
 		        	Intent intent = new Intent(FWelcome.this.getActivity(), ServiceTestActivity.class);
 		        	FWelcome.this.getActivity().startActivity(intent);
 		        } else {
-		        	Events.DiagnosticPageFail(pwd);
+					eventRepository.DiagnosticPageFail(pwd);
 		        }
 		    }
 		});

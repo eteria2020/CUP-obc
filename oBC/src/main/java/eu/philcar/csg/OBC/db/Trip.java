@@ -1,12 +1,21 @@
 package eu.philcar.csg.OBC.db;
 
+import android.location.Location;
+
 import java.util.Date;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
+import eu.philcar.csg.OBC.data.model.TripResponse;
+import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.service.DataManager;
+
 @DatabaseTable(tableName = "trips", daoClass = Trips.class )
-public class Trip  extends DbRecord {
+public class Trip  extends DbRecord<TripResponse> {
+	public static final int OPEN_TRIP = 0;
+	public static final int CLOSE_TRIP = 1;
 	
 		@DatabaseField(generatedId = true)
 		public int id;
@@ -96,8 +105,29 @@ public class Trip  extends DbRecord {
 
 //		@DatabaseField
 //		public boolean sospeso;
-		
-		public String toString() {
+
+
+	public Trip() {
+	}
+
+	public Trip(int id_customer, String plate, Date begin_time, long begin_timestamp, int begin_battery, int begin_km) {
+		this.id_customer = id_customer;
+		this.plate = plate;
+		this.begin_time = begin_time;
+		this.begin_timestamp = begin_timestamp;
+		this.begin_battery = begin_battery;
+		this.begin_km = begin_km;
+		this.begin_sent = false;
+	}
+
+	public void setBeginLocation(Location location) {
+		if (location != null) {
+			this.begin_lat = location.getLatitude();
+			this.begin_lon = location.getLongitude();
+		}
+	}
+
+	public String toString() {
 			return String.format("Trip { Id:%d , RId:%d \n Tms begin:%d , Tms end:%d \n TX 1 : %b , TX 2  : %b , n_pin : %d , id_parent : %d }", id,remote_id,begin_timestamp, end_timestamp, begin_sent, end_sent,n_pin, id_parent);
 		}
 		
@@ -125,5 +155,78 @@ public class Trip  extends DbRecord {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void handleResponse(TripResponse tripResponse, DataManager dataManager, int callOrder) {
+		switch (callOrder){
+			case Trip.OPEN_TRIP:
+
+				recharge = tripResponse.getResult();
+				if (tripResponse.getResult() > 0) {
+
+					remote_id = tripResponse.getResult();
+					begin_sent = true;
+					dataManager.updateBeginSentDone(this);
+
+				} else {
+					switch (tripResponse.getResult()) {
+
+						case -15:
+							warning = "OPEN TRIP";
+							begin_sent = true;
+							break;
+
+						case -16:
+							warning = "FORBIDDEN";
+							begin_sent = true;
+							break;
+
+						case -26:
+						case -27:
+						case -28:
+						case -29:
+							warning = "PREAUTH";
+							begin_sent = true;
+							break;
+
+
+						default:
+							warning = "FAIL";
+							begin_sent = false;
+					}
+					if (tripResponse.getExtra() != null && !tripResponse.getExtra().isEmpty()) {
+						try {
+							remote_id = Integer.parseInt(tripResponse.getExtra());
+						} catch (Exception e) {
+							DLog.E("Exception while extracting extra", e);
+						}
+					}
+					dataManager.updateBeginSentDone(this);
+				}
+				break;
+			case CLOSE_TRIP:
+				recharge = tripResponse.getResult();
+				if (tripResponse.getResult() > 0) {
+					end_sent = true;
+				} else {
+					switch (tripResponse.getResult()) {
+
+						case -3:
+							warning="NO_MATCH";
+							begin_sent = false;
+							end_sent = false;
+							dataManager.updateBeginSentDone(this);
+							break;
+
+						default:
+							warning="FAIL";
+							end_sent = false;
+					}
+				}
+
+				dataManager.updateTripEndSentDone(this);
+				break;
+		}
 	}
 }
