@@ -181,7 +181,7 @@ public class FSOS extends FBase implements OnClickListener {
 				String pwd =  input.getText().toString();
 				App.isAdmin=0;
 				//TODO: use external config for password in hashed form
-				if (pwd.equals("Selip16")) App.isAdmin=1;
+				if (pwd.equals("Jupiter18")) App.isAdmin=1;
 				if (pwd.equals("pamal17"))  App.isAdmin=2;
 
 				if (App.isAdmin>0) {

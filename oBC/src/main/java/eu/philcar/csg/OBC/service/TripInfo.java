@@ -797,7 +797,53 @@ public class TripInfo {
         this.isMaintenance = false;
         OptimizeDistanceCalc.Controller(OdoController.STOP);
     }
-    public void CloseCorsaNew(CarInfo carInfo) {
+
+    public void CloseCorsaMaxDurata(CarInfo carInfo) {
+        //TODO: gestire se non ? aperta
+
+        if (trip==null) {
+            dlog.e("CloseTrip: trip == NULL");
+            return;
+        }
+
+
+        trip.end_battery = App.fuel_level;
+        trip.end_km =  App.km;
+        trip.end_time = new Date();
+        trip.end_timestamp = System.currentTimeMillis()/1000;
+
+        if (carInfo!=null) {
+            trip.end_lat = carInfo.getLatitude();
+            trip.end_lon = carInfo.getLongitude();
+        }
+
+        dlog.d("CloseCorsa: closing trip"+trip.toString());
+
+        phpRepository.closeTrip(trip)
+
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<TripResponse>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull TripResponse tripResponse) {
+
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+    }
+
+    public void CloseCorsaNew(CarInfo carInfo, LowLevelInterface obc_io, ObcService service) {
         //TODO: gestire se non ? aperta
 
         if (trip==null) {

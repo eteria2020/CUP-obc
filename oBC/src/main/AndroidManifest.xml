@@ -1,10 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="eu.philcar.csg.OBC"
 
-	android:versionCode="151"
-	android:versionName="0.108.1" >
+	android:versionCode="152"
+	android:versionName="0.108.0" >
 
-	
+
 	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 	
 	<uses-permission android:name="android.permission.INTERNET"/>
