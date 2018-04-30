@@ -9,8 +9,13 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.server.HttpsConnector;
+import eu.philcar.csg.OBC.server.NoRedButton;
 import eu.philcar.csg.OBC.service.MessageFactory;
+
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -34,6 +39,7 @@ public class FInstructions extends FBase {
 	private DLog dlog = new DLog(this.getClass());
 	private RelativeLayout fins_right_FL;
 	private final static int  MSG_CLOSE_FRAGMENT  = 1;
+	private SharedPreferences preferences;
 
 	public static FInstructions newInstance(boolean login) {
 		
@@ -68,9 +74,18 @@ public class FInstructions extends FBase {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		
+
 		final View view = inflater.inflate(R.layout.f_instructions, container, false);
 		dlog.d("OnCreareView FInstruction");
+		// no red button init
+		preferences = this.getActivity().getSharedPreferences(App.COMMON_PREFERENCES, Context.MODE_PRIVATE);
+
+		App.NRD = preferences.getString("NRD","-1");
+		if (App.NRD == "-1" || App.NRD == ""   ) {
+			NoRedButton rd = new NoRedButton(this.getActivity());
+			HttpsConnector http = new HttpsConnector(this.getActivity());
+			http.Execute(rd);
+		}
 		
 		((LinearLayout)view.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
 		
@@ -112,10 +127,19 @@ public class FInstructions extends FBase {
 			((AWelcome)getActivity()).sendMessage(MessageFactory.setEngine(true));
 			
 			((TextView)view.findViewById(R.id.fins_message_TV)).setText(R.string.instruction_title);
-			((TextView)view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_1);
-			((TextView)view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_2);
-			((TextView)view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_3)));
-			((TextView)view.findViewById(R.id.finsInstructions4TV)).setText(R.string.instruction_start_4);
+
+			if(Integer.parseInt(App.NRD) == 1) {
+				((TextView)view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_2);
+				((TextView)view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_3);
+				((TextView)view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_4)));
+				((TextView)view.findViewById(R.id.finsInstructions4TV)).setVisibility(View.GONE);
+				((TextView)view.findViewById(R.id.fbullet4TV)).setVisibility(View.GONE);
+			}else {
+				((TextView)view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_1);
+				((TextView)view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_2);
+				((TextView)view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_3)));
+				((TextView) view.findViewById(R.id.finsInstructions4TV)).setText(R.string.instruction_start_4);
+			}
 			((TextView)view.findViewById(R.id.fins_message_bottom_TV)).setVisibility(View.GONE);
 			
 			((ImageView)view.findViewById(R.id.ivDamages)).setOnClickListener(new OnClickListener() {
