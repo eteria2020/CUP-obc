@@ -233,7 +233,7 @@ public class App extends Application {
 	public void initSharengo() {
 
 		if(App.ServerIP==1) { //App.Instance.ServerIP==1
-
+			URL_SENDEMAIL = "https://corestage.sharengo.it:8123/sendemail?";
 			URL_Area = "http://corestage.sharengo.it/api/zone/json.php?";
 			URL_Beacon = "http://corestage.sharengo.it/api/pushbeacon.php?";
 			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
@@ -267,7 +267,7 @@ public class App extends Application {
 			URL_Area = "http://core.sharengo.it/api/zone/json.php?";
 			URL_Beacon = "http://api.sharengo.it/api/pushbeacon.php?";
 			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
-
+			URL_SENDEMAIL = "https://api.sharengo.it:8123/sendemail?";
 			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
 			URL_Clienti = "https://api.sharengo.it:8123/whitelist2";
 			URL_Dipendenti = "https://api.sharengo.it:8123/business-employees";
@@ -338,7 +338,8 @@ public class App extends Application {
 
 	public static final int ConnectionTimeout=61000;
 	
-	
+
+	public static String URL_SENDEMAIL;
 	public static String URL_Area;
 	public static String URL_Beacon;
 	public static String URL_PoisIcons;

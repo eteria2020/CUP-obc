@@ -71,6 +71,33 @@
             android:contentDescription="@string/content_description"
             android:src="@drawable/sel_button_back" />
 
+        <Button
+            android:id="@+id/sendDocument"
+            style="@android:style/Widget.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="25dp"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/button_pin"
+            android:text="Invia documenti"
+            android:textAppearance="@android:style/TextAppearance"
+            android:textColor="@android:color/holo_green_dark"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/resp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/sendDocument"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="PROVAAA"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance"
+            android:textColor="@color/yellow_panel_day_background"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
     </FrameLayout>
 
 </RelativeLayout>

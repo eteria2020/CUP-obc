@@ -84,7 +84,7 @@ public class HttpConnector {
 	public void setMessenger(Messenger msgr) {
 		_messenger = msgr;
 	}
-	
+
 	public void Execute(RemoteEntityInterface entity ) {
 		if (entity==null) {
 			dlog.e("Execute: entity==NULL");
