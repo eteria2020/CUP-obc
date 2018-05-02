@@ -117,10 +117,16 @@ public class MessageFactory {
 		return msg;
 	}
 	
-	public static Message requestCallCenterCall(String cellulare) {
+	public static Message requestCallCenterCallSOS(String cellulare) {
 		Message msg  =  Message.obtain(null, ObcService.MSG_CUSTOMER_SOS);	
 		msg.obj =  cellulare;
 		return msg;				
+	}
+
+	public static Message requestCallCenterCallDMG(String cellulare) {
+		Message msg  =  Message.obtain(null, ObcService.MSG_CUSTOMER_DMG);
+		msg.obj =  cellulare;
+		return msg;
 	}
 	
 	public static Message checkPin(String pin) {
