@@ -3,6 +3,7 @@ package eu.philcar.csg.OBC.db;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -10,14 +11,15 @@ import android.content.Context;
 import android.os.Handler;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.support.ConnectionSource;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.helpers.DLog;
-import eu.philcar.csg.OBC.server.CustomersConnector;
-import eu.philcar.csg.OBC.server.HttpConnector;
-import eu.philcar.csg.OBC.server.HttpsConnector;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 
 public class Customers extends DbTable<Customer,Integer> {
 
@@ -131,14 +133,39 @@ public class Customers extends DbTable<Customer,Integer> {
 	}
 
 
-	
+	@Deprecated
 	public void startWhitelistDownload(Context ctx, Handler handler) {
 		DLog.D("Start whitelist download..");
-		CustomersConnector cn = new CustomersConnector();
+		/*CustomersConnector cn = new CustomersConnector();
 		cn.setLastUpdate(mostRecentTimestamp());
 		HttpsConnector http = new HttpsConnector(ctx);
 		http.SetHandler(handler);
-		http.Execute(cn);
+		http.Execute(cn);*/
 	}
 
+	public Observable<Customer> setCustomers(final Collection<Customer> customers){
+		return Observable.create(emitter -> {
+            if (emitter.isDisposed()) return;
+
+            try {int index =0;
+                for (Customer customer : customers) {
+                	index++;
+                    customer.encrypt();
+                    int result = createOrUpdate(customer).getNumLinesChanged();
+                    if (result >= 0) emitter.onNext(customer);
+                }
+                emitter.onComplete();
+            } catch(Exception e) {
+                DLog.E("Exception setting Customer",e);
+                emitter.onError(e);
+            }
+        });
+	}
+
+	@Override
+	public CreateOrUpdateStatus createOrUpdate(Customer data) throws SQLException {
+		if(data.pins!=null)
+			data.pin=data.pins.getJson();
+		return super.createOrUpdate(data);
+	}
 }

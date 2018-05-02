@@ -232,5 +232,9 @@
     <string name="button_video_tutorial">TUTORIAL</string>
     <string name="button_assicurazione">ASSICURAZIONE</string>
     <string name="button_libretto">LIBRETTO</string>
+    <string name="maintenance_instruction"><![CDATA[<b> STACCAIL CAVO DI RICARICA: <b> per iniziare la corsa stacca il cavo di carica collegato alla presa e <u> mettilo nel baule dell\'auto <u> (il pulsante di apertura del baule è posto fra i sedili)]]></string>
+    <string name="maintenance_status_done">TERMINA RICARICA: Clicca su termina ricarica per continuare col noleggio</string>
+    <string name="maintenance_status_plug_insert">IMPOSSIBILE TERMINARE RICARCA: spina ancora inserita</string>
+    <string name="maintenance_status_wait">Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.</string>
 
 </resources>

@@ -1,62 +1,82 @@
 package eu.philcar.csg.OBC.db;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.gson.annotations.SerializedName;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
+import eu.philcar.csg.OBC.data.model.Pin;
+import eu.philcar.csg.OBC.data.model.ServerResponse;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Encryption;
+import eu.philcar.csg.OBC.data.common.ExcludeSerialization;
+import eu.philcar.csg.OBC.service.DataManager;
 
 @DatabaseTable(tableName = "customers", daoClass = Customers.class )
-public class Customer extends DbRecord {
+public class Customer extends DbRecord<Customer> implements CustomOp, ServerResponse{
 
+	@ExcludeSerialization
 	public static final int N_ERROR_PIN = 0;
+	@ExcludeSerialization
 	public static final int N_PRIMARY_PIN = 1;
+	@ExcludeSerialization
 	public static final int N_SECONDARY_PIN = 2;
+	@ExcludeSerialization
 	public static final int N_COMPANY_PIN = 100;
 
-
+	@SerializedName("i")
 	@DatabaseField(id = true)
 	public int 		id;
 
+	@SerializedName("n")
 	@DatabaseField
 	public String 	name;
 
+	@SerializedName("c")
 	@DatabaseField
 	public String 	surname;
 
+	@ExcludeSerialization
 	@DatabaseField
 	public String 	language;
 
+	@SerializedName("t")
 	@DatabaseField
 	public String	mobile;
 
+	@SerializedName("a")
 	@DatabaseField
 	public boolean 	enabled;
 
+	@SerializedName("id")
 	@DatabaseField
 	public String 	info_display;
 
+	@ExcludeSerialization
 	@DatabaseField
 	public String	 pin;
 
+	@SerializedName("cc")
 	@DatabaseField(index = true)
 	public String 	card_code;
 
+	@SerializedName("tm")
 	@DatabaseField(index = true)
 	public long 	update_timestamp;
 
+	@SerializedName("ps")
+	public Pin pins=null;
+
+	@ExcludeSerialization
 	private boolean isEnctypted = true;
 
 	public Customer(boolean isNew) {
@@ -64,6 +84,7 @@ public class Customer extends DbRecord {
 			isEnctypted=false;
 	}
 
+	@Deprecated
 	public Customer() {
 	}
 
@@ -240,5 +261,16 @@ public class Customer extends DbRecord {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void onDbWrite() {
+		isEnctypted=false;
+		encrypt();
+	}
+
+	@Override
+	public void handleResponse(Customer customer, DataManager manager, int callOrder) {
+
 	}
 }

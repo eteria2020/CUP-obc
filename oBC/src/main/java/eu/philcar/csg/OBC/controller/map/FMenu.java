@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,6 +15,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import javax.inject.Inject;
+
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AMainOBC;
@@ -23,7 +25,7 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.controller.welcome.FDamages;
-import eu.philcar.csg.OBC.db.Events;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
@@ -34,6 +36,8 @@ import eu.philcar.csg.OBC.service.ParkMode;
 
 public class FMenu extends FBase implements OnClickListener {
 
+	@Inject
+	EventRepository eventRepository;
 	private DLog dlog = new DLog(this.getClass());
 	private ImageButton endRentIB, pauseRentIB, refuelIB, backIB;
 	private ImageView ivDamages;
@@ -55,9 +59,12 @@ public class FMenu extends FBase implements OnClickListener {
 		return new FMenu();
 	}
 
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		App.get(getActivity()).getComponent().inject(this);
+	}
 
-
-	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		dlog.d("onCreateView FMenu");
@@ -153,7 +160,7 @@ public class FMenu extends FBase implements OnClickListener {
 		case R.id.fmenEndRentIB:
 		case R.id.fmenEndRentTV:
 			if (activity!=null && activity.checkisInsideParkingArea()) {
-				Events.menuclick("END RENT");
+				eventRepository.menuclick("END RENT");
 				try {
 
 
@@ -199,9 +206,9 @@ public class FMenu extends FBase implements OnClickListener {
 				startSelfClose(rootView);
 				(rootView.findViewById(R.id.llCancel)).animate().alpha(0.25f);
 				(rootView.findViewById(R.id.tvPushToCancel)).setVisibility(View.VISIBLE);
-				Events.menuclick("PAUSE RENT");
+				eventRepository.menuclick("PAUSE RENT");
 			} else {
-				Events.menuclick("RESUME RENT");
+				eventRepository.menuclick("RESUME RENT");
 				stopSelfClose(rootView);
 				//((ABase)getActivity()).popFragment();
 				try {
@@ -349,7 +356,7 @@ public class FMenu extends FBase implements OnClickListener {
 								
 				switch (App.parkMode) {
 				case PARK_OFF: 		// (FALSE, NULL, OFF)
-					if( CarInfo.keyStatus != null && !CarInfo.keyStatus.equalsIgnoreCase("OFF") && App.checkKeyOff) {
+					if( CarInfo.getKeyStatus() != null && !CarInfo.getKeyStatus().equalsIgnoreCase("OFF") && App.checkKeyOff) {
 						UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end_key_on, null,
 								R.drawable.button_rent_pause_pushed, R.string.menu_park_mode_suspend_key_on, null,
 								R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this,

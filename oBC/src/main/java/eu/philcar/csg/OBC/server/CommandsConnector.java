@@ -24,7 +24,7 @@ import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.Reservation;
 import android.os.Debug;
 import android.text.format.DateFormat;
-
+@Deprecated
 public class CommandsConnector implements RemoteEntityInterface {
 
 	private DLog dlog = new DLog(this.getClass());

@@ -2,7 +2,6 @@ package eu.philcar.csg.OBC.db;
 
 
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,18 +10,17 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.SystemClock;
 
-import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.Connectors;
-import eu.philcar.csg.OBC.server.TripsConnector;
-import eu.philcar.csg.OBC.server.EventsConnector;
 import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.service.TripInfo;
+import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 
 public class Events extends DbTable<Event,Integer> {
 
@@ -109,7 +107,7 @@ public class Events extends DbTable<Event,Integer> {
 		return Event.class;
 	}
 
-	public static void eventEngine(int state) {
+	/*public static void eventEngine(int state) {
 		generateEvent(EVT_ENGINE,state,null);
 	}
 
@@ -117,43 +115,43 @@ public class Events extends DbTable<Event,Integer> {
 		generateEvent(EVT_SWBOOT,0,version);
 	}
 
-	
+
 	public static void eventRfid(int result, String card) {
 		generateEvent(EVT_RFID,result,card);
 	}
-	
+
 	public static void eventBattery(int value) {
 		generateEvent(EVT_BATTERY,value,null);
 	}
-	
+
 	public static void eventParkBegin() {
 		generateEvent(EVT_PARK,1,null);
 	}
-	
+
 	public static void eventParkEnd() {
 		generateEvent(EVT_PARK,2,null);
 	}
-	
+
 	public static void eventSos(String number) {
 		generateEvent(EVT_SOS,0,number);
 	}
-	
+
 	public static void eventCmd(String cmd) {
 		generateEvent(EVT_CMD,0,cmd);
 	}
-	
+
 	public static void eventCleanliness(int intVal, int extVal) {
 		generateEvent(EVT_CLEANLINESS,0,intVal+";"+extVal);
 	}
-	
+
 	public static void eventCharge(int status) {
 		generateEvent(EVT_CHARGE,status,null);
 	}
-	
+
 	public static void eventKey(int status) {
 		generateEvent(EVT_KEY,status,null);
 	}
-	
+
 	public static void eventReady(int status) {
 		generateEvent(EVT_READY,status,null);
 	}
@@ -166,11 +164,11 @@ public class Events extends DbTable<Event,Integer> {
 	public static void menuclick(String clicked) {
 		generateEvent(EVT_MENU_CLICK,0,"Click on "+clicked);
 	}
-	
+
 	public static void eventGear(String position) {
 		generateEvent(EVT_GEAR,0,position);
 	}
-	
+
 	public static void eventObcFail(long delay) {
 		int idelay=0;
 		if (delay > Integer.MAX_VALUE)
@@ -179,55 +177,55 @@ public class Events extends DbTable<Event,Integer> {
 			idelay = (int) delay;
 		generateEvent(EVT_OBCFAIL,idelay,null);
 	}
-	
+
 	public static void eventObcOk() {
 		generateEvent(EVT_OBCOK,0,null);
 	}
-	
+
 	public static void DiagnosticPage(int pwd) {
 		generateEvent(EVT_DIAG,pwd,null);
 	}
-	
+
 	public static void DiagnosticPageFail(String pwd) {
 		generateEvent(EVT_DIAG,-1,pwd);
 	}
-	
+
 	public static void CarPlateChange(String oldPlate, String newPlate) {
 		generateEvent(EVT_CARPLATE,0,oldPlate+"->"+newPlate);
 	}
-	
+
 	public static void Restart3G(int count, String network) {
 		generateEvent(EVT_3G,count,network);
 	}
-	
+
 	public static void Maintenance(String action) {
 		generateEvent(EVT_MAINTENANCE,0,action);
 	}
-	
-	
+
+
 	public static void BeginOutOfOrder(String reason) {
 		generateEvent(EVT_OUTOFORDER,1,reason);
 	}
-	
+
 	public static void EndOutOfOrder() {
 		generateEvent(EVT_OUTOFORDER,2,null);
 	}
-	
+
 	public static void TripOutOfOrder(String card) {
 		generateEvent(EVT_OUTOFORDER,3,card);
 	}
-	
+
 	public static void selfCloseTrip(int idTrip,int beforePin) {
 		generateEvent(EVT_SELFCLOSE,idTrip,(beforePin>0?"NOPAY":null));
 	}
-	
+
 	public static void DeviceInfo(String versions) {
 		generateEvent(EVT_DEVICEINFO,App.id_Version,versions);
 	}
 	public static void eventSoc(int level, String type) {
 		generateEvent(EVT_SOC,level,type);
 	}
-	
+
 	public static void Shutdown() {
 		generateEvent(EVT_SHUTDOWN,0,"Shutting Down");
 	}
@@ -250,70 +248,73 @@ public class Events extends DbTable<Event,Integer> {
 			generateEvent(EVT_CAN_ANOMALIES, 0, text);
 		}
 	}
-	
-	public static void LeaseInfo(int status,int card) {		
+
+	public static void LeaseInfo(int status,int card) {
 		String Hex=Integer.toHexString(card);
-		generateEvent(EVT_LEASE,status,Hex);		
+		generateEvent(EVT_LEASE,status,Hex);
 	}
 
 	public static void generateEvent(int eventId, int intValue, String strValue) {
 		Events eventi  = App.Instance.dbManager.getEventiDao();
-		eventi.sendEvent(eventId, intValue, strValue);		
+		eventi.sendEvent(eventId, intValue, strValue);
 	}
-	
+
 	public  Event v(int event, int value) {
 		return sendEvent(event,value,null);
 	}
-	
+
 	public  Event sendEvent(int event, String value) {
 		return sendEvent(event,0,value);
 	}
-	
+
 	public  Event sendEvent(int eventId, int intValue, String strValue) {
 		//
-		
+
 		Event event = new Event();
 		event.timestamp = DbManager.getTimestamp();
-		
+
 		event.event = eventId;
-		
+
 		if (labels.containsKey(eventId))
 			event.label = labels.get(eventId);
-		
+
 		event.intval = intValue;
 		event.txtval = strValue;
-		
-		event.km = App.km;
+
+		if(OptimizeDistanceCalc.totalDistance != 0)
+			event.km = (int) OptimizeDistanceCalc.totalDistance; // momo
+		else
+			event.km = 0;
 		event.battery = App.fuel_level;
-		
+
 		if (App.currentTripInfo!=null  && App.currentTripInfo.trip!=null) {
 			event.id_trip = App.currentTripInfo.trip.remote_id;
 			event.id_customer = App.currentTripInfo.trip.id_customer;
 		}
-		
+
 		if (App.lastLocation!=null) {
 			event.lon = App.lastLocation.getLongitude();
 			event.lat = App.lastLocation.getLatitude();
 		}
-		
+
 		try {
 			this.create(event);
 		} catch (SQLException e) {
 			dlog.e("Error inserting evento:",e);
 
 		}
-		
-		HttpConnector http = new HttpConnector(App.Instance.getApplicationContext());
-		http.SetHandler(null);
-		EventsConnector ec = new EventsConnector();
-		ec.event = event;
-	
-		
-		http.Execute(ec);
-		
+
+//		HttpConnector http = new HttpConnector(App.Instance.getApplicationContext());
+//		http.SetHandler(null);
+//		EventsConnector ec = new EventsConnector();
+//		ec.event = event;
+//
+//
+//		http.Execute(ec);
+
 		return event;
-		
-	}
+
+	}*/
 
 	@SuppressWarnings("unchecked")
 	public List<Event> getEventsToSend() {
@@ -344,8 +345,8 @@ public class Events extends DbTable<Event,Integer> {
 	}
 	
 	
-	public boolean spedisciOffline(Context context, Handler handler) {
-		HttpConnector http;
+	public boolean spedisciOffline(Context context, Handler handler, SharengoPhpRepository phpRepository) {
+		//HttpConnector http;
 		List<Event> list = getEventsToSend();
 		
 		if (list==null) 
@@ -353,13 +354,16 @@ public class Events extends DbTable<Event,Integer> {
 		
 		dlog.d("Eventi to send : " + list.size());
 		
-		if (!App.hasNetworkConnection) {
+		if (!App.hasNetworkConnection()) {
 			dlog.w("No connection: aborted");
 			return false;
 		}
-		
+
+
+		phpRepository.sendEvents(list);
+
 		//Dato che l'invio � asincrono viene richiesto l'invio solo della prima corsa non spedito, quando arriva il messaggio di risposto di invio eseguito(o fallito) passa alla successiva 
-		for(Event e : list) {
+		/*for(Event e : list) {
 			
 			dlog.d("Selected  evento to send:" + e.toString());
 			
@@ -372,12 +376,12 @@ public class Events extends DbTable<Event,Integer> {
 			/*if(ec.event.id_trip==0 && ec.event.id_trip_local!=0){
 				Trips corse = App.Instance.getDbManager().getCorseDao();
 				ec.event.id_trip=corse.getRemoteIDfromLocal(ec.event.id_trip_local);
-			}*/
+			}
 			ec.returnMessageId = Connectors.MSG_EVENTS_SENT_OFFLINE;
 			http.Execute(ec);
 						
 			return true;
-		}
+		}*/
 		
 		return false;
 	}

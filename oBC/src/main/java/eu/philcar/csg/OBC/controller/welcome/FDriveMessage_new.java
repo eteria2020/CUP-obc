@@ -46,8 +46,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
-import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.AWelcome;
@@ -208,7 +208,7 @@ public class FDriveMessage_new extends FBase {
 					@Override
 					public void run() {
 						try {
-							loadBanner(App.URL_AdsBuilderCar, "START", false);
+							loadBanner(App.URL_AdsBuilderStart, "START", false);
 							getActivity().runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
@@ -275,10 +275,10 @@ public class FDriveMessage_new extends FBase {
 
 
 
-		new CountDownTimer(4000,1000) {
+		new CountDownTimer(3100,1000) {
 				@Override
 			     public void onTick(long millisUntilFinished) {
-			    	 ((TextView)view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished/1000)+ " s");
+			    	 ((TextView)view.findViewById(R.id.tvCountdown)).setText(String.format(Locale.ITALY,"%d s", (millisUntilFinished / 1000)));
 			     }
 
 				@Override
@@ -657,7 +657,7 @@ public class FDriveMessage_new extends FBase {
 
 
 
-		if (!App.hasNetworkConnection) {
+		if (!App.hasNetworkConnection()) {
 			dlog.e(" loadBanner: nessuna connessione");
 			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;

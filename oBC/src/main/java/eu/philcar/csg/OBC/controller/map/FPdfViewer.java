@@ -133,7 +133,7 @@ public class FPdfViewer extends FBase {
     }
 
     /*
-    control if the pdf file is in local and check the date
+    control if the pdf file is in local and check the time
      */
     public File[] checkPdf() throws ParseException {
         File folder = new File(Environment.getExternalStorageDirectory() + directory);
@@ -252,7 +252,7 @@ public class FPdfViewer extends FBase {
                 setFile(pdf[0]);
                 if (needUpdate(pdf)) {
                     setUpdate(true);
-                    if (App.hasNetworkConnection) {
+                    if (App.hasNetworkConnection()) {
                         Toast.makeText(getActivity(), "Scaricamento file aggiornato...", Toast.LENGTH_LONG).show();
                         new DownloadFile().execute();
                     } else {
@@ -264,7 +264,7 @@ public class FPdfViewer extends FBase {
                     //    openPdf(pdf[0],getView());
                     setUpdate(false);
                 }
-            } else if(App.hasNetworkConnection) {
+            } else if(App.hasNetworkConnection()) {
                 setDownload(true);
                 Toast.makeText(getActivity(), "Scaricamento file, Attendere...", Toast.LENGTH_LONG).show();
                 new DownloadFile().execute();
@@ -273,7 +273,7 @@ public class FPdfViewer extends FBase {
                 Toast.makeText(getActivity(), "Nessuna connessione internet", Toast.LENGTH_SHORT).show();
             }
 
-        } else if (App.hasNetworkConnection) {
+        } else if (App.hasNetworkConnection()) {
             Toast.makeText(getActivity(), "Scaricamento file, Attendere...", Toast.LENGTH_LONG).show();
             new DownloadFile().execute();
         } else {

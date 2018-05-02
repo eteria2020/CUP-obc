@@ -21,13 +21,17 @@ public class ZmqSubscriber {
 
 	private ZmqRunnable zmqRunnable;
 	private Thread  zmqThread;
-	private Handler handler;
+	private final Handler handler;  //csd 2086
+
+	public ZmqSubscriber(Handler handler) {
+		this.handler = handler;
+	}
 
 	public void Start(Handler serviceHandler) {
 		try {
 
 			dlog.d("Starting ZMQ thread");
-			handler = serviceHandler;
+			//handler = serviceHandler;
 			zmqRunnable = new ZmqRunnable();
 			zmqThread = new Thread(zmqRunnable);
 			zmqThread.start();

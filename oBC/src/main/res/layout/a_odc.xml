@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/fmapRootRL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#090808">
+
+        <View
+            android:id="@+id/fmap_top_V"
+            android:layout_width="match_parent"
+            android:layout_height="13dp"
+            android:layout_alignParentTop="true"
+            android:background="#fdee66" />
+
+        <View
+            android:id="@+id/fmap_bottom_V"
+            android:layout_width="match_parent"
+            android:layout_height="13dp"
+            android:layout_alignParentBottom="true"
+            android:background="#fdee66" />
+
+        <LinearLayout
+            android:id="@+id/fmap_top_LL"
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:layout_below="@+id/fmap_top_V"
+            android:layout_toEndOf="@+id/fmapLeftBorderIV"
+            android:layout_toRightOf="@+id/fmapLeftBorderIV"
+            android:background="#3ea447"
+            android:gravity="right"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:id="@+id/fmapRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/fmap_bottom_V"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="4dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:alpha="75"
+                    android:maxWidth="120dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/range" />
+
+                <TextView
+                    android:id="@+id/tvBtnName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_marginTop="50dp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/navigator_range"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="#FFF"
+                    android:textSize="21sp" />
+
+                <TextView
+                    android:id="@+id/tvRange"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_marginTop="82dp"
+                    android:gravity="center_horizontal"
+                    android:text="-- Km"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="#FFF875"
+                    android:textSize="21sp" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/fmapAlarm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/fmap_bottom_V"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="5dp"
+                android:visibility="visible">
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/fmapLeftFrame"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_above="@id/fmap_bottom_V"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/fmap_top_V"
+            android:layout_toLeftOf="@+id/fmapMapMV">
+
+        </FrameLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/fmap_top_LL"
+            android:layout_toEndOf="@+id/fmapLeftBorderIV"
+            android:layout_toRightOf="@+id/fmapLeftBorderIV"
+            android:background="@color/text_green"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/v1"
+                android:layout_width="match_parent"
+                android:layout_height="13dp"
+                android:layout_alignParentTop="true"
+                android:background="#fdee66"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/fmapSearchB"
+                    android:layout_width="141dp"
+                    android:layout_height="120dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="25dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/sel_button_nav_white"
+                    android:gravity="bottom|center"
+                    android:paddingBottom="40dp"
+                    android:text="KM GPS"
+                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large" />
+
+                <TextView
+                    android:id="@+id/KMbyGPS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/sel_button_white"
+                    android:padding="40dp"
+                    android:text="0.00"
+                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+                    android:textColor="@color/black"
+                    android:textColorHighlight="@color/black"
+                    android:textSize="30sp" />
+
+                <TextView
+                    android:id="@+id/KMbyGPS2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/sel_button_white"
+                    android:padding="40dp"
+                    android:text="0.00"
+                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+                    android:textColor="@color/black"
+                    android:textColorHighlight="@color/black"
+                    android:textSize="30sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="55dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/bbb"
+                    android:layout_width="141dp"
+                    android:layout_height="120dp"
+                    android:layout_alignBottom="@+id/fmapSearchB"
+                    android:layout_alignTop="@+id/fmapSearchB"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="25dp"
+                    android:layout_toRightOf="@+id/fmapRadioB"
+                    android:layout_weight="1"
+                    android:background="@drawable/sel_button_nav_white"
+                    android:text="KM Odometer"
+                    android:textColor="@color/text_green"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/KMbyODO"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/white"
+                    android:padding="40dp"
+                    android:text="0"
+                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black"
+                    android:textSize="30sp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/Backb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="25dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:contentDescription="@string/content_description"
+            android:src="@drawable/sel_button_back" />
+
+    </RelativeLayout>
+</LinearLayout>

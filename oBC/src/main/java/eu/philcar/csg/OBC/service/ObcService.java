@@ -4,6 +4,8 @@ package eu.philcar.csg.OBC.service;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -12,15 +14,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 
 import org.acra.ACRA;
+import org.joda.time.LocalDateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,6 +34,12 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
+import eu.philcar.csg.OBC.data.common.ErrorResponse;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoBeaconRepository;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
+import eu.philcar.csg.OBC.data.model.BeaconResponse;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
@@ -50,23 +60,20 @@ import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.interfaces.OnTripCallback;
 import eu.philcar.csg.OBC.server.AdminsConnector;
-import eu.philcar.csg.OBC.server.BusinessEmployeeConnector;
-import eu.philcar.csg.OBC.server.CallCenterConnector;
-import eu.philcar.csg.OBC.server.CommandsConnector;
-import eu.philcar.csg.OBC.server.ConfigsConnector;
 import eu.philcar.csg.OBC.server.Connectors;
-import eu.philcar.csg.OBC.server.HttpsConnector;
-import eu.philcar.csg.OBC.server.NotifiesConnector;
 import eu.philcar.csg.OBC.server.ServerCommand;
-import eu.philcar.csg.OBC.server.CustomersConnector;
-import eu.philcar.csg.OBC.server.HttpConnector;
-import eu.philcar.csg.OBC.server.ReservationConnector;
 import eu.philcar.csg.OBC.server.UdpServer;
 import eu.philcar.csg.OBC.server.UploaderLog;
 import eu.philcar.csg.OBC.server.ZmqRequester;
 import eu.philcar.csg.OBC.server.ZmqSubscriber;
+//import eu.philcar.csg.OBC.task.DataLogger;
 import eu.philcar.csg.OBC.task.OldLogCleamup;
+import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 import eu.philcar.csg.OBC.task.UDPServer;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -84,6 +91,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -92,7 +100,12 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.RemoteException;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.telephony.SmsManager;
+
+import javax.inject.Inject;
+
+import com.google.gson.Gson;
 
 public class ObcService extends Service implements OnTripCallback {
 
@@ -165,6 +178,7 @@ public class ObcService extends Service implements OnTripCallback {
     public static final int MSG_SERVER_HTTPNOTIFY = 63;
     public static final int MSG_SERVER_CHANGE_IP = 64;
     public static final int MSG_SERVER_CHANGE_LOG = 65;
+    public static final int MSG_SERVER_COMMAND_NEW = 66;
 
     public static final int MSG_RADIO_SET_CHANNEL = 70;
     public static final int MSG_RADIO_SET_VOLUME = 71;
@@ -210,6 +224,15 @@ public class ObcService extends Service implements OnTripCallback {
     private boolean isStopRequested = false;
 
 
+    @Inject
+    SharengoApiRepository apiRepository;
+    @Inject
+    SharengoPhpRepository phpRepository;
+    @Inject
+    EventRepository eventRepository;
+    @Inject
+    SharengoBeaconRepository beaconRepository;
+
 
     //ENCAPSULATED OBJECTS
 
@@ -230,6 +253,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     ScheduledExecutorService serverUpdateScheduler;
     ScheduledExecutorService tripUpdateScheduler;
+    ScheduledExecutorService dataLoggerScheduler;
     ScheduledExecutorService tripPoiUpdateScheduler;
     ScheduledExecutorService virtualBMSUpdateScheduler;
     ScheduledExecutorService gpsCheckScheduler;
@@ -269,22 +293,22 @@ public class ObcService extends Service implements OnTripCallback {
                 if(sharengo_time!=null && sharengo_time.getTime() > 1234567890000L){
 
                     dlog.d("timeCheckScheduler: imposto ora Sharengo "+sharengo_time.toString()+ "ora android: "+android_time.toString());
-                    rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(sharengo_time) + ";\n"}); //
-                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
+                    rt.exec(new String[]{"/system/xbin/su", "-c", "time -s " + sdf.format(sharengo_time) + ";\n"}); //
+                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //time -s 20120423.130000
 
                 }else if(carInfo.intGpsLocation.getTime()>1234567890000L) {
                     //if(android_time.getTime()<1234567890000L) {
                     dlog.d("timeCheckScheduler: imposto ora gps "+gps_time.toString()+ "ora android: "+android_time.toString());
-                    rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(gps_time) + ";\n"}); //
-                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
+                    rt.exec(new String[]{"/system/xbin/su", "-c", "time -s " + sdf.format(gps_time) + ";\n"}); //
+                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //time -s 20120423.130000
                     //}
 
                 }
                 else
-                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 1"}); //date -s 20120423.130000*/
+                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 1"}); //time -s 20120423.130000*/
                 dlog.d("timeCheckScheduler: rawGpsTime: " + new Date(carInfo.intGpsLocation.getTime()).toString() + " elapsed: " + (System.currentTimeMillis() - (carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000)) + " android time: " + android_time.toString() + " fixed gps time: " + gps_time.toString() +" Sharengo time: "+(sharengo_time!=null?sharengo_time.toString():" response code "+lastResponseCode));
 
-                rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time_zone 0"}); //date -s 20120423.130000
+                rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time_zone 0"}); //time -s 20120423.130000
                 AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                 am.setTimeZone(App.timeZone);
                 am = null;
@@ -412,6 +436,8 @@ public class ObcService extends Service implements OnTripCallback {
     public void onCreate() {
         super.onCreate();
 
+        App.get(this).getComponent().inject(this);
+
         dlog.d("Service onCreate");
 
         //UDP SERVER to receive broadcast from mobile app
@@ -450,8 +476,8 @@ public class ObcService extends Service implements OnTripCallback {
         }
 
         if (this.WITH_ZMQNOTIFY) {
-            zmqSubscriber = new ZmqSubscriber();
-            localHandler.sendMessageDelayed(MessageFactory.zmqRestart(), 20000);
+            zmqSubscriber = new ZmqSubscriber(localHandler);
+            localHandler.sendMessageDelayed(MessageFactory.zmqRestart(), 15000);
             //zmqSubscriber.Start(localHandler);
         }
 
@@ -463,9 +489,9 @@ public class ObcService extends Service implements OnTripCallback {
         //Create and init data structures
 
         carInfo = new CarInfo(localHandler);
-        carInfo.id = App.CarPlate;
+        carInfo.setId(App.CarPlate);
 
-        tripInfo = new TripInfo();
+        tripInfo = new TripInfo(this);
         tripInfo.init();
 
         //Init GPS
@@ -517,22 +543,23 @@ public class ObcService extends Service implements OnTripCallback {
 
 
         //Send boot event
-        final Events eventi = App.Instance.dbManager.getEventiDao();
-        eventi.sendEvent(Events.EVT_SWBOOT, App.sw_Version);
+        /*final Events eventi = App.Instance.dbManager.getEventiDao();
+        eventi.sendEvent(Events.EVT_SWBOOT, App.sw_Version);*/
+        eventRepository.eventSwBoot(App.sw_Version);
 
         //Start whitelist update
-        Customers customers = App.Instance.dbManager.getClientiDao();
-        customers.startWhitelistDownload(this, privateHandler);
+        startDownloadCustomers();
+//        Customers customers = App.Instance.dbManager.getClientiDao();
+//        customers.startWhitelistDownload(this, privateHandler);
 
 
         //Start employee update
         startDownloadEmployees();
 
 
-        Pois pois = App.Instance.dbManager.getPoisDao();
-        pois.startDownload(this, localHandler);
+        startPoiDownload();
 
-        App.Instance.startAreaPolygonDownload(this, null);
+        startAreaPolygonDownload(this, null);
 
         //Start reservation update
         startDownloadReservations();
@@ -543,10 +570,14 @@ public class ObcService extends Service implements OnTripCallback {
         //Start download configs
         startDownloadConfigs();
 
+        //Start download model
+        startDownloadModel();
+
         //Start dequeueing  trips  and events
         privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
         privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
 
+        dataLoggerScheduler = Executors.newSingleThreadScheduledExecutor();
         // Start scheduler for server query
         serverUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
         //Start scheduler for CAN query
@@ -575,12 +606,13 @@ public class ObcService extends Service implements OnTripCallback {
                     //If HTTP query is enabled schedule an HTTP notifies download
                     if (WITH_HTTP_NOTIFIES&& notifiesPrescaler++>4 && tripInfo != null && tripInfo.isOpen && (App.parkMode == null || !App.parkMode.isOn()) ) {
                         notifiesPrescaler=0;
-                        HttpConnector http = new HttpConnector(ObcService.this);
-                        http.SetHandler(localHandler);
-                        NotifiesConnector nc = new NotifiesConnector();
-                        nc.setTarga(App.CarPlate);
-                        nc.setBeacon(carInfo.getJson(false));
-                        http.Execute(nc);
+                        sendBeacon(carInfo.getJsonGson(false));
+//                        HttpConnector http = new HttpConnector(ObcService.this);
+//                        http.SetHandler(localHandler);
+//                        NotifiesConnector nc = new NotifiesConnector();
+//                        nc.setTarga(App.CarPlate);
+//                        nc.setBeacon(carInfo.getJson(false));
+//                        http.Execute(nc);
                     }
 
                     //If there is no open trip or the car is in park mode  ensure display backlight is off
@@ -595,10 +627,10 @@ public class ObcService extends Service implements OnTripCallback {
                     //If we lost or recovered connection with OBC-IO send event and change status
                     if (obc_io.lastContactDelay() > 30 && !App.ObcIoError) {
                         App.ObcIoError = true;
-                        Events.eventObcFail(obc_io.lastContactDelay());
+                        eventRepository.eventObcFail(obc_io.lastContactDelay());
                     } else if (obc_io.lastContactDelay() <= 30 && App.ObcIoError) {
                         App.ObcIoError = false;
-                        Events.eventObcOk();
+                        eventRepository.eventObcOk();
                     }
                     if (threeminutePrescaler++ >= 18) {
                         threeminutePrescaler = 0;
@@ -642,12 +674,12 @@ public class ObcService extends Service implements OnTripCallback {
                     //retrieve all can data
                     carInfo.cellVoltageValue = getCellVoltages();
                     carInfo.bmsSOC = getSOCValue();
-                    carInfo.outAmp = getCurrentValue();
+                    carInfo.setOutAmp(getCurrentValue());
 
-                    if( carInfo.outAmp==350 || carInfo.outAmp==-1037){
+                    if( carInfo.getOutAmp() ==350 || carInfo.getOutAmp() ==-1037){
                         ampError=true;
                         if(canAmpAnomalies++==3 ){
-                            Events.CanAnomalies("350 Amp");
+                            eventRepository.CanAnomalies("350 Amp");
                         }
                     }
                     else {
@@ -658,7 +690,7 @@ public class ObcService extends Service implements OnTripCallback {
                     if( carInfo.bmsSOC==0){
                         bmsSocError=true;
                         if(canAmpAnomalies++==3){
-                            Events.CanAnomalies("SOC 0");
+                            eventRepository.CanAnomalies("SOC 0");
                         }
                     }
                     else {
@@ -705,7 +737,7 @@ public class ObcService extends Service implements OnTripCallback {
 
                     if( bmsCellError){
                         if(canCellAnomalies++==3){
-                            Events.CanAnomalies("0 CellsVolt");
+                            eventRepository.CanAnomalies("0 CellsVolt");
                         }
                     }
                     else {
@@ -772,7 +804,7 @@ public class ObcService extends Service implements OnTripCallback {
                             if ((carInfo.bmsSOC == 0 || carInfo.bmsSOC_GPRS == 0) && carInfo.currVoltage != 0) { //BMS SOC 0 Voltage OK
                                 if (carInfo.bmsSOC == 0) {
                                     if (canBmsAnomalies++ == 3) {
-                                        Events.CanAnomalies("0 BMS");
+                                        eventRepository.CanAnomalies("0 BMS");
                                     } else
                                         canBmsAnomalies = 0;
                                 }
@@ -790,9 +822,9 @@ public class ObcService extends Service implements OnTripCallback {
                         }
 
 
-                    dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "% outAmp: "+carInfo.outAmp);
+                    dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "% outAmp: "+ carInfo.getOutAmp());
                     //check car bms usage
-                    if (carInfo.currVoltage <= 0 || (carInfo.outAmp>= 25 && carInfo.outAmp!=350)){
+                    if (carInfo.currVoltage <= 0 || (carInfo.getOutAmp() >= 25 && carInfo.getOutAmp() !=350)){
                         carInfo.setBatteryLevel((Math.min(carInfo.batteryLevel,Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS))));
                         dlog.d("virtualBMSUpdateScheduler: value "+ (carInfo.currVoltage<=0?"packVoltage null":"outAmp greater than 25")+" ignoring virtual data.");
                         dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
@@ -825,15 +857,29 @@ public class ObcService extends Service implements OnTripCallback {
                     sendAll(msg);*/
 
 
-
-
-
                 } catch (Exception e) {
                     dlog.e("virtualBMSUpdateScheduler error", e);
                 }
             }
 
         }, 15, 120, TimeUnit.SECONDS);
+
+        dataLoggerScheduler.scheduleAtFixedRate(new Runnable() {
+
+          //  private DataLogger dataLogger = new DataLogger();
+
+            @Override
+            public void run() {
+                try {
+
+                    Run();
+
+                } catch (Exception e) {
+                    dlog.e("Data logger error", e);
+                }
+            }
+
+        }, 10, 10, TimeUnit.SECONDS);
 
         gpsCheckScheduler.scheduleAtFixedRate(new Runnable() {
 
@@ -940,7 +986,7 @@ public class ObcService extends Service implements OnTripCallback {
         /*
         control if documenti of the veichele is present in the device before starting
          */
-        if(App.hasNetworkConnection) {
+        if(App.hasNetworkConnection()) {
             new DocumentControl().execute();
         }
     }
@@ -1015,10 +1061,10 @@ public class ObcService extends Service implements OnTripCallback {
         obc_io.setForcedLedBlink(!status);
 
         //Detect loss or recover connection
-        if (App.hasNetworkConnection && !status) {
-            App.hasNetworkConnection = false;
-        } else if (!App.hasNetworkConnection && status) {
-            App.hasNetworkConnection = true;
+        if (App.hasNetworkConnection() && !status) {
+            App.setHasNetworkConnection(false);
+        } else if (!App.hasNetworkConnection() && status) {
+            App.setHasNetworkConnection(true);
             App.lastNetworkOn = new Date();
 
             //Force zmq restart for faster reconnection
@@ -1043,14 +1089,17 @@ public class ObcService extends Service implements OnTripCallback {
     private static int restart3GCount = 0;
 
     private void CheckNetwork() {
-        if (!SystemControl.hasNetworkConnection(this)) {
+        if (!SystemControl.hasNetworkConnection(this,eventRepository)) {
             DLog.D(ObcService.class.toString() + " NO NETWORK CONNECTION");
             setNetworkConnectionStatus(false);
             if (restart3GCount >= 8 && !this.tripInfo.isOpen) {
                 restart3GCount = 0;
-                Events.Reboot("No 3G Reboot");
+                eventRepository.Reboot("No 3G Reboot");
                 SystemControl.doReboot();
             } else {
+
+                App.Instance.setDNS();
+
                 if (WITH_AUTORESET3G) {
                     SystemControl.Reset3G(this);
                 }
@@ -1063,7 +1112,7 @@ public class ObcService extends Service implements OnTripCallback {
                 if (delta > 31 * 60 & App.reservation == null) {
                     dlog.w("Timeout max network offline : out of order local reservation");
                     this.setReservation(Reservation.createOutOfOrderReservation());
-                    Events.BeginOutOfOrder("NET");
+                    eventRepository.BeginOutOfOrder("NET");
                 }
             }
 
@@ -1074,7 +1123,7 @@ public class ObcService extends Service implements OnTripCallback {
             if (App.reservation != null && App.reservation.isMaintenance() && App.reservation.isLocal()) {
                 dlog.w("Network on - removing out of order local reservation");
                 setReservation(null);
-                Events.EndOutOfOrder();
+                eventRepository.EndOutOfOrder();
             }
             setNetworkConnectionStatus(true);
         }
@@ -1082,23 +1131,92 @@ public class ObcService extends Service implements OnTripCallback {
 
     public void sendBeacon() {
 
-        if (!App.hasNetworkConnection) {
+        if (!App.hasNetworkConnection()) {
             dlog.w("No connection. Beacon aborted");
             return;
         }
 
-        String msg = carInfo.getJson(true);
-        if (msg != null) {
+        sendBeacon(carInfo.getJsonGson(true));
+        /*if (msg != null) {
             dlog.d("Sending beacon : " + msg);
             //udpServer.sendBeacon(msg);
 
-            NotifiesConnector nc = new NotifiesConnector();
-            nc.setTarga(App.CarPlate);
-            nc.setBeacon(msg);
+            beaconRepository.sendBeacon(msg).subscribeOn(Schedulers.io())
+                    .subscribe(new Observer<BeaconResponse>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d){
+                        }
 
-            HttpConnector httpConnector = new HttpConnector(ObcService.this);
-            httpConnector.HttpMethod = HttpConnector.METHOD_GET;
-            httpConnector.Execute(nc);
+                        @Override
+                        public void onNext(@NonNull BeaconResponse beaconResponse) {
+                            DLog.D("BeaconResponse is: " + beaconResponse.toString());
+                            parseServerNotify(beaconResponse.getJson());
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                        }
+
+                        @Override
+                        public void onComplete() {
+                        }
+                    });
+
+//            NotifiesConnector nc = new NotifiesConnector();
+//            nc.setTarga(App.CarPlate);
+//            nc.setBeacon(msg);
+//
+//            HttpConnector httpConnector = new HttpConnector(ObcService.this);
+//            httpConnector.HttpMethod = HttpConnector.METHOD_GET;
+//            httpConnector.Execute(nc);
+
+        }*/
+
+    }
+
+    public void sendBeacon(String beacon) {
+
+        if (!App.hasNetworkConnection()) {
+            dlog.w("No connection. Beacon aborted");
+            return;
+        }
+
+//        String msg = carInfo.getJson(true);
+        if (beacon != null) {
+            dlog.d("Sending beacon : " + beacon);
+            //udpServer.sendBeacon(msg);
+
+            beaconRepository.sendBeacon(beacon).subscribeOn(Schedulers.io())
+                    .subscribe(new Observer<BeaconResponse>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(@NonNull BeaconResponse beaconResponse) {
+                            DLog.D("BeaconResponse is: " + beaconResponse.toString());
+                            parseServerNotify(beaconResponse.getJson());
+
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            DLog.I("Synced successfully!");
+                        }
+                    });
+
+//            NotifiesConnector nc = new NotifiesConnector();
+//            nc.setTarga(App.CarPlate);
+//            nc.setBeacon(msg);
+//
+//            HttpConnector httpConnector = new HttpConnector(ObcService.this);
+//            httpConnector.HttpMethod = HttpConnector.METHOD_GET;
+//            httpConnector.Execute(nc);
 
         }
 
@@ -1114,7 +1232,8 @@ public class ObcService extends Service implements OnTripCallback {
 //TODO change with foreach
 
         if (msg.what != ObcService.MSG_CAR_INFO &&
-                msg.what != ObcService.MSG_RADIO_SEEK_INFO)
+                msg.what != ObcService.MSG_RADIO_SEEK_INFO &&
+                msg.what != ObcService.MSG_CAR_LOCATION)
             dlog.i("Sending to " + clients.size() + " clients MSG id " + msg.what);
 
         try {
@@ -1221,7 +1340,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     public void notifyCard(String id, String event, boolean ObcIohandled, boolean forced) {
         DbManager dbm = App.Instance.dbManager;
-        Customers clienti = dbm.getClientiDao();
+        //Customers clienti = dbm.getClientiDao();
 
         if (id != null && event != null)
             dlog.d(ObcService.class.toString() + " notifyCard: id:" + id + ", event:" + event);
@@ -1235,7 +1354,8 @@ public class ObcService extends Service implements OnTripCallback {
 
         //... then schedule a whitelist update, so before PIN dialog we have updated db
 
-        clienti.startWhitelistDownload(this, privateHandler);
+        startDownloadCustomers();
+        //clienti.startWhitelistDownload(this, privateHandler);
 
         // and update employees
         startDownloadEmployees();
@@ -1282,7 +1402,7 @@ public class ObcService extends Service implements OnTripCallback {
             return;
 
         //TODO: FORZATURA DA RIMUOVERE UNA VOLTA RISOLTO IL PROBLEMA AGGIORNAMENTO DALL AUTO
-        if (false && (carInfo.keyStatus.equalsIgnoreCase("ON") || carInfo.keyStatus.equalsIgnoreCase("ACC"))) {
+        if (false && (carInfo.getKeyStatus().equalsIgnoreCase("ON") || carInfo.getKeyStatus().equalsIgnoreCase("ACC"))) {
 
             if (!App.motoreAvviato) {
                 dlog.d("set motore avviato:" + App.motoreAvviato);
@@ -1353,13 +1473,14 @@ public class ObcService extends Service implements OnTripCallback {
             dlog.d("CarInfo created");
         }
 
-        if (carInfo.handleUpdate(b))
-            sendBeacon();
+        //Use BetterHandleUpdate
+        /*if (carInfo.handleUpdate(b))
+            sendBeacon();*/
 
 
         if (b.containsKey("PackAmp") && b.containsKey("timestampAmp")) {
 
-            if (!carInfo.chargingPlug) {
+            if (!carInfo.isChargingPlug()) {
 
                 carInfo.currentAmpere += ((double) b.getInt("PackAmp") * 1000) / (double) b.getLong("timestampAmp");
                 App.Instance.setCurrentAmp(carInfo.currentAmpere);
@@ -1505,6 +1626,13 @@ public class ObcService extends Service implements OnTripCallback {
 
     }
 
+    private void executeServerCommands(ServerCommand command) {
+        List<ServerCommand> list = new ArrayList<>();
+        list.add(command);
+        executeServerCommands(list);
+    }
+
+
     private void executeServerCommands(List<ServerCommand> list) {
         Customers clienti;
 
@@ -1514,21 +1642,26 @@ public class ObcService extends Service implements OnTripCallback {
         for (ServerCommand cmd : list) {
 
             dlog.d(ObcService.class.toString() + " executeServerCommands: Executing: " + cmd.command);
-            Events.eventCmd(cmd.command + " : " + cmd.intarg1 + " - " + cmd.txtarg1);
+            eventRepository.eventCmd(cmd.command + " : " + cmd.intarg1 + " - " + cmd.txtarg1);
 
             switch (cmd.command.toUpperCase()) {
 
                 case "WLUPDATE":
-                    clienti = App.Instance.dbManager.getClientiDao();
-                    clienti.startWhitelistDownload(this, privateHandler);
+
+                    startDownloadCustomers();
+//                    clienti = App.Instance.dbManager.getClientiDao();
+//                    clienti.startWhitelistDownload(this, privateHandler);
                     break;
 
                 case "WLCLEAN":
                     clienti = App.Instance.dbManager.getClientiDao();
                     clienti.deleteAll();
-                    clienti.startWhitelistDownload(this, localHandler);
+
+                    startDownloadCustomers();
+                    //clienti.startWhitelistDownload(this, localHandler);
                     break;
 
+                case "START_TRIP":
                 case "OPEN_TRIP":
                     if (App.currentTripInfo == null)
                         this.notifyCard(cmd.txtarg1, "OPEN", false, false);
@@ -1667,7 +1800,7 @@ public class ObcService extends Service implements OnTripCallback {
 
                 case "ADMINS_UPDATE":
                     dlog.d(ObcService.class.toString() + " executeServerCommands: Update admins cards list");
-                    startDownloadAdmins();
+                    //startDownloadAdmins();
                     break;
 
                 case "ADMINS_CLEAN":
@@ -1702,7 +1835,7 @@ public class ObcService extends Service implements OnTripCallback {
                     if (job.equalsIgnoreCase("TestBatteryAlarm")) {
                         //sendSMS(App.BatteryAlarmSmsNumbers,"Battery alarm test : "+App.CarPlate);
                     } else if (job.equalsIgnoreCase("GetDeviceInfo")) {
-                        Events.DeviceInfo(App.Versions.toJson());
+                        eventRepository.DeviceInfo(App.Versions.toJson());
                     } else {
 
                         dlog.e(ObcService.class.toString() + " executeServerCommands: Unknown job");
@@ -1718,6 +1851,7 @@ public class ObcService extends Service implements OnTripCallback {
             }
 
         }
+
 
     }
 
@@ -1777,48 +1911,117 @@ public class ObcService extends Service implements OnTripCallback {
     }
 
     public void startDownloadCustomers() {
-        Customers customers = App.Instance.dbManager.getClientiDao();
-        customers.startWhitelistDownload(this, privateHandler);
+
+        apiRepository.getCustomer();
+
+//        Customers customers = App.Instance.dbManager.getClientiDao();
+//        customers.startWhitelistDownload(this, privateHandler);
     }
 
     public void startDownloadEmployees() {
         DLog.D("Start downloading businesses");
-        BusinessEmployeeConnector connector = BusinessEmployeeConnector.GetDownloadConnector();
-        HttpsConnector http = new HttpsConnector(this);
-        http.SetHandler(localHandler);
-        http.Execute(connector);
+
+        apiRepository.getEmployee();
+
+//        BusinessEmployeeConnector connector = BusinessEmployeeConnector.GetDownloadConnector();
+//        HttpsConnector http = new HttpsConnector(this);
+//        http.SetHandler(localHandler);
+//        http.Execute(connector);
+    }
+    public void startAreaPolygonDownload(Context ctx, Handler handler) {
+        DLog.D("Start area download..");
+
+        phpRepository.getArea();
+    }
+
+    public void startPoiDownload() {
+        DLog.D("Start poi download..");
+
+        phpRepository.getPois();
     }
 
     public void startDownloadReservations() {
         dlog.d("Start Downloading reservations");
-        HttpConnector http = new HttpConnector(this);
-        http.SetHandler(localHandler);
-        ReservationConnector rc = new ReservationConnector();
-        rc.setTarga(App.CarPlate);
-        http.Execute(rc);
+        phpRepository.getReservation(App.CarPlate)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Reservation>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Reservation reservation) {
+                        setReservation(reservation);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        if(e instanceof ErrorResponse)
+                            if (((ErrorResponse)e).errorType == ErrorResponse.ErrorType.EMPTY) {
+                                setReservation(null);
+                            }
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+//        HttpConnector http = new HttpConnector(this);
+//        http.SetHandler(localHandler);
+//        ReservationConnector rc = new ReservationConnector();
+//        rc.setTarga(App.CarPlate);
+//        http.Execute(rc);
     }
 
 
     public void startDownloadCommands() {
 
             dlog.d("Start Downloading comandi");
-            HttpConnector http = new HttpConnector(this);
-            http.SetHandler(localHandler);
-            CommandsConnector rc = new CommandsConnector();
-            rc.setTarga(App.CarPlate);
-            http.Execute(rc);
+        phpRepository.getCommands(App.CarPlate)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<ServerCommand>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull ServerCommand command) {
+                        executeServerCommands(command);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        DLog.I("Synced successfully!");
+                    }
+                });
+//            HttpConnector http = new HttpConnector(this);
+//            http.SetHandler(localHandler);
+//            CommandsConnector rc = new CommandsConnector();
+//            rc.setTarga(App.CarPlate);
+//            http.Execute(rc);
 
 
     }
 
 
+
+    @Deprecated
     public void startDownloadAdmins() {
-        dlog.d("Start Downloading admins");
+        /*dlog.d("Start Downloading admins");
         HttpsConnector http = new HttpsConnector(this);
         http.SetHandler(privateHandler);
         AdminsConnector rc = new AdminsConnector();
         rc.setCarPlate(App.CarPlate);
-        http.Execute(rc);
+        http.Execute(rc);*/
     }
 
     public void startCleanAdmins() {
@@ -1827,11 +2030,23 @@ public class ObcService extends Service implements OnTripCallback {
 
     public void startDownloadConfigs() {
         dlog.d("Start Downloading configs");
-        HttpsConnector http = new HttpsConnector(this);
+        apiRepository.getConfig();
+        /*HttpsConnector http = new HttpsConnector(this);
         http.SetHandler(privateHandler);
         ConfigsConnector rc = new ConfigsConnector();
         rc.setCarPlate(App.CarPlate);
-        http.Execute(rc);
+        http.Execute(rc);*/
+    }
+
+
+    public void startDownloadModel() {
+        dlog.d("Start Downloading model");
+        apiRepository.getModel();
+        /*HttpsConnector http = new HttpsConnector(this);
+        http.SetHandler(privateHandler);
+        ConfigsConnector rc = new ConfigsConnector();
+        rc.setCarPlate(App.CarPlate);
+        http.Execute(rc);*/
     }
 
     public void notifyServerMessage(int what, int value, String response) {
@@ -1908,7 +2123,7 @@ public class ObcService extends Service implements OnTripCallback {
                     }
 
                     if (WITH_UDPSERVER)
-                        udpServer.sendBeacon(carInfo.getJson(false));
+                        udpServer.sendBeacon(carInfo.getJsonGson(false));
 
                 } catch (Exception e) {
                     dlog.e("Exception inside tripUpdateScheduler", e);
@@ -1934,16 +2149,16 @@ public class ObcService extends Service implements OnTripCallback {
         obc_io.setSecondaryGPS(10000);
     }
 
-
+@Deprecated
     void startCallCenterCall(Messenger replyTo, String number) {
         try {
-            CallCenterConnector ccc = new CallCenterConnector();
+            /*CallCenterConnector ccc = new CallCenterConnector();
             ccc.setTripInfo(App.currentTripInfo);
             ccc.setMobileNumber(number);
 
             HttpConnector httpConnector = new HttpConnector(this);
             httpConnector.setMessenger(replyTo);
-            httpConnector.Execute(ccc);
+            httpConnector.Execute(ccc);*/
 
 
         } catch (Exception e) {
@@ -2053,14 +2268,14 @@ public class ObcService extends Service implements OnTripCallback {
             return true;
         }
 
-        return App.checkParkArea(this.carInfo.latitude, this.carInfo.longitude);
+        return App.checkParkArea(this.carInfo.getLatitude(), this.carInfo.getLongitude());
     }
 
     public void scheduleSelfCloseTrip(int seconds, boolean beforePin) {
 
         if(App.currentTripInfo==null)
             return;//no openTrip
-        if (App.getParkModeStarted() == null&&!beforePin) {
+        if (App.getParkModeStarted() == null && !beforePin) {
             App.askClose.putInt("id", App.currentTripInfo.trip.remote_id);
             App.askClose.putBoolean("close", true);
             App.Instance.persistAskClose();
@@ -2101,11 +2316,13 @@ public class ObcService extends Service implements OnTripCallback {
 
             localHandler.sendMessage(MessageFactory.checkLogSize());
 
-            App.Instance.dbManager.getClientiDao().startWhitelistDownload(ObcService.this, privateHandler);
+
+            startDownloadCustomers();
+            //App.Instance.dbManager.getClientiDao().startWhitelistDownload(ObcService.this, privateHandler);
             //App.Instance.dbManager.getPoisDao().startDownload(ObcService.this, localHandler);
             if(fourHurScheduler++>4*4) {
                 fourHurScheduler=0;
-                App.Instance.startAreaPolygonDownload(ObcService.this, null);
+                startAreaPolygonDownload(ObcService.this, null);
                 startDownloadConfigs();
             }
             startDownloadReservations();
@@ -2117,10 +2334,10 @@ public class ObcService extends Service implements OnTripCallback {
             privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
             privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
 
-            if(fourHurScheduler%2==0) {
+            //if(fourHurScheduler%2==0) {
                 localHandler.sendMessage(MessageFactory.zmqRestart());
                 App.canRestartZMQ=true;
-            }
+            //}
             if(App.currentTripInfo==null && System.currentTimeMillis()- App.AppScheduledReboot.getTime()>24*60*60*1000 && !startedReboot){
                 startedReboot=true;
                 if(App.reservation!=null) {
@@ -2132,7 +2349,7 @@ public class ObcService extends Service implements OnTripCallback {
                     }
                 }
                 dlog.d("Excecuting scheduled reboot");
-                Events.Reboot("Scheduled reboot");
+                eventRepository.Reboot("Scheduled reboot");
                 SystemControl.doReboot();
             }
             //SystemControl.ResycNTP();
@@ -2151,7 +2368,7 @@ public class ObcService extends Service implements OnTripCallback {
 
         @Override
         public void onReceive(Context c, Intent i) {
-            boolean status = SystemControl.hasNetworkConnection(ObcService.this);
+            boolean status = SystemControl.hasNetworkConnection(ObcService.this,eventRepository);
             dlog.d("Broadcast CONNECTIVITY_CHANGE " + i.getAction() + status);
             setNetworkConnectionStatus(status);
         }
@@ -2180,13 +2397,13 @@ public class ObcService extends Service implements OnTripCallback {
                 case Connectors.MSG_TRIPS_SENT_OFFLINE:
                 case Connectors.MSG_TRIPS_SENT_REALTIME:
                     Trips corse = App.Instance.getDbManager().getCorseDao();
-                    corse.sendOffline(ObcService.this, this);
+                    corse.sendOffline(ObcService.this, this, phpRepository);
                     carInfo.updateTrips();
                     break;
 
                 case Connectors.MSG_EVENTS_SENT_OFFLINE:
                     Events eventi = App.Instance.getDbManager().getEventiDao();
-                    eventi.spedisciOffline(ObcService.this, this);
+                    eventi.spedisciOffline(ObcService.this, this,phpRepository);
                     break;
 
                 case Connectors.MSG_DN_ADMINS:
@@ -2194,18 +2411,20 @@ public class ObcService extends Service implements OnTripCallback {
                     obc_io.addAdminCard(obj.AdminsList);
                     break;
 
-                case Connectors.MSG_DN_CLIENTI:
+                case Connectors.MSG_DN_CLIENTI:/*
                     CustomersConnector cc = (CustomersConnector) msg.obj;
                     if (cc.getReceivedRecords() > 0) {
                         startDownloadCustomers();
-                    }
+                    }*/
                     break;
 
-                case Connectors.MSG_DN_CONFIGS:
+                case Connectors.MSG_DN_CONFIGS:/*
                     ConfigsConnector cfgc = (ConfigsConnector) msg.obj;
                     if (cfgc.ConfigsString != null) {
                         App.Instance.setConfig(cfgc.ConfigsString, null);
-                    }
+                    }*/
+                    break;
+
 
             }
 
@@ -2336,12 +2555,12 @@ public class ObcService extends Service implements OnTripCallback {
                     break;
 
                 case MSG_CAR_INFO:
-                    Bundle b = carInfo.getBundle();
+                    //Bundle b = carInfo.getBundle();
                     try {
-                        Message rmsg = Message.obtain(null, MSG_CAR_INFO);
-                        rmsg.setData(b);
-                        msg.replyTo.send(rmsg);
-                    } catch (RemoteException e) {
+                        Message rmsg = MessageFactory.notifyCarInfoUpdate(carInfo);
+                        //rmsg.setData(b);
+                        sendAll(rmsg);
+                    } catch (Exception e) {
                         DLog.E("Error sending to client", e);
                     }
                     break;
@@ -2376,8 +2595,8 @@ public class ObcService extends Service implements OnTripCallback {
 
 
                 case MSG_CUSTOMER_SOS:
-                    Events.eventSos((String) msg.obj);
-                    startCallCenterCall(msg.replyTo, (String) msg.obj);
+                    eventRepository.eventSos((String) msg.obj);
+                    //startCallCenterCall(msg.replyTo, (String) msg.obj);
                     break;
 
 
@@ -2443,10 +2662,10 @@ public class ObcService extends Service implements OnTripCallback {
                     if (App.currentTripInfo != null && App.currentTripInfo.isOpen && ((App.getParkModeStarted() == null && App.isCloseable) || App.getParkModeStarted() != null)) {
 
                         localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,1));
-                        Events.selfCloseTrip(App.currentTripInfo.trip.remote_id, msg.arg1);
+                        eventRepository.selfCloseTrip(App.currentTripInfo.trip.remote_id, msg.arg1);
 
 
-                        ObcService.this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, false);
+                        ObcService.this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, (msg.arg1>0 && !App.pinChecked));
                     } else {
                         dlog.w("MSG_TRIP_SELFCLOSE discarded");
                     }
@@ -2457,7 +2676,7 @@ public class ObcService extends Service implements OnTripCallback {
                     if (App.currentTripInfo != null && App.currentTripInfo.isOpen ) {
 
                         localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,1));
-                        Events.selfCloseTrip(App.currentTripInfo.trip.remote_id, 0);
+                        eventRepository.selfCloseTrip(App.currentTripInfo.trip.remote_id, 0);
 
 
                         ObcService.this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, true);
@@ -2479,12 +2698,12 @@ public class ObcService extends Service implements OnTripCallback {
                     break;
 
                 case MSG_SERVER_HTTPNOTIFY:
-                    String response = ((NotifiesConnector) msg.obj).response;
-                    notifyServerMessage(msg.arg1, msg.arg2, response);
+                    /*String response = ((NotifiesConnector) msg.obj).response;
+                    notifyServerMessage(msg.arg1, msg.arg2, response);*/
                     break;
 
                 case MSG_SERVER_COMMAND:
-                    if (msg.obj != null) {
+                    /*if (msg.obj != null) {
                         List<ServerCommand> list = null;
                         try {
                             CommandsConnector cc = (CommandsConnector) msg.obj;
@@ -2496,11 +2715,27 @@ public class ObcService extends Service implements OnTripCallback {
                         }
 
                         executeServerCommands(list);
+                    }*/
+                    break;
+
+                case MSG_SERVER_COMMAND_NEW:
+                    if (msg.obj != null) {
+                        ServerCommand command = null;
+                        try {
+                            if(msg.obj instanceof ServerCommand)
+                            command = (ServerCommand) msg.obj;
+                        } catch (Exception e) {
+                            dlog.e("Exception casting server command:", e);
+                            break;
+                        }
+
+                        executeServerCommands(command);
                     }
                     break;
 
                 case MSG_SERVER_RESERVATION:
-                    ReservationConnector r = null;
+                    //Update retrofit
+                   /* ReservationConnector r = null;
                     try {
                         r = (ReservationConnector) msg.obj;
                     } catch (Exception e) {
@@ -2508,7 +2743,7 @@ public class ObcService extends Service implements OnTripCallback {
                         break;
                     }
 
-                    setReservation(r.getReservation());
+                    setReservation(r.getReservation());*/
                     break;
 
                 case MSG_SERVER_CHANGE_IP:
@@ -2593,7 +2828,7 @@ public class ObcService extends Service implements OnTripCallback {
 
 
                     dlog.d("Received endCharging message");
-                    if (!carInfo.chargingPlug && App.Charging) {
+                    if (!carInfo.isChargingPlug() && App.Charging) {
                         App.Charging = false;
                         App.Instance.persistCharging();
                         if(FMaintenance.Instance!=null)
@@ -2617,7 +2852,7 @@ public class ObcService extends Service implements OnTripCallback {
                     break;
                 case ObcService.MSG_CAR_START_CHARGING:
 
-                    if (carInfo.chargingPlug) {
+                    if (carInfo.isChargingPlug()) {
                         carInfo.chargingAmpere = carInfo.currentAmpere;
                     }
                     break;
@@ -2719,9 +2954,9 @@ public class ObcService extends Service implements OnTripCallback {
             public void run() {
                 try {
 
-                    if(System.currentTimeMillis()/1000- App.currentTripInfo.trip.begin_timestamp<60*5 || carInfo.batteryLevel>=25 || App.lastLocation==null )
+                   /* if(System.currentTimeMillis()/1000- App.currentTripInfo.trip.begin_timestamp<60*5 || carInfo.batteryLevel>=25 || App.lastLocation==null )
                         return;
-
+                   */
                     for(Poi singlePoi : PoiList){
                         if(App.lastLocation.distanceTo(singlePoi.getLoc())<=90){
                                 sendAll(MessageFactory.notifyTripPoiUpdate(1,singlePoi));
@@ -2762,6 +2997,8 @@ public class ObcService extends Service implements OnTripCallback {
             @Override
             public void run() {
 */
+       if(response.trip.id == App.currentTripInfo.trip.id)
+           App.currentTripInfo = response;
         sendAll(MessageFactory.apiTripCallback(response));
             /*}
         },15000);*/
@@ -2782,7 +3019,236 @@ public class ObcService extends Service implements OnTripCallback {
             super.onPostExecute(aLong);
             FPdfViewer P2 = new FPdfViewer().newInstance("LIBRETTO",false,true);
             P2.control("ASSICURAZIONE");
-            P2.control("LIBRETTO");}
+            P2.control("LIBRETTO");
+        }
 
     }
+
+
+
+
+    public static String FileName;
+    public static SimpleDateFormat fileDate;
+    public static String directory = Environment.getExternalStorageDirectory() + "/DataLogger/";
+    public static JSONObject j =  new JSONObject();
+    public int Sec = 15;
+    public int [] SensorTempValue = {-3000,-3000,-3000,-3000,-3000,-3000,-3000};
+
+    public void Run() throws JSONException {
+        SimpleDateFormat d2 = new SimpleDateFormat("yyyyMMdd");
+        String TodayDate = d2.format(new Date());
+        if(FileName != null)
+        {
+            if(Integer.parseInt(FileName) < Integer.parseInt(TodayDate)  ) {
+                deleteOldLog();
+                File file= new File (directory+FileName +".json");
+                FileWriter output= null;
+                try {
+                    output = new FileWriter(file,true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    output.write(']');
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                FileName = TodayDate;
+                getData();
+            }else{
+                FileName = TodayDate;
+                getData();
+            }
+
+        } else{
+           // fileDate = new SimpleDateFormat(d2.toString());
+            FileName = TodayDate;
+            getData();
+        }
+
+    }
+    public void deleteOldLog(){
+        SimpleDateFormat d2 = new SimpleDateFormat("yyyyMMdd");
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MONTH, -1);
+        int LastmonthDate = Integer.parseInt(d2.format(cal.getTime()));
+        File folder = new File(directory);
+        if (folder.exists()) {
+            File[] fList = folder.listFiles();
+
+            if (fList.length > 0) {
+                for(int i =0; i<fList.length; i++){
+                   int x =  Integer.parseInt(fList[i].getName().replace(".json",""));
+                   if(Integer.parseInt(fList[i].getName().replace(".json","")) < LastmonthDate)
+                   {
+                       fList[i].delete();
+                   }
+                }
+
+            }
+
+
+                }else
+                    return;
+
+
+
+
+        }
+
+
+
+
+    public void setOnSensorTempValue(int index, int onSensorTempValue) {
+        this.SensorTempValue[index] = onSensorTempValue;
+    }
+
+    @SuppressLint("DefaultLocale")
+    public void getData() throws JSONException {
+
+        for (int i = 0; i < Data.values().length; i++) {
+            getValue(Data.values()[i]);
+        }
+        Gson js = new Gson();
+        float[] Vcell = getCellVoltages();
+        float max = Vcell[0];
+        float min = Vcell[0];
+        float Vcell_sum = 0;
+        for (int i = 0; i < Vcell.length; i++) {
+            Vcell_sum = Vcell_sum+Vcell[i];
+            if (Vcell[i] > max) {
+                max = Vcell[i];
+            }
+            if (Vcell[i] < min) {
+                min = Vcell[i];
+            }
+        }
+        setData(Data.V_MAX_CELL.toString(), String.format("%.02f",max));
+        setData(Data.V_MIN_CELL.toString(), String.format("%.02f",min));
+        try {
+          //  Vcell = js.toJson();
+            setData(Data.V_BATTERY.toString(), String.format("%.02f",Vcell_sum));
+        } catch (Exception e) {
+            //Vcell = "-1";
+
+            setData(Data.V_BATTERY.toString(),String.valueOf("-1"));
+        }
+        int i =0;
+        float meanTEMP = 0;
+        for(int c=0; c< 7; c++)
+        {
+            if(SensorTempValue[c] > -10 && SensorTempValue[c] <45 )
+            {
+                i = i+1;
+                meanTEMP = meanTEMP + SensorTempValue[c];
+            }
+        }
+        if(i>0){
+            meanTEMP = meanTEMP / i;
+            setData(Data.MEAN_TEMP.toString(),  String.format("%.02f",meanTEMP));
+        } else
+            setData(Data.MEAN_TEMP.toString(),  "-3000");
+
+        try {
+            SaveToFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @SuppressLint("DefaultLocale")
+    public void getValue(Data data) throws JSONException {
+        switch (data){
+            case KM:
+                setData(data.toString(), String.format("%.02f",OptimizeDistanceCalc.totalDistance/1000));
+                break;
+
+            case SOC:
+                try {
+                    setData(data.toString(), String.valueOf(getSOCValue()));
+                }catch (Exception e){
+                    setData(data.toString(), String.valueOf(-1));
+                }
+                break;
+
+            case AMPER:
+                try {
+                    int AMP = getCurrentValue();
+                    setData(data.toString(), String.valueOf(AMP));
+                }catch (Exception e){
+                    setData(data.toString(), String.valueOf(-1));
+                }
+                break;
+
+            case TIME:
+                setData(data.toString(), String.valueOf(LocalDateTime.now()));
+                break;
+
+            case MEAN_TEMP:
+                //   setData(data.toString(), String.valueOf(LocalDateTime.now().getHourOfDay())+':'+LocalDateTime.now().getMinuteOfHour());
+
+                break;
+
+            case V_BATTERY:
+                //  setData(data.toString(), getCellVoltages().toString());
+                break;
+
+            case V_MAX_CELL:
+
+                break;
+
+            case V_MIN_CELL:
+                break;
+
+            case KM_FROM_TRIP_BEG:
+                setData(data.toString(), String.format("%.02f",OptimizeDistanceCalc.tripDistanceValue/1000));
+                break;
+            default:
+
+        }
+    }
+    public void setData(String name, String value) throws JSONException {
+        j.put(name,value);
+    }
+
+    public void SaveToFile() throws IOException {
+
+
+        File file= new File (directory+FileName +".json");
+        FileWriter output;
+        if(file.exists()) {
+            output = new FileWriter(file,true);
+            output.write(','+j.toString());
+        }
+        else {
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+            output = new FileWriter(file);
+            output.write('['+j.toString());
+        }
+
+        output.close();
+
+    }
+
+
+    public enum  Data{
+        TIME,
+        V_BATTERY,
+        AMPER,
+        V_MAX_CELL,
+        V_MIN_CELL,
+        MEAN_TEMP,
+        SOC,
+        KM,
+        KM_FROM_TRIP_BEG
+    }
+
+
 }

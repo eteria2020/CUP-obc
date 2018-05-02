@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:layout_width="match_parent"
+<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent" android:layout_marginBottom="5dp" xmlns:android="http://schemas.android.com/apk/res/android" android:background="@color/black">
 
     <View android:id="@+id/fins_top_V"
@@ -14,105 +16,82 @@
         android:layout_alignParentBottom="true"
         android:background="#fdee66" />
 
-    <FrameLayout
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/frameLayout3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/frameLayout"
-        android:layout_toStartOf="@+id/frameLayout"
         android:layout_above="@+id/fins_bottom_V"
-        android:layout_below="@+id/fins_top_V">
+        android:layout_below="@+id/fins_top_V"
+        android:layout_toLeftOf="@+id/frameLayout"
+        android:layout_toStartOf="@+id/frameLayout">
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/fins_top_V"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_toLeftOf="@+id/frameLayout"
-            android:layout_toStartOf="@+id/frameLayout"
-            android:id="@+id/linearLayout"
-            android:layout_above="@+id/fins_bottom_V">
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="32dp"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:src="@drawable/charging_plug"
+            app:layout_constraintBottom_toTopOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/fins_top_V"
-                android:text="Maintenance page"
-                android:textSize="55sp"
-                android:gravity="center_horizontal"
-                android:layout_toLeftOf="@+id/frameLayout"
-                android:textStyle="bold"
-                android:textColor="#feef79" />
 
-            <LinearLayout
-                android:id="@+id/linearLayout2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:orientation="horizontal" >
-
-                <TextView
-                    android:id="@+id/textView6"
-                    android:layout_width="65dp"
-                    android:layout_height="65dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/img_circle_white"
-                    android:gravity="center"
-                    android:textColor="#FFFFFF"
-                    android:textSize="40sp"
-                    android:textStyle="bold"
-                    android:text="-" />
-
-                <TextView
-                    android:id="@+id/tvEndCharging"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginStart="8dp"
-                    android:gravity="start"
-                    android:padding="8dp"
-                    android:text="@string/refuel_customer"
-                    android:textColor="@color/white"
-                    android:textSize="35sp"
-                    android:layout_marginTop="20dp" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btnEndCharging"
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="End charge"
-            android:textSize="22sp"
-            android:layout_above="@+id/fins_bottom_V"
-            android:layout_alignLeft="@+id/tvEndCharging"
-            android:layout_alignStart="@+id/tvEndCharging"
-            android:layout_gravity="center_horizontal|bottom"
-            android:background="@drawable/sel_button_fuel_station"
-            android:layout_marginBottom="25dp"
-            android:textColor="@color/text_green"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintGuide_begin="252dp"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/btnCarUpdate"
+        <TextView
+            android:id="@+id/tvEndCharging"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:gravity="start"
+            android:maxHeight="200dp"
+            android:padding="8dp"
+            android:text="@string/maintenance_instruction"
+            android:textColor="@color/white"
+            android:textSize="35sp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline" />
+
+
+        <TextView
+            android:id="@+id/tvChargingStatus"
+            android:layout_width="0dp"
+            android:layout_height="0sp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginStart="32dp"
+            android:text="TextView"
+            android:textColor="@color/white"
+            android:textSize="30sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline3" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Refresh Data"
-            android:textSize="20sp"
-            android:layout_above="@+id/fins_bottom_V"
-            android:layout_alignLeft="@+id/tvEndCharging"
-            android:layout_alignStart="@+id/tvEndCharging"
-            android:layout_gravity="left|bottom"
-            android:background="@drawable/sel_button_fuel_station"
-            android:layout_marginBottom="25dp"
-            android:textColor="@color/text_green"
-            android:textStyle="bold"
-            android:layout_marginLeft="75dp" />
-    </FrameLayout>
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="435dp" />
+
+    </android.support.constraint.ConstraintLayout>
 
     <FrameLayout
         android:id="@+id/frameLayout"
@@ -124,9 +103,26 @@
         android:layout_alignParentEnd="true"
         android:background="#3ea447" >
 
-        <Button android:id="@+id/finsNextIB" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_above="@+id/fins_bottom_V" android:layout_alignParentRight="true" android:layout_marginBottom="25dp"
-            android:background="@drawable/button_next"
-            android:layout_gravity="center_horizontal|bottom" />
+        <Button android:id="@+id/fmaintSOSB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:layout_gravity="center_horizontal|top"
+            android:background="@drawable/sel_button_sos" />
+
+        <Button
+            android:id="@+id/btnCarUpdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Refresh Data"
+            android:textSize="20sp"
+            android:visibility="gone"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:background="@drawable/sel_button_fuel_station"
+            android:layout_marginBottom="25dp"
+            android:textColor="@color/text_green"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvCountdown"
@@ -137,6 +133,18 @@
             android:text="-"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="36sp" />
+        <Button
+            android:id="@+id/btnEndCharging"
+            android:layout_width="142dp"
+            android:layout_height="105dp"
+            android:background="@drawable/sel_button_fuel_station"
+            android:text="End charge"
+            android:textColor="@color/text_green"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="70dp"
+            android:textSize="22sp"
+            android:textStyle="bold"/>
+
     </FrameLayout>
 
 </RelativeLayout>

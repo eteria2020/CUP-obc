@@ -15,16 +15,20 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
@@ -41,11 +45,16 @@ import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
 import com.Hik.Mercury.SDK.Manager.CANManager;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.skobbler.ngx.SKCoordinate;
 import com.skobbler.ngx.SKMaps;
 import com.skobbler.ngx.SKMapsInitSettings;
 import com.skobbler.ngx.SKPrepareMapTextureListener;
 import com.skobbler.ngx.SKPrepareMapTextureThread;
 import com.skobbler.ngx.map.SKMapViewStyle;
+import com.skobbler.ngx.map.SKPolygon;
+import com.skobbler.ngx.map.SKPolyline;
 import com.skobbler.ngx.navigation.SKAdvisorSettings;
 import com.skobbler.ngx.packages.SKPackage;
 import com.skobbler.ngx.packages.SKPackageManager;
@@ -64,6 +73,10 @@ import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 import ch.qos.logback.core.util.StatusPrinter;
 import eu.philcar.csg.OBC.controller.map.util.GeoUtils;
+import eu.philcar.csg.OBC.data.common.ErrorResponse;
+import eu.philcar.csg.OBC.data.datasources.api.ApiModule;
+import eu.philcar.csg.OBC.data.model.AreaResponse;
+import eu.philcar.csg.OBC.data.model.LatLng;
 import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Events;
@@ -74,8 +87,9 @@ import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.Encryption;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.helpers.SkobblerSearch;
-import eu.philcar.csg.OBC.server.AreaConnector;
-import eu.philcar.csg.OBC.server.HttpConnector;
+import eu.philcar.csg.OBC.injection.component.ApplicationComponent;
+import eu.philcar.csg.OBC.injection.component.DaggerApplicationComponent;
+import eu.philcar.csg.OBC.injection.module.ApplicationModule;
 import eu.philcar.csg.OBC.server.SslConnection;
 import eu.philcar.csg.OBC.service.AdvertisementService;
 import eu.philcar.csg.OBC.service.ObcService;
@@ -83,6 +97,13 @@ import eu.philcar.csg.OBC.service.ParkMode;
 import eu.philcar.csg.OBC.service.Reservation;
 import eu.philcar.csg.OBC.service.ServiceConnector;
 import eu.philcar.csg.OBC.service.TripInfo;
+import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Application;
@@ -115,6 +136,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
+import android.support.multidex.MultiDexApplication;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
@@ -122,12 +144,13 @@ import android.util.FloatMath;
 import android.util.Log;
 import android.widget.Toast;
 
+import javax.inject.Inject;
 
 
 @ReportsCrashes(
         formKey = "", // This is required for backward compatibility but not used
 		formUri = "http://core.sharengo.it/api/post_crashreport.php",
-        mode = ReportingInteractionMode.SILENT, 
+        mode = ReportingInteractionMode.SILENT,
         customReportContent = {APP_VERSION_CODE , APP_VERSION_NAME,/* SETTINGS_GLOBAL,*/ AVAILABLE_MEM_SIZE, CUSTOM_DATA, STACK_TRACE, USER_APP_START_DATE ,LOGCAT/*, DEVICE_ID, SHARED_PREFERENCES*/ },
         reportType=org.acra.sender.HttpSender.Type.JSON,
         resToastText = R.string.Acra_message
@@ -135,20 +158,72 @@ import android.widget.Toast;
 
 
 
-public class App extends Application {
+public class App extends MultiDexApplication {
 
 	private DLog dlog = new DLog(this.getClass());
-	
+
 	public static App Instance;
+	public static Versions versions = new Versions();
+
+	ApplicationComponent mApplicationComponent;
+
 	public App() {
 		Instance = this;
 		initSharengo();
-		
+
 	}
-	
+
+
+	public static void onFailedApi(ErrorResponse e) {
+		if(e.errorType != ErrorResponse.ErrorType.EMPTY) {
+			if (hasNetworkConnection()) {
+				if (SystemClock.elapsedRealtime() - getDiffLastApiError() < 60 * 1000) {//1min
+					if (++networkExceptions > 60) {
+						setNetworkStable(false);
+					}
+				}
+				setLastApiError(SystemClock.elapsedRealtime());
+
+
+			} else {
+				setNetworkStable(false);
+			}
+
+		}
+	}
+
+	public static boolean isNetworkStable() {
+		return networkStable || getDiffLastApiError()>20*60*1000;//20 min
+	}
+
+	public static void setNetworkStable(boolean networkStable) {
+		App.networkStable = networkStable;
+	}
+
+	public static long getLastApiError() {
+		return lastApiError;
+	}
+
+
+	public static long getDiffLastApiError() {
+		return SystemClock.elapsedRealtime() - lastApiError;
+	}
+
+	public static void setLastApiError(long lastApiError) {
+		App.lastApiError = lastApiError;
+	}
+
+	public static boolean hasNetworkConnection() {
+		return hasNetworkConnection;
+	}
+
+	public static void setHasNetworkConnection(boolean hasNetworkConnection) {
+		App.hasNetworkConnection = hasNetworkConnection;
+	}
+
 
 	public static class Versions {
-		
+
 		static  {
 			AndroidDevice = Build.DEVICE;
 			AndroidModel = Build.MODEL;
@@ -156,7 +231,7 @@ public class App extends Application {
 			AndroidRadio = Build.getRadioVersion();
 			AndroidSDK =  Build.VERSION.SDK_INT;
 		}
-		
+
 		public static String AndroidDevice;
 		public static String AndroidBuild;
 		public static String AndroidModel;
@@ -176,37 +251,37 @@ public class App extends Application {
 		public static String TBoxSw;
 		public static String VINCode;
 		public static String HbVer;
-		
+
 		public static int getLevel() {
 			if (AndroidDevice==null)
 				return 0;
-			
+
 			switch (AndroidDevice) {
-			
+
 			case "tiny4412":
 				return 0;
-				
+
 			case "ita_d1":
 				return 1;
 
 			default:
 				return 0;
 			}
-					
+
 		}
-		
-		
+
+
 		public static String toJson() {
 			JSONObject jo = new JSONObject();
 			try {
-				
+
 				jo.put("AndroidDevice", AndroidDevice);
 				jo.put("AndroidBuild",AndroidBuild);
-				
+
 				jo.put("AppName", AppName);
 				jo.put("AppCode", AppCode);
-				
-				
+
+
 				jo.put("Service", Service);
 				jo.put("SDK", SDK);
 				jo.put("MCU", MCU);
@@ -217,7 +292,7 @@ public class App extends Application {
 				jo.put("MCUModel", MCUModel);
 				jo.put("TBoxHw", TBoxHw);
 				jo.put("TBoxSw", TBoxSw);
-				jo.put("VINCode", VINCode);				
+				jo.put("VINCode", VINCode);
 				jo.put("HbVer", HbVer);
 			} catch (JSONException e) {
 				DLog.E("Versions to json",e);
@@ -225,10 +300,10 @@ public class App extends Application {
 			return jo.toString();
 
 		}
-		
+
 	}
 
-	
+
 
 	public void initSharengo() {
 
@@ -262,7 +337,7 @@ public class App extends Application {
 			URL_Time = "http://corestage.sharengo.it/api/get_date.php";
 			IP_UDP_Beacon = "185.81.1.24";
 			Port_UDP_Beacon = 7600;
-			APP_DATA_PATH="/csg-stage/";
+			APP_DATA_PATH=getString(R.string.app_data_path);
 		}
 		else {
 			URL_Area = "http://core.sharengo.it/api/zone/json.php?";
@@ -287,7 +362,7 @@ public class App extends Application {
 			URL_ZMQNotifier = "tcp://185.58.119.117:8001";
 			URL_AdsBuilder = "http://manage.sharengo.it/banner2.php";
 			URL_AdsBuilderCar = "http://manage.sharengo.it/banner2_offline.php";
-			URL_AdsBuilderStart = "http://manage.sharengo.it/dev/banner4_offline.php";
+			URL_AdsBuilderStart = "http://manage.sharengo.it/banner4_offline.php";
 			URL_AdsBuilderEnd = "http://manage.sharengo.it/banner5_offline.php";
 			URL_Time = "http://core.sharengo.it/api/get_date.php";
 			IP_UDP_Beacon = "185.58.119.117";
@@ -325,10 +400,10 @@ public class App extends Application {
 	}
 
 	public enum Fleets { SHARENGO };
-	
-	
+
+
 	public static final Fleets FLEET_IDENTITY = Fleets.SHARENGO;
-	
+
 	public static final int AWELCOME_UID = 0x0001;
 	public static final int ASOS_UID     = 0x0010;
 	public static final int AMAINOBC_UID = 0x0100;
@@ -338,8 +413,8 @@ public class App extends Application {
 	public static final boolean USE_TTS_ALERT=false;
 
 	public static final int ConnectionTimeout=61000;
-	
-	
+
+
 	public static String URL_Area;
 	public static String URL_Beacon;
 	public static String URL_PoisIcons;
@@ -368,17 +443,17 @@ public class App extends Application {
 	
 	public static String IP_UDP_Beacon;
 	public static int    Port_UDP_Beacon;
-	
-	
+
+
 	public static final String COMMON_PREFERENCES = "eu.philcar.csg.preferences";
 //	public static final String USE_NAVIGATOR = COMMON_PREFERENCES + ".use_navigator";
-	
-	public DbManager dbManager;	
-	
+	@Inject
+	public DbManager dbManager;
+
 	private ServiceConnector serviceConnector;
-	
+
 	private SharedPreferences preferences;
-	
+
 
 	private static final String  KEY_CarPlate = "CarPlate";
 	private static final String  KEY_fw_version = "fw_version";
@@ -421,22 +496,22 @@ public class App extends Application {
 
 	
 	public static final String  KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
-	
+
 
 	public static RadioSetup radioSetup;
 	public static CardRfidCollection openDoorsCards;
-	
+
 	public static String CarPlate="ND";
 	public static String Damages = "";
 	public static String FuelCard_PIN = null;
-	
+
 	public static int    Pulizia_int=0;
 	public static int    Pulizia_ext=0;
-	
+
 	public static boolean isNavigatorEnabled = true;
 	public static int isAdmin=0; //1=MAGGIMI PRIVILEGI; 2=PRIVILEGI RIDOTTI;
 	public static boolean canRestartZMQ=true;
-	
+
 	public static int     id_Version;
 	public static String  sw_Version="ND";
 	public static String  fw_version="ND";
@@ -456,6 +531,7 @@ public class App extends Application {
 	}
 
 	public static int   km=0;
+	public static int   km2=0;
 	public static long  whiteListSize=0;
 	public static int   tabletBatteryTemperature=0;
 	public static int   tabletBatteryLevel=0;
@@ -467,31 +543,31 @@ public class App extends Application {
 	private static int bmsCountTo90 =0;
 
 
-	
+
 	public static TripInfo currentTripInfo;
-	
+
 	public static Reservation reservation;
-	
+
 	public static String MacAddress="";
 	public static String IMEI="";
 	public static String PhoneNumber="";
 	public static String SimSerialNumber="";
-	
+
 	private static Date   ParkModeStarted;
 	public static ParkMode parkMode = ParkMode.PARK_OFF;
 	public static boolean motoreAvviato=false;
-	
+
 	public static boolean pinChecked = false;
 	public static boolean userDrunk = false;
-	
+
 	public static boolean isCloseable=true;
 	public static boolean isClosing=false;
-	
+
 	public static boolean  ObcIoError=false;
 	public static boolean  Charging = false;
-	
+
 	public static boolean  AlarmSOCSent=false;
-	
+
 	public static boolean  AlarmEnabled=false;
 	public static String   AlarmSmsNumber="";
 	public static List<String> BatteryAlarmSmsNumbers;
@@ -503,13 +579,15 @@ public class App extends Application {
 	public static int	   FleetId = 0;
 	public static int	   ServerIP = 0;
 	public static String timeZone;
-	
-	public static boolean hasNetworkConnection=false;
+
+	private static boolean hasNetworkConnection=false;
+	private static boolean networkStable = true;
+	private static long		lastApiError = 0;
 	public static Date    lastNetworkOn = new Date();
-	
+
 	public static Date    AppStartupTime = new Date(), AppScheduledReboot=new Date();
 	public static Date    lastUpdateCAN =new Date();
-	
+
 	public static String APP_DATA_PATH = "/csg/";
 	public static final String APP_LOG_PATH = "/log/";
 	public static final String APP_OLD_LOG_PATH = "/log/";
@@ -517,16 +595,16 @@ public class App extends Application {
 	public static final String POI_POSITION_FOLDER ="PoisPos/";
 	public static final String BANNER_IMAGES_FOLDER ="BannerImages/";
 	public static final String END_IMAGES_FOLDER ="BannerImages/";
-	
+
 	private final String  CONFIG_FILE ="config";
 	private final String  STOP_FILE ="stop";
 
-	
+
 	private final String  SPLIT_TRIP_CONFIG_FILE ="splittrip.txt";
 	private final String  DEFAULT_CITY_CONFIG_FILE = "default_city.txt";
 	private final String  MOCKLOCATION_CONFIG_FILE ="mockgps.txt";
 	private final String  ZMQ_DISABLE_CONFIG_FILE = "zmq_disable.txt";
-	
+
 	private static String foregroundActivity="";
 	private static boolean loaded=false;
 	public static long serverTime=0;
@@ -534,12 +612,12 @@ public class App extends Application {
 
 	private SensorManager sensorManager;
 	private Sensor        motionDetector;
-	
+
 	private SMSreceiver smsReceiver;
 	private IntentFilter intentFilter;
 
 	public CANManager CanManager;
-	
+
 	private ABase mCurrentActivity = null;
 	public static long lastConnReset =0;
 	public static Date update_Poi = new Date();
@@ -551,10 +629,12 @@ public class App extends Application {
 	public static Bundle BannerName= new Bundle();
 	public static Bundle askClose=new Bundle();
 	public static int CounterCleanlines=0;
-	
+
 	public static String AreaPolygonMD5;
 	public static ArrayList<double[]> AreaPolygons;
-	
+	public static List<List<SKCoordinate>> nodes;
+	public static List<List<SKCoordinate>> polyline;
+
 	//public static final double[] polygon = new double[]{46.091832, 13.235410, 46.096125, 13.234584, 46.097628, 13.239723, 46.092658, 13.240678};	// Udine
 	//public static final double[] polygon = new double[]{45.402867 , 9.276161, 45.402867 , 9.053406, 45.542358 , 9.053406, 45.542358 , 9.276161};		// Milano
 	//public static final double[] polygon = new double[]{46.090560, 13.067453, 46.090560, 13.174187, 46.123334, 13.174187, 46.123334, 13.067453};		// Fagagna
@@ -700,7 +780,7 @@ public class App extends Application {
 			e.apply();
 		}
 	}
-	
+
 	public void persistCharging() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
@@ -708,7 +788,7 @@ public class App extends Application {
 			e.apply();
 		}
 	}
-	
+
 	public void persistRadioSetup() {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
@@ -729,7 +809,7 @@ public class App extends Application {
 			e.apply();
 		}
 	}
-	
+
 	public void persistWatchdog() {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
@@ -737,14 +817,14 @@ public class App extends Application {
 			e.apply();
 		}
 	}
-	
+
 	public void persistBatteryShutdownLevel() {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putInt(KEY_NewBatteryShutdownLevel, BatteryShutdownLevel);
 			e.apply();
-		}		
-		
+		}
+
 	}
 
 	public void persistFleetId() {
@@ -839,7 +919,7 @@ public class App extends Application {
 			App.userDrunk = false;
 		}
 	}
-	
+
 
 	public void loadReservation() {
 		if (this.preferences != null) {
@@ -850,7 +930,7 @@ public class App extends Application {
 			App.reservation = null;
 		}
 	}
-	
+
 	public void loadCharging() {
 		if (this.preferences != null) {
 			App.Charging = this.preferences.getBoolean(KEY_Charging, false);
@@ -858,12 +938,12 @@ public class App extends Application {
 			App.Charging = false;
 		}
 	}
-	
-	
+
+
 	public void loadBatteryAlarmSmsNumbers() {
-		
-		BatteryAlarmSmsNumbers = new ArrayList<String>();			
-		
+
+		BatteryAlarmSmsNumbers = new ArrayList<String>();
+
 		if (this.preferences != null) {
 			String json = preferences.getString(KEY_BatteryAlarmSmsNumbers, "[]");
 			JSONArray ja;
@@ -879,7 +959,7 @@ public class App extends Application {
 				dlog.e("Parsing BatteryAlarmSmsNumbers",e);
 			}
 		}
-		
+
 		if (BatteryAlarmSmsNumbers.size()==0) {
 			BatteryAlarmSmsNumbers.add("3442653987");
 			BatteryAlarmSmsNumbers.add("3703322640");
@@ -887,26 +967,26 @@ public class App extends Application {
 		}
 
 	}
-	
+
 public void loadRadioSetup() {
-		
-			
+
+
 		if (this.preferences != null) {
 			String json = preferences.getString(KEY_RadioSetup, "");
 			dlog.d("RadioSetup from preferences : " + json);
 			radioSetup = RadioSetup.fromJson(json);
-			
+
 		}
-		
+
 		if (radioSetup==null) {
 			radioSetup = new RadioSetup();
 			radioSetup.addChannel("FM", 105.10, "LifeGate");
 			radioSetup.addChannel("FM", 107.60, "Radio Popolare");
 			radioSetup.addChannel("FM", 99.70, "Radio Deejay");
 			radioSetup.addChannel("FM", 104.50, "Virgin Radio");
-			
+
 			persistRadioSetup();
-			
+
 			dlog.d("RadioSetup from defaults : " + radioSetup.toJson());
 		}
 
@@ -923,14 +1003,14 @@ public void loadRadioSetup() {
 		}
 
 	}
-	
-	
+
+
 	public boolean loadZmqDisabledConfig() {
 		File f = new File(getZMQ_DISABLE_CONFIG_FILE());
-		
+
 		return f.exists();
 	}
-	
+
 	public int loadSplitTripConfig() {
 		File f = new File(getSPLIT_TRIP_CONFIG_FILE());
 		if (f.exists()) {
@@ -945,13 +1025,13 @@ public void loadRadioSetup() {
 			} catch (Exception e) {
 				dlog.e("Loading split trip config : " + getSPLIT_TRIP_CONFIG_FILE(),e);
 			}
-	    
+
 		}
 		return 1435;
-		
+
 	}
-	
-	
+
+
 	public String loadDefaultCity() {
 		File f = new File(getDEFAULT_CITY_CONFIG_FILE());
 		if (f.exists()) {
@@ -967,10 +1047,10 @@ public void loadRadioSetup() {
 			} catch (Exception e) {
 				dlog.e("Loading split trip config : " + getDEFAULT_CITY_CONFIG_FILE(),e);
 			}
-	    
+
 		}
 		return "";
-		
+
 	}
 
 	public void loadMaxVoltage() {
@@ -999,57 +1079,57 @@ public void loadRadioSetup() {
 
 	}
 
-	
-	
+
+
 	public void SaveDefaultCity(String city) {
-		
+
 		App.DefaultCity = city;
-		
+
 		File f = new File(getDEFAULT_CITY_CONFIG_FILE());
-		
+
 		if (city==null) {
 			f.delete();
-		} else {		
+		} else {
 			try {
-				BufferedWriter bw = new BufferedWriter(new FileWriter(f));				
+				BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 				bw.write(city);
 				bw.close();
 			} catch (IOException e) {
 				dlog.e("Writing default city",e);
-	
+
 			}
 		}
-		
-			
+
+
 	}
 
 
 	public void setMockLocation(String json) {
-		
+
 		if (json==null || json.isEmpty() || json.equalsIgnoreCase("null")) {
 			setMockLocation(0,0);
 			return;
 		}
-		
+
 		try {
 			JSONArray ja = new JSONArray(json);
 			if (ja.length()>=2) {
 				setMockLocation(ja.getDouble(0),ja.getDouble(1));
 			}
-			
+
 		} catch (JSONException e) {
 			dlog.e("Setting MockLocation",e);
 		}
-		
-		
+
+
 	}
-	
+
 	public void setMockLocation(double lat, double lon) {
 		File f = new File(getMOCKLOCATION_CONFIG_FILE());
-		
+
 		if (lat==0 && lon==0) {
 			f.delete();
-		} else {		
+		} else {
 			try {
 				BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 				String line = String.format(Locale.US,"%f;%f", lat,lon);
@@ -1057,16 +1137,16 @@ public void loadRadioSetup() {
 				bw.close();
 			} catch (IOException e) {
 				dlog.e("Writing MOCKLOCATION",e);
-	
+
 			}
 		}
-		
+
 		loadMockLocationConfig();
 	}
-	
+
 	public void loadMockLocationConfig() {
 		File f = new File(getMOCKLOCATION_CONFIG_FILE());
-		
+
 		if (f.exists()) {
 			try {
 			    BufferedReader br = new BufferedReader(new FileReader(f));
@@ -1079,36 +1159,37 @@ public void loadRadioSetup() {
 				    	App.mockLocation.setLatitude(Double.parseDouble(p[0]));
 				    	App.mockLocation.setLongitude(Double.parseDouble(p[1]));
 				    	App.mockLocation.setAccuracy(1);
-				    	
+
 				    	App.lastLocation = App.mockLocation;
 			    	}
-			    	
+
 			    }
 			    br.close();
 			} catch (Exception e) {
 				dlog.e("Loading split trip config : " + getMOCKLOCATION_CONFIG_FILE(),e);
 			}
-	    
+
 		} else {
 			App.mockLocation = null;
 		}
-		
-		
+
+
 	}
-	
-	
-	
-	
+
+
+
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+		getComponent().inject(this);
 
+		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
 
 
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		StatusPrinter.print(lc);
-
+		OptimizeDistanceCalc.context = getApplicationContext();
 		//configureLogbackDirectly(getAppLogPath(),"logtest");
 		//SystemControl.InsertAPN(this, "");
 
@@ -1149,6 +1230,7 @@ public void loadRadioSetup() {
 		dlog.i("CPU_ABI: " +Build.CPU_ABI);
 		dlog.i("RADIO: " +Build.getRadioVersion());
 		dlog.i("ANDROID VERSION: " +Build.VERSION.SDK_INT);
+
 		/*
 		File skmaps = new File("/sdcard/skmaps.zip");
 		if ( skmaps.exists()) {
@@ -1250,6 +1332,7 @@ public void loadRadioSetup() {
 		initPhase2();
 }
 
+	@SuppressLint("HandlerLeak")
 	private final Handler localHandler = new Handler() {
 
 		@Override
@@ -1268,7 +1351,7 @@ public void loadRadioSetup() {
 	};
 	
 		
-private Handler searchHandler = new Handler() {
+/*private Handler searchHandler = new Handler() {
 	
 	 SkobblerSearch sks = new SkobblerSearch();
 	
@@ -1296,20 +1379,20 @@ private Handler searchHandler = new Handler() {
 		 }
 		 
 	 }
-};
+};*/
 
-private void  initPhase2() {		
-	
+private void  initPhase2() {
+
 		//SkobblerSearch sks = new SkobblerSearch();
 		//sks.preselect(new String[] {"Milano","Via Massena", "10"}, null);		
 		//searchHandler.sendEmptyMessage(0);
 
-	
+
 		ACRA.init(this);
 
 		PackageInfo pInfo;
 		try {
-			pInfo = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_PERMISSIONS);			
+			pInfo = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_PERMISSIONS);
 			App.sw_Version = pInfo.versionName;
 			App.id_Version = pInfo.versionCode;
 			App.Versions.AppCode = pInfo.versionCode;
@@ -1319,12 +1402,13 @@ private void  initPhase2() {
 					dlog.d("Uses permission: " + s);
 				}
 			}
-				
+
 		} catch (NameNotFoundException e1) {
 			dlog.e("App package not found",e1);
 
 		}
-		
+		setDNS();
+
 		try {
 			WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 			WifiInfo info = manager.getConnectionInfo();
@@ -1333,13 +1417,15 @@ private void  initPhase2() {
 		} catch (Exception e){
 			dlog.e("Failed reading MAC address",e);
 		}
-		
+
 		try {
 			TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 			IMEI = telephonyManager.getDeviceId();
 			SimSerialNumber =  telephonyManager.getSimSerialNumber();
 			PhoneNumber = telephonyManager.getLine1Number();
 			dlog.d("Got IMEI : " + IMEI);
+		} catch (SecurityException e){
+			dlog.e("Failed reading IMEI ",e);
 		} catch (Exception e){
 			dlog.e("Failed reading IMEI ",e);
 		}
@@ -1375,14 +1461,14 @@ private void  initPhase2() {
 		initAreaPolygon();
 
 		
-		dbManager =  DbManager.getInstance(this);
-		dbManager.getReadableDatabase();
+		//dbManager =  DbManager.getInstance(this);
+		//dbManager.getReadableDatabase();
 		
 		
 		
 		
-		Trips corse = dbManager.getCorseDao();
-		corse.sendOffline(this, null);
+		//Trips corse = dbManager.getCorseDao();
+		//corse.sendOffline(this, null);
 
 		
         //SMS event receiver
@@ -1396,7 +1482,7 @@ private void  initPhase2() {
         serviceConnector.startService();
     
         // start handler which starts pending-intent after Application-Crash
-	    Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
+
 	    
 	    // TODO: enable the line below to schedule advertisement updates
 	    //scheduleAdvertisementUpdate();
@@ -1431,7 +1517,7 @@ private void  initPhase2() {
 							float z = pAcc[2]-acc[2];
 							
 							
-							float module = FloatMath.sqrt(x*x+y*y+z*z);
+							float module = (float) Math.sqrt(x*x+y*y+z*z);
 							
 							if (module>1 && App.AlarmEnabled && App.currentTripInfo==null) {
 							  dlog.d("Motion alarm. Module=" + module);
@@ -1474,7 +1560,7 @@ private void  initPhase2() {
 	}
 
 
-	public  void setCarPlate(String carPlate) {
+	public void setCarPlate(String carPlate) {
 
 		//Null or empty Plate should be ignored
 		if (carPlate==null || carPlate.isEmpty() || carPlate.equalsIgnoreCase("NULL"))
@@ -1489,7 +1575,7 @@ private void  initPhase2() {
 		if (carPlate.equals(App.CarPlate))
 			return;
 
-		Events.CarPlateChange(App.CarPlate,carPlate);
+		//Events.CarPlateChange(App.CarPlate,carPlate);
 
 		Editor editor = preferences.edit();
 		editor.putString(KEY_CarPlate, carPlate);
@@ -1576,7 +1662,8 @@ private void  initPhase2() {
 	}
 
 	public  void setKm( int km) {
-
+		if(OptimizeDistanceCalc.totalDistance != 0)
+			km = (int) OptimizeDistanceCalc.totalDistance/1000; // momo
 		if (km==App.km || km==0)
 			return;
 
@@ -1909,7 +1996,18 @@ private void  initPhase2() {
 		loadDefaultCity();
 		loadBmsCountTo90();
 	}
-	
+
+	public void setDNS(){
+		try {
+
+			Runtime rt = Runtime.getRuntime();
+			rt.exec(new String[]{"/system/xbin/su", "-c", "setprop net.dns1 208.67.222.222"});
+			rt.exec(new String[]{"/system/xbin/su", "-c", "setprop net.dns2 8.8.8.8"});
+
+		}catch(Exception e){
+			dlog.e("Impossible to set manually DNS ",e);
+		}
+	}
 	public static String getipAddress() { 
         try {
             for (Enumeration en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
@@ -1960,13 +2058,7 @@ private void  initPhase2() {
 		return (now-boot)/1000;
 	}
 	
-	public void startAreaPolygonDownload(Context ctx, Handler handler) {
-		DLog.D("Start area download..");
-		AreaConnector cn = new AreaConnector();
-		HttpConnector http = new HttpConnector(ctx);
-		http.SetHandler(handler);
-		http.Execute(cn);
-	}
+
 	
 	public void initAreaPolygon() {
 		
@@ -1990,7 +2082,7 @@ private void  initPhase2() {
 				String str;
 				while ((str = reader.readLine())!=null) {
 					writer.write(str);
-				};
+				}
 				writer.close(); reader.close();
 				oms.close();ims.close();
 			} catch (IOException e) {
@@ -2004,8 +2096,8 @@ private void  initPhase2() {
 
 		StringBuilder sb = new StringBuilder();
 	    try {
-	    	
-			InputStream ims = new FileInputStream(areaFile);	
+
+			InputStream ims = new FileInputStream(areaFile);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(ims));
 			String str;
 			while ((str=reader.readLine())!=null) {
@@ -2063,12 +2155,203 @@ private void  initPhase2() {
 			}
 		}
 		
+	decodeAreaPolygonSkobbler(json);
+	}
 
+	private static Observable<AreaResponse>stringToAreaResponse(String json){
+		Type listType = new TypeToken<List<AreaResponse>>(){}.getType();
+		Gson gson = new Gson();
+		return Observable.fromIterable(gson.fromJson(json,listType));
+	}
+
+	private static Observable<AreaResponse>decodeStringToAreaResponse(String json){
+    	return Observable.just(json)
+				.delay(5, TimeUnit.SECONDS) //for faster boot purpose
+				.concatMap(App::stringToAreaResponse);
+	}
+
+	public static void decodeAreaPolygonSkobbler(String json) {
+		nodes = new ArrayList<List<SKCoordinate>>();
+		polyline = new ArrayList<List<SKCoordinate>>();
+
+    	decodeStringToAreaResponse(json) //Area response out now we have to select the maxLat  min and max
+				.concatMap(AreaResponse::initPoints)
+				.concatMap(AreaResponse::initEnvelop)
+				.filter(AreaResponse::insideItaly)
+				.sorted()
+				.take(5)
+				.subscribeOn(Schedulers.computation())
+				.observeOn(Schedulers.io())
+				.subscribe(new Observer<AreaResponse>() {
+					@Override
+					public void onSubscribe(Disposable d) {
+
+					}
+
+					@Override
+					public void onNext(AreaResponse areaResponse) {
+						polyline.add(areaResponse.getEnvelope());
+					}
+
+					@Override
+					public void onError(Throwable e) {
+
+					}
+
+					@Override
+					public void onComplete() {
+
+					}
+				});
+
+
+
+
+		/*JSONArray jArray;
+		try {
+
+			jArray = new JSONArray(json);
+		} catch (JSONException e) {
+			DLog.E("decodeAreaPolygon : ", e);
+			return ;
+		}
+
+		int n = jArray.length();
+
+		for (int i = 0; i < n; i++) {
+
+			try {
+				JSONObject jobj = jArray.getJSONObject(i);
+				JSONArray jarr = jobj.getJSONArray("coordinates");
+				int x  = jarr.length();
+				List<SKCoordinate> node =new ArrayList<>();
+				List<SKCoordinate> envelope =new ArrayList<>();
+				SKCoordinate min = null;
+				SKCoordinate max = null;
+				SKCoordinate maxLat = new SKCoordinate(0,0);
+
+				for (int j=0;j<x;j+=3) {
+					SKCoordinate point = new SKCoordinate(0,0);
+					try {
+						point = new SKCoordinate(jarr.getDouble(j), jarr.getDouble(j+1));
+						if(point.getLongitude() == 10.925045013428)
+							DLog.E("Mhh è modena");
+						if(min == null)
+							min = new SKCoordinate(point.getLongitude(),point.getLatitude());
+						if(max== null) {
+							max = new SKCoordinate(point.getLongitude(), point.getLatitude());
+							maxLat = point;
+						}
+
+						if(point.getLatitude()<min.getLatitude()){
+							min.setLatitude(point.getLatitude());
+						}else if(point.getLatitude()>max.getLatitude()) {
+							max.setLatitude(point.getLatitude());
+							maxLat = point;
+						}
+
+						if(point.getLongitude()<min.getLongitude()){
+							min.setLongitude(point.getLongitude());
+						}else if(point.getLongitude()>max.getLongitude())
+							max.setLongitude(point.getLongitude());
+
+					}catch (NumberFormatException e){
+						DLog.E("Exception parsing coordinate while init Points",e);
+					}
+
+
+
+
+					node.add(point);
+				}
+
+				//Keep only the biggest area on screen
+
+
+
+				envelope.clear();
+				Double offset = 0.005;
+				//Set the start of the Polyline as the max lat
+				int indexMaxLat = node.indexOf(maxLat);
+				for( int k =indexMaxLat;k<node.size()-1;k++){
+					envelope.add(node.get(k));
+				}
+				for (int k = 0; k <indexMaxLat; k++){
+					envelope.add(node.get(k));
+				}
+				envelope.add(new SKCoordinate(node.get(indexMaxLat).getLongitude(),node.get(indexMaxLat).getLatitude()+Double.MIN_VALUE));
+				envelope.add(new SKCoordinate(node.get(indexMaxLat).getLongitude(),node.get(indexMaxLat).getLatitude()+offset ));
+				envelope.add(new SKCoordinate( max.getLongitude()+offset*1.25,max.getLatitude()+offset));//1
+				envelope.add(new SKCoordinate( max.getLongitude()+offset*1.25,min.getLatitude()-offset));//2
+				envelope.add(new SKCoordinate( min.getLongitude()-offset*1.25,min.getLatitude()-offset));//3
+				envelope.add(new SKCoordinate( min.getLongitude()-offset*1.25,max.getLatitude()+offset));//4
+				envelope.add(new SKCoordinate(node.get(indexMaxLat).getLongitude(),node.get(indexMaxLat).getLatitude()+offset+Double.MIN_VALUE));//5
+				envelope.add(node.get(indexMaxLat));
+
+
+				nodes.add(node);
+				polyline.add(envelope);
+
+			} catch (Exception e) {
+
+				DLog.E("WTF Exception in ",e);
+			}
+		}*/
+
+		// Render the polygon on the map
+
+
+
+	}
+
+	public static List<SKPolygon> getSKPoligon(){
+    	List<SKPolygon> result = new ArrayList<>();
+    	for(List<SKCoordinate> node : nodes){
+
+			SKPolygon polygon = new SKPolygon();
+			polygon.setNodes(node);
+			// Set the outline size
+			polygon.setOutlineSize(3);
+			// Set colors used to render the polygon
+			polygon.setOutlineColor(new float[]{ 1f, 0f, 0f, 1f});
+			polygon.setColor(new float[]{ 1f, 0f, 0f, 0.2f});
+			polygon.setIdentifier(10);
+
+			result.add(polygon);
+		}
+		return result;
+    }
+	public static List<SKPolyline> getSKPolyline(){
+		List<SKPolyline> result = new ArrayList<>();
+		for(List<SKCoordinate> node : nodes){
+			SKPolyline polyline = new SKPolyline();
+
+			polyline.setNodes(node);
+			// Set the outline size
+
+
+			result.add(polyline);
+		}
+		return result;
+	}
+
+	public static List<SKPolygon> getSKPolylineEnvelope(){
+		List<SKPolygon> result = new ArrayList<>();
+		for(List<SKCoordinate> node : polyline){
+			SKPolygon polyline = new SKPolygon();
+
+			polyline.setNodes(node);
+			// Set the outline size
+
+
+			result.add(polyline);
+		}
+		return result;
 	}
 	
 	public DbManager  getDbManager() {
-		if (dbManager==null)
-			dbManager =  DbManager.getInstance(this);
+		/*if (dbManager==null)
+			dbManager =  DbManager.getInstance(this);*/
 		
 		
 		return dbManager;
@@ -2324,9 +2607,10 @@ private void  initPhase2() {
 	    }
 	}
 
+	@Deprecated
 	public static boolean startShutdownTimer(){
 		if(shutdownTimer==0) {
-			Events.StartShutdown();
+			//Events.StartShutdown();
 			shutdownTimer = SystemClock.elapsedRealtime();
 		}
 		if (SystemClock.elapsedRealtime() - shutdownTimer >3*60 * 60 * 1000) { //3 ORE
@@ -2338,10 +2622,11 @@ private void  initPhase2() {
 		}
 	}
 
+	@Deprecated
 	public static void stopShutdownTimer(){
 		if(shutdownTimer!=0){
 			shutdownTimer = 0;
-			Events.StopShutdown();
+			//Events.StopShutdown();
 		}
 	}
 
@@ -2383,5 +2668,23 @@ private void  initPhase2() {
 		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 		root.setLevel(Level.TRACE);
 		root.addAppender(rollingFileAppender);
+	}
+
+	public static App get(Context context) {
+		return (App) context.getApplicationContext();
+	}
+
+	public ApplicationComponent getComponent() {
+		if (mApplicationComponent == null) {
+			mApplicationComponent = DaggerApplicationComponent.builder()
+					.applicationModule(new ApplicationModule(this))
+					.apiModule(new ApiModule())
+					.build();
+		}
+		return mApplicationComponent;
+	}
+
+	public void setComponent(ApplicationComponent applicationComponent) {
+		mApplicationComponent = applicationComponent;
 	}
 }

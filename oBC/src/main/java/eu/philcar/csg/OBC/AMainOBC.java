@@ -32,6 +32,8 @@ import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.service.MessageFactory;
 import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.ServiceConnector;
+import eu.philcar.csg.OBC.task.OdoController;
+import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 import android.annotation.SuppressLint;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
@@ -145,7 +147,7 @@ public class AMainOBC extends ABase implements LocationListener {
 		Boolean inside=true;
 		try{
 		if (App.lastLocation!=null)
-		 	inside =	App.checkParkArea(App.lastLocation.getLatitude(), App.lastLocation.getLongitude());
+		 	inside = App.checkParkArea(App.lastLocation.getLatitude(), App.lastLocation.getLongitude());
 		}catch(Exception e){
 			dlog.e("Exception while checking inside area ",e);
 		}
@@ -474,6 +476,8 @@ public class AMainOBC extends ABase implements LocationListener {
 
 
 		//updateAd();
+		if(location != null)
+			OptimizeDistanceCalc.Controller(OdoController.RUNonChangGps,location);
 
 
 
