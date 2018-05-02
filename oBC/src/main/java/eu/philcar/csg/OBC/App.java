@@ -314,6 +314,7 @@ public class App extends MultiDexApplication {
 			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
 			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
 			URL_Clienti = "https://corestage.sharengo.it:8123/whitelist2";
+			URL_NRD = "https://corestage.sharengo.it:8123/getredbutton";
 			URL_Dipendenti = "https://corestage.sharengo.it:8123/business-employees";
 			URL_Commands = "http://corestage.sharengo.it/api/get_commands.php?";
 			//URL_Corse = "http://corestage.sharengo.it/api/pushcorsa-convenzioni.php?";
@@ -342,7 +343,7 @@ public class App extends MultiDexApplication {
 			URL_Area = "http://core.sharengo.it/api/zone/json.php?";
 			URL_Beacon = "http://api.sharengo.it/api/pushbeacon.php?";
 			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
-
+			URL_NRD = "https://api.sharengo.it:8123/getredbutton";
 			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
 			URL_Clienti = "https://api.sharengo.it:8123/whitelist2";
 			URL_Dipendenti = "https://api.sharengo.it:8123/business-employees";
@@ -438,7 +439,8 @@ public class App extends MultiDexApplication {
 	public static String URL_UpdateEndImages;
 	public static String URL_Configs;
 	public static String URL_Time;
-
+	public static String URL_NRD;
+	
 	public static String IP_UDP_Beacon;
 	public static int    Port_UDP_Beacon;
 
@@ -490,7 +492,9 @@ public class App extends MultiDexApplication {
 	private static final String  KEY_TimeZone = "time_zone";
 	private static final String  KEY_NewBatteryShutdownLevel = "new_battery_shutdown_level";
 
+	public static String NRD = "-1";
 
+	
 	public static final String  KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
 
 
@@ -1487,8 +1491,8 @@ private void  initPhase2() {
 	    if (!f.exists()) {
 	    	f.mkdirs();
 	    }
-	    
-	   
+
+
 	    sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
 	    motionDetector = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 	    
