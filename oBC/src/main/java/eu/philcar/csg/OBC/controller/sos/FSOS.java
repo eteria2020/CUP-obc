@@ -153,7 +153,7 @@ public class FSOS extends FBase implements OnClickListener {
 			
 		case R.id.fsosDialCallB:
 			
-			((ASOS)getActivity()).sendMessage(MessageFactory.requestCallCenterCall(customerCenterNumber));
+			((ASOS)getActivity()).sendMessage(MessageFactory.requestCallCenterCallSOS(customerCenterNumber));
 			
 			changeNumberB.setVisibility(View.INVISIBLE);
 			dialCallB.setVisibility(View.INVISIBLE);

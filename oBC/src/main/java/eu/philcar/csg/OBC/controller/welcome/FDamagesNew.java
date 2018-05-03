@@ -302,9 +302,9 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
             case R.id.fdamCallB:
 
                 if (login) {
-                    ((AWelcome)getActivity()).sendMessage(MessageFactory.requestCallCenterCall(customerCenterNumber));
+                    ((AWelcome)getActivity()).sendMessage(MessageFactory.requestCallCenterCallDMG(customerCenterNumber));
                 } else {
-                    ((AGoodbye)getActivity()).sendMessage(MessageFactory.requestCallCenterCall(customerCenterNumber));
+                    ((AGoodbye)getActivity()).sendMessage(MessageFactory.requestCallCenterCallDMG(customerCenterNumber));
                 }
 
                 questionLL.setVisibility(View.GONE);

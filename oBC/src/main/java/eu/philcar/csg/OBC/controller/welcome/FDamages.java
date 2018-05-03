@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AGoodbye;
+import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
@@ -247,9 +248,9 @@ public class FDamages extends FBase implements OnClickListener, OnSeekBarChangeL
 		case R.id.fdamCallB:
 			
 			if (login) {
-				((AWelcome)getActivity()).sendMessage(MessageFactory.requestCallCenterCall(customerCenterNumber));
+				((AWelcome)getActivity()).sendMessage(MessageFactory.requestCallCenterCallDMG(customerCenterNumber));
 			} else {
-				((AGoodbye)getActivity()).sendMessage(MessageFactory.requestCallCenterCall(customerCenterNumber));
+				((AMainOBC)getActivity()).sendMessage(MessageFactory.requestCallCenterCallDMG(customerCenterNumber));
 			}
 			
 			questionLL.setVisibility(View.GONE);

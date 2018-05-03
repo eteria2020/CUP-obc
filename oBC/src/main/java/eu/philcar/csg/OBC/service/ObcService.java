@@ -159,6 +159,7 @@ public class ObcService extends Service implements OnTripCallback {
     public static final int MSG_CUSTOMER_CHECKPIN = 41;
     public static final int MSG_CAR_CLEANLINESS = 42;
     public static final int MSG_CUSTOMER_SOS = 43;
+    public static final int MSG_CUSTOMER_DMG = 44;
 
     public static final int MSG_TRIP_BEGIN = 50;
     public static final int MSG_TRIP_END = 51;
@@ -2597,6 +2598,11 @@ public class ObcService extends Service implements OnTripCallback {
                 case MSG_CUSTOMER_SOS:
                     eventRepository.eventSos((String) msg.obj);
                     //startCallCenterCall(msg.replyTo, (String) msg.obj);
+                    break;
+
+                case MSG_CUSTOMER_DMG:
+                    Events.eventDmg((String) msg.obj);
+                    startCallCenterCall(msg.replyTo, (String) msg.obj);
                     break;
 
 

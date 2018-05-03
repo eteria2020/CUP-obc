@@ -133,8 +133,9 @@ public class Events extends DbTable<Event,Integer> {
 	}
 
 	public static void eventSos(String number) {
-		generateEvent(EVT_SOS,0,number);
+		generateEvent(EVT_SOS,1,number);
 	}
+	public static void eventDmg(String number) { generateEvent(EVT_SOS,2,number); }
 
 	public static void eventCmd(String cmd) {
 		generateEvent(EVT_CMD,0,cmd);
