@@ -9,6 +9,7 @@ public class Connectors {
 	public static final int MSG_DN_AREAS =1021;
 	public static final int MSG_DN_CONFIGS =1022;
 	public static final int MSG_DN_ADS = 1111;
+	public static final int MSG_SEND_EMAIL = 1112;
 	
 
 	public static final int MSG_UP_BEACON =2020;

@@ -308,7 +308,7 @@ public class App extends MultiDexApplication {
 	public void initSharengo() {
 
 		if(App.ServerIP==1) { //App.Instance.ServerIP==1
-
+			URL_SENDEMAIL = "https://corestage.sharengo.it:8123/sendemail?";
 			URL_Area = "http://corestage.sharengo.it/api/zone/json.php?";
 			URL_Beacon = "http://corestage.sharengo.it/api/pushbeacon.php?";
 			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
@@ -344,6 +344,7 @@ public class App extends MultiDexApplication {
 			URL_Beacon = "http://api.sharengo.it/api/pushbeacon.php?";
 			URL_Callcenter = "http://mobile.sharengo.it/soscar.php?";
 			URL_NRD = "https://api.sharengo.it:8123/getredbutton";
+			URL_SENDEMAIL = "https://api.sharengo.it:8123/sendemail?";
 			//URL_Clienti = "http://core.sharengo.it/api/whitelist.php?";
 			URL_Clienti = "https://api.sharengo.it:8123/whitelist2";
 			URL_Dipendenti = "https://api.sharengo.it:8123/business-employees";
@@ -413,8 +414,9 @@ public class App extends MultiDexApplication {
 	public static final boolean USE_TTS_ALERT=false;
 
 	public static final int ConnectionTimeout=61000;
+	
 
-
+	public static String URL_SENDEMAIL;
 	public static String URL_Area;
 	public static String URL_Beacon;
 	public static String URL_PoisIcons;
@@ -440,7 +442,7 @@ public class App extends MultiDexApplication {
 	public static String URL_Configs;
 	public static String URL_Time;
 	public static String URL_NRD;
-	
+
 	public static String IP_UDP_Beacon;
 	public static int    Port_UDP_Beacon;
 
@@ -494,7 +496,7 @@ public class App extends MultiDexApplication {
 
 	public static String NRD = "-1";
 
-	
+
 	public static final String  KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
 
 

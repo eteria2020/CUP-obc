@@ -204,8 +204,8 @@
 
         <ImageView android:id="@+id/ivDirty" android:layout_width="200dp" android:layout_height="138dp" android:layout_above="@+id/tvDirty" android:layout_alignLeft="@id/ivDamages" android:layout_alignTop="@+id/finsNextIB" android:background="@drawable/sel_button_roundedblack" android:clickable="true" android:padding="9dp" android:src="@drawable/img_car_dirty"/>
         <TextView android:id="@+id/tvDirty" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignLeft="@+id/ivDirty" android:layout_alignParentBottom="true" android:layout_alignRight="@+id/ivDirty" android:text="@string/instruction_dirty" android:textAppearance="?android:attr/textAppearanceMedium" android:textSize="32sp"/>
-        
-        
+
+
         <LinearLayout android:id="@+id/llSelfClose" android:layout_width="140dp" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_centerVertical="true" android:layout_gravity="right|center_vertical" android:layout_marginRight="10dp" android:background="@drawable/sha_roundedbox" android:orientation="vertical" android:padding="20dp">
             <TextView android:id="@+id/tvSelfclose" android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_horizontal" android:text="@string/self_close_message" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#000" android:textSize="24sp"/>
             <TextView android:id="@+id/tvCountdown" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="5dp" android:gravity="center_horizontal" android:text="30 s" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#F00" android:textSize="42sp"/>

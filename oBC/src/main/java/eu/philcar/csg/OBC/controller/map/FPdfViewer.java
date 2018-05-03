@@ -1,15 +1,23 @@
 package eu.philcar.csg.OBC.controller.map;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
@@ -37,11 +45,17 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.server.HttpConnector;
+import eu.philcar.csg.OBC.server.HttpsConnector;
+import eu.philcar.csg.OBC.server.SendEmail;
 
 import static java.lang.Boolean.FALSE;
 
@@ -65,6 +79,11 @@ public class FPdfViewer extends FBase {
     protected int fileSize = 0;
     private int mega = 1024 * 1024; // per il buffer
     private String downloadUrl;
+    private TextView tv1;
+    private   Button b;
+    public String response;
+    Handler h1;
+    private Bundle bb = new Bundle();
 
     public static FPdfViewer newInstance(String fileTypeString) {
         return newInstance(fileTypeString, false, false);
@@ -94,13 +113,29 @@ public class FPdfViewer extends FBase {
         super.onCreate(savedInstanceState);
         this.control();
 
+        h1 = new Handler(Looper.getMainLooper()) {
+
+            @Override
+            public void handleMessage(Message msg) {
+                bb = msg.getData();
+                String str = bb.getString("response");
+                setTitleText(str);
+            }
+        };
+
 
         //  Toast.makeText(getActivity(), "No Application available to view PDF", Toast.LENGTH_SHORT).show();
     }
 
+
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setOpenFile(true);
+
         View view = inflater.inflate(R.layout.f_pdf, container, false);
+
+        tv1 = (TextView)view.findViewById(R.id.resp);
+        tv1.setVisibility(View.INVISIBLE);
 
         ((ImageButton) view.findViewById(R.id.fmenBackIB)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,9 +149,103 @@ public class FPdfViewer extends FBase {
         if (file != null && file.exists()) {
             openPdf(file, PDFView);
         }
+        b = (Button) view.findViewById(R.id.sendDocument);
+        b.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                getEmail();
+            }
+
+        });
         return view;
     }
+    public void setTitleText(String resp) {
+        this.response = resp;
+        getActivity().runOnUiThread(new Runnable() {
 
+            @Override
+            public void run() {
+                b.setVisibility(View.INVISIBLE);
+                tv1.setText(response);
+                tv1.setVisibility(View.VISIBLE);
+            }
+        });
+
+    }
+    public void getEmail(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        builder.setTitle("Inserisci una mail valida");
+
+        // Add edit text for password input
+        final EditText input = new EditText(getActivity());
+        input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS );
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String email =  input.getText().toString();
+                DLog.I("Email inserita : " + ", "+email);
+                if(isEmailValid(email)){
+
+                        try {
+                            SendEmail sendEmail= new SendEmail();
+                            sendEmail.setEmail(email);
+                            sendEmail.setHandler(h1);
+                            HttpsConnector httpConnector = new HttpsConnector(getActivity());
+                            httpConnector.Execute(sendEmail);
+
+
+                        } catch (Exception e) {
+                            DLog.E("SendEmail", e);
+
+                        }
+                    }
+
+                else {
+                    Toast.makeText(getActivity(), "EMAIL NON VALIDA", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                //  sendemail.execute();
+
+            }
+        });
+        builder.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    public boolean isEmailValid(String email)
+    {
+        String regExpn =
+                "^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]{1}|[\\w-]{2,}))@"
+                        +"((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                        +"[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
+                        +"([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                        +"[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
+                        +"([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$";
+
+        CharSequence inputStr = email;
+
+        Pattern pattern = Pattern.compile(regExpn,Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(inputStr);
+
+        if(matcher.matches())
+            return true;
+        else
+            return false;
+    }
     protected void openPdf(File pdf, PDFView pdfView) {
 
 
