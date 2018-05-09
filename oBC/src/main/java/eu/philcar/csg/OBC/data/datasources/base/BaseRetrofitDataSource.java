@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
+import eu.philcar.csg.OBC.data.model.SharengoResponse;
 import eu.philcar.csg.OBC.db.DbRecord;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.service.DataManager;
@@ -28,6 +29,12 @@ public abstract class BaseRetrofitDataSource {
             mSubscriptions = new CompositeDisposable();
         }
         mSubscriptions.add(d);
+    }
+
+    protected <T> Observable<T> extractResponse(SharengoResponse<T> response){
+
+        return Observable.just(response.data);
+
     }
 
     protected <T> ObservableTransformer<Result<T>, T> handleRetrofitRequest() {
@@ -71,7 +78,8 @@ public abstract class BaseRetrofitDataSource {
             }
 
             return Observable.just(r.response().body());
-        });
+        }
+        );
     }
 
     protected void handleResponsePersistance(DbRecord record,BaseResponse response, DataManager manager, int callOrder){

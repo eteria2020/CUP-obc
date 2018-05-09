@@ -2,8 +2,7 @@ package eu.philcar.csg.OBC.data.datasources;
 
 import java.util.List;
 
-import eu.philcar.csg.OBC.data.model.AreaResponse;
-import eu.philcar.csg.OBC.data.model.CommandResponse;
+import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.Event;
@@ -21,7 +20,7 @@ import io.reactivex.Observable;
 public interface SharengoPhpDataSource {
 
 
-    Observable<List<AreaResponse>> getArea(String plate, String md5);
+    Observable<List<Area>> getArea(String plate, String md5);
 
     Observable<List<ServerCommand>> getCommands(String plat);
 

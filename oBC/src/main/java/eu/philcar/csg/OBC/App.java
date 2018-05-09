@@ -20,8 +20,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
@@ -59,7 +57,6 @@ import com.skobbler.ngx.navigation.SKAdvisorSettings;
 import com.skobbler.ngx.packages.SKPackage;
 import com.skobbler.ngx.packages.SKPackageManager;
 import com.skobbler.ngx.packages.SKPackageURLInfo;
-import com.skobbler.ngx.search.SKSearchResult;
 import com.skobbler.ngx.versioning.SKVersioningManager;
 
 
@@ -75,18 +72,14 @@ import ch.qos.logback.core.util.StatusPrinter;
 import eu.philcar.csg.OBC.controller.map.util.GeoUtils;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.api.ApiModule;
-import eu.philcar.csg.OBC.data.model.AreaResponse;
-import eu.philcar.csg.OBC.data.model.LatLng;
-import eu.philcar.csg.OBC.db.Trips;
+import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.db.DbManager;
-import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.devices.RadioSetup;
 import eu.philcar.csg.OBC.helpers.CardRfidCollection;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.Encryption;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
-import eu.philcar.csg.OBC.helpers.SkobblerSearch;
 import eu.philcar.csg.OBC.injection.component.ApplicationComponent;
 import eu.philcar.csg.OBC.injection.component.DaggerApplicationComponent;
 import eu.philcar.csg.OBC.injection.module.ApplicationModule;
@@ -106,7 +99,6 @@ import io.reactivex.schedulers.Schedulers;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
-import android.app.Application;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -140,7 +132,6 @@ import android.support.multidex.MultiDexApplication;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
-import android.util.FloatMath;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -2160,13 +2151,13 @@ private void  initPhase2() {
 	decodeAreaPolygonSkobbler(json);
 	}
 
-	private static Observable<AreaResponse>stringToAreaResponse(String json){
-		Type listType = new TypeToken<List<AreaResponse>>(){}.getType();
+	private static Observable<Area>stringToAreaResponse(String json){
+		Type listType = new TypeToken<List<Area>>(){}.getType();
 		Gson gson = new Gson();
 		return Observable.fromIterable(gson.fromJson(json,listType));
 	}
 
-	private static Observable<AreaResponse>decodeStringToAreaResponse(String json){
+	private static Observable<Area>decodeStringToAreaResponse(String json){
     	return Observable.just(json)
 				.delay(5, TimeUnit.SECONDS) //for faster boot purpose
 				.concatMap(App::stringToAreaResponse);
@@ -2177,22 +2168,22 @@ private void  initPhase2() {
 		polyline = new ArrayList<List<SKCoordinate>>();
 
     	decodeStringToAreaResponse(json) //Area response out now we have to select the maxLat  min and max
-				.concatMap(AreaResponse::initPoints)
-				.concatMap(AreaResponse::initEnvelop)
-				.filter(AreaResponse::insideItaly)
+				.concatMap(Area::initPoints)
+				.concatMap(Area::initEnvelop)
+				.filter(Area::insideItaly)
 				.sorted()
 				.take(5)
 				.subscribeOn(Schedulers.computation())
 				.observeOn(Schedulers.io())
-				.subscribe(new Observer<AreaResponse>() {
+				.subscribe(new Observer<Area>() {
 					@Override
 					public void onSubscribe(Disposable d) {
 
 					}
 
 					@Override
-					public void onNext(AreaResponse areaResponse) {
-						polyline.add(areaResponse.getEnvelope());
+					public void onNext(Area area) {
+						polyline.add(area.getEnvelope());
 					}
 
 					@Override

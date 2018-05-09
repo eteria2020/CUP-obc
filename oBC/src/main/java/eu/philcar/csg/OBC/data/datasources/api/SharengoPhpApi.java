@@ -2,12 +2,10 @@ package eu.philcar.csg.OBC.data.datasources.api;
 
 import java.util.List;
 
-import eu.philcar.csg.OBC.data.model.AreaResponse;
-import eu.philcar.csg.OBC.data.model.CommandResponse;
+import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.Poi;
-import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.Reservation;
 import io.reactivex.Observable;
@@ -22,7 +20,7 @@ import retrofit2.http.Query;
 public interface SharengoPhpApi {
 
     @GET("zone/json.php")
-    Observable<Result<List<AreaResponse>>> getArea(@Query("targa") String plate, @Query("md5") String md5);
+    Observable<Result<List<Area>>> getArea(@Query("targa") String plate, @Query("md5") String md5);
 
     @GET("get_commands.php")
     Observable<Result<List<ServerCommand>>> getCommands(@Query("car_plate") String car_plate);

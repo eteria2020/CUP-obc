@@ -10,7 +10,7 @@ import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
  * Created by Fulvio on 16/02/2018.
  */
 
-public class ConfigResponse extends BaseResponse {
+public class Config extends BaseResponse {
     private String BatteryAlarmSMSNumbers;
     private String DefaultCity;
     private String UseExternalGPS;
@@ -22,7 +22,7 @@ public class ConfigResponse extends BaseResponse {
     private String TimeZone;
     private String OpenDoorsCards;
 
-    public ConfigResponse(String batteryAlarmSMSNumbers, String defaultCity, String useExternalGPS, String radioSetup, String watchdog, String newBatteryShutdownLevel, String fleetId, String serverIP, String timeZone, String openDoorsCards) {
+    public Config(String batteryAlarmSMSNumbers, String defaultCity, String useExternalGPS, String radioSetup, String watchdog, String newBatteryShutdownLevel, String fleetId, String serverIP, String timeZone, String openDoorsCards) {
         BatteryAlarmSMSNumbers = batteryAlarmSMSNumbers;
         DefaultCity = defaultCity;
         UseExternalGPS = useExternalGPS;

@@ -15,14 +15,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import eu.philcar.csg.OBC.App;
-import eu.philcar.csg.OBC.data.datasources.api.SharengoService;
-import eu.philcar.csg.OBC.data.model.AreaResponse;
-import eu.philcar.csg.OBC.data.model.CommandResponse;
-import eu.philcar.csg.OBC.data.model.ConfigResponse;
+import eu.philcar.csg.OBC.data.model.Area;
+import eu.philcar.csg.OBC.data.model.Config;
 import eu.philcar.csg.OBC.data.model.ModelResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
-import eu.philcar.csg.OBC.db.Customers;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Event;
 import eu.philcar.csg.OBC.db.Poi;
@@ -80,7 +77,7 @@ public class DataManager { //TODO change to interface-type system like api does 
 
     }
 
-    public void saveConfig(ConfigResponse customer) {
+    public void saveConfig(Config customer) {
 
         App.Instance.setConfig(customer.getJson(),null);
 
@@ -92,7 +89,7 @@ public class DataManager { //TODO change to interface-type system like api does 
 
     }
 
-    public Observable<List<AreaResponse>> saveArea(List<AreaResponse> area){
+    public Observable<List<Area>> saveArea(List<Area> area){
 
         return persistArea(area);
     }
@@ -221,7 +218,7 @@ public class DataManager { //TODO change to interface-type system like api does 
     }
 
 
-    private Observable<List<AreaResponse>> persistArea(List<AreaResponse> area){
+    private Observable<List<Area>> persistArea(List<Area> area){
         File file = new File(App.getAppDataPath(),"area.json");
 
         String result;

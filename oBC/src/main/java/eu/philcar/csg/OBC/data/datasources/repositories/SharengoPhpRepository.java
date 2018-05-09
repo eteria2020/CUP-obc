@@ -2,7 +2,6 @@ package eu.philcar.csg.OBC.data.datasources.repositories;
 
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +12,7 @@ import javax.inject.Singleton;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.SharengoPhpDataSource;
-import eu.philcar.csg.OBC.data.model.AreaResponse;
+import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.Event;
@@ -69,7 +68,7 @@ public class SharengoPhpRepository {
                     //Emit single Area Response at time
                     .concatMap(Observable::fromIterable)
                     .subscribeOn(Schedulers.io())
-                    .subscribe(new Observer<AreaResponse>() {
+                    .subscribe(new Observer<Area>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
                             areaDisposable = d;
@@ -78,13 +77,13 @@ public class SharengoPhpRepository {
 
                         /**
                          * here I have to parse the response and crate a sort of envelop for the map
-                         * @param areaResponse
+                         * @param area
                          */
                         @Override
-                        public void onNext(@NonNull AreaResponse areaResponse) {
-                            areaResponse.initPoints();
-                            areaResponse.initEnvelop();
-                            App.polyline.add(areaResponse.getEnvelope());
+                        public void onNext(@NonNull Area area) {
+                            area.initPoints();
+                            area.initEnvelop();
+                            App.polyline.add(area.getEnvelope());
 
                         }
 

@@ -4,12 +4,10 @@ import java.util.List;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoPhpApi;
-import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
 import eu.philcar.csg.OBC.data.datasources.base.BaseRetrofitDataSource;
-import eu.philcar.csg.OBC.data.model.AreaResponse;
+import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
-import eu.philcar.csg.OBC.db.DbRecord;
 import eu.philcar.csg.OBC.db.Event;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.db.Trip;
@@ -39,7 +37,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
      * @return all the area downloaded to be interpretated
      */
     @Override
-    public Observable<List<AreaResponse>> getArea(String plate, String md5) {
+    public Observable<List<Area>> getArea(String plate, String md5) {
         return  mSharengoPhpApi.getArea(plate,md5)
                 .compose(this.handleRetrofitRequest())
                 .doOnSubscribe(this::addDisposable)

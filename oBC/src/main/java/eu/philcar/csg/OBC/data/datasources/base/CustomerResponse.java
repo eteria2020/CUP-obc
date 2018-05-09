@@ -8,7 +8,7 @@ import eu.philcar.csg.OBC.db.Customer;
  * Created by Fulvio on 09/02/2018.
  */
 
-public class SharengoResponse {
+public class CustomerResponse {
 
     List<Customer> customers;
 }

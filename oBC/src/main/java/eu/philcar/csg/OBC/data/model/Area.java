@@ -18,7 +18,7 @@ import io.reactivex.Observable;
  * Created by Fulvio on 16/02/2018.
  */
 
-public class AreaResponse extends BaseResponse implements Comparable<AreaResponse> {
+public class Area extends BaseResponse implements Comparable<Area> {
     private String close_trip;
     private String costo_apertura;
     private String costo_chiusura;
@@ -36,7 +36,7 @@ public class AreaResponse extends BaseResponse implements Comparable<AreaRespons
     @ExcludeSerialization
     private int area = 0;
 
-    public AreaResponse(String close_trip, String costo_apertura, String costo_chiusura, List<String> coordinates) {
+    public Area(String close_trip, String costo_apertura, String costo_chiusura, List<String> coordinates) {
         this.close_trip = close_trip;
         this.costo_apertura = costo_apertura;
         this.costo_chiusura = costo_chiusura;
@@ -50,7 +50,7 @@ public class AreaResponse extends BaseResponse implements Comparable<AreaRespons
         this.envelope = new ArrayList<>();
     }
 
-    public Observable<AreaResponse> initPoints() {
+    public Observable<Area> initPoints() {
         init();
         try {
             int x = coordinates.size();
@@ -94,7 +94,7 @@ public class AreaResponse extends BaseResponse implements Comparable<AreaRespons
         return envelope;
     }
 
-    public Observable<AreaResponse> initEnvelop() {
+    public Observable<Area> initEnvelop() {
         Double offset = 0.15;
         //Set the start of the Polyline as the max lat
         int indexMaxLat = points.indexOf(maxLat);
@@ -124,13 +124,13 @@ public class AreaResponse extends BaseResponse implements Comparable<AreaRespons
     }
 
     /**
-     * compare 2 AreaResponse to order by the size of the inner area
+     * compare 2 Area to order by the size of the inner area
      *
      * @param o
      * @return
      */
     @Override
-    public int compareTo(@NonNull AreaResponse o) {
+    public int compareTo(@NonNull Area o) {
         return (int) (o.getArea() - getArea());
     }
 

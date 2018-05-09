@@ -8,7 +8,7 @@ import javax.inject.Singleton;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.SharengoDataSource;
-import eu.philcar.csg.OBC.data.model.ConfigResponse;
+import eu.philcar.csg.OBC.data.model.Config;
 import eu.philcar.csg.OBC.data.model.ModelResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
@@ -155,14 +155,14 @@ public class SharengoApiRepository {
             mRemoteDataSource.getConfig(App.CarPlate)
                     .doOnNext(n -> mDataManager.saveConfig(n))
                     .subscribeOn(Schedulers.io())
-                    .subscribe(new Observer<ConfigResponse>() {
+                    .subscribe(new Observer<Config>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
                             configDisposable = d;
                         }
 
                         @Override
-                        public void onNext(@NonNull ConfigResponse ribot) {
+                        public void onNext(@NonNull Config ribot) {
                         }
 
                         @Override
