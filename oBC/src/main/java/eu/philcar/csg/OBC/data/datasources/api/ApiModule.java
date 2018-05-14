@@ -117,12 +117,11 @@ public class ApiModule {
     @Provides
     @Singleton
     OkHttpClient provideOkHttpClientTrusted(Context context){
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        if (BuildConfig.DEBUG) {
-            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        } else {
-            logging.setLevel(HttpLoggingInterceptor.Level.NONE);
-        }
+        HttpLogger logger = new HttpLogger();
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor(logger);
+            logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
+
+
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);
@@ -216,12 +215,9 @@ public class ApiModule {
     @Provides
     @Singleton
     OkHttpClient provideOkHttpClient(){
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        if (BuildConfig.DEBUG) {
-            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        } else {
-            logging.setLevel(HttpLoggingInterceptor.Level.NONE);
-        }
+        HttpLogger logger = new HttpLogger();
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor(logger);
+            logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);

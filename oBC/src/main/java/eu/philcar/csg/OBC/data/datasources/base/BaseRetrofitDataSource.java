@@ -24,18 +24,14 @@ public abstract class BaseRetrofitDataSource {
 
     private CompositeDisposable mSubscriptions;
 
-    protected void addDisposable(Disposable d){
+    private void addDisposable(Disposable d){
         if(mSubscriptions == null || mSubscriptions.isDisposed()) {
             mSubscriptions = new CompositeDisposable();
         }
         mSubscriptions.add(d);
     }
 
-    protected <T> Observable<T> extractResponse(SharengoResponse<T> response){
 
-        return Observable.just(response.data);
-
-    }
 
     protected <T> ObservableTransformer<Result<T>, T> handleRetrofitRequest() {
 
@@ -77,8 +73,60 @@ public abstract class BaseRetrofitDataSource {
                 }
             }
 
-            return Observable.just(r.response().body());
+            return Observable.just(r.response().body())
+                    .doOnSubscribe(this::addDisposable)
+                    .doOnError(this::handleErorResponse)
+                    .doOnComplete(this::handleCompletion);
         }
+        );
+    }
+
+    protected <T> ObservableTransformer<Result<SharengoResponse<T>>, T> handleSharengoRetrofitRequest() {
+
+        return resultObservable -> resultObservable.flatMap((Function<Result<SharengoResponse<T>>, Observable<T>>) r -> {
+
+                    if (r.isError()) {
+                        Throwable throwable = r.error();
+
+                        if (throwable instanceof IOException) {
+                            if (throwable instanceof ConnectException) {
+                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK,throwable));
+                            } else if (throwable instanceof SocketTimeoutException) {
+                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.SERVER_TIMEOUT,throwable));
+                            } else if (throwable instanceof UnknownHostException) {
+                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK,throwable));
+                            } else if (throwable instanceof EOFException) {
+                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.EMPTY,throwable));
+                            }else{
+                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED,throwable));
+                            }
+                        } else {
+                            return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED,throwable));
+                        }
+                    }
+                    else {
+                        Response<SharengoResponse<T>> retrofitResponse = r.response();
+                        if (!retrofitResponse.isSuccessful()) {
+                            int code = retrofitResponse.code();
+                            String message = "";
+                            try {
+                                message = retrofitResponse.errorBody().string();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            ErrorResponse errorResponse = new ErrorResponse(ErrorResponse.ErrorType.HTTP);
+                            errorResponse.httpStatus = code;
+                            errorResponse.rawMessage = message;
+                            return Observable.error(errorResponse);
+                        }
+                    }
+
+                    return Observable.just(r.response().body())
+                            .concatMap(this::extractResponse)
+                            .doOnSubscribe(this::addDisposable)
+                            .doOnError(this::handleErorResponse)
+                            .doOnComplete(this::handleCompletion);
+                }
         );
     }
 
@@ -90,7 +138,7 @@ public abstract class BaseRetrofitDataSource {
 
     }
 
-    protected void handleErorResponse(Throwable e){
+    private void handleErorResponse(Throwable e){
         if(e instanceof ErrorResponse){
             App.onFailedApi((ErrorResponse) e);
             ErrorResponse er = (ErrorResponse) e;
@@ -122,7 +170,13 @@ public abstract class BaseRetrofitDataSource {
         }
     }
 
-    protected void hanldeCompletation(){
+    private void handleCompletion(){
      App.setNetworkStable(true);
+    }
+
+    private <T> Observable<T> extractResponse(SharengoResponse<T> response){
+
+        return Observable.just(response.data);
+
     }
 }

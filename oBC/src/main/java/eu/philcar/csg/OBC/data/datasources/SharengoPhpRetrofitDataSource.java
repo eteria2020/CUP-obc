@@ -39,10 +39,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
     @Override
     public Observable<List<Area>> getArea(String plate, String md5) {
         return  mSharengoPhpApi.getArea(plate,md5)
-                .compose(this.handleRetrofitRequest())
-                .doOnSubscribe(this::addDisposable)
-                .doOnError(this::handleErorResponse)
-                .doOnComplete(this::hanldeCompletation);
+                .compose(this.handleRetrofitRequest());
     }
 
     /**
@@ -53,9 +50,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
     @Override
     public Observable<List<ServerCommand>> getCommands(String plate) {
         return  mSharengoPhpApi.getCommands(plate)
-                .compose(this.handleRetrofitRequest())
-                .doOnSubscribe(this::addDisposable)
-                .doOnError(this::handleErorResponse);
+                .compose(this.handleRetrofitRequest());
     }
 
     /**
@@ -70,8 +65,6 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
             return mSharengoPhpApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat,
                     trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin, trip.id_parent==0?null:String.valueOf(trip.id_parent))
                     .compose(this.handleRetrofitRequest())
-                    .doOnSubscribe(this::addDisposable)
-                    .doOnError(this::handleErorResponse)
                     .doOnError(e -> {
                         trip.recharge = 0; //server result
                         trip.offline = true;
@@ -92,8 +85,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
     @Override
     public Observable<Trip> openTripPassive(final Trip trip, final DataManager dataManager) {
         return openTrip(trip,dataManager)
-                .concatMap(tripResponse -> Observable.just(trip))
-                .doOnError(this::handleErorResponse);
+                .concatMap(tripResponse -> Observable.just(trip));
     }
 
     /**
@@ -106,9 +98,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
 
             return mSharengoPhpApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat,
                     trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin,trip.id_parent==0?null:String.valueOf(trip.id_parent))
-                    .compose(this.handleRetrofitRequest())
-                    .doOnSubscribe(this::addDisposable)
-                    .doOnError(this::handleErorResponse);
+                    .compose(this.handleRetrofitRequest());
 
     }
 
@@ -119,8 +109,6 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
             return mSharengoPhpApi.closeTrip(2,trip.remote_id, trip.plate, trip.id_customer, trip.end_timestamp, trip.end_km, trip.end_battery, trip.end_lon, trip.end_lat,
                     trip.warning, trip.int_cleanliness, trip.ext_cleanliness, trip.park_seconds, trip.n_pin, trip.id_parent==0?null:String.valueOf(trip.id_parent))
                     .compose(this.handleRetrofitRequest())
-                    .doOnSubscribe(this::addDisposable)
-                    .doOnError(this::handleErorResponse)
                     .doOnError(e ->{
                         trip.offline=true;
                         dataManager.updateTripSetOffline(trip);
@@ -135,8 +123,6 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
     public Observable<EventResponse> sendEvent(Event event, DataManager dataManager) {
         return mSharengoPhpApi.sendEvent(event.event,event.label, App.CarPlate, event.id_customer, event.id_trip, event.timestamp, event.intval, event.txtval, event.lon, event.lat, event.km, event.battery, App.IMEI, event.json_data)
                 .compose(this.handleRetrofitRequest())
-                .doOnSubscribe(this::addDisposable)
-                .doOnError(this::handleErorResponse)
                 .concatMap(n ->{this.handleResponsePersistance(event,n,dataManager,0);
                             return Observable.just(n);})
                 .doOnError(e ->{
@@ -150,24 +136,18 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
     @Override
     public Observable<List<Reservation>> getReservation(String plate) {
         return  mSharengoPhpApi.getReservation(plate)
-                .compose(this.handleRetrofitRequest())
-                .doOnSubscribe(this::addDisposable)
-                .doOnError(this::handleErorResponse);
+                .compose(this.handleRetrofitRequest());
     }
 
     @Override
     public Observable<Void> consumeReservation(int reservation_id) {
         return  mSharengoPhpApi.consumeReservation(reservation_id)
-                .compose(this.handleRetrofitRequest())
-                .doOnSubscribe(this::addDisposable)
-                .doOnError(this::handleErorResponse);
+                .compose(this.handleRetrofitRequest());
     }
 
     @Override
     public Observable<List<Poi>> getPois(long lastupdate) {
         return mSharengoPhpApi.getPois(lastupdate)
-                .compose(this.handleRetrofitRequest())
-                .doOnSubscribe(this::addDisposable)
-                .doOnError(this::handleErorResponse);
+                .compose(this.handleRetrofitRequest());
     }
 }
