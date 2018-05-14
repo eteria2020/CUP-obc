@@ -15,6 +15,7 @@ import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.RxUtil;
 import eu.philcar.csg.OBC.service.DataManager;
+import eu.philcar.csg.OBC.service.Reservation;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -33,6 +34,7 @@ public class SharengoApiRepository {
     private Disposable employeeDisposable;
     private Disposable configDisposable;
     private Disposable modelDisposable;
+    private Disposable reservationDisposable;
 
     @Inject
     public SharengoApiRepository(DataManager mDataManager, SharengoDataSource mRemoteDataSource) {
@@ -224,6 +226,29 @@ public class SharengoApiRepository {
                         }
                     });
         }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                      Reservation                                           //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public void stopReservation(){
+        if (reservationDisposable != null)
+            reservationDisposable.dispose();
+    }
+    public Observable<Reservation> getReservation(){
+
+        return mRemoteDataSource.getReservation(App.CarPlate)
+                .concatMap(reservations -> mDataManager.handleReservations(reservations))
+                .concatMap(Reservation::init)
+                .doOnSubscribe(n -> {
+                    reservationDisposable =n;
+                })
+                .doOnComplete(() ->{});
+
     }
 
 }

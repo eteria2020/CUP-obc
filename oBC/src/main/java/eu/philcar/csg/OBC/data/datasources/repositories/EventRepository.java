@@ -89,6 +89,10 @@ public class EventRepository {
         generateEvent(EVT_SOS,0,number);
     }
 
+    public  void eventDmg(String number) {
+        generateEvent(EVT_SOS,2,number);
+    }
+
     public  void eventCmd(String cmd) {
         generateEvent(EVT_CMD,0,cmd);
     }

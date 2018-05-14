@@ -1943,7 +1943,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     public void startDownloadReservations() {
         dlog.d("Start Downloading reservations");
-        phpRepository.getReservation(App.CarPlate)
+        apiRepository.getReservation()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Reservation>() {
@@ -2601,7 +2601,8 @@ public class ObcService extends Service implements OnTripCallback {
                     break;
 
                 case MSG_CUSTOMER_DMG:
-                    Events.eventDmg((String) msg.obj);
+                    eventRepository.eventDmg((String) msg.obj);
+                    //Events.eventDmg((String) msg.obj);
                     startCallCenterCall(msg.replyTo, (String) msg.obj);
                     break;
 

@@ -307,6 +307,7 @@ public class SharengoPhpRepository {
                     });
     }
 
+    @Deprecated
     public Observable<Reservation> getReservation(final String plate){
 
         return mRemoteDataSource.getReservation(App.CarPlate)
