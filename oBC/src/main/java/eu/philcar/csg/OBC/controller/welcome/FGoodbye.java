@@ -1,6 +1,7 @@
 package eu.philcar.csg.OBC.controller.welcome;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -12,7 +13,9 @@ import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.apache.http.HttpEntity;
@@ -36,10 +39,16 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AGoodbye;
+import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.controller.map.FMenu;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.helpers.DLog;
@@ -52,6 +61,8 @@ public class FGoodbye extends FBase {
 
 	private DLog dlog = new DLog(this.getClass());
 	//private WebView webViewBanner;
+	@Inject
+	public EventRepository eventRepository;
 	private ImageView adIV;
 	private static int closingTripid;
 	private static Boolean handleClick=false;
@@ -59,6 +70,7 @@ public class FGoodbye extends FBase {
 	private static Boolean RequestBanner=false;
 	private final static int  MSG_CLOSE_ACTIVITY  = 1;
 	private final static int  MSG_PLAY_ADVICE  = 2;
+	public LinearLayout CancelEndRent;
 
 	private ProTTS tts;
 	private AudioPlayer player;
@@ -203,7 +215,9 @@ public class FGoodbye extends FBase {
 		
 		((TextView)view.findViewById(R.id.fgodTopTV)).setTypeface(font);
 		((TextView)view.findViewById(R.id.fgod_Goodbye_Title_TV)).setTypeface(font);
-		((TextView)view.findViewById(R.id.fgodGoodbyeTV)).setTypeface(font);
+		//((TextView)view.findViewById(R.id.fgodGoodbyeTV)).setTypeface(font);
+		CancelEndRent = (LinearLayout)view.findViewById(R.id.CancelEndRent);
+
 		//webViewBanner = (WebView)view.findViewById(R.id.fgoodWV);
 		adIV=(ImageView) view.findViewById(R.id.fgoodIV);
 		timer_5sec = new CountDownTimer((5)*1000,1000) {
@@ -236,6 +250,17 @@ public class FGoodbye extends FBase {
 				afterClick.start();
 			}
 		};
+
+		CancelEndRent.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
+				selfclose.cancel();
+				Intent myIntent = new Intent(getActivity(), AMainOBC.class);
+				myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				getActivity().startActivity(myIntent);
+			}
+		});
 		adIV.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -284,7 +309,7 @@ public class FGoodbye extends FBase {
 		} else if (Debug.IGNORE_HARDWARE) {
 			name = "Gino Panino";
 		}
-		((TextView)view.findViewById(R.id.fgodGoodbyeTV)).setText(name);
+		//((TextView)view.findViewById(R.id.fgodGoodbyeTV)).setText(name);
 		
 		((AGoodbye)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
 		(view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
@@ -321,6 +346,8 @@ public class FGoodbye extends FBase {
 				}
 
 				}
+
+
 
 
 		}.start();

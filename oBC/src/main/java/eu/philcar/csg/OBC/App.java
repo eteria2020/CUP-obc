@@ -442,7 +442,7 @@ public class App extends MultiDexApplication {
 	public static String URL_Configs;
 	public static String URL_Time;
 	public static String URL_NRD;
-
+	public static String NRD = "0";
 	public static String IP_UDP_Beacon;
 	public static int    Port_UDP_Beacon;
 
@@ -494,7 +494,7 @@ public class App extends MultiDexApplication {
 	private static final String  KEY_TimeZone = "time_zone";
 	private static final String  KEY_NewBatteryShutdownLevel = "new_battery_shutdown_level";
 
-	public static String NRD = "-1";
+
 
 
 	public static final String  KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";

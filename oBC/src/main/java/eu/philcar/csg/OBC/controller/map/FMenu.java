@@ -42,11 +42,12 @@ public class FMenu extends FBase implements OnClickListener {
 	private ImageButton endRentIB, pauseRentIB, refuelIB, backIB;
 	private ImageView ivDamages;
 	private TextView endRentTV, pauseRentTV, refuelTV;
-	private Button sosB;
+	private Button sosB,CancelPark;
 	private View rootView;
 	private FrameLayout fmen_right_FL;
+	private boolean endrentStarted = true;
 	private boolean Checkkey = App.checkKeyOff;
-	public boolean changed =true;
+	public boolean changed =false;
 
 	public static String clickedButton; // to determinate which button is clicked
 	
@@ -77,6 +78,7 @@ public class FMenu extends FBase implements OnClickListener {
 		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 		
 		(view.findViewById(R.id.tvPushToCancel)).setVisibility(View.INVISIBLE);
+		(view.findViewById(R.id.CancelPark)).setVisibility(View.INVISIBLE);
 		(view.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
 		
 		endRentIB = (ImageButton)view.findViewById(R.id.fmenEndRentIB);
@@ -91,13 +93,14 @@ public class FMenu extends FBase implements OnClickListener {
 		refuelTV = (TextView)view.findViewById(R.id.fmenRefuelTV);
 		
 		sosB = (Button)view.findViewById(R.id.fmenSOSB);
-		
+		CancelPark = (Button)view.findViewById(R.id.CancelPark);
+
 		endRentTV.setTypeface(font);
 		pauseRentTV.setTypeface(font);
 		refuelTV.setTypeface(font);
 		
 		sosB.setTypeface(font);
-				
+        CancelPark.setOnClickListener(this);
 		sosB.setOnClickListener(this);
 		ivDamages.setOnClickListener(this);
 		ivDamages.setVisibility(View.VISIBLE);
@@ -123,6 +126,25 @@ public class FMenu extends FBase implements OnClickListener {
 			(view.findViewById(R.id.llPause)).setVisibility(View.VISIBLE);
 		}
 
+
+    if(clickedButton == "PARK" ) {
+		    if(App.checkKeyOff ) {
+                if (CarInfo.getKeyStatus().equalsIgnoreCase("OFF")) {
+                    startPark();
+                }
+            }else{
+				startPark();
+            }
+    }
+		if(clickedButton == "CANCEL" ) {
+			if(App.checkKeyOff ) {
+				if (CarInfo.getKeyStatus().equalsIgnoreCase("OFF")) {
+					startEndRent();
+				}
+			}else{
+				startEndRent();
+			}
+		}
 
 		return view;
 	}
@@ -159,64 +181,12 @@ public class FMenu extends FBase implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.fmenEndRentIB:
 		case R.id.fmenEndRentTV:
-			if (activity!=null && activity.checkisInsideParkingArea()) {
-				eventRepository.menuclick("END RENT");
-				try {
+			startEndRent();
 
-
-					FMap.timer_2min.cancel();
-					FMap.timer_5sec.cancel();
-				}catch (Exception e){
-					dlog.e("Exeption while ending rent",e);
-				}
-				dlog.d("Banner: end rent stopping update, start countdown");
-				FMap.firstRun=true;
-				((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(false));
-
-				Intent i = new Intent(getActivity(), AGoodbye.class);
-				i.putExtra(AGoodbye.EUTHANASIA, false);
-
-				startActivity(i);
-				((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
-				getActivity().finish();
-			}
-			break;
-			
+			case R.id.CancelPark:
 		case R.id.fmenPauseRentIB:
 		case R.id.fmenPauseRentTV:
-			try {
-				FMap.timer_2min.cancel();
-				FMap.timer_5sec.cancel();
-			}catch (Exception e){
-				dlog.e("Exeption while park",e);
-			}
-			FMap.firstRun=true;
-			((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,-1));
-			dlog.d("Banner: pause rent stopping update");
-			boolean startParkingMode = (App.getParkModeStarted() == null);
-			((AMainOBC)getActivity()).setParkModeStarted( startParkingMode );
-
-			if(!App.motoreAvviato && App.getParkModeStarted()!=null && App.parkMode == ParkMode.PARK_ENDED){
-
-				((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(true));
-
-			}
-			
-			if (startParkingMode) {
-				startSelfClose(rootView);
-				(rootView.findViewById(R.id.llCancel)).animate().alpha(0.25f);
-				(rootView.findViewById(R.id.tvPushToCancel)).setVisibility(View.VISIBLE);
-				eventRepository.menuclick("PAUSE RENT");
-			} else {
-				eventRepository.menuclick("RESUME RENT");
-				stopSelfClose(rootView);
-				//((ABase)getActivity()).popFragment();
-				try {
-					((ABase)getActivity()).popTillFragment(FHome.class.getName());
-				} catch (Exception e) {
-					dlog.e("Exception while popping fragment",e);
-				}
-			}
+			startPark();
 			
 			break;
 			
@@ -308,6 +278,12 @@ public class FMenu extends FBase implements OnClickListener {
 							 R.drawable.button_rent_pause_pushed, R.string.menu_park_mode_suspend_shutdown_engine, null, 
 							 R.drawable.button_fuel_station_small_pushed, R.string.menu_refuel_shutdown_engine, null, 
 							 R.drawable.sel_button_back, this);
+					if(clickedButton == "PARK"){
+						startPark();
+					}
+					if(clickedButton == "CANCEL"){
+						startEndRent();
+					}
 					break;
 				case PARK_STARTED:	// (TRUE, NULL, STARTED) - WTF STATE
 					UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end_shutdown_engine, null, 
@@ -361,6 +337,7 @@ public class FMenu extends FBase implements OnClickListener {
 								R.drawable.button_rent_pause_pushed, R.string.menu_park_mode_suspend_key_on, null,
 								R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this,
 								R.drawable.sel_button_back, this);
+
 					}else {
 						if (activity.checkisInsideParkingArea()) {
 
@@ -369,12 +346,20 @@ public class FMenu extends FBase implements OnClickListener {
 									R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this,
 									R.drawable.sel_button_back, this);
 
-
+							if(clickedButton == "PARK"){
+								startPark();
+							}
+							if(clickedButton == "CANCEL"){
+								startEndRent();
+							}
 						} else {
 							UIHelper(R.drawable.sel_button_cancel_small, R.string.menu_rent_end_outside_park_area, null,
 									R.drawable.sel_button_rent_pause, R.string.menu_park_mode_suspend, this,
 									R.drawable.sel_button_fuel_station_small, R.string.menu_refuel, this,
 									R.drawable.sel_button_back, this);
+							if(clickedButton == "PARK"){
+								startPark();
+							}
 						}
 					}
 					break;
@@ -532,6 +517,80 @@ public class FMenu extends FBase implements OnClickListener {
 		pauseRentIB=null;
 		pauseRentTV=null;
 		super.onDestroy();
+	}
+	public void startPark(){
+
+		try {
+			FMap.timer_2min.cancel();
+			FMap.timer_5sec.cancel();
+		}catch (Exception e){
+			dlog.e("Exeption while park",e);
+		}
+		FMap.firstRun=true;
+		((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,-1));
+		dlog.d("Banner: pause rent stopping update");
+		boolean startParkingMode = (App.getParkModeStarted() == null);
+		((AMainOBC)getActivity()).setParkModeStarted( startParkingMode );
+
+		if(!App.motoreAvviato && App.getParkModeStarted()!=null && App.parkMode == ParkMode.PARK_ENDED){
+
+			((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(true));
+
+		}
+
+		if (startParkingMode) {
+			startSelfClose(rootView);
+			(rootView.findViewById(R.id.llCancel)).animate().alpha(0.25f);
+			(rootView.findViewById(R.id.tvPushToCancel)).setVisibility(View.VISIBLE);
+			(rootView.findViewById(R.id.CancelPark)).setVisibility(View.VISIBLE);
+			eventRepository.menuclick("PAUSE RENT");
+		} else {
+			eventRepository.menuclick("CANCEL END RENT");
+			stopSelfClose(rootView);
+			//((ABase)getActivity()).popFragment();
+			try {
+				((ABase)getActivity()).popTillFragment(FHome.class.getName());
+			} catch (Exception e) {
+				dlog.e("Exception while popping fragment",e);
+			}
+		}
+	}
+
+	public void startEndRent(){
+		AMainOBC activity = (AMainOBC)getActivity();
+		if (activity!=null && activity.checkisInsideParkingArea()) {
+			if(endrentStarted){
+			eventRepository.menuclick("END RENT");
+			try {
+
+
+				FMap.timer_2min.cancel();
+				FMap.timer_5sec.cancel();
+			}catch (Exception e){
+				dlog.e("Exeption while ending rent",e);
+			}
+			dlog.d("Banner: end rent stopping update, start countdown");
+			FMap.firstRun=true;
+			((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(false));
+
+			Intent i = new Intent(getActivity(), AGoodbye.class);
+			i.putExtra(AGoodbye.EUTHANASIA, false);
+
+			startActivity(i);
+			((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
+			getActivity().finish();
+			}else {
+				eventRepository.menuclick("Cancel end park");
+				stopSelfClose(rootView);
+				//((ABase)getActivity()).popFragment();
+				try {
+					((ABase)getActivity()).popTillFragment(FHome.class.getName());
+				} catch (Exception e) {
+					dlog.e("Exception while popping fragment",e);
+				}
+			}
+		}
+
 	}
 
 }

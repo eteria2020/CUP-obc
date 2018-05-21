@@ -128,7 +128,7 @@ public class FInstructions extends FBase {
 			
 			((TextView)view.findViewById(R.id.fins_message_TV)).setText(R.string.instruction_title);
 
-			if(Integer.parseInt(App.NRD) == 1) {
+			if(App.NRD == "1") {
 				((TextView)view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_2);
 				((TextView)view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_3);
 				((TextView)view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_4)));

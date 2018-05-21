@@ -105,8 +105,7 @@
                 android:layout_weight="1">
                 <TextView android:id="@+id/fgod_Goodbye_Title_TV" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="15dp" android:gravity="center" android:text="@string/goodbye" android:textColor="@color/white" android:textSize="25dp"
                     android:layout_weight="1" />
-                <TextView android:id="@+id/fgodGoodbyeTV" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="6dp" android:gravity="center" android:text="Gino Panino" android:textColor="@color/white" android:textSize="30sp" android:textStyle="bold"
-                    android:layout_weight="1" />
+
                 <LinearLayout android:id="@+id/llSelfClose" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true"
                     android:layout_marginTop="12dp" android:background="@drawable/sha_roundedbox" android:orientation="horizontal"
                     android:paddingLeft="20dp"
@@ -125,6 +124,37 @@
                         android:gravity="center_horizontal" android:text="30 s" android:textAppearance="?android:attr/textAppearanceLarge" android:textColor="#F00" android:textSize="30sp"
                         android:layout_marginLeft="5dp"
                         android:layout_weight="1" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/CancelEndRent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/sha_roundedbox"
+                    android:orientation="horizontal"
+                    android:paddingBottom="7dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:paddingTop="7dp">
+
+                    <TextView
+                        android:id="@+id/CancelTV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:singleLine="true"
+                        android:text="Annulla chiusura"
+                        android:textAppearance="@android:style/TextAppearance.Large"
+                        android:textColor="@color/red" />
+
                 </LinearLayout>
             </LinearLayout>
 

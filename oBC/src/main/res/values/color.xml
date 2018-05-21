@@ -5,11 +5,11 @@
  	<color name="cyan">#35778f</color>
  	<color name="gray">#AAAAAA</color>
  	<color name="green">#3cd52e</color>
- 	<color name="red">#CC0000</color>
+ 	<color name="red">#cc0000</color>
  	<color name="white">#f9f9f9</color>
  	<color name="white_pushed">#A9A9A9</color>
  	<color name="white_disabled">#33F9F9F9</color>
-	<color name="background_red">#A11F12</color>
+	<color name="background_red">#a11f12</color>
 
 	<color name="background_green">#3ea447</color>
 

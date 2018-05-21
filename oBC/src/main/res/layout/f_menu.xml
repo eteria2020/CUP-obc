@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 	
@@ -14,8 +15,8 @@
         android:layout_height="13dp"
         android:layout_alignParentBottom="true"
         android:background="#fdee66" />
-    
-    <LinearLayout 
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/fmen_top_V"
@@ -23,7 +24,7 @@
         android:layout_toLeftOf="@+id/fmen_right_FL"
         android:layout_toStartOf="@+id/fmen_right_FL"
         android:orientation="vertical" >
-        
+
         <TextView android:id="@+id/fmen_title_TV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,9 +35,9 @@
             android:textColor="#827a3a"
             android:textSize="30sp"
             android:textStyle="bold" />
-        
+
         <LinearLayout android:id="@+id/llCancel" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="25dp" android:layout_marginLeft="40dp" android:layout_marginStart="40dp" android:orientation="horizontal">
-            
+
             <ImageButton android:id="@+id/fmenEndRentIB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -44,7 +45,7 @@
                 android:src="@drawable/sel_button_cancel_small"
                 android:contentDescription="@string/content_description"
                 android:background="@null" />
-            
+
             <TextView android:id="@+id/fmenEndRentTV"
             	android:layout_width="wrap_content"
             	android:layout_height="wrap_content"
@@ -54,23 +55,57 @@
                 android:text="@string/menu_rent_end"
                 android:textColor="@color/white"
                 android:textSize="28sp" />
-            
+
         </LinearLayout>
-        
-        <LinearLayout android:id="@+id/llPause" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="50dp" android:layout_marginLeft="40dp" android:layout_marginStart="40dp" android:orientation="horizontal">
-            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical">
-                <ImageButton android:id="@+id/fmenPauseRentIB" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@null" android:contentDescription="@string/content_description" android:src="@drawable/sel_button_rent_pause"/>
-                <TextView android:id="@+id/tvPushToCancel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:text="@string/push_to_cancel" android:textAppearance="?android:attr/textAppearanceSmall" android:textColor="#FF0000" android:textSize="18sp"/>
+
+        <LinearLayout
+            android:id="@+id/llPause"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="50dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/fmenPauseRentIB"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:contentDescription="@string/content_description"
+                    android:src="@drawable/sel_button_rent_pause" />
+
+                <TextView
+                    android:id="@+id/tvPushToCancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/push_to_cancel"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#FF0000"
+                    android:textSize="18sp" />
             </LinearLayout>
-            
-            <TextView android:id="@+id/fmenPauseRentTV"
-            	android:layout_width="wrap_content"
-            	android:layout_height="wrap_content"
-            	android:layout_gravity="center_vertical|top" android:layout_marginLeft="30dp" android:layout_marginStart="30dp" android:layout_marginTop="20dp" android:text="@string/menu_park_mode_suspend" android:textColor="@color/white" android:textSize="28sp"/>
-            
+
+            <TextView
+                android:id="@+id/fmenPauseRentTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|top"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="20dp"
+                android:text="@string/menu_park_mode_suspend"
+                android:textColor="@color/white"
+                android:textSize="28sp" />
+
         </LinearLayout>
-        
-        <LinearLayout 
+
+        <LinearLayout
             android:layout_width="match_parent"
         	android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
@@ -78,7 +113,7 @@
             android:layout_marginStart="40dp"
         	android:orientation="horizontal" android:visibility="gone">
             <ImageButton android:id="@+id/fmenRefuelIB" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@null" android:contentDescription="@string/content_description" android:src="@drawable/sel_button_fuel_station_small"/>
-            
+
             <TextView android:id="@+id/fmenRefuelTV"
             	android:layout_width="wrap_content"
             	android:layout_height="wrap_content"
@@ -88,11 +123,30 @@
                 android:text="@string/menu_refuel"
                 android:textColor="@color/white"
                 android:textSize="28sp" />
-            
+
         </LinearLayout>
-        
+
     </LinearLayout>
-    
+
+    <Button
+        android:id="@+id/CancelPark"
+        style="@android:style/Widget.Button.Inset"
+        android:layout_width="215dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="83dp"
+        android:layout_marginStart="304dp"
+        android:layout_weight="1"
+        android:background="?android:attr/colorForeground"
+        android:padding="30dp"
+        android:text="Annulla sosta"
+        android:textAlignment="center"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
     <FrameLayout android:id="@+id/fmen_right_FL"
         android:layout_width="225dp"
         android:layout_height="match_parent"
@@ -101,7 +155,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:background="#3ea447" >
-        
+
         <Button android:id="@+id/fmenSOSB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -125,7 +179,7 @@
             android:src="@drawable/sel_button_back"
             android:contentDescription="@string/content_description"
             android:background="@null" />
-        
+
     </FrameLayout>
     
 </RelativeLayout>
