@@ -145,7 +145,11 @@ public class MessageFactory {
 		
 		return msg;
 	}
-	
+
+	public static Message notifyNewAdsCar() {
+
+		return Message.obtain(null, ObcService.MSG_ADS_CAR_UPDATE);
+	}
 	
 	public static Message notifyTripBegin(TripInfo tripInfo) {
 		Message msg  =  Message.obtain(null, ObcService.MSG_TRIP_BEGIN);

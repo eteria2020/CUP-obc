@@ -55,7 +55,6 @@ import com.skobbler.ngx.map.SKMapSurfaceView.SKOrientationIndicatorType;
 import com.skobbler.ngx.map.SKMapViewHolder;
 import com.skobbler.ngx.map.SKPOICluster;
 import com.skobbler.ngx.map.SKPolygon;
-import com.skobbler.ngx.map.SKPolyline;
 import com.skobbler.ngx.map.SKScreenPoint;
 import com.skobbler.ngx.map.realreach.SKRealReachSettings;
 import com.skobbler.ngx.navigation.SKNavigationListener;
@@ -120,9 +119,9 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.data.datasources.repositories.AdsRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.DbManager;
-import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
@@ -132,6 +131,8 @@ import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.service.MessageFactory;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 @SuppressLint("SimpleDateFormat")
 public class FMap extends FBase implements OnClickListener {
@@ -143,6 +144,9 @@ public class FMap extends FBase implements OnClickListener {
 
 	@Inject
 	EventRepository eventRepository;
+
+	@Inject
+	AdsRepository adsRepository;
 	private DLog dlog = new DLog(this.getClass());
 
 	public final static int  BASE_TOLLERANCE = 50;					// Circle radius in meters (for fuel station on-map-tap)
@@ -190,7 +194,7 @@ public class FMap extends FBase implements OnClickListener {
 	private TextView  txtNextStreet, titleAnnotation, descriptionAnnotation;
 	private ArrayList<SKAnnotation> annotationList = new ArrayList<SKAnnotation>();
 
-	public static CountDownTimer timer_2min, timer_5sec;
+	//public static CountDownTimer timer_2min, timer_5sec;
 
 	private static List<View> panels = new ArrayList<View>();
 	
@@ -275,7 +279,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		dlog.d("OnCreareView FMap");
 		rootView = view;
-		if(App.Instance.BannerName.getBundle("CAR")==null&&!RequestBanner){          //App.Instance.BannerName.getBundle("CAR")==null&&
+		/*if(App.Instance.BannerName.getBundle("CAR")==null&&!RequestBanner){          //App.Instance.BannerName.getBundle("CAR")==null&&
 			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
 			RequestBanner=true;
 			new Thread(new Runnable() {
@@ -300,10 +304,10 @@ public class FMap extends FBase implements OnClickListener {
 					});
 				}
 			}).start();
-		}
+		}*/
 
 
-		if(App.Instance.BannerName.getBundle("END")==null){          //App.Instance.BannerName.getBundle("CAR")==null&&
+		/*if(App.Instance.BannerName.getBundle("END")==null){          //App.Instance.BannerName.getBundle("CAR")==null&&
 			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
 
 			new Thread(new Runnable() {
@@ -314,7 +318,7 @@ public class FMap extends FBase implements OnClickListener {
 
 				}
 			}).start();
-		}
+		}*/
 
 		//uri = Uri.parse("android.resource://eu.philcar.csg.OBC/"+ R.raw.out_operative_area_tts_it);//avviso sonoro
 
@@ -596,7 +600,7 @@ public class FMap extends FBase implements OnClickListener {
 
 
 
-		//timer for advertisment update
+		/*//timer for advertisment update
 		timer_2min = new CountDownTimer((120)*1000,1000) {
 		@Override
 		public void onTick(long millisUntilFinished) {
@@ -640,11 +644,11 @@ public class FMap extends FBase implements OnClickListener {
 			}).start();
 		}
 
-	};
+	};*/
 
 
 
-	timer_5sec = new CountDownTimer((5)*1000,1000) {
+	/*timer_5sec = new CountDownTimer((5)*1000,1000) {
 		@Override
 		public void onTick(long millisUntilFinished) {
 
@@ -682,15 +686,15 @@ public class FMap extends FBase implements OnClickListener {
 				}
 			}).start();
 		}
-	};
+	};*/
 
 
-		if(firstRun) {
+		/*if(firstRun) {
 			firstRun=!firstRun;
 			timer_2min.cancel();
 			timer_2min.start();
-		}
-		updateBanner("CAR");
+		}*/
+		updateBanner();
 
 		if(App.fuel_level!=0)
 			tvRange.setText( App.fuel_level + " Km");
@@ -787,10 +791,10 @@ public class FMap extends FBase implements OnClickListener {
 			if (currentPositionProvider != null)
 				currentPositionProvider.stopLocationUpdates();
 
-			if(timer_2min!=null)
+			/*if(timer_2min!=null)
 				timer_2min.cancel();
 			if(timer_5sec!=null)
-				timer_5sec.cancel();
+				timer_5sec.cancel();*/
 			firstRun = true;
 			firstLaunch = true;
 			drawCharging = true;
@@ -1319,8 +1323,8 @@ public class FMap extends FBase implements OnClickListener {
 			break; */
 
 		case R.id.fmapCancelB:
-			timer_2min.cancel();
-			timer_5sec.cancel();
+			/*timer_2min.cancel();
+			timer_5sec.cancel();*/
 			firstRun=true;
 			if (!resetUI()) {
 				((ABase)getActivity()).pushFragment( new FMenu(), FMenu.class.getName(), true);
@@ -1339,7 +1343,8 @@ public class FMap extends FBase implements OnClickListener {
 			break;
 
 		case R.id.fmapLeftBorderIV:
-			if(App.Instance.BannerName.getBundle("CAR")!=null){
+			//TODO handle click with repository
+			/*if(App.Instance.BannerName.getBundle("CAR")!=null){
 				if(App.Instance.BannerName.getBundle("CAR").getString("CLICK").compareTo("null")!=0){
 
 					if(!handleClick) {
@@ -1369,7 +1374,7 @@ public class FMap extends FBase implements OnClickListener {
 						}).start();
 					}
 				}
-			}
+			}*/
 			break;
 
 		}
@@ -3287,6 +3292,7 @@ public class FMap extends FBase implements OnClickListener {
 
 	};
 
+	@Deprecated
 	public void loadBanner(String Url, String type, Boolean isClick) {
 
 		File outDir = new File(App.getBannerImagesFolder());
@@ -3451,7 +3457,31 @@ public class FMap extends FBase implements OnClickListener {
 
 	}
 
-	private void updateBanner(String type){
+	public void updateBanner(){
+		adsRepository.getBannerCar()
+				.subscribe(new Observer<Bitmap>() {
+					@Override
+					public void onSubscribe(Disposable d) {
+
+					}
+
+					@Override
+					public void onNext(Bitmap bitmap) {
+						adIV.setImageBitmap(bitmap);
+						adIV.setVisibility(View.VISIBLE);
+					}
+
+					@Override
+					public void onError(Throwable e) {
+						adIV.setImageResource(R.drawable.offline_welcome);
+					}
+
+					@Override
+					public void onComplete() {
+
+					}
+				});
+		/*
 
 		File ImageV;
 		Bundle Banner = App.Instance.BannerName.getBundle(type);
@@ -3507,7 +3537,7 @@ public class FMap extends FBase implements OnClickListener {
 			started= !started;
 			timer_2min.cancel();
 			timer_2min.start();
-		}
+		}*/
 	}
 
 	private void updateFleet(int fleet ){

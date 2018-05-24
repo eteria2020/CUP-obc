@@ -72,6 +72,7 @@ import ch.qos.logback.core.util.StatusPrinter;
 import eu.philcar.csg.OBC.controller.map.util.GeoUtils;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.api.ApiModule;
+import eu.philcar.csg.OBC.data.model.AdsImage;
 import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.devices.RadioSetup;
@@ -210,6 +211,33 @@ public class App extends MultiDexApplication {
 
 	public static void setHasNetworkConnection(boolean hasNetworkConnection) {
 		App.hasNetworkConnection = hasNetworkConnection;
+	}
+
+	public static AdsImage getBannerStart() {
+		return BannerStart;
+	}
+
+	public static void setBannerStart(AdsImage bannerStart) {
+		BannerStart = bannerStart;
+		BannerName.putBundle("START",bannerStart.getBundle());
+	}
+
+	public static AdsImage getBannerCar() {
+		return BannerCar;
+	}
+
+	public static void setBannerCar(AdsImage bannerCar) {
+		BannerCar = bannerCar;
+		BannerName.putBundle("CAR",bannerCar.getBundle());
+	}
+
+	public static AdsImage getBannerEnd() {
+		return BannerEnd;
+	}
+
+	public static void setBannerEnd(AdsImage bannerEnd) {
+		BannerEnd = bannerEnd;
+		BannerName.putBundle("END",bannerEnd.getBundle());
 	}
 
 
@@ -620,6 +648,9 @@ public class App extends MultiDexApplication {
 	public static boolean first_UP_Start=true; //flag per primo update Start Images
 	public static boolean first_UP_End=true; //flag per primo update End Images
 	public static Bundle BannerName= new Bundle();
+	private static AdsImage BannerStart = null;
+	private static AdsImage BannerCar = null;
+	private static AdsImage BannerEnd = null;
 	public static Bundle askClose=new Bundle();
 	public static int CounterCleanlines=0;
 
@@ -2361,7 +2392,7 @@ private void  initPhase2() {
 	}
 	
 	public static boolean isForegroundActivity(Activity activity) {
-		
+
 		if (foregroundActivity!=null && foregroundActivity.equals(activity.getClass().getName())) {
 			return true;
 		} else {
@@ -2680,4 +2711,6 @@ private void  initPhase2() {
 	public void setComponent(ApplicationComponent applicationComponent) {
 		mApplicationComponent = applicationComponent;
 	}
+
+
 }

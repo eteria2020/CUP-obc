@@ -5,10 +5,9 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoApi;
+import eu.philcar.csg.OBC.data.datasources.api.SharengoAdsApi;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoBeaconApi;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoPhpApi;
-import eu.philcar.csg.OBC.data.datasources.repositories.SharengoBeaconRepository;
-import eu.philcar.csg.OBC.service.DataManager;
 
 /**
  * Created by Fulvio on 15/02/2018.
@@ -32,6 +31,12 @@ public class DataSourceModule {
     @Singleton
     SharengoBeaconDataSource provideSharengoBeaconRemoteDataSource(SharengoBeaconApi api) {
         return new SharengoBeaconRetrofitDataSource(api);
+    }
+
+    @Provides
+    @Singleton
+    SharengoAdsDataSource provideSharengoAdsRemoteDataSource(SharengoAdsApi api) {
+        return new SharengoAdsRetrofitDataSource(api);
     }
 
 

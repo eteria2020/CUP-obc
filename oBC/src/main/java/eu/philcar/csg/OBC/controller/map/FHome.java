@@ -28,6 +28,7 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.data.datasources.repositories.AdsRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
@@ -40,6 +41,8 @@ import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -77,6 +80,8 @@ public class FHome extends FBase implements OnClickListener {
     SharengoPhpRepository repositoryPhp;
     @Inject
     EventRepository eventRepository;
+    @Inject
+    AdsRepository adsRepository;
 
     public static FHome newInstance() {
         FHome fm = new FHome();
@@ -352,7 +357,7 @@ public class FHome extends FBase implements OnClickListener {
 
         //timer per aggiornamento advertisment
 
-        updateBanner("CAR");
+        updateBanner();
 
         return view;
     }
@@ -496,7 +501,8 @@ public class FHome extends FBase implements OnClickListener {
 
                 break;
             case R.id.fmapLeftBorderIV://Banner
-                if(App.Instance.BannerName.getBundle("CAR")!=null){
+                //TODO handle click with repository
+               /* if(App.Instance.BannerName.getBundle("CAR")!=null){
                     if(App.Instance.BannerName.getBundle("CAR").getString("CLICK").compareTo("null")!=0){
 
                         if(!handleClick) {
@@ -526,7 +532,7 @@ public class FHome extends FBase implements OnClickListener {
                             }).start();
                         }
                     }
-                }
+                }*/
                 break;
             case R.id.fmapAlertCloseBTN:
 
@@ -892,6 +898,7 @@ public class FHome extends FBase implements OnClickListener {
  * With a given URL and type (END-START...) load the Banner ID, if present Use the downloaded one otherwise download it.
  * After Put the ID inside the App variable to share the current banner
  * */
+@Deprecated
     private void loadBanner(String Url, String type, Boolean isClick) {
 
         File outDir = new File(App.getBannerImagesFolder());
@@ -1045,7 +1052,33 @@ public class FHome extends FBase implements OnClickListener {
 /**
  * Set to screen the current banner from the App variable
  * */
-    public void updateBanner(String type){
+    public void updateBanner(){
+
+        adsRepository.getBannerCar()
+                .subscribe(new Observer<Bitmap>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Bitmap bitmap) {
+                        adIV.setImageBitmap(bitmap);
+                        adIV.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        adIV.setImageResource(R.drawable.car_banner_offline);
+                        adIV.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+        /*
 
         File ImageV;
         Bundle Banner = App.Instance.BannerName.getBundle(type);
@@ -1103,7 +1136,7 @@ public class FHome extends FBase implements OnClickListener {
         }catch(Exception e){
             dlog.e("Exception tryng to start timer",e);
         }
-
+*/
     }
 
     private void queueTTS(String text){

@@ -781,6 +781,17 @@ public class AMainOBC extends ABase implements LocationListener {
 				}
 
 				break;
+			case ObcService.MSG_ADS_CAR_UPDATE:
+				fMap = (FMap) getFragmentManager().findFragmentByTag(FMap.class.getName());
+				if (fMap != null) {
+					fMap.updateBanner();
+				}
+
+				fHome = (FHome)getFragmentManager().findFragmentByTag(FHome.class.getName());
+				if (fHome != null) {
+					fHome.updateBanner();
+				}
+				break;
 			case ObcService.MSG_TRIP_NEAR_POI:
 				App.currentTripInfo.isBonusEnabled=msg.arg1>0;
 

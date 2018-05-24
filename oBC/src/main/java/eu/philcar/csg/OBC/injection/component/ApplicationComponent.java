@@ -14,6 +14,8 @@ import eu.philcar.csg.OBC.controller.map.FMap;
 import eu.philcar.csg.OBC.controller.map.FMenu;
 import eu.philcar.csg.OBC.controller.sos.FSOS;
 import eu.philcar.csg.OBC.controller.welcome.FCleanliness;
+import eu.philcar.csg.OBC.controller.welcome.FDriveMessage_new;
+import eu.philcar.csg.OBC.controller.welcome.FGoodbye;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
 import eu.philcar.csg.OBC.controller.welcome.FWelcome;
 import eu.philcar.csg.OBC.data.datasources.DataSourceModule;
@@ -52,6 +54,8 @@ public interface ApplicationComponent {
     void inject(FMaintenance fMaintenance);
     void inject(TripInfo tripInfo);
     void inject(FHome fHome);
+    void inject(FDriveMessage_new fDriveMessage_new);
+    void inject(FGoodbye fGoodbye);
     void inject(ObcService obcService);
 
     @ApplicationContext Context context();

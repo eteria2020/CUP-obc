@@ -4,7 +4,6 @@ package eu.philcar.csg.OBC.service;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +19,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
 
 import org.acra.ACRA;
 import org.joda.time.LocalDateTime;
@@ -36,9 +33,11 @@ import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
+import eu.philcar.csg.OBC.data.datasources.repositories.AdsRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoBeaconRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
+import eu.philcar.csg.OBC.data.model.AdsResponse;
 import eu.philcar.csg.OBC.data.model.BeaconResponse;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Poi;
@@ -69,7 +68,7 @@ import eu.philcar.csg.OBC.server.ZmqSubscriber;
 //import eu.philcar.csg.OBC.task.DataLogger;
 import eu.philcar.csg.OBC.task.OldLogCleamup;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
-import eu.philcar.csg.OBC.task.UDPServer;
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -194,6 +193,7 @@ public class ObcService extends Service implements OnTripCallback {
     public static final int MSG_AUDIO_CHANNEL = 80;
     public static final int MSG_NAVIGATE_TO = 81;
     public static final int MSG_CHECK_TIME = 82;
+    public static final int MSG_ADS_CAR_UPDATE = 83;
 
 
     public static final int MSG_DEBUG_CARD = 90;
@@ -233,6 +233,8 @@ public class ObcService extends Service implements OnTripCallback {
     EventRepository eventRepository;
     @Inject
     SharengoBeaconRepository beaconRepository;
+    @Inject
+    AdsRepository adsRepository;
 
 
     //ENCAPSULATED OBJECTS
@@ -254,6 +256,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     ScheduledExecutorService serverUpdateScheduler;
     ScheduledExecutorService tripUpdateScheduler;
+    ScheduledExecutorService adsUpdateScheduler;
     ScheduledExecutorService dataLoggerScheduler;
     ScheduledExecutorService tripPoiUpdateScheduler;
     ScheduledExecutorService virtualBMSUpdateScheduler;
@@ -412,6 +415,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     GpsStatus.Listener gpsStatusListener = new GpsStatus.Listener() {
 
+        @SuppressLint("MissingPermission")
         @Override
         public void onGpsStatusChanged(int event) {
             switch (event) {
@@ -433,6 +437,7 @@ public class ObcService extends Service implements OnTripCallback {
     };
 
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onCreate() {
         super.onCreate();
@@ -520,6 +525,7 @@ public class ObcService extends Service implements OnTripCallback {
             dlog.d("Restarting from open trip. Acquiring lock");
             obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
             startRemoteUpdateCycle();
+            startRemoteAdsUpdateCycle();
             startRemotePoiCheckCycle();
         } else {
             setDisplayStatus(false, 15);
@@ -607,7 +613,7 @@ public class ObcService extends Service implements OnTripCallback {
                     //If HTTP query is enabled schedule an HTTP notifies download
                     if (WITH_HTTP_NOTIFIES&& notifiesPrescaler++>4 && tripInfo != null && tripInfo.isOpen && (App.parkMode == null || !App.parkMode.isOn()) ) {
                         notifiesPrescaler=0;
-                        sendBeacon(carInfo.getJsonGson(false));
+                        sendBeacon(carInfo);
 //                        HttpConnector http = new HttpConnector(ObcService.this);
 //                        http.SetHandler(localHandler);
 //                        NotifiesConnector nc = new NotifiesConnector();
@@ -685,20 +691,18 @@ public class ObcService extends Service implements OnTripCallback {
                     }
                     else {
                         ampError=false;
-                        canAmpAnomalies = 0;
-                    }
 
-                    if( carInfo.bmsSOC==0){
-                        bmsSocError=true;
-                        if(canAmpAnomalies++==3){
-                            eventRepository.CanAnomalies("SOC 0");
+                        if( carInfo.bmsSOC==0){
+                            bmsSocError=true;
+                            if(canAmpAnomalies++==3){
+                                eventRepository.CanAnomalies("SOC 0");
+                            }
                         }
-                    }
-                    else {
-                        bmsSocError=false;
-                        canAmpAnomalies = 0;
-                    }
-
+                        else {
+                            bmsSocError=false;
+                            canAmpAnomalies = 0;
+                        }
+                }
 
                     //type of battery
                     //if(carInfo.minVoltage==2.6f || carInfo.batteryType.equalsIgnoreCase("")) {
@@ -1026,6 +1030,7 @@ public class ObcService extends Service implements OnTripCallback {
             timeCheckScheduler.shutdown();
 
         stopRemoteUpdateCycle();
+        stopRemoteAdsUpdateCycle();
         stopRemotePoiCheckCycle();
 
         locationManager.removeUpdates(carInfo.serviceLocationListener);
@@ -1047,6 +1052,7 @@ public class ObcService extends Service implements OnTripCallback {
 
 
     // Set the speed of locations updates
+    @SuppressLint("MissingPermission")
     private void setLocationMode(long minTime) {
         if (locationManager != null) {
             dlog.d("setLocationMode "+minTime);
@@ -1137,7 +1143,7 @@ public class ObcService extends Service implements OnTripCallback {
             return;
         }
 
-        sendBeacon(carInfo.getJsonGson(true));
+        sendBeacon(carInfo);
         /*if (msg != null) {
             dlog.d("Sending beacon : " + msg);
             //udpServer.sendBeacon(msg);
@@ -1175,7 +1181,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     }
 
-    public void sendBeacon(String beacon) {
+    public void sendBeacon(final CarInfo carinfo) {
 
         if (!App.hasNetworkConnection()) {
             dlog.w("No connection. Beacon aborted");
@@ -1183,11 +1189,14 @@ public class ObcService extends Service implements OnTripCallback {
         }
 
 //        String msg = carInfo.getJson(true);
-        if (beacon != null) {
-            dlog.d("Sending beacon : " + beacon);
+        if (carinfo != null) {
+            //dlog.d("Sending beacon : " + carinfo.);
             //udpServer.sendBeacon(msg);
-
-            beaconRepository.sendBeacon(beacon).subscribeOn(Schedulers.io())
+            Observable.just(1).delay(100,TimeUnit.MILLISECONDS)
+                    .concatMap(i->
+            beaconRepository.sendBeacon(carinfo.getJsonGson(true)))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.computation())
                     .subscribe(new Observer<BeaconResponse>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
@@ -1365,14 +1374,16 @@ public class ObcService extends Service implements OnTripCallback {
         if (tripInfo == null) {
             dlog.e(ObcService.class.toString() + " notifyCard: Tripinfo NULL!");
         } else {
+            dlog.d("perf: start handleCard");
             Message tripMsg = tripInfo.handleCard(id, event, carInfo, obc_io, this, screenLockTrip, forced?TripInfo.CloseType.forced:TripInfo.CloseType.normal);
-            carInfo.updateTrips();
+            dlog.d("perf: end handleCard");
             if (tripMsg != null) {
                 if (tripMsg.what == this.MSG_TRIP_END && App.reservation != null) {
                     setReservation(App.reservation);
                 }
                 sendAll(tripMsg);
             }
+            carInfo.updateTrips();
             sendBeacon();
         }
     }
@@ -1932,13 +1943,13 @@ public class ObcService extends Service implements OnTripCallback {
     public void startAreaPolygonDownload(Context ctx, Handler handler) {
         DLog.D("Start area download..");
 
-        phpRepository.getArea();
+        apiRepository.getArea();
     }
 
     public void startPoiDownload() {
         DLog.D("Start poi download..");
 
-        phpRepository.getPois();
+        apiRepository.getPois();
     }
 
     public void startDownloadReservations() {
@@ -2148,6 +2159,71 @@ public class ObcService extends Service implements OnTripCallback {
 
         setLocationMode(30000);  // If car is idle  30sec is min time between locations updates
         obc_io.setSecondaryGPS(10000);
+    }
+
+    void startRemoteAdsUpdateCycle() {
+
+        stopRemoteAdsUpdateCycle();
+
+
+
+        adsUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
+
+        adsUpdateScheduler.scheduleAtFixedRate(new Runnable() {
+            private boolean firstRun = true;
+
+            @SuppressWarnings("unused")
+            @Override
+            public void run() {
+                try {
+                    if(firstRun){
+                        firstRun = false;
+                        adsRepository.updateBannerStart();
+                        adsRepository.updateBannerEnd();
+                    }
+
+                    adsRepository.updateBannerCars()
+                            .subscribe(new Observer<AdsResponse>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(AdsResponse adsResponse) {
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            sendAll(MessageFactory.notifyNewAdsCar());
+                        }
+                    });
+
+                } catch (Exception e) {
+                    dlog.e("Exception inside adsUpdateScheduler", e);
+                }
+
+            }
+
+        }, 0, 12, TimeUnit.SECONDS);
+
+        dlog.d("Started remote Update Cycle");
+    }
+
+    void stopRemoteAdsUpdateCycle() {
+
+        if (adsUpdateScheduler != null) {
+            adsUpdateScheduler.shutdown();
+            dlog.d("Stopped remote ads Update Cycle");
+        }
+
+        adsUpdateScheduler = null;
+       //TODO  adsRepository.clearAds();
+
     }
 
 @Deprecated
@@ -2634,8 +2710,10 @@ public class ObcService extends Service implements OnTripCallback {
                 case MSG_CAR_REMOTEUPDATECYCLE:
                     if (msg.arg1 == 1) {  //Start
                         startRemoteUpdateCycle();
+                        startRemoteAdsUpdateCycle();
                         startRemotePoiCheckCycle();
                     } else {             //Stop
+                        stopRemoteAdsUpdateCycle();
                         stopRemoteUpdateCycle();
                         stopRemotePoiCheckCycle();
                     }

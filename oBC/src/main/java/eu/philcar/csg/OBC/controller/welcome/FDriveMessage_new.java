@@ -2,7 +2,6 @@ package eu.philcar.csg.OBC.controller.welcome;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -48,20 +47,27 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.data.datasources.repositories.AdsRepository;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.MessageFactory;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 public class FDriveMessage_new extends FBase {
 	
 	private DLog dlog = new DLog(this.getClass());
+	@Inject
+	protected AdsRepository adsRepository;
 
 	public static FDriveMessage_new newInstance(boolean login) {
 		
@@ -90,6 +96,7 @@ public class FDriveMessage_new extends FBase {
 
 		super.onCreate(savedInstanceState);
 
+		App.get(getActivity()).getComponent().inject(this);
 		/*if(App.first_UP_Start){
 			App.first_UP_Start=false;
 
@@ -146,7 +153,7 @@ public class FDriveMessage_new extends FBase {
 		if(App.Instance.BannerName.getBundle("START")==null&&!RequestBanner){
 			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
 			RequestBanner=true;
-			new Thread(new Runnable() {
+			/*new Thread(new Runnable() {
 				@Override
 				public void run() {
 					try {
@@ -164,7 +171,7 @@ public class FDriveMessage_new extends FBase {
 						dlog.e("Eccezione durante caricamento banner iniziale");
 					}
 				}
-			}).start();
+			}).start();*/
 		}
 
 		((View)view.findViewById(R.id.btnNext)).setVisibility(View.INVISIBLE);
@@ -196,7 +203,7 @@ public class FDriveMessage_new extends FBase {
 
 
 
-		timer_5sec = new CountDownTimer((5)*1000,1000) {
+		/*timer_5sec = new CountDownTimer((5)*1000,1000) {
 			@Override
 			public void onTick(long millisUntilFinished) {
 
@@ -225,7 +232,7 @@ public class FDriveMessage_new extends FBase {
 					}
 				}).start();
 			}
-		};
+		};*/
 
         adIV = (ImageView)view.findViewById(R.id.imgfsIV);
 		video = (VideoView)view.findViewById(R.id.video);
@@ -233,8 +240,8 @@ public class FDriveMessage_new extends FBase {
 		adIV.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
-				if(App.Instance.BannerName.getBundle("START")!=null){
+//TODO handle click with repository
+				/*if(App.Instance.BannerName.getBundle("START")!=null){
 					if(App.Instance.BannerName.getBundle("START").getString("CLICK").compareTo("null")!=0){
 
 						if(!handleClick) {
@@ -269,7 +276,7 @@ public class FDriveMessage_new extends FBase {
 						}
 
 					}
-				}
+				}*/
 			}
 		});
 
@@ -298,7 +305,7 @@ public class FDriveMessage_new extends FBase {
 		} else {
 			view.findViewById(R.id.fchn_right_FL).setBackgroundColor(getResources().getColor(R.color.background_green));
 		}
-		updateBanner("START");
+		updateBanner();
 		return view;
 	}
 
@@ -648,6 +655,7 @@ public class FDriveMessage_new extends FBase {
 		return"0";
 	}
 
+	@Deprecated
 	public void loadBanner(String Url, String type, Boolean isClick) {
 
 		File outDir = new File(App.getBannerImagesFolder());
@@ -809,7 +817,35 @@ public class FDriveMessage_new extends FBase {
 
 	}
 
-	private void updateBanner(String type){
+	private void updateBanner(){
+
+		adsRepository.getBannerStart()
+				.subscribe(new Observer<Bitmap>() {
+					@Override
+					public void onSubscribe(Disposable d) {
+
+					}
+
+					@Override
+					public void onNext(Bitmap bitmap) {
+						adIV.setImageBitmap(bitmap);
+					}
+
+					@Override
+					public void onError(Throwable e) {
+						adIV.setImageResource(R.drawable.offline_welcome);
+						adIV.setVisibility(View.VISIBLE);
+					}
+
+					@Override
+					public void onComplete() {
+
+					}
+				});
+
+
+
+		/*
 
 		File ImageV;
 		Bundle Banner = App.Instance.BannerName.getBundle(type);
@@ -868,7 +904,7 @@ public class FDriveMessage_new extends FBase {
 			adIV.setVisibility(View.VISIBLE);
 			return;
 		}
-
+*/
 	}
 
 	@Override

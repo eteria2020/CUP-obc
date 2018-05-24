@@ -59,7 +59,7 @@ public class SharengoPhpRepository {
             areaDisposable.dispose();
     }
 
-
+    @Deprecated
     public void getArea(){
 
         if(!RxUtil.isRunning(areaDisposable)) {
@@ -273,6 +273,7 @@ public class SharengoPhpRepository {
     }
 
     private static boolean sendingEvents;
+
     public void sendEvents(final List<Event> event){
         if(!sendingEvents)
             Observable.interval(60,TimeUnit.SECONDS)
@@ -327,6 +328,7 @@ public class SharengoPhpRepository {
 
     }
 
+    @Deprecated
     public void consumeReservation(final int reservation_id){
 
         mRemoteDataSource.consumeReservation(reservation_id)
@@ -357,6 +359,7 @@ public class SharengoPhpRepository {
 
     }
 
+    @Deprecated
     public void getPois(){
          mRemoteDataSource.getPois(mDataManager.getMaxPoiLastupdate())
                 .concatMap(n -> mDataManager.savePoi(n))

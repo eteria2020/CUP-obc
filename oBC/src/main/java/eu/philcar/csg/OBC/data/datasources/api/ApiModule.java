@@ -30,6 +30,7 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.data.common.SerializationExclusionStrategy;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.injection.ApplicationContext;
+import okhttp3.CookieJar;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -116,6 +117,25 @@ public class ApiModule {
 
     @Provides
     @Singleton
+    SharengoAdsApi provideSharengoAdsApi(@ApplicationContext Context context) {
+
+        Gson gson = new GsonBuilder()
+                .addSerializationExclusionStrategy(new SerializationExclusionStrategy())
+                .create();
+
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(context.getString(R.string.endpointSharengoAds))
+                .client(provideOkHttpClient())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        return retrofit.create(SharengoAdsApi.class);
+    }
+
+    @Provides
+    @Singleton
     OkHttpClient provideOkHttpClientTrusted(Context context){
         HttpLogger logger = new HttpLogger();
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(logger);
@@ -125,6 +145,7 @@ public class ApiModule {
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);
+        httpClient.cookieJar(CookieJar.NO_COOKIES);
 
         try {
 

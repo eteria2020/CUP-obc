@@ -14,6 +14,7 @@ import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQException;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Encryption;
 import eu.philcar.csg.OBC.service.ObcService;
@@ -229,7 +230,7 @@ public class ZmqRequester {
 		@Override
 		public void run() {
 			
-			zmqSocket.connect(App.URL_ZMQNotifier);
+			zmqSocket.connect(App.Instance.getString(R.string.endpointSharengoZMQ));
 						
 			String sid="";
 	        while(!Thread.currentThread().isInterrupted()) {

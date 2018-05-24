@@ -161,15 +161,7 @@ public class FMenu extends FBase implements OnClickListener {
 		case R.id.fmenEndRentTV:
 			if (activity!=null && activity.checkisInsideParkingArea()) {
 				eventRepository.menuclick("END RENT");
-				try {
 
-
-					FMap.timer_2min.cancel();
-					FMap.timer_5sec.cancel();
-				}catch (Exception e){
-					dlog.e("Exeption while ending rent",e);
-				}
-				dlog.d("Banner: end rent stopping update, start countdown");
 				FMap.firstRun=true;
 				((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(false));
 
@@ -184,13 +176,7 @@ public class FMenu extends FBase implements OnClickListener {
 			
 		case R.id.fmenPauseRentIB:
 		case R.id.fmenPauseRentTV:
-			try {
-				FMap.timer_2min.cancel();
-				FMap.timer_5sec.cancel();
-			}catch (Exception e){
-				dlog.e("Exeption while park",e);
-			}
-			FMap.firstRun=true;
+
 			((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,-1));
 			dlog.d("Banner: pause rent stopping update");
 			boolean startParkingMode = (App.getParkModeStarted() == null);

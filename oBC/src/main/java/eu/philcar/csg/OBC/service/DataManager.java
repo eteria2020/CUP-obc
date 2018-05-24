@@ -1,7 +1,10 @@
 package eu.philcar.csg.OBC.service;
 
+import android.graphics.Bitmap;
+
 import com.google.gson.Gson;
 import com.j256.ormlite.stmt.UpdateBuilder;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.model.AdsResponse;
 import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.data.model.Config;
 import eu.philcar.csg.OBC.data.model.ModelResponse;
@@ -33,6 +37,9 @@ public class DataManager { //TODO change to interface-type system like api does 
 
     private final DbManager mDbManager; //TODO use interface DbHelper
 
+    private AdsResponse imageCar;
+    private AdsResponse imageStart;
+    private AdsResponse imageEnd;
 
     @Inject
     public DataManager(DbManager DbManager) {
@@ -254,6 +261,56 @@ public class DataManager { //TODO change to interface-type system like api does 
 //                });
 
 
+    public void saveBannerStart(final AdsResponse adsStart){
+        if(adsStart!=null){
+            imageStart=adsStart;
+            App.setBannerStart(adsStart.getLastImage());
+        }
+    }
+    public void saveBannerCar(final AdsResponse adsCar){
+        if(adsCar!=null){
+            imageCar=adsCar;
+            App.setBannerCar(adsCar.getLastImage());
+        }
+    }
+    public void saveBannerEnd(final AdsResponse adsEnd){
+        if(adsEnd!=null){
+            imageEnd=adsEnd;
+            App.setBannerEnd(adsEnd.getLastImage());
+        }
+    }
+
+    public AdsResponse getImageCar() {
+        return imageCar;
+    }
+
+    public AdsResponse getImageStart() {
+        return imageStart;
+    }
+
+    public AdsResponse getImageEnd() {
+        return imageEnd;
+    }
+
+    public Observable<Bitmap> getBitmapCar() {
+        return Observable.just(1)
+                .concatMap(i->Observable.just(new File(App.getBannerImagesFolder(), imageCar.getLastFilename())))
+                .concatMap(file1 -> Observable.just(Picasso.get().load(file1).get()));
+
+    }
+
+    public Observable<Bitmap> getBitmapStart() {
+        return Observable.just(1)
+                .concatMap(i->Observable.just(new File(App.getBannerImagesFolder(), imageStart.getLastFilename())))
+                .concatMap(file1 -> Observable.just(Picasso.get().load(file1).get()));
 
 
+    }
+
+    public Observable<Bitmap> getBitmapEnd() {
+        return Observable.just(1)
+                .concatMap(i->Observable.just(new File(App.getBannerImagesFolder(), imageEnd.getLastFilename())))
+                .concatMap(file1 -> Observable.just(Picasso.get().load(file1).get()));
+
+    }
 }

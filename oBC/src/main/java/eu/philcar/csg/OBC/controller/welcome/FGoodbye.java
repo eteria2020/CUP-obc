@@ -2,7 +2,6 @@ package eu.philcar.csg.OBC.controller.welcome;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,10 +35,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.data.datasources.repositories.AdsRepository;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.helpers.DLog;
@@ -47,6 +49,8 @@ import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.MessageFactory;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 public class FGoodbye extends FBase {
 
@@ -55,11 +59,13 @@ public class FGoodbye extends FBase {
 	private ImageView adIV;
 	private static int closingTripid;
 	private static Boolean handleClick=false;
-	private static CountDownTimer timer_5sec,selfclose=null;
+	//private static CountDownTimer timer_5sec;
+	private static CountDownTimer selfclose=null;
 	private static Boolean RequestBanner=false;
 	private final static int  MSG_CLOSE_ACTIVITY  = 1;
 	private final static int  MSG_PLAY_ADVICE  = 2;
-
+	@Inject
+	protected AdsRepository adsRepository;
 	private ProTTS tts;
 	private AudioPlayer player;
 	private static boolean played=false;
@@ -119,6 +125,7 @@ public class FGoodbye extends FBase {
 
 		super.onCreate(savedInstanceState);
 		closingTripid=App.currentTripInfo.trip.id;
+		App.get(getActivity()).getComponent().inject(this);
 		/*if(App.first_UP_End && App.hasNetworkConnection){
 			App.first_UP_End=false;
 
@@ -146,8 +153,8 @@ public class FGoodbye extends FBase {
 		
 		App.isCloseable = true;
 		App.isClosing=true;
-		dlog.d("OnCreareView FGoodbye");
-		try {
+		dlog.d("OnCreateView FGoodbye");
+		/*try {
 			if ((App.BannerName != null && App.BannerName.getBundle("END") == null) && !RequestBanner) {
 				//controllo se ho il banner e se non ho già iniziato a scaricarlo.
 				RequestBanner = true;
@@ -178,7 +185,7 @@ public class FGoodbye extends FBase {
 			}
 		}catch(Exception e){
 			dlog.e("Exception while updating banner end",e);
-		}
+		}*/
 		dlog.d("FGoodbye: onCreateView");
 		//((AMainOBC) getActivity()).player.inizializePlayer();
 		//getActivity().getResources().getString(R.string.alert_key));
@@ -206,7 +213,7 @@ public class FGoodbye extends FBase {
 		((TextView)view.findViewById(R.id.fgodGoodbyeTV)).setTypeface(font);
 		//webViewBanner = (WebView)view.findViewById(R.id.fgoodWV);
 		adIV=(ImageView) view.findViewById(R.id.fgoodIV);
-		timer_5sec = new CountDownTimer((5)*1000,1000) {
+		/*timer_5sec = new CountDownTimer((5)*1000,1000) {
 			@Override
 			public void onTick(long millisUntilFinished) {
 
@@ -235,7 +242,7 @@ public class FGoodbye extends FBase {
 				});
 				afterClick.start();
 			}
-		};
+		};*/
 		adIV.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -250,7 +257,8 @@ public class FGoodbye extends FBase {
 								Thread onBannerClick = new Thread(new Runnable() {
 									@Override
 									public void run() {
-										try {
+										//TODO Handle click with repository
+										/*try {
 											loadBanner(App.BannerName.getBundle("END").getString("CLICK"), "END", true);
 											getActivity().runOnUiThread(new Runnable() {
 												@Override
@@ -265,7 +273,7 @@ public class FGoodbye extends FBase {
 											});
 										} catch (Exception e) {
 											dlog.e("Exception while updating banner", e);
-										}
+										}*/
 
 									}
 								});
@@ -356,7 +364,7 @@ public class FGoodbye extends FBase {
 		}
 
 
-		updateBanner("END");
+		updateBanner();
 		if(!played) {
 			played = true;
 			localHandler.removeMessages(MSG_PLAY_ADVICE);
@@ -388,6 +396,7 @@ public class FGoodbye extends FBase {
 		super.onPause();
 	}
 
+	@Deprecated
 	public void loadBanner(String Url, String type, Boolean isClick) {
 
 		File outDir = new File(App.getBannerImagesFolder());
@@ -547,9 +556,34 @@ public class FGoodbye extends FBase {
 
 	}
 
-	private void updateBanner(String type){
+	private void updateBanner(){
 
-		File ImageV;
+		adsRepository.getBannerEnd()
+				.subscribe(new Observer<Bitmap>() {
+					@Override
+					public void onSubscribe(Disposable d) {
+
+					}
+
+					@Override
+					public void onNext(Bitmap bitmap) {
+						adIV.setImageBitmap(bitmap);
+						adIV.setVisibility(View.VISIBLE);
+					}
+
+					@Override
+					public void onError(Throwable e) {
+						adIV.setImageResource(R.drawable.offline_welcome);
+					}
+
+					@Override
+					public void onComplete() {
+
+					}
+				});
+
+
+		/*File ImageV;
 		Bundle Banner = App.BannerName.getBundle(type);
 		if(Banner!=null){
 			ImageV=new File(App.getBannerImagesFolder(),Banner.getString("FILENAME",null));
@@ -593,7 +627,7 @@ public class FGoodbye extends FBase {
 			adIV.setImageResource(R.drawable.offline_goodbye);
 			adIV.setVisibility(View.VISIBLE);
 			return;
-		}
+		}*/
 
 	}
 
@@ -612,7 +646,7 @@ public class FGoodbye extends FBase {
 		try{
 			localHandler.removeCallbacksAndMessages(null);
 			adIV=null;
-			timer_5sec.cancel();
+			//timer_5sec.cancel();
 			handleClick=null;
 			RequestBanner=null;
 			played=false;

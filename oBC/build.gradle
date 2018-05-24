@@ -28,6 +28,8 @@ android {
             resValue "string", "endpointSharengo", "https://api.sharengo.it:8123/"
             resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
+            resValue "string", "endpointSharengoZMQ", "tcp://core.sharengo.it:8001"
+            resValue "string", "endpointSharengoAds", "http://manage.sharengo.it"
             minifyEnabled false
             debuggable false
             signingConfig signingConfigs.vmtest
@@ -40,6 +42,8 @@ android {
             resValue "string", "endpointSharengo", "https://api.localhost.it:8123/"
             resValue "string", "endpointSharengoBeacon", "http://api.localhost.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://api.localhost.it/api/"
+            resValue "string", "endpointSharengoZMQ", "tcp://api.localhost.it:8001"
+            resValue "string", "endpointSharengoAds", "http://manage.sharengo.it"
             signingConfig signingConfigs.vmtest
             debuggable true
 
@@ -51,6 +55,8 @@ android {
             resValue "string", "endpointSharengo", "https://api.sharengo.it:8123/"
             resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
+            resValue "string", "endpointSharengoZMQ", "tcp://core.sharengo.it:8001"
+            resValue "string", "endpointSharengoAds", "http://manage.sharengo.it"
             signingConfig signingConfigs.vmtest
             debuggable true
 
@@ -62,6 +68,8 @@ android {
             resValue "string", "endpointSharengo", "https://corestage.sharengo.it:8123/"
             resValue "string", "endpointSharengoBeacon", "http://corestage.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://corestage.sharengo.it/api/"
+            resValue "string", "endpointSharengoZMQ", "tcp://corestage.sharengo.it:8001"
+            resValue "string", "endpointSharengoAds", "http://manage.sharengo.it"
             signingConfig signingConfigs.vmtest
             debuggable true
 
@@ -115,6 +123,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.0'
     implementation "com.google.dagger:dagger:$DAGGER_VERSION"
     implementation 'com.jakewharton:butterknife:8.8.1'
+    implementation 'com.squareup.picasso:picasso:2.71828'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     //Required by Dagger2
     annotationProcessor daggerCompiler

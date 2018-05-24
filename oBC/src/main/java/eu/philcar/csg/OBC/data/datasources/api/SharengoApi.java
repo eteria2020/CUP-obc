@@ -11,6 +11,7 @@ import eu.philcar.csg.OBC.data.model.SharengoResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Poi;
+import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.Reservation;
 import io.reactivex.Observable;
 import retrofit2.adapter.rxjava2.Result;
@@ -32,10 +33,10 @@ public interface SharengoApi {
 
 
     @GET("area")
-    Observable<Result<SharengoResponse<List<Area>>>> getArea(@Query("md5") String car_plate);
+    Observable<Result<SharengoResponse<List<Area>>>> getArea(@Query("md5") String md5);
 
     @GET("commands")
-    Observable<Result<Config>> getCommands(@Query("car_plate") String car_plate);
+    Observable<Result<SharengoResponse<List<ServerCommand>>>> getCommands(@Query("car_plate") String car_plate);
 
     @GET("reservation")
     Observable<Result<SharengoResponse<List<Reservation>>>> getReservation(@Query("car_plate") String car_plate);
@@ -44,7 +45,7 @@ public interface SharengoApi {
     Observable<Result<SharengoResponse<Reservation>>> consumeReservation(@Query("consumed") int reservation_id);
 
     @GET("pois")
-    Observable<SharengoResponse<List<Poi>>> getPois(@Query("lastupdate") String lastupdate);
+    Observable<Result<SharengoResponse<List<Poi>>>> getPois(@Query("lastupdate") String lastupdate);
 
     @GET("configs")
     Observable<Result<SharengoResponse<Config>>> getConfigs(@Query("car_plate") String car_plate);

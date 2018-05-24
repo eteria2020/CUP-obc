@@ -127,18 +127,25 @@ public class FInstructions extends FBase {
 			((AWelcome)getActivity()).sendMessage(MessageFactory.setEngine(true));
 			
 			((TextView)view.findViewById(R.id.fins_message_TV)).setText(R.string.instruction_title);
-
-			if(Integer.parseInt(App.NRD) == 1) {
-				((TextView)view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_2);
-				((TextView)view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_3);
-				((TextView)view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_4)));
-				((TextView)view.findViewById(R.id.finsInstructions4TV)).setVisibility(View.GONE);
-				((TextView)view.findViewById(R.id.fbullet4TV)).setVisibility(View.GONE);
-			}else {
-				((TextView)view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_1);
-				((TextView)view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_2);
-				((TextView)view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_3)));
+			try {
+				if (Integer.parseInt(App.NRD) == 1) {
+					((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_2);
+					((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_3);
+					((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_4)));
+					((TextView) view.findViewById(R.id.finsInstructions4TV)).setVisibility(View.GONE);
+					((TextView) view.findViewById(R.id.fbullet4TV)).setVisibility(View.GONE);
+				} else {
+					((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_1);
+					((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_2);
+					((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_3)));
+					((TextView) view.findViewById(R.id.finsInstructions4TV)).setText(R.string.instruction_start_4);
+				}
+			}catch (Exception e){
+				((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_1);
+				((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_2);
+				((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_3)));
 				((TextView) view.findViewById(R.id.finsInstructions4TV)).setText(R.string.instruction_start_4);
+
 			}
 			((TextView)view.findViewById(R.id.fins_message_bottom_TV)).setVisibility(View.GONE);
 			

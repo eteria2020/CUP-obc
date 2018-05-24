@@ -161,7 +161,7 @@ public class Hik_io implements LowLevelInterface {
 			mLeaseManager.attachLeaseInfoObserver(mLeaseObserver);
 			int status = mLeaseManager.GetLeaseStatus();
 			int memberId = mLeaseManager.GetLeaseMerberID();
-			eventRepository.LeaseInfo(status, memberId);
+			//eventRepository.LeaseInfo(status, memberId);
 		}
 		
 		if (WITH_RADIO) {
@@ -943,8 +943,10 @@ public class Hik_io implements LowLevelInterface {
 				super.onLeaseReportCard(cardID);
 
 				String Hex=Integer.toHexString(cardID);
-				dlog.i("onLeaseReportCard : " + cardID + ", hex="+Hex);	
+				dlog.i("onLeaseReportCard : " + cardID + ", hex="+Hex);
+				dlog.d("perf: onLeaseReportCard");
 				obcService.notifyCard(Hex,"OPEN",false);
+
 				
 			}
 
@@ -996,7 +998,7 @@ public class Hik_io implements LowLevelInterface {
 	    		Bundle b = new Bundle();
 	    		b.putInt("LEASE", result);
 	    		b.putInt("LEASEID", memberID);
-				eventRepository.LeaseInfo(result, memberID);
+				//eventRepository.LeaseInfo(result, memberID);
 	    	}
 	    	
 	    }

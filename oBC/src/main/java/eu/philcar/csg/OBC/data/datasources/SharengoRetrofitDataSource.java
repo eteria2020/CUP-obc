@@ -9,6 +9,8 @@ import eu.philcar.csg.OBC.data.model.Config;
 import eu.philcar.csg.OBC.data.model.ModelResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
+import eu.philcar.csg.OBC.db.Poi;
+import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.Reservation;
 import io.reactivex.Observable;
 
@@ -62,9 +64,21 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
                 .compose(this.handleSharengoRetrofitRequest());
     }
 
+    @Override
+    public Observable<List<ServerCommand>> getCommands(String plate) {
+        return  mSharengoApi.getCommands(plate)
+                .compose(this.handleSharengoRetrofitRequest());
+    }
+
         @Override
     public Observable<List<ModelResponse>> getModel(String plate) {
         return  mSharengoApi.getModel(plate)
                 .compose(this.handleRetrofitRequest());
+    }
+
+    @Override
+    public Observable<List<Poi>> getPois(long lastupdate) {
+        return mSharengoApi.getPois(String.valueOf(lastupdate))
+                .compose(this.handleSharengoRetrofitRequest());
     }
 }

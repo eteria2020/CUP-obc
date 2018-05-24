@@ -1,16 +1,7 @@
 package eu.philcar.csg.OBC.service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -19,8 +10,9 @@ import com.j256.ormlite.stmt.UpdateBuilder;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.controller.map.FRadio;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
-import eu.philcar.csg.OBC.data.common.ExcludeSerialization;
+import eu.philcar.csg.OBC.data.datasources.repositories.AdsRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
@@ -33,9 +25,7 @@ import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.CardRfid;
 import eu.philcar.csg.OBC.helpers.DLog;
-import eu.philcar.csg.OBC.helpers.UrlTools;
 import io.reactivex.Observable;
-import eu.philcar.csg.OBC.server.ReservationConnector;
 import eu.philcar.csg.OBC.task.OdoController;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 import io.reactivex.Observer;
@@ -43,21 +33,9 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Message;
 import android.os.PowerManager.WakeLock;
 import android.support.annotation.NonNull;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import javax.inject.Inject;
 
@@ -80,6 +58,10 @@ public class TripInfo {
     SharengoPhpRepository phpRepository;
     @Inject
     EventRepository eventRepository;
+    @Inject
+    SharengoApiRepository apiRepository;
+    @Inject
+    AdsRepository adsRepository;
 
     // Properties
     public Customer customer;
@@ -294,7 +276,7 @@ public class TripInfo {
                         if (!App.reservation.isLocal()) {
                             //if (!this.isMaintenance) {
 
-                            phpRepository.consumeReservation(App.reservation.id);
+                            apiRepository.consumeReservation(App.reservation.id);
 
                             /*HttpConnector rhttp = new HttpConnector(service);
                             ReservationConnector rc = new ReservationConnector();
@@ -335,20 +317,6 @@ public class TripInfo {
                 // Prepara un messaggio ritardato che chiude l'auto se non viene abilitata la trip entro un timeout
 
 
-                if(!processing) {
-                    processing=true;
-                    new Thread(new Runnable() {
-                        public void run() {//inizzializzazione banner inizio e fine
-                            dlog.d(" handleCard: inizzializzazione banner");
-                            App.BannerName.clear();
-                            App.first_UP_poi=true;
-                            loadBanner(App.URL_AdsBuilderStart, "START", false);
-                            loadBanner(App.URL_AdsBuilderCar, "CAR", false);
-                            loadBanner(App.URL_AdsBuilderEnd, "END", false);
-                            processing=false;
-                        }
-                    }).start();
-                }
 
                 return (MessageFactory.notifyTripBegin(this));
             } else {
@@ -484,8 +452,9 @@ public class TripInfo {
         return trip!=null?this.trip.toString():"";
     }
 
+    @Deprecated
     public void loadBanner(String Url, String type, Boolean isClick) {
-
+/*
         File outDir = new File(App.getBannerImagesFolder());
         if (!outDir.isDirectory()) {
             outDir.mkdir();
@@ -637,7 +606,7 @@ public class TripInfo {
         }
 
 
-
+*/
     }
 
 
