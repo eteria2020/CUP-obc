@@ -79,4 +79,9 @@ public class SharengoAdsRetrofitDataSource extends BaseRetrofitDataSource implem
             shouldDownload(image);
         return Observable.just(response);
     }
+
+
+    public Observable<Bitmap> bannerClick(AdsImage image){
+        return
+    }
 }

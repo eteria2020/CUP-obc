@@ -8,6 +8,7 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.SharengoAdsDataSource;
 import eu.philcar.csg.OBC.data.datasources.base.BaseRepository;
+import eu.philcar.csg.OBC.data.model.AdsImage;
 import eu.philcar.csg.OBC.data.model.AdsResponse;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.service.DataManager;
@@ -180,5 +181,9 @@ public class AdsRepository extends BaseRepository {
     public Observable<Bitmap> getBannerEnd() {
         return mDataManager.getBitmapEnd()
                 .observeOn(Schedulers.io());
+    }
+
+    public Observable<Bitmap> onBannerClick(AdsImage image){
+        return mRemoteDataSource.bannerClick(image);
     }
 }

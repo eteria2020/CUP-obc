@@ -1,5 +1,7 @@
 package eu.philcar.csg.OBC.data.datasources;
 
+import android.graphics.Bitmap;
+
 import eu.philcar.csg.OBC.data.model.AdsImage;
 import eu.philcar.csg.OBC.data.model.AdsResponse;
 import io.reactivex.Observable;
@@ -24,5 +26,7 @@ public interface SharengoAdsDataSource {
     void shouldDownload(AdsImage image);
 
     Observable<AdsResponse> updateImages(AdsResponse response);
+
+    Observable<Bitmap> bannerClick(AdsImage image);
 
 }

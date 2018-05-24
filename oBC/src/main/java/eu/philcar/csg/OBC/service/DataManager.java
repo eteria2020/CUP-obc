@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.model.AdsImage;
 import eu.philcar.csg.OBC.data.model.AdsResponse;
 import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.data.model.Config;
@@ -313,4 +314,5 @@ public class DataManager { //TODO change to interface-type system like api does 
                 .concatMap(file1 -> Observable.just(Picasso.get().load(file1).get()));
 
     }
+
 }
