@@ -8,12 +8,15 @@ import javax.inject.Singleton;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.SharengoDataSource;
+import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.data.model.Config;
 import eu.philcar.csg.OBC.data.model.ModelResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
+import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.RxUtil;
+import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.DataManager;
 import eu.philcar.csg.OBC.service.Reservation;
 import io.reactivex.Observable;
@@ -30,11 +33,13 @@ public class SharengoApiRepository {
     private SharengoDataSource mRemoteDataSource;
     private boolean needUpdateCustomer;
 
-    private Disposable customerDisposable;
-    private Disposable employeeDisposable;
-    private Disposable configDisposable;
-    private Disposable modelDisposable;
-    private Disposable reservationDisposable;
+    private Disposable customerDisposable = null;
+    private Disposable employeeDisposable = null;
+    private Disposable configDisposable = null;
+    private Disposable modelDisposable = null;
+    private Disposable reservationDisposable = null;
+    private Disposable areaDisposable = null;
+    private Disposable commandDisposable = null;
 
     @Inject
     public SharengoApiRepository(DataManager mDataManager, SharengoDataSource mRemoteDataSource) {
@@ -89,6 +94,8 @@ public class SharengoApiRepository {
                                 getCustomer();
                         }
                     });
+        }else{
+            DLog.D("CustomerDisposable is running");
         }
     }
 
@@ -170,7 +177,7 @@ public class SharengoApiRepository {
                         @Override
                         public void onError(@NonNull Throwable e) {
                             if(e instanceof ErrorResponse)
-                                DLog.E("Error syncing getConfig", ((ErrorResponse)e).error);
+                                DLog.E("Error syncing getConfig" + ((ErrorResponse) e).rawMessage, e);
                             RxUtil.dispose(configDisposable);
                         }
 
@@ -215,7 +222,7 @@ public class SharengoApiRepository {
                         @Override
                         public void onError(@NonNull Throwable e) {
                             if(e instanceof ErrorResponse)
-                                DLog.E("Error syncing getConfig", ((ErrorResponse)e).error);
+                                DLog.E("Error syncing getModel", ((ErrorResponse)e).error);
                             RxUtil.dispose(modelDisposable);
                         }
 
@@ -249,6 +256,162 @@ public class SharengoApiRepository {
                 })
                 .doOnComplete(() ->{});
 
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                      AREA                                                  //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void stopArea(){
+        if (areaDisposable != null)
+            areaDisposable.dispose();
+    }
+
+
+    public void getArea(){
+
+        if(!RxUtil.isRunning(areaDisposable)) {
+            mRemoteDataSource.getArea(App.AreaPolygonMD5)
+                    .concatMap(n -> mDataManager.saveArea(n))
+                    //Emit single Area Response at time
+                    .concatMap(Observable::fromIterable)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Observer<Area>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
+                            areaDisposable = d;
+                            //App.polyline = new ArrayList<>();
+                        }
+
+                        /**
+                         * here I have to parse the response and crate a sort of envelop for the map
+                         * @param area
+                         */
+                        @Override
+                        public void onNext(@NonNull Area area) {
+                            area.initPoints();
+                            area.initEnvelop();
+                            App.polyline.add(area.getEnvelope());
+
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            if(e instanceof ErrorResponse)
+                                if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
+                                    DLog.E("Error inside getArea"+ ((ErrorResponse) e).rawMessage);
+                            //RxUtil.dispose(areaDisposable);
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            DLog.I("Synced successfully!");
+                            //RxUtil.dispose(areaDisposable);
+                            App.Instance.initAreaPolygon();
+                        }
+                    });
+        }
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                      COMMANDS                                              //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void stopCommand(){
+        RxUtil.dispose(commandDisposable);
+    }
+
+
+    public Observable<ServerCommand> getCommands(String plate) {
+
+        return  mRemoteDataSource.getCommands(plate)
+                .flatMap(Observable::fromIterable)
+                .filter(command -> {
+                    if ((command.ttl<=0 || command.queued+command.ttl>System.currentTimeMillis()/1000) || command.command.equalsIgnoreCase("CLOSE_TRIP")) {
+
+                        DLog.D("Command accepted :"+command);
+                        return true;
+                    }else {
+                        DLog.D("Command timeout :"+command);
+                        return false;
+                    }
+                })
+                .doOnSubscribe(n -> {
+                    //RxUtil.dispose(commandDisposable);
+                    commandDisposable = n;})
+                .doOnError(e -> {
+                    if(e instanceof ErrorResponse)
+                        if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
+                            DLog.E("Error insiede GetCommand",e);
+                    //RxUtil.dispose(commandDisposable);
+                })
+                .doOnComplete(() -> {
+                    RxUtil.dispose(commandDisposable);
+                });
+
+
+    }
+
+    public void consumeReservation(final int reservation_id){
+
+        mRemoteDataSource.consumeReservation(reservation_id)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Reservation>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Reservation r) {
+
+                        App.reservation = null;  //Cancella la prenotazione in locale
+                        App.Instance.persistReservation();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+    }
+
+
+    public void getPois(){
+        mRemoteDataSource.getPois(mDataManager.getMaxPoiLastupdate())
+                .concatMap(n -> mDataManager.savePoi(n))
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Poi>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Poi poi) {
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        DLog.I("Synced successfully!");
+                    }
+                });
     }
 
 }

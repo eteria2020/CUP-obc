@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-        vmtest {
-            keyAlias 'Sharengo.user'
-            keyPassword 'Sharengo1'
-            storeFile file('D:/Mobile Workspace/Android Workspace/key/sharengo.keystore.jks')
-            storePassword 'Sharengo1'
-        }
+//        vmtest {
+//            keyAlias 'Sharengo.user'
+//            keyPassword 'Sharengo1'
+//            storeFile file('D:/Mobile Workspace/Android Workspace/key/sharengo.keystore.jks')
+//            storePassword 'Sharengo1'
+//        }
     }
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
@@ -28,9 +28,10 @@ android {
             resValue "string", "endpointSharengo", "https://api.sharengo.it:8123/"
             resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
+            resValue "string", "endpointSharengoZMQ", "tcp://core.sharengo.it:8001"
             minifyEnabled false
             debuggable false
-            signingConfig signingConfigs.vmtest
+            //signingConfig signingConfigs.vmtest
 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             multiDexKeepProguard file('multidex-proguard-rules.pro')
@@ -40,7 +41,8 @@ android {
             resValue "string", "endpointSharengo", "https://api.localhost.it:8123/"
             resValue "string", "endpointSharengoBeacon", "http://api.localhost.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://api.localhost.it/api/"
-            signingConfig signingConfigs.vmtest
+            resValue "string", "endpointSharengoZMQ", "tcp://api.localhost.it:8001"
+            //signingConfig signingConfigs.vmtest
             debuggable true
 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
@@ -51,7 +53,8 @@ android {
             resValue "string", "endpointSharengo", "https://api.sharengo.it:8123/"
             resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
-            signingConfig signingConfigs.vmtest
+            resValue "string", "endpointSharengoZMQ", "tcp://core.sharengo.it:8001"
+            //signingConfig signingConfigs.vmtest
             debuggable true
 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -62,7 +65,8 @@ android {
             resValue "string", "endpointSharengo", "https://corestage.sharengo.it:8123/"
             resValue "string", "endpointSharengoBeacon", "http://corestage.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://corestage.sharengo.it/api/"
-            signingConfig signingConfigs.vmtest
+            resValue "string", "endpointSharengoZMQ", "tcp://corestage.sharengo.it:8001"
+            //signingConfig signingConfigs.vmtest
             debuggable true
 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -77,6 +81,8 @@ android {
         produzione {
         }
         develop {
+        }
+        node {
         }
     }
 }
@@ -98,9 +104,8 @@ dependencies {
     implementation files('libs/rc.jar')
     //implementation files('libs/slf4j-api-1.7.6.jar')
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    implementation 'org.slf4j:slf4j-api:1.7.25'
     implementation 'com.github.tony19:logback-android:1.1.1-10'
-
     implementation files('libs/activation.jar')
     implementation files('libs/additionnal.jar')
     implementation files('libs/mail.jar')

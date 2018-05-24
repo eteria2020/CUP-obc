@@ -157,7 +157,7 @@ public class AWelcome extends ABase {
 			
 			
 			case ObcService.MSG_TRIP_BEGIN:
-				DLog.D(AWelcome.class.getName() + "AWelcome: received ObcService.MSG_TRIP_BEGIN");
+				dlog.d("perf: received MSG_TRIP_BEGIN");
 				TripInfo ti = (TripInfo)msg.obj;
 				if (msg.arg1==0) {
 					if (ti!=null && ti.customer !=  null) {
@@ -189,6 +189,7 @@ public class AWelcome extends ABase {
 				break;
 				
 			case ObcService.MSG_TRIP_END:
+				dlog.d("perf: received MSG_TRIP_END");
 				try {
 					popTillFragment(FWelcome.class.getName());
 				}catch (PopTillException ex){
@@ -200,9 +201,15 @@ public class AWelcome extends ABase {
 				}
 
 				
-				FWelcome welcome = (FWelcome)getFragmentManager().findFragmentByTag(FWelcome.class.getName());
+				final FWelcome welcome = (FWelcome)getFragmentManager().findFragmentByTag(FWelcome.class.getName());
 				if (welcome != null) {
-					welcome.resetUI();
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							dlog.d("perf: reset ui");
+							welcome.resetUI();
+						}
+					});
 				}
 		
 				break;

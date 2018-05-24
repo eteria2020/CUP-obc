@@ -191,7 +191,9 @@
 
     
     <ImageView android:id="@+id/fmapLeftBorderIV"
-        android:layout_width="wrap_content"
+        android:layout_above="@id/fmap_bottom_V"
+        android:layout_below="@id/fmap_top_V"
+        android:layout_width="255dp"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -203,6 +205,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/fmap_top_LL"
+        android:layout_above="@id/fmap_bottom_V"
         android:layout_toRightOf="@+id/fmapLeftBorderIV"
         android:layout_toEndOf="@+id/fmapLeftBorderIV">
 

@@ -8,6 +8,7 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Encryption;
 import eu.philcar.csg.OBC.service.MessageFactory;
@@ -129,8 +130,8 @@ public class ZmqSubscriber {
 				socket.setTCPKeepAliveInterval(60);
 				socket.setReconnectIVL(1000);  //TODO: Add random  component
 
-				dlog.d("ZMQ Connecting to:" + App.URL_ZMQNotifier);
-				socket.connect(App.URL_ZMQNotifier);
+				dlog.d("ZMQ Connecting to:" + App.Instance.getString(R.string.endpointSharengoZMQ));
+				socket.connect(App.Instance.getString(R.string.endpointSharengoZMQ));
 				//socket.subscribe(ZMQ.SUBSCRIPTION_ALL);
 				dlog.d("ZMQ Subscribing to channels: COMMON," + App.CarPlate);
 				socket.subscribe(App.CarPlate.getBytes());

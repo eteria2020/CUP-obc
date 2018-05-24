@@ -32,6 +32,7 @@ import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.AMainOBC;
+import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
@@ -70,6 +71,7 @@ import eu.philcar.csg.OBC.server.ZmqSubscriber;
 import eu.philcar.csg.OBC.task.OldLogCleamup;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 import eu.philcar.csg.OBC.task.UDPServer;
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -607,7 +609,7 @@ public class ObcService extends Service implements OnTripCallback {
                     //If HTTP query is enabled schedule an HTTP notifies download
                     if (WITH_HTTP_NOTIFIES&& notifiesPrescaler++>4 && tripInfo != null && tripInfo.isOpen && (App.parkMode == null || !App.parkMode.isOn()) ) {
                         notifiesPrescaler=0;
-                        sendBeacon(carInfo.getJsonGson(false));
+                        sendBeacon(carInfo);
 //                        HttpConnector http = new HttpConnector(ObcService.this);
 //                        http.SetHandler(localHandler);
 //                        NotifiesConnector nc = new NotifiesConnector();
@@ -685,20 +687,18 @@ public class ObcService extends Service implements OnTripCallback {
                     }
                     else {
                         ampError=false;
-                        canAmpAnomalies = 0;
-                    }
 
-                    if( carInfo.bmsSOC==0){
-                        bmsSocError=true;
-                        if(canAmpAnomalies++==3){
-                            eventRepository.CanAnomalies("SOC 0");
+                        if( carInfo.bmsSOC==0){
+                            bmsSocError=true;
+                            if(canAmpAnomalies++==3){
+                                eventRepository.CanAnomalies("SOC 0");
+                            }
                         }
-                    }
-                    else {
-                        bmsSocError=false;
-                        canAmpAnomalies = 0;
-                    }
-
+                        else {
+                            bmsSocError=false;
+                            canAmpAnomalies = 0;
+                        }
+                }
 
                     //type of battery
                     //if(carInfo.minVoltage==2.6f || carInfo.batteryType.equalsIgnoreCase("")) {
@@ -1137,7 +1137,7 @@ public class ObcService extends Service implements OnTripCallback {
             return;
         }
 
-        sendBeacon(carInfo.getJsonGson(true));
+        sendBeacon(carInfo);
         /*if (msg != null) {
             dlog.d("Sending beacon : " + msg);
             //udpServer.sendBeacon(msg);
@@ -1175,7 +1175,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     }
 
-    public void sendBeacon(String beacon) {
+    public void sendBeacon(final CarInfo carinfo) {
 
         if (!App.hasNetworkConnection()) {
             dlog.w("No connection. Beacon aborted");
@@ -1183,11 +1183,14 @@ public class ObcService extends Service implements OnTripCallback {
         }
 
 //        String msg = carInfo.getJson(true);
-        if (beacon != null) {
-            dlog.d("Sending beacon : " + beacon);
+        if (carinfo != null) {
+            //dlog.d("Sending beacon : " + carinfo.);
             //udpServer.sendBeacon(msg);
-
-            beaconRepository.sendBeacon(beacon).subscribeOn(Schedulers.io())
+            Observable.just(1).delay(100,TimeUnit.MILLISECONDS)
+                    .concatMap(i->
+            beaconRepository.sendBeacon(carinfo.getJsonGson(true)))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.computation())
                     .subscribe(new Observer<BeaconResponse>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
@@ -1365,14 +1368,16 @@ public class ObcService extends Service implements OnTripCallback {
         if (tripInfo == null) {
             dlog.e(ObcService.class.toString() + " notifyCard: Tripinfo NULL!");
         } else {
+            dlog.d("perf: start handleCard");
             Message tripMsg = tripInfo.handleCard(id, event, carInfo, obc_io, this, screenLockTrip, forced?TripInfo.CloseType.forced:TripInfo.CloseType.normal);
-            carInfo.updateTrips();
+            dlog.d("perf: end handleCard");
             if (tripMsg != null) {
                 if (tripMsg.what == this.MSG_TRIP_END && App.reservation != null) {
                     setReservation(App.reservation);
                 }
                 sendAll(tripMsg);
             }
+            carInfo.updateTrips();
             sendBeacon();
         }
     }
@@ -1932,45 +1937,82 @@ public class ObcService extends Service implements OnTripCallback {
     public void startAreaPolygonDownload(Context ctx, Handler handler) {
         DLog.D("Start area download..");
 
-        phpRepository.getArea();
+        if(BuildConfig.FLAVOR.equalsIgnoreCase("node"))
+            apiRepository.getArea();
+        else
+            phpRepository.getArea();
     }
 
     public void startPoiDownload() {
         DLog.D("Start poi download..");
 
-        phpRepository.getPois();
+        if(BuildConfig.FLAVOR.equalsIgnoreCase("node"))
+            apiRepository.getPois();
+        else
+            phpRepository.getPois();
     }
 
     public void startDownloadReservations() {
         dlog.d("Start Downloading reservations");
-        apiRepository.getReservation()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Reservation>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
 
-                    }
+        if(BuildConfig.FLAVOR.equalsIgnoreCase("node"))
+            apiRepository.getReservation()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<Reservation>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
 
-                    @Override
-                    public void onNext(Reservation reservation) {
-                        setReservation(reservation);
-                    }
+                        }
 
-                    @Override
-                    public void onError(Throwable e) {
+                        @Override
+                        public void onNext(Reservation reservation) {
+                            setReservation(reservation);
+                        }
 
-                        if(e instanceof ErrorResponse)
-                            if (((ErrorResponse)e).errorType == ErrorResponse.ErrorType.EMPTY) {
-                                setReservation(null);
-                            }
-                    }
+                        @Override
+                        public void onError(Throwable e) {
 
-                    @Override
-                    public void onComplete() {
+                            if(e instanceof ErrorResponse)
+                                if (((ErrorResponse)e).errorType == ErrorResponse.ErrorType.EMPTY) {
+                                    setReservation(null);
+                                }
+                        }
 
-                    }
-                });
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+        else
+            phpRepository.getReservation(App.CarPlate)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<Reservation>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(Reservation reservation) {
+                            setReservation(reservation);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                            if(e instanceof ErrorResponse)
+                                if (((ErrorResponse)e).errorType == ErrorResponse.ErrorType.EMPTY) {
+                                    setReservation(null);
+                                }
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
 //        HttpConnector http = new HttpConnector(this);
 //        http.SetHandler(localHandler);
 //        ReservationConnector rc = new ReservationConnector();

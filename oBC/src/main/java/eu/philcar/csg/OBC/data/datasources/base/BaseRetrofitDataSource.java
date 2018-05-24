@@ -73,12 +73,11 @@ public abstract class BaseRetrofitDataSource {
                 }
             }
 
-            return Observable.just(r.response().body())
-                    .doOnSubscribe(this::addDisposable)
-                    .doOnError(this::handleErorResponse)
-                    .doOnComplete(this::handleCompletion);
-        }
-        );
+            return Observable.just(r.response().body());
+        })
+            .doOnSubscribe(this::addDisposable)
+            .doOnError(this::handleErorResponse)
+            .doOnComplete(this::handleCompletion);
     }
 
     protected <T> ObservableTransformer<Result<SharengoResponse<T>>, T> handleSharengoRetrofitRequest() {

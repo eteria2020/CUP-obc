@@ -285,7 +285,9 @@
 
 
 	<ImageView android:id="@+id/fmapLeftBorderIV"
-		android:layout_width="wrap_content" android:layout_height="match_parent"
+		android:layout_below="@id/fmap_top_V"
+		android:layout_above="@id/fmap_bottom_V"
+		android:layout_width="255dp" android:layout_height="match_parent"
 		android:layout_alignParentLeft="true" android:layout_alignParentStart="true"
 		android:scaleType="fitXY" android:src="@drawable/car_banner_offline"
 		android:contentDescription="@string/content_description"

@@ -67,6 +67,7 @@ public class ProTTS implements TextToSpeech.OnInitListener{
             player.shutdown();
             player=null;
             utteranceListener=null;
+            context = null;
         }catch(Exception e){
             dlog.e("Exception while pausing player",e);
         }

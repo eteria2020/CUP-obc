@@ -17,10 +17,12 @@ import java.util.TimerTask;
 import com.j256.ormlite.stmt.UpdateBuilder;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.controller.map.FRadio;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.common.ExcludeSerialization;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
@@ -80,6 +82,8 @@ public class TripInfo {
     SharengoPhpRepository phpRepository;
     @Inject
     EventRepository eventRepository;
+    @Inject
+    SharengoApiRepository apiRepository;
 
     // Properties
     public Customer customer;
@@ -294,7 +298,10 @@ public class TripInfo {
                         if (!App.reservation.isLocal()) {
                             //if (!this.isMaintenance) {
 
-                            phpRepository.consumeReservation(App.reservation.id);
+                            if(BuildConfig.FLAVOR.equalsIgnoreCase("node"))
+                                apiRepository.consumeReservation(App.reservation.id);
+                            else
+                                phpRepository.consumeReservation(App.reservation.id);
 
                             /*HttpConnector rhttp = new HttpConnector(service);
                             ReservationConnector rc = new ReservationConnector();
@@ -710,7 +717,7 @@ public class TripInfo {
                     return  n;
                 })
                 .concatMap(f->phpRepository.openTrip(trip,this))
-
+F
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<TripResponse>() {
                     @Override
