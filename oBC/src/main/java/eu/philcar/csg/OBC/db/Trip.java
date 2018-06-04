@@ -170,30 +170,32 @@ public class Trip  extends DbRecord<TripResponse> {
 					dataManager.updateBeginSentDone(this);
 
 				} else {
-					switch (tripResponse.getResult()) {
+					if(end_timestamp == 0) {//if trip offline not update value
+						switch (tripResponse.getResult()) {
 
-						case -15:
-							warning = "OPEN TRIP";
-							begin_sent = true;
-							break;
+							case -15:
+								warning = "OPEN TRIP";
+								begin_sent = true;
+								break;
 
-						case -16:
-							warning = "FORBIDDEN";
-							begin_sent = true;
-							break;
+							case -16:
+								warning = "FORBIDDEN";
+								begin_sent = true;
+								break;
 
-						case -26:
-						case -27:
-						case -28:
-						case -29:
-							warning = "PREAUTH";
-							begin_sent = true;
-							break;
+							case -26:
+							case -27:
+							case -28:
+							case -29:
+								warning = "PREAUTH";
+								begin_sent = true;
+								break;
 
 
-						default:
-							warning = "FAIL";
-							begin_sent = false;
+							default:
+								warning = "FAIL";
+								begin_sent = false;
+						}
 					}
 					if (tripResponse.getExtra() != null && !tripResponse.getExtra().isEmpty()) {
 						try {

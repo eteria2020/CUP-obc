@@ -121,12 +121,12 @@ public abstract class BaseRetrofitDataSource {
                     }
 
                     return Observable.just(r.response().body())
-                            .concatMap(this::extractResponse)
-                            .doOnSubscribe(this::addDisposable)
-                            .doOnError(this::handleErorResponse)
-                            .doOnComplete(this::handleCompletion);
+                            .concatMap(this::extractResponse);
                 }
-        );
+        )
+                .doOnSubscribe(this::addDisposable)
+                .doOnError(this::handleErorResponse)
+                .doOnComplete(this::handleCompletion);
     }
 
     protected void handleResponsePersistance(DbRecord record,BaseResponse response, DataManager manager, int callOrder){
@@ -174,6 +174,9 @@ public abstract class BaseRetrofitDataSource {
     }
 
     private <T> Observable<T> extractResponse(SharengoResponse<T> response){
+        if(response.timestamp!=0){
+            App.sharengoTime = response.timestamp;
+        }
 
         return Observable.just(response.data);
 

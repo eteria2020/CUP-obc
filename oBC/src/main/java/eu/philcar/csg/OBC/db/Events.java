@@ -15,6 +15,7 @@ import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.Connectors;
@@ -346,7 +347,7 @@ public class Events extends DbTable<Event,Integer> {
 	}
 	
 	
-	public boolean spedisciOffline(Context context, Handler handler, SharengoPhpRepository phpRepository) {
+	public boolean spedisciOffline(Context context, Handler handler, SharengoApiRepository apiRepository, SharengoPhpRepository phpRepository) {
 		//HttpConnector http;
 		List<Event> list = getEventsToSend();
 		
@@ -360,8 +361,10 @@ public class Events extends DbTable<Event,Integer> {
 			return false;
 		}
 
-
-		phpRepository.sendEvents(list);
+		if(App.fullNode)
+			apiRepository.sendEvents(list);
+		else
+			phpRepository.sendEvents(list);
 
 		//Dato che l'invio � asincrono viene richiesto l'invio solo della prima corsa non spedito, quando arriva il messaggio di risposto di invio eseguito(o fallito) passa alla successiva 
 		/*for(Event e : list) {

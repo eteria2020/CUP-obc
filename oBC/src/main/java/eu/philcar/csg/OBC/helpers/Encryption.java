@@ -61,7 +61,10 @@ public class Encryption {
             byte[] dataBytes = data.getBytes(_charsetName);
             Cipher cipher = Cipher.getInstance(_algorithm);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            return Base64.encodeToString(cipher.doFinal(dataBytes), _base64Mode);
+            String result = Base64.encodeToString(cipher.doFinal(dataBytes), _base64Mode);
+            cipher = null;
+            secretKeyFactory = null;
+            return result;
         } catch (Exception e) {
             return null;
         }

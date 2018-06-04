@@ -4,12 +4,17 @@ import java.util.List;
 
 import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.data.model.Config;
+import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.ModelResponse;
 import eu.philcar.csg.OBC.data.model.ReservationResponse;
+import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
+import eu.philcar.csg.OBC.db.Event;
 import eu.philcar.csg.OBC.db.Poi;
+import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.server.ServerCommand;
+import eu.philcar.csg.OBC.service.DataManager;
 import eu.philcar.csg.OBC.service.Reservation;
 import io.reactivex.Observable;
 
@@ -37,4 +42,16 @@ public interface SharengoDataSource {
     Observable<List<ModelResponse>> getModel(String plate);
 
     Observable<List<Poi>> getPois(long lastupdate);
+
+    Observable<EventResponse> sendEvent(Event trip, DataManager dataManager);
+
+    Observable<TripResponse> openTrip(Trip trip, DataManager dataManager);
+
+    Observable<Trip> openTripPassive(Trip trip, DataManager dataManager);
+
+    Observable<Trip> closeTripPassive(Trip trip, DataManager dataManager);
+
+    Observable<TripResponse> updateTrip(Trip trip);
+
+    Observable<TripResponse> closeTrip(Trip trip, DataManager dataManager);
 }

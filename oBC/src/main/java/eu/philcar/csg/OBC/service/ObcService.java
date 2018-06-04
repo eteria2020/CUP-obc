@@ -275,7 +275,7 @@ public class ObcService extends Service implements OnTripCallback {
             long sharengoTime=0;
             long fix =SystemClock.elapsedRealtime();
             try {
-                sharengoTime = Long.parseLong(doGet(App.URL_Time));
+                sharengoTime = App.sharengoTime;//doGet(App.URL_Time));
             }catch (Exception e){
                 dlog.e("Exception while retreiving sharengoTime",e);
                 lastResponseCode=0;
@@ -285,7 +285,7 @@ public class ObcService extends Service implements OnTripCallback {
             Runtime rt = Runtime.getRuntime();
             try {
                 Date sharengo_time=null;
-                if(lastResponseCode==200) {
+                if(App.sharengoTime!=0){//lastResponseCode==200) {
                     sharengo_time = new Date(sharengoTime*1000 + SystemClock.elapsedRealtime() - fix);
                 }
                 Date gps_time = new Date(carInfo.intGpsLocation.getTime() + SystemClock.elapsedRealtime() - carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000);
@@ -661,8 +661,8 @@ public class ObcService extends Service implements OnTripCallback {
 
         virtualBMSUpdateScheduler.scheduleAtFixedRate(new Runnable() {
 
-            int canAmpAnomalies =0, canCellAnomalies =0, canBmsAnomalies=0, canAllAnomalies=0;
-            boolean bmsSocError =false, bmsCellError=false, ampError=false;
+            int canAmpAnomalies = 0, canCellAnomalies = 0, canBmsAnomalies = 0, canAllAnomalies=0;
+            boolean bmsSocError = false, bmsCellError = false, ampError=false;
 
 
             @Override
@@ -981,7 +981,7 @@ public class ObcService extends Service implements OnTripCallback {
         //SystemControl.ResycNTP();
 
 
-        localHandler.sendMessageDelayed(MessageFactory.checkLogSize(),3000);
+        localHandler.sendMessageDelayed(MessageFactory.checkLogSize(),5*60*1000);
         dlog.d("Service created");
         isStarted = true;
         /*
@@ -1189,7 +1189,7 @@ public class ObcService extends Service implements OnTripCallback {
             Observable.just(1).delay(100,TimeUnit.MILLISECONDS)
                     .concatMap(i->
             beaconRepository.sendBeacon(carinfo.getJsonGson(true)))
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(Schedulers.computation())
                     .subscribe(new Observer<BeaconResponse>() {
                         @Override
@@ -1247,6 +1247,8 @@ public class ObcService extends Service implements OnTripCallback {
                   myMsg=Message.obtain();
                     myMsg.copyFrom(msg);
                     cliente.getClient().send(myMsg);
+                    if(msg.what ==50)
+                        dlog.d("perf: sent to client");
                 }
                 //clients.get(clients.size() - 1).getClient().send(msg);
             else {
@@ -1375,10 +1377,11 @@ public class ObcService extends Service implements OnTripCallback {
                 if (tripMsg.what == this.MSG_TRIP_END && App.reservation != null) {
                     setReservation(App.reservation);
                 }
+                dlog.d("perf: sendAll "+ tripMsg.what);
                 sendAll(tripMsg);
             }
             carInfo.updateTrips();
-            sendBeacon();
+            //sendBeacon();
         }
     }
 
@@ -1918,7 +1921,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     public void startDownloadCustomers() {
 
-        apiRepository.getCustomer();
+        apiRepository.getCustomer(200);
 
 //        Customers customers = App.Instance.dbManager.getClientiDao();
 //        customers.startWhitelistDownload(this, privateHandler);
@@ -1937,7 +1940,7 @@ public class ObcService extends Service implements OnTripCallback {
     public void startAreaPolygonDownload(Context ctx, Handler handler) {
         DLog.D("Start area download..");
 
-        if(BuildConfig.FLAVOR.equalsIgnoreCase("node"))
+        if(App.fullNode)
             apiRepository.getArea();
         else
             phpRepository.getArea();
@@ -1946,7 +1949,7 @@ public class ObcService extends Service implements OnTripCallback {
     public void startPoiDownload() {
         DLog.D("Start poi download..");
 
-        if(BuildConfig.FLAVOR.equalsIgnoreCase("node"))
+        if(App.fullNode)
             apiRepository.getPois();
         else
             phpRepository.getPois();
@@ -1954,10 +1957,15 @@ public class ObcService extends Service implements OnTripCallback {
 
     public void startDownloadReservations() {
         dlog.d("Start Downloading reservations");
+        Observable.just(1)
+        .delay(150,TimeUnit.MILLISECONDS)
+        .concatMap(i->{
+            if(App.fullNode)
+                return apiRepository.getReservation();
+            else
+                return phpRepository.getReservation(App.CarPlate);})
 
-        if(BuildConfig.FLAVOR.equalsIgnoreCase("node"))
-            apiRepository.getReservation()
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<Reservation>() {
                         @Override
@@ -1973,10 +1981,13 @@ public class ObcService extends Service implements OnTripCallback {
                         @Override
                         public void onError(Throwable e) {
 
-                            if(e instanceof ErrorResponse)
-                                if (((ErrorResponse)e).errorType == ErrorResponse.ErrorType.EMPTY) {
+                            if(e instanceof ErrorResponse) {
+                                if (((ErrorResponse) e).errorType == ErrorResponse.ErrorType.EMPTY) {
                                     setReservation(null);
                                 }
+                            }
+                            else if(e instanceof NullPointerException)
+                                    setReservation(null);
                         }
 
                         @Override
@@ -1984,35 +1995,8 @@ public class ObcService extends Service implements OnTripCallback {
 
                         }
                     });
-        else
-            phpRepository.getReservation(App.CarPlate)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<Reservation>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
 
-                        }
 
-                        @Override
-                        public void onNext(Reservation reservation) {
-                            setReservation(reservation);
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-
-                            if(e instanceof ErrorResponse)
-                                if (((ErrorResponse)e).errorType == ErrorResponse.ErrorType.EMPTY) {
-                                    setReservation(null);
-                                }
-                        }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    });
 //        HttpConnector http = new HttpConnector(this);
 //        http.SetHandler(localHandler);
 //        ReservationConnector rc = new ReservationConnector();
@@ -2024,8 +2008,14 @@ public class ObcService extends Service implements OnTripCallback {
     public void startDownloadCommands() {
 
             dlog.d("Start Downloading comandi");
-        phpRepository.getCommands(App.CarPlate)
-                .subscribeOn(Schedulers.io())
+            Observable.just(1)
+                    .concatMap(i-> {
+                        if(App.fullNode)
+                            return apiRepository.getCommands(App.CarPlate);
+                        else
+                            return phpRepository.getCommands(App.CarPlate);
+                    })
+                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<ServerCommand>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
@@ -2363,11 +2353,11 @@ public class ObcService extends Service implements OnTripCallback {
             startDownloadCustomers();
             //App.Instance.dbManager.getClientiDao().startWhitelistDownload(ObcService.this, privateHandler);
             //App.Instance.dbManager.getPoisDao().startDownload(ObcService.this, localHandler);
-            if(fourHurScheduler++>4*4) {
+            /*if(fourHurScheduler++>4*4) {
                 fourHurScheduler=0;
                 startAreaPolygonDownload(ObcService.this, null);
                 startDownloadConfigs();
-            }
+            }*/
             startDownloadReservations();
             //startDownloadCommands();
 
@@ -2440,13 +2430,13 @@ public class ObcService extends Service implements OnTripCallback {
                 case Connectors.MSG_TRIPS_SENT_OFFLINE:
                 case Connectors.MSG_TRIPS_SENT_REALTIME:
                     Trips corse = App.Instance.getDbManager().getCorseDao();
-                    corse.sendOffline(ObcService.this, this, phpRepository);
+                    corse.sendOffline(ObcService.this, this, apiRepository,phpRepository);
                     carInfo.updateTrips();
                     break;
 
                 case Connectors.MSG_EVENTS_SENT_OFFLINE:
                     Events eventi = App.Instance.getDbManager().getEventiDao();
-                    eventi.spedisciOffline(ObcService.this, this,phpRepository);
+                    eventi.spedisciOffline(ObcService.this, this, apiRepository,phpRepository);
                     break;
 
                 case Connectors.MSG_DN_ADMINS:

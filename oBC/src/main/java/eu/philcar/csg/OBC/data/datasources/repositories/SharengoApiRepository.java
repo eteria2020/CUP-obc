@@ -2,6 +2,10 @@ package eu.philcar.csg.OBC.data.datasources.repositories;
 
 import android.support.annotation.NonNull;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -10,15 +14,20 @@ import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.SharengoDataSource;
 import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.data.model.Config;
+import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.ModelResponse;
+import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
+import eu.philcar.csg.OBC.db.Event;
 import eu.philcar.csg.OBC.db.Poi;
+import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.RxUtil;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.DataManager;
 import eu.philcar.csg.OBC.service.Reservation;
+import eu.philcar.csg.OBC.service.TripInfo;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -59,13 +68,14 @@ public class SharengoApiRepository {
     }
 
 
-    public void getCustomer(){
+    public void getCustomer(int millidelay){
         needUpdateCustomer=false;
 
         if(!RxUtil.isRunning(customerDisposable)) {
-            mRemoteDataSource.getCustomer(mDataManager.getMaxCustomerLastupdate())
+            Observable.just(1)
+                    .delay(millidelay, TimeUnit.MILLISECONDS)
+                    .concatMap(i->mRemoteDataSource.getCustomer(mDataManager.getMaxCustomerLastupdate()))
                     .concatMap(n -> mDataManager.saveCustomer(n))
-                    .subscribeOn(Schedulers.io())
                     .subscribe(new Observer<Customer>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
@@ -91,7 +101,7 @@ public class SharengoApiRepository {
                             DLog.I("Synced successfully!");
                             RxUtil.dispose(customerDisposable);
                             if(needUpdateCustomer)
-                                getCustomer();
+                                getCustomer(150);
                         }
                     });
         }else{
@@ -117,7 +127,7 @@ public class SharengoApiRepository {
             mRemoteDataSource.getBusinessEmployees()
 
                     .concatMap(n -> mDataManager.saveEmployee(n))
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .subscribe(new Observer<BusinessEmployee>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
@@ -163,7 +173,7 @@ public class SharengoApiRepository {
         if(!RxUtil.isRunning(configDisposable)) {
             mRemoteDataSource.getConfig(App.CarPlate)
                     .doOnNext(n -> mDataManager.saveConfig(n))
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .subscribe(new Observer<Config>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
@@ -208,7 +218,7 @@ public class SharengoApiRepository {
             mRemoteDataSource.getModel(App.CarPlate)
                     .concatMap(Observable::fromIterable)
                     .doOnNext(n -> mDataManager.saveModel(n))
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .subscribe(new Observer<ModelResponse>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
@@ -250,7 +260,6 @@ public class SharengoApiRepository {
 
         return mRemoteDataSource.getReservation(App.CarPlate)
                 .concatMap(reservations -> mDataManager.handleReservations(reservations))
-                .concatMap(Reservation::init)
                 .doOnSubscribe(n -> {
                     reservationDisposable =n;
                 })
@@ -278,7 +287,7 @@ public class SharengoApiRepository {
                     .concatMap(n -> mDataManager.saveArea(n))
                     //Emit single Area Response at time
                     .concatMap(Observable::fromIterable)
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .subscribe(new Observer<Area>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
@@ -361,7 +370,7 @@ public class SharengoApiRepository {
     public void consumeReservation(final int reservation_id){
 
         mRemoteDataSource.consumeReservation(reservation_id)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<Reservation>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -389,10 +398,17 @@ public class SharengoApiRepository {
     }
 
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                      POIS                                                  //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     public void getPois(){
         mRemoteDataSource.getPois(mDataManager.getMaxPoiLastupdate())
                 .concatMap(n -> mDataManager.savePoi(n))
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<Poi>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
@@ -411,6 +427,162 @@ public class SharengoApiRepository {
                     public void onComplete() {
                         DLog.I("Synced successfully!");
                     }
+                });
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                      EVENTS                                                //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private static boolean sendingEvents;
+    public void sendEvent(final Event event){
+        mDataManager.saveEvent(event)
+                .concatMap(e -> mRemoteDataSource.sendEvent(e,mDataManager))
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Observer<EventResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(EventResponse eventResponse) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    public void sendEvents(final List<Event> event){
+        if(!sendingEvents)
+            Observable.interval(60,TimeUnit.SECONDS)
+                    .take(event.size())
+                    .concatMap(i->Observable.just(event.get(i.intValue())))
+                    .concatMap(mDataManager::saveEvent)
+            /*mDataManager.saveEvents(event)
+                    .delay(10, TimeUnit.SECONDS)*/
+                    .concatMap(e -> mRemoteDataSource.sendEvent(e,mDataManager))
+                    .subscribeOn(Schedulers.newThread())
+                    .subscribe(new Observer<EventResponse>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            sendingEvents = true;
+                        }
+
+                        @Override
+                        public void onNext(EventResponse eventResponse) {
+                            DLog.D("Receiver Event response");
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            sendingEvents = false;
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            sendingEvents = false;
+
+                        }
+                    });
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                      TRIPS                                                 //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    public Observable<TripResponse> openTrip(final Trip trip, final TripInfo tripInfo) {
+        return mDataManager.saveTrip(trip)
+                .concatMap(n -> mRemoteDataSource.openTrip(n, mDataManager))
+                .doOnSubscribe(n -> {
+                    //RxUtil.dispose(openTripDisposable);
+                    //openTripDisposable = n;
+                })
+                .doOnError(e -> {
+                    if(e instanceof ErrorResponse)
+                        if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
+                            DLog.E("Error insiede openTrip",e);
+                    //RxUtil.dispose(openTripDisposable);
+                })
+                .doOnComplete(() -> {
+                    //RxUtil.dispose(openTripDisposable);
+                });
+
+    }
+
+    public Observable<TripResponse> updateServerTripData(Trip trip){
+        return mRemoteDataSource.updateTrip(trip)
+                .doOnSubscribe(n -> {
+                    //RxUtil.dispose(openTripDisposable);
+                    //openTripDisposable = n;
+                })
+                .doOnError(e -> {
+                    DLog.E("Error insiede updateTrip",e);
+                    //RxUtil.dispose(openTripDisposable);
+                })
+                .doOnComplete(() -> {
+                    //RxUtil.dispose(openTripDisposable);
+                });
+    }
+
+    public Observable<TripResponse> closeTrip(final Trip trip) {
+        return mDataManager.saveTrip(trip)
+                .concatMap(n -> {
+                    if(!n.begin_sent)
+                        return mRemoteDataSource.openTripPassive(n, mDataManager);
+                    return Observable.just(n);
+                })
+                .concatMap(n -> mRemoteDataSource.closeTrip(n, mDataManager))
+                .doOnSubscribe(n -> {
+                    //RxUtil.dispose(openTripDisposable);
+                    //openTripDisposable = n;
+                })
+                .doOnError(e -> {
+                    DLog.E("Error insiede closeTrip",e);
+                    //RxUtil.dispose(openTripDisposable);
+                })
+                .doOnComplete(() -> {
+                    //RxUtil.dispose(openTripDisposable);
+                });
+
+    }
+
+    public Observable<Trip> closeTrips(final Collection<Trip> trip) {
+        return mDataManager.saveTrips(trip)
+                .concatMap(n -> {
+                    if(!n.begin_sent)
+                        return mRemoteDataSource.openTripPassive(n, mDataManager);
+                    return Observable.just(n);
+                })
+                .concatMap(n -> {
+                    if(n.end_timestamp!=0)
+                        return mRemoteDataSource.closeTripPassive(n, mDataManager);
+                    return Observable.just(n);
+                })
+                .doOnSubscribe(n -> {
+                    //RxUtil.dispose(openTripDisposable);
+                    //openTripDisposable = n;
+                })
+                .doOnError(e -> {
+                    DLog.E("Error insiede closeTrips",e);
+                    //RxUtil.dispose(openTripDisposable);
+                })
+                .doOnComplete(() -> {
+                    //RxUtil.dispose(openTripDisposable);
                 });
     }
 

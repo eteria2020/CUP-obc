@@ -21,8 +21,9 @@ public class Config extends BaseResponse {
     private String ServerIP;
     private String TimeZone;
     private String OpenDoorsCards;
+    private Boolean FullNode;
 
-    public Config(String batteryAlarmSMSNumbers, String defaultCity, String useExternalGPS, String radioSetup, String watchdog, String newBatteryShutdownLevel, String fleetId, String serverIP, String timeZone, String openDoorsCards) {
+    public Config(String batteryAlarmSMSNumbers, String defaultCity, String useExternalGPS, String radioSetup, String watchdog, String newBatteryShutdownLevel, String fleetId, String serverIP, String timeZone, String openDoorsCards, Boolean fullNode) {
         BatteryAlarmSMSNumbers = batteryAlarmSMSNumbers;
         DefaultCity = defaultCity;
         UseExternalGPS = useExternalGPS;
@@ -33,6 +34,7 @@ public class Config extends BaseResponse {
         ServerIP = serverIP;
         TimeZone = timeZone;
         OpenDoorsCards = openDoorsCards;
+        FullNode = fullNode;
     }
 
     public String getBatteryAlarmSMSNumbers() {
@@ -113,5 +115,13 @@ public class Config extends BaseResponse {
 
     public void setOpenDoorsCards(String openDoorsCards) {
         OpenDoorsCards = openDoorsCards;
+    }
+
+    public Boolean getFullNode() {
+        return FullNode;
+    }
+
+    public void setFullNode(Boolean fullNode) {
+        FullNode = fullNode;
     }
 }

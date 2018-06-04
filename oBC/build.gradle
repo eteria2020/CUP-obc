@@ -1,13 +1,28 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 
 android {
     signingConfigs {
-//        vmtest {
-//            keyAlias 'Sharengo.user'
-//            keyPassword 'Sharengo1'
-//            storeFile file('D:/Mobile Workspace/Android Workspace/key/sharengo.keystore.jks')
-//            storePassword 'Sharengo1'
-//        }
+        vmtest {
+            keyAlias 'Sharengo.user'
+            keyPassword 'Sharengo1'
+            storeFile file('D:/Mobile Workspace/Android Workspace/key/sharengo.keystore.jks')
+            storePassword 'Sharengo1'
+        }
     }
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
@@ -31,7 +46,7 @@ android {
             resValue "string", "endpointSharengoZMQ", "tcp://core.sharengo.it:8001"
             minifyEnabled false
             debuggable false
-            //signingConfig signingConfigs.vmtest
+            signingConfig signingConfigs.vmtest
 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             multiDexKeepProguard file('multidex-proguard-rules.pro')
@@ -42,7 +57,7 @@ android {
             resValue "string", "endpointSharengoBeacon", "http://api.localhost.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://api.localhost.it/api/"
             resValue "string", "endpointSharengoZMQ", "tcp://api.localhost.it:8001"
-            //signingConfig signingConfigs.vmtest
+            signingConfig signingConfigs.vmtest
             debuggable true
 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
@@ -54,7 +69,7 @@ android {
             resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
             resValue "string", "endpointSharengoZMQ", "tcp://core.sharengo.it:8001"
-            //signingConfig signingConfigs.vmtest
+            signingConfig signingConfigs.vmtest
             debuggable true
 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -66,7 +81,7 @@ android {
             resValue "string", "endpointSharengoBeacon", "http://corestage.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://corestage.sharengo.it/api/"
             resValue "string", "endpointSharengoZMQ", "tcp://corestage.sharengo.it:8001"
-            //signingConfig signingConfigs.vmtest
+            signingConfig signingConfigs.vmtest
             debuggable true
 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -126,4 +141,7 @@ dependencies {
     testAnnotationProcessor daggerCompiler
     androidTestAnnotationProcessor daggerCompiler
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.3@aar') {
+        transitive = true;
+    }
 }

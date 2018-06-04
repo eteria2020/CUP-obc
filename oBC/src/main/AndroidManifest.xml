@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="eu.philcar.csg.OBC"
 
-	android:versionCode="152"
-	android:versionName="0.108.0" >
+	android:versionCode="154"
+	android:versionName="0.108.3" >
 
 
 	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
@@ -125,6 +125,9 @@
 
 
 		
-	</application>
+	    <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="96e06e0318dbf65715b2dfbc853fa90975ced412" />
+    </application>
 
 </manifest>

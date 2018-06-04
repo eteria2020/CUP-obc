@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import com.j256.ormlite.stmt.UpdateBuilder;
 
@@ -298,7 +299,7 @@ public class TripInfo {
                         if (!App.reservation.isLocal()) {
                             //if (!this.isMaintenance) {
 
-                            if(BuildConfig.FLAVOR.equalsIgnoreCase("node"))
+                            if(App.fullNode)
                                 apiRepository.consumeReservation(App.reservation.id);
                             else
                                 phpRepository.consumeReservation(App.reservation.id);
@@ -688,6 +689,7 @@ public class TripInfo {
         trip = buildOpenTrip();
         //Scrittura DB
         Observable.just(1)
+                .delay(50, TimeUnit.MILLISECONDS)
                 .map(n->{
                     if(service!=null)
                         service.onTripResult(TripInfo.this);
@@ -716,9 +718,13 @@ public class TripInfo {
                     service.sendBeacon();
                     return  n;
                 })
-                .concatMap(f->phpRepository.openTrip(trip,this))
-F
-                .subscribeOn(Schedulers.io())
+                .concatMap(f->{
+                    if(App.fullNode)
+                        return apiRepository.openTrip(trip,this);
+                    else
+                        return phpRepository.openTrip(trip,this);
+                })
+//                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<TripResponse>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
@@ -825,10 +831,15 @@ F
         }
 
         dlog.d("CloseCorsa: closing trip"+trip.toString());
+        Observable.just(1)
+                .concatMap(i->{
+                    if(App.fullNode)
+                        return apiRepository.closeTrip(trip);
+                    else
+                        return phpRepository.closeTrip(trip);
+                })
 
-        phpRepository.closeTrip(trip)
-
-                .subscribeOn(Schedulers.io())
+//                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<TripResponse>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
@@ -876,6 +887,7 @@ F
         OptimizeDistanceCalc.Controller(OdoController.STOP);
 
         Observable.just(1)
+                .delay(50,TimeUnit.MILLISECONDS)
                 .map(n ->{
                     cardCode="";
                     obc_io.setLcd(null, "   Auto Libera");
@@ -896,8 +908,13 @@ F
                     service.sendBeacon();
                     return n;
                 })
-                .concatMap(n-> phpRepository.closeTrip(trip))
-                .subscribeOn(Schedulers.io())
+                .concatMap(n->  {
+                            if(App.fullNode)
+                                return apiRepository.closeTrip(trip);
+                            else
+                                return phpRepository.closeTrip(trip);
+                        })
+//                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<TripResponse>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
@@ -1058,8 +1075,14 @@ F
     }
 
     private void sendUpdateTrip(Trip trip){
-        phpRepository.updateServerTripData(trip)
-                .subscribeOn(Schedulers.io())
+        Observable.just(1)
+                .concatMap(i->{
+                    if(App.fullNode)
+                        return apiRepository.updateServerTripData(trip);
+                    else
+                        return phpRepository.updateServerTripData(trip);
+                })
+//                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<TripResponse>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -1197,8 +1220,14 @@ F
                 trip = buildOpenTrip();
                 trip.id_parent = id_parent;
                 trip.n_pin = n_pin;
-                phpRepository.openTrip(trip,this)
-                        .subscribeOn(Schedulers.io())
+                Observable.just(1)
+                        .concatMap(i-> {
+                            if(App.fullNode)
+                                return apiRepository.openTrip(trip,this);
+                            else
+                                return phpRepository.openTrip(trip,this);
+                        })
+//                        .+(Schedulers.newThread())
                         .subscribe(new Observer<TripResponse>() {
                             @Override
                             public void onSubscribe(@NonNull Disposable d) {

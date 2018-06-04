@@ -38,7 +38,7 @@ public class Event extends DbRecord<EventResponse> {
 	public int id_trip;
 	
 	@DatabaseField
-	public int level;
+	public int level; //Can be used to store the local trip id
 	
 	@DatabaseField
 	public double lon;

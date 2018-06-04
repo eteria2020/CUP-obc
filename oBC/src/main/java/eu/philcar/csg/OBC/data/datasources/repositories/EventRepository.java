@@ -3,17 +3,12 @@ package eu.philcar.csg.OBC.data.datasources.repositories;
 import android.os.SystemClock;
 import android.util.SparseArray;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Event;
-import eu.philcar.csg.OBC.db.Events;
 
 import static eu.philcar.csg.OBC.db.Events.*;
 
@@ -22,14 +17,15 @@ import static eu.philcar.csg.OBC.db.Events.*;
  */
 @Singleton
 public class EventRepository {
+    @Inject SharengoApiRepository apiRepository;
     @Inject SharengoPhpRepository phpRepository;
 
 
     private SparseArray<String> labels = new SparseArray<>();
 
     @Inject
-    public EventRepository(SharengoPhpRepository phpRepository) {
-        this.phpRepository = phpRepository;
+    public EventRepository(SharengoApiRepository apiRepository) {
+        this.apiRepository = apiRepository;
         labels.put(EVT_SWBOOT, "SW_BOOT");
         labels.put(EVT_RFID, "RFID");
         labels.put(EVT_BATTERY, "BATTERY");
@@ -86,7 +82,7 @@ public class EventRepository {
     }
 
     public  void eventSos(String number) {
-        generateEvent(EVT_SOS,0,number);
+        generateEvent(EVT_SOS,1,number);
     }
 
     public  void eventDmg(String number) {
@@ -214,7 +210,7 @@ public class EventRepository {
 
     public void generateEvent(int eventId, int intValue, String strValue) {
        Event event = new Event();
-        event.timestamp = DbManager.getTimestamp();
+        event.timestamp = System.currentTimeMillis();
 
         event.event = eventId;
 
@@ -222,12 +218,13 @@ public class EventRepository {
             event.label = labels.get(eventId);
 
         event.intval = intValue;
-        event.txtval = strValue;
+        event.txtval = strValue==null?"":strValue;
 
         event.km = App.km;
         event.battery = App.fuel_level;
 
         if (App.currentTripInfo!=null  && App.currentTripInfo.trip!=null) {
+            event.level = App.currentTripInfo.trip.id;
             event.id_trip = App.currentTripInfo.trip.remote_id;
             event.id_customer = App.currentTripInfo.trip.id_customer;
         }
@@ -236,7 +233,10 @@ public class EventRepository {
             event.lon = App.lastLocation.getLongitude();
             event.lat = App.lastLocation.getLatitude();
         }
-        phpRepository.sendEvent(event);
+        if(App.fullNode)
+            apiRepository.sendEvent(event);
+        else
+            phpRepository.sendEvent(event);
 
     }
 

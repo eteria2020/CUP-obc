@@ -15,9 +15,11 @@ import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.helpers.DLog;
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -150,7 +152,7 @@ public class Trips extends DbTable<Trip,Integer> {
 	
 	
 	
-	public boolean sendOffline(Context context, Handler handler, SharengoPhpRepository phpRepository) {
+	public boolean sendOffline(Context context, Handler handler, SharengoApiRepository apiRepository, SharengoPhpRepository phpRepository) {
 		//HttpConnector http;
 		List<Trip> list = getTripsToSend();
 
@@ -169,18 +171,23 @@ public class Trips extends DbTable<Trip,Integer> {
 		}
 
 		//Dato che l'invio � asincrono viene richiesto l'invio solo della prima corsa non spedito, quando arriva il messaggio di risposto di invio eseguito(o fallito) passa alla successiva
-
-		phpRepository.closeTrips(list)
-				.subscribeOn(Schedulers.io())
-				.subscribe(new Observer<TripResponse>() {
+		Observable.just(1)
+				.concatMap(i->{
+					if(App.fullNode)
+						return apiRepository.closeTrips(list);
+					else
+						return phpRepository.closeTrips(list);
+				})
+//				.subscribeOn(Schedulers.newThread())
+				.subscribe(new Observer<Trip>() {
 					@Override
 					public void onSubscribe(Disposable d) {
 
 					}
 
 					@Override
-					public void onNext(TripResponse tripResponse) {
-						dlog.d("Sent offline trip, response is " + tripResponse.getJson());
+					public void onNext(Trip trip) {
+						dlog.d("Sent offline trip, response is " + trip.toString());
 
 					}
 

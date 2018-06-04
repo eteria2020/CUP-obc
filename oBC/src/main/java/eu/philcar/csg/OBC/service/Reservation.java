@@ -22,8 +22,9 @@ public class Reservation  implements ServerResponse{
 	private static final DLog dlog = new DLog(Reservation.class);
 	
 	public int   id;
-	public String cards;
-	@ExcludeSerialization
+	@SerializedName("cards")
+//	public String cards;
+//	@ExcludeSerialization
 	public List<String> codes;
 	@SerializedName("time")
 	public long timestamp;
@@ -313,7 +314,7 @@ public class Reservation  implements ServerResponse{
 	}
 
 
-	public Observable<Reservation> init(){
+	/*public Observable<Reservation> init(){
 		codes=new ArrayList<>();
 
 		if(cards!=null) {
@@ -329,6 +330,6 @@ public class Reservation  implements ServerResponse{
 			date =new Date(timestamp*1000);
 		}
 		return Observable.just(this);
-	}
+	}*/
 	
 }

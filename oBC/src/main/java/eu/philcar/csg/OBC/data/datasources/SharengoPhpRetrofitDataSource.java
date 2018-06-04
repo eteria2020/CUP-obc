@@ -89,6 +89,18 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
     }
 
     /**
+     * open trip wothout blocking the chain, it return the Trip not the TripResponse
+     * @param trip
+     * @param dataManager
+     * @return
+     */
+    @Override
+    public Observable<Trip> closeTripPassive(final Trip trip, final DataManager dataManager) {
+        return closeTripPassive(trip,dataManager)
+                .concatMap(tripResponse -> Observable.just(trip));
+    }
+
+    /**
      * update Trip for Pin Result
      * @param trip
      * @return

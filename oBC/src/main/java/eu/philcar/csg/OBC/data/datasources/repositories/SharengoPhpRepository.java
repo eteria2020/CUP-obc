@@ -54,7 +54,7 @@ public class SharengoPhpRepository {
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void stopCustomer(){
+    public void stopArea(){
         if (areaDisposable != null)
             areaDisposable.dispose();
     }
@@ -67,7 +67,7 @@ public class SharengoPhpRepository {
                     .concatMap(n -> mDataManager.saveArea(n))
                     //Emit single Area Response at time
                     .concatMap(Observable::fromIterable)
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .subscribe(new Observer<Area>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
@@ -113,12 +113,13 @@ public class SharengoPhpRepository {
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void stopCommand(){
+    public void stopCommands(){
         if (commandDisposable != null)
             commandDisposable.dispose();
     }
 
 
+    @Deprecated
     public Observable<ServerCommand> getCommands(String plate) {
 
         return  mRemoteDataSource.getCommands(plate)
@@ -161,6 +162,7 @@ public class SharengoPhpRepository {
     }
 
 
+    @Deprecated
     public Observable<TripResponse> openTrip(final Trip trip, final TripInfo tripInfo) {
            return mDataManager.saveTrip(trip)
                     .concatMap(n -> mRemoteDataSource.openTrip(n, mDataManager))
@@ -183,6 +185,7 @@ public class SharengoPhpRepository {
 
     }
 
+    @Deprecated
     public Observable<TripResponse> updateServerTripData(Trip trip){
         return mRemoteDataSource.updateTrip(trip)
                 .doOnSubscribe(n -> {
@@ -198,7 +201,7 @@ public class SharengoPhpRepository {
                 });
     }
 
-
+    @Deprecated
     public Observable<TripResponse> closeTrip(final Trip trip) {//TODO gestire la parte di salvataggio di begin_sent dentro la parte di comunicazione corsa conun concatMap avendo cura di passare il mDataManager
         return mDataManager.saveTrip(trip)
                 .concatMap(n -> {
@@ -224,14 +227,19 @@ public class SharengoPhpRepository {
 
     }
 
-    public Observable<TripResponse> closeTrips(final Collection<Trip> trip) {//TODO gestire la parte di salvataggio di begin_sent dentro la parte di comunicazione corsa conun concatMap avendo cura di passare il mDataManager
+    @Deprecated
+    public Observable<Trip> closeTrips(final Collection<Trip> trip) {
         return mDataManager.saveTrips(trip)
                 .concatMap(n -> {
                     if(!n.begin_sent)
                         return mRemoteDataSource.openTripPassive(n, mDataManager);
                     return Observable.just(n);
                 })
-                .concatMap(n -> mRemoteDataSource.closeTrip(n, mDataManager))
+                .concatMap(n -> {
+                    if(n.end_timestamp!=0)
+                        return mRemoteDataSource.closeTripPassive(n, mDataManager);
+                    return Observable.just(n);
+                })
                 .doOnSubscribe(n -> {
                     //RxUtil.dispose(openTripDisposable);
                     //openTripDisposable = n;
@@ -245,6 +253,7 @@ public class SharengoPhpRepository {
                 });
     }
 
+    @Deprecated
     public void sendEvent(final Event event){
         mDataManager.saveEvent(event)
                 .concatMap(e -> mRemoteDataSource.sendEvent(e,mDataManager))
@@ -274,6 +283,7 @@ public class SharengoPhpRepository {
 
     private static boolean sendingEvents;
 
+    @Deprecated
     public void sendEvents(final List<Event> event){
         if(!sendingEvents)
             Observable.interval(60,TimeUnit.SECONDS)
@@ -313,7 +323,7 @@ public class SharengoPhpRepository {
 
         return mRemoteDataSource.getReservation(App.CarPlate)
                 .concatMap(reservations -> mDataManager.handleReservations(reservations))
-                .concatMap(Reservation::init)
+                //.concatMap(Reservation::init)
                 .doOnSubscribe(n -> {
                     //RxUtil.dispose(openTripDisposable);
                     //openTripDisposable = n;

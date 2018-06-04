@@ -163,9 +163,13 @@ public class AWelcome extends ABase {
 					if (ti!=null && ti.customer !=  null) {
 						Fragment fb = getActiveFragment();// getFragmentManager().findFragmentById(R.id.awelPlaceholderFL);
 						if (fb!=null && fb instanceof FWelcome) {
-							FWelcome f = (FWelcome)fb;
-							f.setName(ti.customer.name + " " + ti.customer.surname);
-							f.setMaintenance(ti.isMaintenance);
+							runOnUiThread(() -> {
+                                FWelcome f = (FWelcome)fb;
+                                f.setName(ti.customer.name + " " + ti.customer.surname);
+                                f.setMaintenance(ti.isMaintenance);
+                                dlog.d("perf: show flag");
+                            });
+
 						} else {
 							DLog.E(AWelcome.class.getName() + "Impossibile cast a FWelcome  :");
 						}

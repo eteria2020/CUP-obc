@@ -1,5 +1,7 @@
 package eu.philcar.csg.OBC;
 
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -155,6 +157,7 @@ public class App extends MultiDexApplication {
 
 	public static App Instance;
 	public static Versions versions = new Versions();
+	public static long sharengoTime = 0;
 
 	ApplicationComponent mApplicationComponent;
 
@@ -484,6 +487,7 @@ public class App extends MultiDexApplication {
 	private static final String  KEY_CounterCleanliness = "Cleanliness";
 	private static final String  KEY_TimeZone = "time_zone";
 	private static final String  KEY_NewBatteryShutdownLevel = "new_battery_shutdown_level";
+	private static final String  KEY_FullNode = "full_node";
 
 	public static String NRD = "-1";
 
@@ -572,6 +576,7 @@ public class App extends MultiDexApplication {
 	public static int	   FleetId = 0;
 	public static int	   ServerIP = 0;
 	public static String timeZone;
+	public static Boolean fullNode=true;
 
 	private static boolean hasNetworkConnection=false;
 	private static boolean networkStable = true;
@@ -838,6 +843,13 @@ public class App extends MultiDexApplication {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putString(KEY_TimeZone, timeZone);
+			e.apply();
+		}
+	}
+	public void persistFullNode() {
+		if (this.preferences != null ) {
+			Editor e = this.preferences.edit();
+			e.putBoolean(KEY_FullNode, fullNode);
 			e.apply();
 		}
 	}
@@ -1175,6 +1187,7 @@ public void loadRadioSetup() {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Fabric.with(this, new Crashlytics());
 		getComponent().inject(this);
 
 		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
@@ -1778,6 +1791,9 @@ private void  initPhase2() {
 					else
 						openDoorsCards =  CardRfidCollection.decodeFromJson(value);
 					persistOpenDoorsCards();
+				} else if (key.equalsIgnoreCase("FullNode")) {
+//					fullNode = jo.getBoolean(key);
+//					persistFullNode();
 				}
 			}
 			loadPreferences();
@@ -1963,6 +1979,7 @@ private void  initPhase2() {
 
 		ServerIP = preferences.getInt(KEY_ServerIP, 0);
 		timeZone = preferences.getString(KEY_TimeZone,"Europe/Rome");
+//		fullNode = preferences.getBoolean(KEY_FullNode,false);
 		saveLog = preferences.getBoolean(KEY_PersistLog, true);
 		checkKeyOff = preferences.getBoolean(KEY_CheckKeyOff, true);
 		try {
@@ -2174,7 +2191,7 @@ private void  initPhase2() {
 				.sorted()
 				.take(5)
 				.subscribeOn(Schedulers.computation())
-				.observeOn(Schedulers.io())
+				.observeOn(Schedulers.computation())
 				.subscribe(new Observer<Area>() {
 					@Override
 					public void onSubscribe(Disposable d) {

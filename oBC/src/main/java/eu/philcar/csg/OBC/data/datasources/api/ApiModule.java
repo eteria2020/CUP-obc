@@ -30,6 +30,7 @@ import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.data.common.SerializationExclusionStrategy;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.injection.ApplicationContext;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -57,7 +58,7 @@ public class ApiModule {
                 .baseUrl(context.getString(R.string.endpointSharengo))
                 //.baseUrl("http:gr3dcomunication.com/sharengo/")
                 .client(provideOkHttpClientTrusted(context))
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
@@ -87,7 +88,7 @@ public class ApiModule {
                 .baseUrl(context.getString(R.string.endpointSharengoPhp))
                 //.baseUrl("http:gr3dcomunication.com/sharengo/")
                 .client(provideOkHttpClient())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
@@ -107,7 +108,7 @@ public class ApiModule {
                 .baseUrl(context.getString(R.string.endpointSharengoBeacon))
                 //.baseUrl("http:gr3dcomunication.com/sharengo/")
                 .client(provideOkHttpClient())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
@@ -119,7 +120,7 @@ public class ApiModule {
     OkHttpClient provideOkHttpClientTrusted(Context context){
         HttpLogger logger = new HttpLogger();
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(logger);
-            logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
+            logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
 
 
 
