@@ -326,7 +326,7 @@ public class App extends MultiDexApplication {
 			URL_ZMQNotifier = "tcp://185.81.1.24:8001";
 			URL_AdsBuilder = "http://manage.sharengo.it/banner2.php";
 			URL_AdsBuilderCar = "http://manage.sharengo.it/banner2_offline.php";
-			URL_AdsBuilderStart = "http://manage.sharengo.it/dev/banner4_offline.php";
+			URL_AdsBuilderStart = "http://manage.sharengo.it/banner4_offline.php";
 			URL_AdsBuilderEnd = "http://manage.sharengo.it/banner5_offline.php";
 			URL_Time = "http://corestage.sharengo.it/api/get_date.php";
 			IP_UDP_Beacon = "185.81.1.24";

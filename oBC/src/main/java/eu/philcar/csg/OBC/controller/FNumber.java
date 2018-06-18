@@ -26,10 +26,11 @@ public class FNumber extends FBase implements OnClickListener {
 		return fn;
 	}
 	
-	private Button b1,b2,b3,b4,b5,b6,b7,b8,b9,b0;
+	private Button b1,b2,b3,b4,b5,b6,b7,b8,b9,b0,bp;
 	private DLog dlog = new DLog(this.getClass());
 	private FrameLayout fchn_right_FL;
 	private TextView numberTV;
+	private int MAX_NUM = 11;
 	
 	private String phoneNumber;
 
@@ -62,6 +63,7 @@ public class FNumber extends FBase implements OnClickListener {
 		b8 = (Button)view.findViewById(R.id.fchnEightB);
 		b9 = (Button)view.findViewById(R.id.fchnNineB);
 		b0 = (Button)view.findViewById(R.id.fchnZeroB);
+		bp = (Button)view.findViewById(R.id.fchnPlus);
 		
 		numberTV = (TextView)view.findViewById(R.id.fchnNumberTV);
 		fchn_right_FL=(FrameLayout)view.findViewById(R.id.fchn_right_FL);
@@ -72,8 +74,17 @@ public class FNumber extends FBase implements OnClickListener {
 		numberTV.setText(phoneNumber);
 		
 		((TextView)view.findViewById(R.id.fchnMessageTV)).setTypeface(font);
-		
+
 		((ImageButton)view.findViewById(R.id.fchnDeleteIB)).setOnClickListener(this);
+		((ImageButton)view.findViewById(R.id.fchnDeleteIB)).setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				phoneNumber = "";
+				MAX_NUM = 11;
+				updateUI();
+				return true;
+			}
+		});
 		((ImageButton)view.findViewById(R.id.fchnNextIB)).setOnClickListener(this);
 		
 		b1.setOnClickListener(this);
@@ -86,6 +97,7 @@ public class FNumber extends FBase implements OnClickListener {
 		b8.setOnClickListener(this);
 		b9.setOnClickListener(this);
 		b0.setOnClickListener(this);
+		bp.setOnClickListener(this);
 
 		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fchn_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
@@ -121,6 +133,9 @@ public class FNumber extends FBase implements OnClickListener {
 			break;
 		case R.id.fchnZeroB: addNumber("0");
 			break;
+		case R.id.fchnPlus:
+			addNumber("+");
+				break;
 		case R.id.fchnDeleteIB:
 			removeNumber();
 			break;
@@ -143,14 +158,20 @@ public class FNumber extends FBase implements OnClickListener {
 	}
 	
 	private void addNumber(String number) {
+
+		if(number.equalsIgnoreCase("+"))
+			if(phoneNumber.length() !=0)
+				return;
+			else
+				MAX_NUM = 16;
 		
-		if (phoneNumber.length() >= 11) {
+		if (phoneNumber.length() >= MAX_NUM) {
 			return;
 		}
 		
-		if (phoneNumber.length() == 3) {
-			phoneNumber += " ";
-		}
+//		if (phoneNumber.length() == 3) {
+//			phoneNumber += " ";
+//		}
 		
 		phoneNumber += number;
 	}
@@ -164,6 +185,8 @@ public class FNumber extends FBase implements OnClickListener {
 				phoneNumber = phoneNumber.substring(0, phoneNumber.length()-1);
 			}
 		}
+		if(phoneNumber.length() ==0)
+			MAX_NUM = 11;
 	}
 	
 	private void updateUI() {

@@ -69,6 +69,8 @@ public class DbTable<tableClass, pk>  extends BaseDaoImpl<tableClass, pk>{
 						if (collection instanceof CustomOp) {
 							((CustomOp) collection).onDbWrite();
 						}
+
+						DLog.D("UpdateOne" + collection.toString());
 						int result = createOrUpdate(collection).getNumLinesChanged();
 						if (result >= 0) emitter.onNext(collection);
 

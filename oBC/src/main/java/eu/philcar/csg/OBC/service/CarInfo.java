@@ -70,9 +70,10 @@ public class CarInfo {
     private int km = 0;
     private float voltage = 0;
     private int isKeyOn = 0;
-    private static String keyStatus = "";
+    private static String keyStatus = "OFF";
     private String gear = "";
     private boolean batterySafety = false;
+    private String fakeCard = "00000000";
     private boolean lastBatterySafety = batterySafety;
     private Date lastBatterySafetyTx = new Date();
     private int outAmp = 0;
@@ -173,6 +174,14 @@ public class CarInfo {
         beacon = new Beacon();
     }
 
+    public String getFakeCard() {
+        return fakeCard;
+    }
+
+    public Boolean setFakeCard(String fakeCard) {
+        this.fakeCard = fakeCard;
+        return !this.fakeCard.equalsIgnoreCase("00000000");
+    }
 
     public boolean isBatterySafety() {
 
@@ -407,7 +416,7 @@ public class CarInfo {
         return forceBeacon;
     }
 
-    public Bundle betterHandleUpdate(Bundle b) {
+    public Bundle betterHandleUpdate(Bundle b, ObcService service) {
         int i;
         float f;
         Long l;
@@ -454,6 +463,17 @@ public class CarInfo {
                 if (bo != isBatterySafety()) {
                     hasChanged = true;
                     setBatterySafety(bo);
+                }
+
+
+            }else if (key.equalsIgnoreCase("fakeCard")) {
+
+                s = b.getString(key);
+
+                if (s != null && !s.equalsIgnoreCase(getFakeCard())) {
+                    hasChanged = true;
+                    if(setFakeCard(s))
+                        service.notifyCard(s, "OPEN", false, false);
                 }
 
 

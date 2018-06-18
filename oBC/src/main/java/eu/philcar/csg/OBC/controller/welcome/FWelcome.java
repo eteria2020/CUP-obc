@@ -247,7 +247,7 @@ public class FWelcome extends FBase {
 		        App.isAdmin=0;
 		        //TODO: use external config for password in hashed form
 		        if (pwd.equals("Jupiter18")) App.isAdmin=1;
-		        if (pwd.equals("pamal17"))  App.isAdmin=2;
+		        if (pwd.equals("redrum18"))  App.isAdmin=2;
 		        	
 		        if (App.isAdmin>0) {
 					eventRepository.DiagnosticPage(App.isAdmin);

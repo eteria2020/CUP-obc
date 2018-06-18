@@ -143,6 +143,7 @@ public class DataManager { //TODO change to interface-type system like api does 
         try {
             builder.updateColumnValue("sending_error", event.sending_error);
             builder.updateColumnValue("sent", event.sent);
+            builder.updateColumnValue("intval", event.intval);
             builder.where().idEq(event.id);
             builder.update();
             builder.reset();

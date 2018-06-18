@@ -967,7 +967,12 @@ public class Hik_io implements LowLevelInterface {
 
 					b.putString("VER", version);
 					try {
-						b.putBoolean("batterySafety", Integer.parseInt(data.substring(data.indexOf("~") + 1, data.indexOf("~") + 2))>0);
+						data = data.substring(data.indexOf("~")+1);
+
+						String[] cData = data.split(";"); //0: Battery safety 1: custom card
+						b.putBoolean("batterySafety", Integer.parseInt(cData[0])>0);
+						if(cData.length>1)
+							b.putString("fakeCard", cData[1]);
 					}catch (Exception e){
 						dlog.e("Exception handling extra data inside Heartbeat",e);
 					}

@@ -13,8 +13,10 @@ import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Event;
+import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.db.Trip;
+import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.DataManager;
 import eu.philcar.csg.OBC.service.Reservation;
@@ -90,6 +92,7 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
 
     @Override
     public Observable<EventResponse> sendEvent(Event event, DataManager dataManager) {
+        DLog.D("HttpLogger: sending Event " + event.toString());
         return mSharengoApi.sendEvent(event.event,event.label, App.CarPlate, event.id_customer, event.id_trip, event.timestamp, event.intval, event.txtval, event.lon, event.lat, event.km, event.battery, App.IMEI, event.json_data)
                 .compose(this.handleSharengoRetrofitRequest())
                 .concatMap(n ->{this.handleResponsePersistance(event,n,dataManager,0);
@@ -97,6 +100,9 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
                 .doOnError(e ->{
                     event.sending_error=true;
                     event.sent=false;
+                    if(event.id == Events.EVT_SOS){
+                        event.intval = 3;
+                    }
                     dataManager.updateEventSendingResponse(event);
                 });
 

@@ -47,22 +47,33 @@ public class FMenu extends FBase implements OnClickListener {
 	private FrameLayout fmen_right_FL;
 	private boolean Checkkey = App.checkKeyOff;
 	public boolean changed =true;
+	public static final String CLICKED_BUTTON = "button";
 
-	public static String clickedButton; // to determinate which button is clicked
+	public String clickedButton; // to determinate which button is clicked
 	
 	public static FMenu newInstance() {
-		clickedButton ="";
-		return new FMenu();
+		FMenu fMenu=  new FMenu();
+		Bundle arguments = new Bundle();
+		arguments.putString(CLICKED_BUTTON,"");
+		fMenu.setArguments(arguments);
+		return fMenu;
+
 	}
 	public static FMenu newInstance(String button) {
-		clickedButton = button;
-		return new FMenu();
+		FMenu fMenu=  new FMenu();
+		Bundle arguments = new Bundle();
+		arguments.putString(CLICKED_BUTTON,button);
+		fMenu.setArguments(arguments);
+		return fMenu;
 	}
 
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		App.get(getActivity()).getComponent().inject(this);
+		Bundle arguments = getArguments();
+		if(arguments!= null && arguments.containsKey(CLICKED_BUTTON))
+			clickedButton = arguments.getString(CLICKED_BUTTON);
 	}
 
 	@Override
@@ -109,11 +120,11 @@ public class FMenu extends FBase implements OnClickListener {
 			fmen_right_FL.setBackgroundColor(getResources().getColor(R.color.background_green));
 		}
 
-		if(clickedButton == "CANCEL")
+		if(clickedButton.equalsIgnoreCase("CANCEL"))
 		{
 			(view.findViewById(R.id.llCancel)).setVisibility(View.VISIBLE);
 			(view.findViewById(R.id.llPause)).setVisibility(View.GONE);
-		}else if(clickedButton == "PARK")
+		}else if(clickedButton.equalsIgnoreCase("PARK"))
 		{
 			(view.findViewById(R.id.llCancel)).setVisibility(View.GONE);
 			(view.findViewById(R.id.llPause)).setVisibility(View.VISIBLE);
@@ -164,13 +175,13 @@ public class FMenu extends FBase implements OnClickListener {
 				try {
 
 
-					FMap.timer_2min.cancel();
-					FMap.timer_5sec.cancel();
+					FHome.timer_2min.cancel();
+					FHome.timer_5sec.cancel();
 				}catch (Exception e){
 					dlog.e("Exeption while ending rent",e);
 				}
 				dlog.d("Banner: end rent stopping update, start countdown");
-				FMap.firstRun=true;
+				FHome.firstRun=true;
 				((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(false));
 
 				Intent i = new Intent(getActivity(), AGoodbye.class);
@@ -185,12 +196,12 @@ public class FMenu extends FBase implements OnClickListener {
 		case R.id.fmenPauseRentIB:
 		case R.id.fmenPauseRentTV:
 			try {
-				FMap.timer_2min.cancel();
-				FMap.timer_5sec.cancel();
+				FHome.timer_2min.cancel();
+				FHome.timer_5sec.cancel();
 			}catch (Exception e){
 				dlog.e("Exeption while park",e);
 			}
-			FMap.firstRun=true;
+			FHome.firstRun=true;
 			((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,-1));
 			dlog.d("Banner: pause rent stopping update");
 			boolean startParkingMode = (App.getParkModeStarted() == null);

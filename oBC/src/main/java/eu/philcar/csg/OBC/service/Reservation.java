@@ -310,6 +310,8 @@ public class Reservation  implements ServerResponse{
 
 	@Override
 	public String toString() {
+		if(date ==null)
+			this.date = new Date(this.timestamp *1000);
 		return "Id:" + id + ", timestamp:" + date.toString() + ", card:" + codes.toString() + ",duration:" + duration + ",local:" + local;
 	}
 

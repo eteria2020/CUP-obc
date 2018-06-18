@@ -150,6 +150,7 @@ public class FPdfViewer extends FBase {
             openPdf(file, PDFView);
         }
         b = (Button) view.findViewById(R.id.sendDocument);
+        b.setVisibility(View.GONE);
         b.setOnClickListener(new View.OnClickListener() {
 
             @Override

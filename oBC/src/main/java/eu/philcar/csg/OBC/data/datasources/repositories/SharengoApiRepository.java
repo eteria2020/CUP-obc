@@ -20,12 +20,15 @@ import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Event;
+import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.RxUtil;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.DataManager;
+import eu.philcar.csg.OBC.service.MessageFactory;
+import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.Reservation;
 import eu.philcar.csg.OBC.service.TripInfo;
 import io.reactivex.Observable;
@@ -438,7 +441,12 @@ public class SharengoApiRepository {
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private static boolean sendingEvents;
+
     public void sendEvent(final Event event){
+        sendEvent(event,null);
+    }
+
+    public void sendEvent(final Event event, final ObcService service){
         mDataManager.saveEvent(event)
                 .concatMap(e -> mRemoteDataSource.sendEvent(e,mDataManager))
                 .subscribeOn(Schedulers.newThread())
@@ -455,7 +463,9 @@ public class SharengoApiRepository {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        if(service!=null){
+                            service.sendMessage(MessageFactory.failedSOS());
+                        }
                     }
 
                     @Override
@@ -506,6 +516,7 @@ public class SharengoApiRepository {
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
     public Observable<TripResponse> openTrip(final Trip trip, final TripInfo tripInfo) {
+
         return mDataManager.saveTrip(trip)
                 .concatMap(n -> mRemoteDataSource.openTrip(n, mDataManager))
                 .doOnSubscribe(n -> {

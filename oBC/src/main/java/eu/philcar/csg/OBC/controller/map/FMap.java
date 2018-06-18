@@ -597,99 +597,99 @@ public class FMap extends FBase implements OnClickListener {
 
 
 		//timer for advertisment update
-		timer_2min = new CountDownTimer((120)*1000,1000) {
-		@Override
-		public void onTick(long millisUntilFinished) {
-
-		}
-
-		@Override
-		public void onFinish() {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					loadBanner(App.URL_AdsBuilderCar,"CAR",false);
-					try{
-						if(getActivity()!=null)
-						getActivity().runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-								if(FMap.this.isVisible()) {
-								updateBanner("CAR");
-								//Modifico l'IV
-							}
-							else{
-								FHome fHome = (FHome)getFragmentManager().findFragmentByTag(FHome.class.getName());
-								if (fHome != null) {
-
-
-									fHome.updateBanner("CAR");
-									//Modifico l'IV
-								}
-							}
-						}
-					});
-
-				}catch(Exception e){
-						dlog.e("runOnUiThread: eccezione ",e);
-					}
-				timer_2min.start();
-					started=false;
-				}
-
-			}).start();
-		}
-
-	};
-
-
-
-	timer_5sec = new CountDownTimer((5)*1000,1000) {
-		@Override
-		public void onTick(long millisUntilFinished) {
-
-		}
-
-		@Override
-		public void onFinish() {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					loadBanner(App.URL_AdsBuilderCar,"CAR",false);
-					getActivity().runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							if(FMap.this.isVisible()) {
-								updateBanner("CAR");
-								timer_2min.start();//Modifico l'IV
-							}
-							else{
-								FHome fHome = (FHome)getFragmentManager().findFragmentByTag(FHome.class.getName());
-								if (fHome != null) {
+//		timer_2min = new CountDownTimer((120)*1000,1000) {
+//		@Override
+//		public void onTick(long millisUntilFinished) {
+//
+//		}
+//
+//		@Override
+//		public void onFinish() {
+//			new Thread(new Runnable() {
+//				@Override
+//				public void run() {
+//					loadBanner(App.URL_AdsBuilderCar,"CAR",false);
+//					try{
+//						if(getActivity()!=null)
+//						getActivity().runOnUiThread(new Runnable() {
+//						@Override
+//						public void run() {
+//								if(FMap.this.isVisible()) {
+//								updateBanner("CAR");
+//								//Modifico l'IV
+//							}
+//							else{
+//								FHome fHome = (FHome)getFragmentManager().findFragmentByTag(FHome.class.getName());
+//								if (fHome != null) {
+//
+//
+//									fHome.updateBanner("CAR");
+//									//Modifico l'IV
+//								}
+//							}
+//						}
+//					});
+//
+//				}catch(Exception e){
+//						dlog.e("runOnUiThread: eccezione ",e);
+//					}
+//				timer_2min.start();
+//					started=false;
+//				}
+//
+//			}).start();
+//		}
+//
+//	};
 
 
-									fHome.updateBanner("CAR");
-									timer_2min.start();//Modifico l'IV
-								}
-								else{
-									timer_2min.cancel();
-								}
-							}
 
-						}
-					});
+//	timer_5sec = new CountDownTimer((5)*1000,1000) {
+//		@Override
+//		public void onTick(long millisUntilFinished) {
+//
+//		}
+//
+//		@Override
+//		public void onFinish() {
+//			new Thread(new Runnable() {
+//				@Override
+//				public void run() {
+//					loadBanner(App.URL_AdsBuilderCar,"CAR",false);
+//					getActivity().runOnUiThread(new Runnable() {
+//						@Override
+//						public void run() {
+//							if(FMap.this.isVisible()) {
+//								updateBanner("CAR");
+//								FHome.timer_2min.start();//Modifico l'IV
+//							}
+//							else{
+//								FHome fHome = (FHome)getFragmentManager().findFragmentByTag(FHome.class.getName());
+//								if (fHome != null) {
+//
+//
+//									fHome.updateBanner("CAR");
+//									FHome.timer_2min.start();//Modifico l'IV
+//								}
+//								else{
+//									FHome.timer_2min.cancel();
+//								}
+//							}
+//
+//						}
+//					});
+//
+//				}
+//			}).start();
+//		}
+//	};
 
-				}
-			}).start();
-		}
-	};
 
-
-		if(firstRun) {
-			firstRun=!firstRun;
-			timer_2min.cancel();
-			timer_2min.start();
-		}
+//		if(firstRun) {
+//			firstRun=!firstRun;
+//			FHome.timer_2min.cancel();
+//			FHome.timer_2min.start();
+//		}
 		updateBanner("CAR");
 
 		if(App.fuel_level!=0)
@@ -787,10 +787,10 @@ public class FMap extends FBase implements OnClickListener {
 			if (currentPositionProvider != null)
 				currentPositionProvider.stopLocationUpdates();
 
-			if(timer_2min!=null)
-				timer_2min.cancel();
-			if(timer_5sec!=null)
-				timer_5sec.cancel();
+			if(FHome.timer_2min!=null)
+				FHome.timer_2min.cancel();
+			if(FHome.timer_5sec!=null)
+				FHome.timer_5sec.cancel();
 			firstRun = true;
 			firstLaunch = true;
 			drawCharging = true;
@@ -1319,8 +1319,8 @@ public class FMap extends FBase implements OnClickListener {
 			break; */
 
 		case R.id.fmapCancelB:
-			timer_2min.cancel();
-			timer_5sec.cancel();
+			FHome.timer_2min.cancel();
+			FHome.timer_5sec.cancel();
 			firstRun=true;
 			if (!resetUI()) {
 				((ABase)getActivity()).pushFragment( new FMenu(), FMenu.class.getName(), true);
@@ -1344,7 +1344,7 @@ public class FMap extends FBase implements OnClickListener {
 
 					if(!handleClick) {
 						adIV.setColorFilter(R.color.overlay_banner);
-						timer_2min.cancel();
+						FHome.timer_2min.cancel();
 						handleClick=true;
 						dlog.d(FMap.class.toString()+" Banner: Click su banner ");
 						new Thread(new Runnable() {
@@ -1358,8 +1358,8 @@ public class FMap extends FBase implements OnClickListener {
 										if(FMap.this.isVisible()) {
 											adIV.clearColorFilter();
 											updateBanner("CAR");
-											timer_2min.cancel();
-											timer_5sec.start();//Modifico l'IV
+											FHome.timer_2min.cancel();
+											FHome.timer_5sec.start();//Modifico l'IV
 											handleClick = false;
 										}
 									}
@@ -3451,7 +3451,7 @@ public class FMap extends FBase implements OnClickListener {
 
 	}
 
-	private void updateBanner(String type){
+	public void updateBanner(String type){
 
 		File ImageV;
 		Bundle Banner = App.Instance.BannerName.getBundle(type);
@@ -3470,10 +3470,10 @@ public class FMap extends FBase implements OnClickListener {
 						//webViewBanner.setVisibility(View.INVISIBLE);
 						adIV.setImageResource(R.drawable.car_banner_offline);
 						adIV.setVisibility(View.VISIBLE);
-						if(!started){
-							started= !started;
-							timer_2min.cancel();
-							timer_2min.start();
+						if(!FHome.started){
+							FHome.started= !FHome.started;
+							FHome.timer_2min.cancel();
+							FHome.timer_2min.start();
 						}
 						return;
 					}
@@ -3503,10 +3503,10 @@ public class FMap extends FBase implements OnClickListener {
 
 		}
 
-		if(!started){
-			started= !started;
-			timer_2min.cancel();
-			timer_2min.start();
+		if(!FHome.started){
+			FHome.started= !FHome.started;
+			FHome.timer_2min.cancel();
+			FHome.timer_2min.start();
 		}
 	}
 

@@ -58,4 +58,12 @@ public class ErrorResponse extends Throwable {
                 .toHashCode();
     }*/
 
+    @Override
+    public void printStackTrace() {
+
+        if(error!=null)
+            error.printStackTrace();
+        else
+            super.printStackTrace();
+    }
 }

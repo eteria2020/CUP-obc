@@ -180,7 +180,7 @@ public class FDamages extends FBase implements OnClickListener, OnSeekBarChangeL
 			dlog.d("FDamages fdamAlternativeNoB click : ");
 			secondLL.setVisibility(View.INVISIBLE);
 			//getActivity().finish();
-			((ABase)getActivity()).pushFragment(FMenu.newInstance(), FMenu.class.getName(), true);
+			((ABase)getActivity()).pushBackFragment(FMenu.newInstance(), FMenu.class.getName(), true);
 			
 			break;
 		
@@ -191,7 +191,8 @@ public class FDamages extends FBase implements OnClickListener, OnSeekBarChangeL
 			if (login) {
 				((ABase)getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
 			} else {
-				((ABase)getActivity()).pushFragment(FMenu.newInstance(), FMenu.class.getName(), true);
+
+				((ABase)getActivity()).pushBackFragment(FMenu.newInstance(), FMenu.class.getName(), true);
 				//getActivity().finish();
 			}
 			

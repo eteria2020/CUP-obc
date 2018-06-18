@@ -13,6 +13,8 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Encryption;
 import eu.philcar.csg.OBC.service.MessageFactory;
 import eu.philcar.csg.OBC.service.ObcService;
+import zmq.ZError;
+
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -174,11 +176,18 @@ public class ZmqSubscriber {
 				dlog.d("ZMQ socket closed");
 
 
-			}catch(Exception e){
+			}catch(ZError.IOException e){
+
+				isStarting=false;
+				dlog.e("ZMQException Maybe A problem of too many file opened restarting OBC",e);
+				throw e;
+			}
+			catch(Exception e){
 
 				isStarting=false;
 				dlog.e("ZMQException ",e);
-				handler.sendMessageDelayed(MessageFactory.zmqRestart(),5000);
+				if(App.hasNetworkConnection())
+					handler.sendMessageDelayed(MessageFactory.zmqRestart(),5000);
 			}
 
 		}

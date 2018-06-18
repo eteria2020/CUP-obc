@@ -12,6 +12,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import com.crashlytics.android.Crashlytics;
+
 public class ExceptionHandler implements UncaughtExceptionHandler {
 	
 	private final static int RESTART_TIME_MILLIS = 100;
@@ -37,7 +39,7 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 		
 		DLog.E("Uncaught Exception ", e);
 		e.printStackTrace();
-		
+		Crashlytics.logException(e);
 		ACRA.getErrorReporter().handleSilentException(e);
 		
 	    AlarmManager mgr = (AlarmManager)mApp.getApplicationContext().getSystemService(Context.ALARM_SERVICE);

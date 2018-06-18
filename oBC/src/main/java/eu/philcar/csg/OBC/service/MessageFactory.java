@@ -318,6 +318,10 @@ public class MessageFactory {
 		Message msg = Message.obtain(null,ObcService.MSG_CHECK_TIME);
 		return msg;
 	}
-		
+
+	public static Message failedSOS(){
+		Message msg = Message.obtain(null,ObcService.MSG_FAILED_SOS);
+		return msg;
+	}
 	
 }

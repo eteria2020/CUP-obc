@@ -9,8 +9,8 @@ import eu.philcar.csg.OBC.service.ServiceClient;
 
 import android.app.Activity;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.FragmentManager.BackStackEntry;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;

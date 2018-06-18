@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Event;
+import eu.philcar.csg.OBC.service.ObcService;
 
 import static eu.philcar.csg.OBC.db.Events.*;
 
@@ -83,6 +84,9 @@ public class EventRepository {
 
     public  void eventSos(String number) {
         generateEvent(EVT_SOS,1,number);
+    }
+    public  void eventSos(String number, ObcService service) {
+        generateEvent(EVT_SOS,1,number, service);
     }
 
     public  void eventDmg(String number) {
@@ -208,7 +212,11 @@ public class EventRepository {
     }
 
 
-    public void generateEvent(int eventId, int intValue, String strValue) {
+    public void generateEvent(int eventId, int intValue, String strValue){
+        generateEvent(eventId, intValue, strValue, null);
+    }
+
+    public void generateEvent(int eventId, int intValue, String strValue, ObcService service) {
        Event event = new Event();
         event.timestamp = System.currentTimeMillis();
 
