@@ -112,7 +112,7 @@ public class FHome extends FBase implements OnClickListener {
     public static Boolean firstRun=true;
     public static CountDownTimer timer_2min, timer_5sec;
 
-    public static Boolean started;
+    public static Boolean started=false;
 
     private List<String> animQueue =new ArrayList<String>();
     private Uri uri;
@@ -290,6 +290,7 @@ public class FHome extends FBase implements OnClickListener {
 
                     playing=animQueue.get(index);
 
+                    dlog.d("onAnimationRepeat:repeat anim " + playing);
 
 
                     switch(playing){
@@ -1222,7 +1223,7 @@ public class FHome extends FBase implements OnClickListener {
         try{
             if(!ProTTS.reqSystem) {
                 ProTTS.askForSystem();
-                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
+                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,LowLevelInterface.AUDIO_LEVEL_ALERT);
             }
             tts.speak(text);
             dlog.d("queueTTS: leggo " +text);
@@ -1237,7 +1238,7 @@ public class FHome extends FBase implements OnClickListener {
         try{
             if(!AudioPlayer.reqSystem) {
                 AudioPlayer.askForSystem();
-                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
+                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,LowLevelInterface.AUDIO_LEVEL_ALERT);
             }
             player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ resID));
             dlog.d("playAlertAdvice: play " +name);

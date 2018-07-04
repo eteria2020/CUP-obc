@@ -201,7 +201,7 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 					public void run() {
 						pinChecked(pin.equals("1234"));
 					}
-				}, 2000);
+				}, 1000);
 				
 			} else {
 
@@ -414,7 +414,7 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 
 			}
 		}else{
-			localHandler.postDelayed(skipRemoteCheck,10000);
+			localHandler.postDelayed(skipRemoteCheck,1000);
 		}
 	}
 

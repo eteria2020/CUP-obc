@@ -173,7 +173,16 @@ public class TripInfo {
         }
     }
 
-
+    /**
+     *
+     * @param code
+     * @param event
+     * @param carInfo
+     * @param obc_io
+     * @param service
+     * @param screenLock
+     * @return
+     */
     public Message handleCard(String code, String event,CarInfo carInfo,LowLevelInterface obc_io,ObcService service, WakeLock screenLock) {
         return handleCard( code,  event, carInfo, obc_io, service,  screenLock, CloseType.normal) ;
     }
@@ -248,12 +257,12 @@ public class TripInfo {
              customer.id =  Integer.parseInt(App.reservation.getCustomer_id());
              customer.name = App.reservation.getName();
              customer.surname = App.reservation.getSurname();
-             customer.mobile = App.reservation.getMobile();
              customer.enabled = true;
              customer.language = "";
              customer.info_display = "";
              customer.update_timestamp =0;
-             customer.pin = App.reservation.getPin();
+             customer.mobile = App.reservation.getMobile();
+             customer.pin = App.reservation.getPin().getJson();
              customer.card_code = App.reservation.getCard_code();
              customer.encrypt();
              try {
@@ -668,8 +677,14 @@ public class TripInfo {
         int km =0;
         if(OptimizeDistanceCalc.totalDistance != 0)
             km =  (int) OptimizeDistanceCalc.totalDistance/1000;
-
-        Trip trip = new Trip(this.customer.id,App.CarPlate,new Date(), DbManager.getTimestamp(), App.fuel_level, km);
+        Trip trip = new Trip();
+        trip.id_customer = this.customer.id;
+        trip.plate = App.CarPlate;
+        trip.begin_time = new Date();
+        trip.begin_timestamp = DbManager.getTimestamp();
+        trip.begin_battery = App.fuel_level;
+        trip.begin_km = km;
+//        Trip trip = new Trip(this.customer.id,App.CarPlate,new Date(), DbManager.getTimestamp(), App.fuel_level, km);
         trip.setBeginLocation(App.lastLocation);
 
         return trip;

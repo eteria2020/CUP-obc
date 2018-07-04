@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 
 import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AMainOBC;
+import eu.philcar.csg.OBC.devices.LowLevelInterface;
 
 
 public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener{
@@ -57,9 +58,9 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
         if(queue<=0&&ProTTS.getQueue()==0) {
             queue=0;
             if (context instanceof AMainOBC)
-                ((AMainOBC) context).setAudioSystem(lastAudioState, -1);
+                ((AMainOBC) context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
             else if (context instanceof AGoodbye)
-                ((AGoodbye) context).setAudioSystem(lastAudioState, -1);
+                ((AGoodbye) context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
         }
 
 
@@ -74,9 +75,9 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
         if(queue<=0&&ProTTS.getQueue()==0) {
             queue=0;
             if (context instanceof AMainOBC)
-                ((AMainOBC) context).setAudioSystem(lastAudioState, -1);
+                ((AMainOBC) context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
             else if (context instanceof AGoodbye)
-                ((AGoodbye) context).setAudioSystem(lastAudioState, -1);
+                ((AGoodbye) context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
         }
         return true; //error was handled
     }
@@ -99,9 +100,9 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
                             reset();
                             isBusy = false;
                             if (context instanceof AMainOBC)
-                                ((AMainOBC) context).setAudioSystem(lastAudioState, -1);
+                                ((AMainOBC) context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
                             else if (context instanceof AGoodbye)
-                                ((AGoodbye) context).setAudioSystem(lastAudioState, -1);
+                                ((AGoodbye) context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
 
 
                             dlog.d("waitToPlayFile: reset and abort");
@@ -129,9 +130,9 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
                             if (queue <= 0 && ProTTS.getQueue() == 0) {
                                 queue = 0;
                                 if (context instanceof AMainOBC)
-                                    ((AMainOBC) context).setAudioSystem(lastAudioState, -1);
+                                    ((AMainOBC) context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
                                 else if (context instanceof AGoodbye)
-                                    ((AGoodbye) context).setAudioSystem(lastAudioState, -1);
+                                    ((AGoodbye) context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
                             }
                             dlog.e("waitToPlayFile: deep Exception ");
                             return;

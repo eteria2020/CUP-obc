@@ -47,7 +47,7 @@ public interface SharengoApi {
     @GET("v2/reservation")
     Observable<Result<SharengoResponse<Reservation>>> consumeReservation(@Query("consumed") int reservation_id);
 
-    @GET("/v2pois")
+    @GET("/v2/pois")
     Observable<Result<SharengoResponse<List<Poi>>>> getPois(@Query("lastupdate") String lastupdate);
 
     @GET("configs")

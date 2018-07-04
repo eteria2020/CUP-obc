@@ -1,5 +1,7 @@
 package eu.philcar.csg.OBC.data.datasources.base;
 
+import android.os.SystemClock;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.ConnectException;
@@ -143,7 +145,7 @@ public abstract class BaseRetrofitDataSource {
             ErrorResponse er = (ErrorResponse) e;
             switch (er.errorType){
                 case HTTP:
-                    DLog.E("Retrofit Exception HTTP ",er.error);
+                    DLog.E("Retrofit Exception HTTP " + er.rawMessage,er.error);
                     break;
                 case EMPTY:
                     DLog.D("Retrofit Response EMPTY ");
@@ -176,6 +178,7 @@ public abstract class BaseRetrofitDataSource {
     private <T> Observable<T> extractResponse(SharengoResponse<T> response){
         if(response.timestamp!=0){
             App.sharengoTime = response.timestamp;
+            App.sharengoTimeFix = SystemClock.elapsedRealtime();
         }
 
         return Observable.just(response.data);

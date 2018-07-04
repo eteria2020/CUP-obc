@@ -23,6 +23,9 @@ public interface LowLevelInterface {
 	public final static int AUDIO_SYSTEM = 2;
 	public final static int AUDIO_AUX = 3;
 
+	public final static int AUDIO_LEVEL_ALERT = 25;
+	public final static int AUDIO_LEVEL_LAST = -1;
+
 //  0 :  Green - Free
 //  1 :  Blue - in use
 //  2 :  orange - booked

@@ -92,8 +92,8 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
 
     @Override
     public Observable<EventResponse> sendEvent(Event event, DataManager dataManager) {
-        DLog.D("HttpLogger: sending Event " + event.toString());
-        return mSharengoApi.sendEvent(event.event,event.label, App.CarPlate, event.id_customer, event.id_trip, event.timestamp, event.intval, event.txtval, event.lon, event.lat, event.km, event.battery, App.IMEI, event.json_data)
+        //DLog.D("HttpLogger: sending Event " + event.toString());
+        return mSharengoApi.sendEvent(event.event,event.label, App.CarPlate, event.id_customer, event.id_trip, event.timestamp, event.intval, event.txtval!=null?event.txtval:"", event.lon, event.lat, event.km, event.battery, App.IMEI, event.json_data)
                 .compose(this.handleSharengoRetrofitRequest())
                 .concatMap(n ->{this.handleResponsePersistance(event,n,dataManager,0);
                     return Observable.just(n);})

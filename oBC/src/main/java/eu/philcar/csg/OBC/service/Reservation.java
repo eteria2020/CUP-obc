@@ -39,7 +39,7 @@ public class Reservation  implements ServerResponse{
 	private String name;
 	private String surname;
 	private String mobile;
-	private String pin;
+	private Pin pin;
 	private String card_code;
 	
 	@ExcludeSerialization
@@ -292,11 +292,11 @@ public class Reservation  implements ServerResponse{
 		this.mobile = mobile;
 	}
 
-	public String getPin() {
+	public Pin getPin() {
 		return pin;
 	}
 
-	public void setPin(String pin) {
+	public void setPin(Pin pin) {
 		this.pin = pin;
 	}
 

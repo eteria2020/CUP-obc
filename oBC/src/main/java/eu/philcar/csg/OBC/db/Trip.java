@@ -110,15 +110,7 @@ public class Trip  extends DbRecord<TripResponse> {
 	public Trip() {
 	}
 
-	public Trip(int id_customer, String plate, Date begin_time, long begin_timestamp, int begin_battery, int begin_km) {
-		this.id_customer = id_customer;
-		this.plate = plate;
-		this.begin_time = begin_time;
-		this.begin_timestamp = begin_timestamp;
-		this.begin_battery = begin_battery;
-		this.begin_km = begin_km;
-		this.begin_sent = false;
-	}
+
 
 	public void setBeginLocation(Location location) {
 		if (location != null) {
@@ -128,7 +120,7 @@ public class Trip  extends DbRecord<TripResponse> {
 	}
 
 	public String toString() {
-			return String.format("Trip { Id:%d , RId:%d \n Tms begin:%d , Tms end:%d \n TX 1 : %b , TX 2  : %b , n_pin : %d , id_parent : %d }", id,remote_id,begin_timestamp, end_timestamp, begin_sent, end_sent,n_pin, id_parent);
+			return String.format("Trip { Id:%d , RId:%d  Tms begin:%d , Tms end:%d  TX 1 : %b , TX 2  : %b , n_pin : %d , id_parent : %d }", id,remote_id,begin_timestamp, end_timestamp, begin_sent, end_sent,n_pin, id_parent);
 		}
 		
 		public long getMinutiDurata() {

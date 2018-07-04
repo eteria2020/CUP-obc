@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 
 import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -22,6 +23,10 @@ import eu.philcar.csg.OBC.server.Connectors;
 import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.service.TripInfo;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class Events extends DbTable<Event,Integer> {
 
@@ -107,6 +112,21 @@ public class Events extends DbTable<Event,Integer> {
 	public  static Class GetRecordClass() {
 		return Event.class;
 	}
+
+
+
+	public void ResetFailed() {
+		try {
+			UpdateBuilder<Event, Integer> updateBuilder = updateBuilder();
+
+			updateBuilder.updateColumnValue("sent", false);
+			updateBuilder.update();
+			updateBuilder.reset();
+		} catch (SQLException e) {
+			dlog.e("ResetFailed error:",e);
+		}
+	}
+
 
 	/*public static void eventEngine(int state) {
 		generateEvent(EVT_ENGINE,state,null);
@@ -323,33 +343,66 @@ public class Events extends DbTable<Event,Integer> {
 		
 		try {
 			Where<Event,Integer> where  = queryBuilder().orderBy("timestamp", true).where();
-			
-			where.and(
-				where.eq("sent",false),
+
+				where.eq("sent",false);
 				//where.eq("sending_error", false)
-				where.ge("timestamp",((System.currentTimeMillis()/1000)-60*60*24*7))
-			);
+				//where.ge("timestamp",((System.currentTimeMillis()/1000)-60*60*24*7))
 
 
-			
-			
+
+
+
 			PreparedQuery<Event> query =  where.prepare();
-			
+
 			dlog.d("Query : " + query.toString());
-			
+
 			return this.query(query);
-										
+
 		} catch (SQLException e) {
 			dlog.e("getEventsToSend fail:",e);
 			return null;
 
 		}
 	}
+
+
 	
 	
 	public boolean spedisciOffline(Context context, Handler handler, SharengoApiRepository apiRepository, SharengoPhpRepository phpRepository) {
 		//HttpConnector http;
-		List<Event> list = getEventsToSend();
+		if(!SharengoApiRepository.sendingEvents)
+		Observable.just(0)
+				.concatMap(i->Observable.just(getEventsToSend()))
+				.doOnNext(list->{
+					if(App.fullNode)
+						apiRepository.sendEvents(list);
+					else
+						phpRepository.sendEvents(list);
+				})
+				.subscribeOn(Schedulers.computation())
+				.subscribe(new Observer<List<Event>>() {
+					@Override
+					public void onSubscribe(Disposable d) {
+
+					}
+
+					@Override
+					public void onNext(List<Event> events) {
+
+						dlog.d("Eventi to send : " + events.size());
+					}
+
+					@Override
+					public void onError(Throwable e) {
+					dlog.e("Esception sending offline Events",e);
+					}
+
+					@Override
+					public void onComplete() {
+
+					}
+				});
+		/*List<Event> list = getEventsToSend();
 		
 		if (list==null) 
 			return false;		
@@ -364,7 +417,7 @@ public class Events extends DbTable<Event,Integer> {
 		if(App.fullNode)
 			apiRepository.sendEvents(list);
 		else
-			phpRepository.sendEvents(list);
+			phpRepository.sendEvents(list);*/
 
 		//Dato che l'invio � asincrono viene richiesto l'invio solo della prima corsa non spedito, quando arriva il messaggio di risposto di invio eseguito(o fallito) passa alla successiva 
 		/*for(Event e : list) {

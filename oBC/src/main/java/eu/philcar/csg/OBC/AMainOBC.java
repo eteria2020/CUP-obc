@@ -787,6 +787,7 @@ public class AMainOBC extends ABase implements LocationListener {
 				if(firstUpCharging) {
 					firstUpCharging=false;
 					if(App.USE_TTS_ALERT)
+
 						queueTTS(getResources().getString(R.string.alert_bonus));
 					else {
 						switch (App.DefaultCity.toLowerCase()){
@@ -828,7 +829,7 @@ public class AMainOBC extends ABase implements LocationListener {
 		try{
 			if(!ProTTS.reqSystem) {
 				ProTTS.askForSystem();
-				setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
+				setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,LowLevelInterface.AUDIO_LEVEL_ALERT);
 			}
 			tts.speak(text);
 			dlog.d("queueTTS: leggo " +text);
@@ -843,7 +844,7 @@ public class AMainOBC extends ABase implements LocationListener {
 		try{
 			if(!AudioPlayer.reqSystem) {
 				AudioPlayer.askForSystem();
-				setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
+				setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,LowLevelInterface.AUDIO_LEVEL_ALERT);
 			}
 			player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ resID));
 			dlog.d("playAlertAdvice: play " +name);

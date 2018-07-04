@@ -440,7 +440,7 @@ public class SharengoApiRepository {
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private static boolean sendingEvents;
+    public static boolean sendingEvents = false;
 
     public void sendEvent(final Event event){
         sendEvent(event,null);
@@ -479,10 +479,16 @@ public class SharengoApiRepository {
         if(!sendingEvents)
             Observable.interval(60,TimeUnit.SECONDS)
                     .take(event.size())
-                    .concatMap(i->Observable.just(event.get(i.intValue())))
+                    .concatMap(i->Observable.just(event.get(i.intValue()))).concatMap(event1 -> {
+                        if(event1.id_trip==0)
+                            event1.id_trip = mDataManager.getTripIdFromEvent(event1);
+                        return Observable.just(event1);
+
+                    })
                     .concatMap(mDataManager::saveEvent)
             /*mDataManager.saveEvents(event)
                     .delay(10, TimeUnit.SECONDS)*/
+
                     .concatMap(e -> mRemoteDataSource.sendEvent(e,mDataManager))
                     .subscribeOn(Schedulers.newThread())
                     .subscribe(new Observer<EventResponse>() {

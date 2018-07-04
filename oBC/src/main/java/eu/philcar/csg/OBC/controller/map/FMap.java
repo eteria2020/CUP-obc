@@ -3645,7 +3645,7 @@ public class FMap extends FBase implements OnClickListener {
 		try{
 			if(!ProTTS.reqSystem) {
 				ProTTS.askForSystem();
-				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
+				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,LowLevelInterface.AUDIO_LEVEL_ALERT);
 			}
 			tts.speak(text);
 			dlog.d("queueTTS: leggo " +text);
@@ -3660,7 +3660,7 @@ public class FMap extends FBase implements OnClickListener {
 		try{
 			if(!AudioPlayer.reqSystem) {
 				AudioPlayer.askForSystem();
-				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
+				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,LowLevelInterface.AUDIO_LEVEL_ALERT);
 			}
 			player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ resID));
 			dlog.d("playAlertAdvice: play " +name);

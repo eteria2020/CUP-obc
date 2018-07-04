@@ -143,6 +143,14 @@ public class FDriveMessage_new extends FBase {
 		
 		final View view = inflater.inflate(R.layout.f_lanes_new, container, false);
 		dlog.d("OnCreareView FDriveMessage_new");
+
+		if(App.Instance.BannerName.getBundle("START")==null){
+			Intent i = new Intent(getActivity(), AMainOBC.class);
+			i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(i);
+			getActivity().finish();
+		}
+
 		if(App.Instance.BannerName.getBundle("START")==null&&!RequestBanner){
 			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
 			RequestBanner=true;
@@ -660,6 +668,7 @@ public class FDriveMessage_new extends FBase {
 		if (!App.hasNetworkConnection()) {
 			dlog.e(" loadBanner: nessuna connessione");
 			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+
 			return;
 		}
 		StringBuilder  builder = new StringBuilder();

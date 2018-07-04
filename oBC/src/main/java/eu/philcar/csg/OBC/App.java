@@ -158,6 +158,7 @@ public class App extends MultiDexApplication {
 	public static App Instance;
 	public static Versions versions = new Versions();
 	public static long sharengoTime = 0;
+	public static long sharengoTimeFix = 0;
 
 	ApplicationComponent mApplicationComponent;
 
@@ -171,9 +172,10 @@ public class App extends MultiDexApplication {
 	public static void onFailedApi(ErrorResponse e) {
 		if(e.errorType != ErrorResponse.ErrorType.EMPTY) {
 			if (hasNetworkConnection()) {
-				if (SystemClock.elapsedRealtime() - getDiffLastApiError() < 60 * 1000) {//1min
+				if (lastApiError != 0 && SystemClock.elapsedRealtime() - getDiffLastApiError() < 60 * 1000) {//1min
 					if (++networkExceptions > 60) {
 						setNetworkStable(false);
+						DLog.D("Api Failed set network false");
 					}
 				}
 				setLastApiError(SystemClock.elapsedRealtime());
@@ -191,7 +193,10 @@ public class App extends MultiDexApplication {
 	}
 
 	public static void setNetworkStable(boolean networkStable) {
+		if(networkStable && !App.hasNetworkConnection())
+			setHasNetworkConnection(true);
 		App.networkStable = networkStable;
+		App.networkExceptions = 0;
 	}
 
 	public static long getLastApiError() {
@@ -2100,10 +2105,6 @@ private void  initPhase2() {
 			}
 			
 		}
-		
-	
-		
-
 		StringBuilder sb = new StringBuilder();
 	    try {
 

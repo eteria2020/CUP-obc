@@ -18,6 +18,7 @@ import java.util.Locale;
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AMainOBC;
+import eu.philcar.csg.OBC.devices.LowLevelInterface;
 
 
 public class ProTTS implements TextToSpeech.OnInitListener{
@@ -214,9 +215,9 @@ public class ProTTS implements TextToSpeech.OnInitListener{
                         playing.remove(utteranceId);
                         if(playing.size()==0 && AudioPlayer.getQueue()==0)
                             if(Context instanceof AMainOBC)
-                                ((AMainOBC) Context).setAudioSystem(lastAudioState,-1);
+                                ((AMainOBC) Context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
                             else if (Context instanceof AGoodbye)
-                                ((AGoodbye) Context).setAudioSystem(lastAudioState,-1);
+                                ((AGoodbye) Context).setAudioSystem(lastAudioState,LowLevelInterface.AUDIO_LEVEL_LAST);
                     }catch (Exception e){
                         dlog.e("ProTTS: Exception while executing onDone operation ",e);
                     }
@@ -228,9 +229,9 @@ public class ProTTS implements TextToSpeech.OnInitListener{
                         playing.remove(utteranceId);
                         if(getQueue()==0 && AudioPlayer.getQueue()==0)
                             if(Context instanceof AMainOBC)
-                                ((AMainOBC) Context).setAudioSystem(lastAudioState,-1);
+                                ((AMainOBC) Context).setAudioSystem(lastAudioState,LowLevelInterface.AUDIO_LEVEL_LAST);
                             else if (Context instanceof AGoodbye)
-                                ((AGoodbye) Context).setAudioSystem(lastAudioState,-1);
+                                ((AGoodbye) Context).setAudioSystem(lastAudioState,LowLevelInterface.AUDIO_LEVEL_LAST);
                     }catch (Exception e){
                         dlog.e("ProTTS: Exception while executing onDone operation ",e);
                     }

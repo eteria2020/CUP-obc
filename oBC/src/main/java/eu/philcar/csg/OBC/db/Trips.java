@@ -297,6 +297,31 @@ public class Trips extends DbTable<Trip,Integer> {
 			return 0;
 		}
 	}
-	
+
+	public List<Trip> getTripfromTime(long timestamp) {
+
+		try {
+			Where<Trip,Integer> where  = queryBuilder().orderBy("remote_id", false).limit(1L).where();
+
+			where.and(where.le("begin_timestamp",timestamp),
+					  where.ge("end_timestamp",timestamp));
+			//where.eq("sending_error", false)
+			//where.ge("timestamp",((System.currentTimeMillis()/1000)-60*60*24*7))
+
+
+
+
+
+			PreparedQuery<Trip> query =  where.prepare();
+			dlog.d("Query : " + query.toString());
+
+			return this.query(query);
+
+		} catch (SQLException e) {
+			dlog.e("getEventsToSend fail:",e);
+			return null;
+
+		}
+	}
 	
 }

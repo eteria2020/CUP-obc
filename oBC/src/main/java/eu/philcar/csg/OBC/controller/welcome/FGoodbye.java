@@ -632,7 +632,7 @@ public class FGoodbye extends FBase {
 
 			if(!ProTTS.reqSystem) {
 				ProTTS.askForSystem();
-				((AGoodbye) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
+				((AGoodbye) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,LowLevelInterface.AUDIO_LEVEL_ALERT);
 			}
 			tts.speak(text);
 			dlog.d("queueTTS: leggo " + text);
@@ -645,7 +645,7 @@ public class FGoodbye extends FBase {
 		try{
 			if(!AudioPlayer.reqSystem) {
 				AudioPlayer.askForSystem();
-				((AGoodbye) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,15);
+				((AGoodbye) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM,LowLevelInterface.AUDIO_LEVEL_ALERT);
 			}
 			player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ resID));
 			dlog.d("playAlertAdvice: play " +name);

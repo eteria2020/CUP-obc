@@ -1,6 +1,7 @@
 package eu.philcar.csg.OBC.service;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.j256.ormlite.stmt.UpdateBuilder;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.data.model.Config;
 import eu.philcar.csg.OBC.data.model.ModelResponse;
+import eu.philcar.csg.OBC.data.model.adapter.AreaAdapter;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.DbManager;
@@ -224,7 +226,11 @@ public class DataManager { //TODO change to interface-type system like api does 
 
         String result;
 
-            Gson gson = new Gson();
+        GsonBuilder builder = new GsonBuilder()
+                .registerTypeAdapter(Area.class, new AreaAdapter())
+                .serializeNulls();
+
+            Gson gson =builder.create();
             result = gson.toJson(area);
 
         try {
@@ -240,6 +246,14 @@ public class DataManager { //TODO change to interface-type system like api does 
 
     public long getMaxCustomerLastupdate(){
         return mDbManager.getClientiDao().mostRecentTimestamp();
+    }
+
+    public int getTripIdFromEvent(Event event){
+        List<Trip> trips =  mDbManager.getCorseDao().getTripfromTime(event.timestamp);
+        if(trips.size()>0)
+            return trips.get(0).remote_id;
+        else
+            return 0;
     }
 
     public long getMaxPoiLastupdate(){

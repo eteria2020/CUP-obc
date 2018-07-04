@@ -13,4 +13,8 @@ public class HttpLogger implements HttpLoggingInterceptor.Logger {
     public void log(String message) {
         dlog.d(message);
     }
+
+    public void  e(String message, Throwable e){
+        dlog.e(message, e);
+    }
 }

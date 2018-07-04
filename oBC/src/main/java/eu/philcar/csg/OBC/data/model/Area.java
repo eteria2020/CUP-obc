@@ -20,9 +20,9 @@ import io.reactivex.Observable;
 
 public class Area extends BaseResponse implements Comparable<Area> {
     private String close_trip;
-    private String costo_apertura;
-    private String costo_chiusura;
-    private List<String> coordinates;
+    private int costo_apertura;
+    private int costo_chiusura;
+    private List<Double> coordinates;
     @ExcludeSerialization
     private List<SKCoordinate> points;
     @ExcludeSerialization
@@ -36,7 +36,10 @@ public class Area extends BaseResponse implements Comparable<Area> {
     @ExcludeSerialization
     private int area = 0;
 
-    public Area(String close_trip, String costo_apertura, String costo_chiusura, List<String> coordinates) {
+    public Area() {
+    }
+
+    public Area(String close_trip, int costo_apertura, int costo_chiusura, List<Double> coordinates) {
         this.close_trip = close_trip;
         this.costo_apertura = costo_apertura;
         this.costo_chiusura = costo_chiusura;
@@ -57,7 +60,7 @@ public class Area extends BaseResponse implements Comparable<Area> {
             for (int j = 0; j < x; j += 3) {
                 SKCoordinate point = new SKCoordinate(0, 0);
                 try {
-                    point = new SKCoordinate(Double.valueOf(coordinates.get(j)), Double.valueOf(coordinates.get(j + 1)));
+                    point = new SKCoordinate(coordinates.get(j), coordinates.get(j + 1));
 
                     if (min == null)
                         min = new SKCoordinate(point.getLongitude(), point.getLatitude());
@@ -158,27 +161,27 @@ public class Area extends BaseResponse implements Comparable<Area> {
         this.close_trip = close_trip;
     }
 
-    public String getCosto_apertura() {
+    public int getCosto_apertura() {
         return costo_apertura;
     }
 
-    public void setCosto_apertura(String costo_apertura) {
+    public void setCosto_apertura(int costo_apertura) {
         this.costo_apertura = costo_apertura;
     }
 
-    public String getCosto_chiusura() {
+    public int getCosto_chiusura() {
         return costo_chiusura;
     }
 
-    public void setCosto_chiusura(String costo_chiusura) {
+    public void setCosto_chiusura(int costo_chiusura) {
         this.costo_chiusura = costo_chiusura;
     }
 
-    public List<String> getCoordinates() {
+    public List<Double> getCoordinates() {
         return coordinates;
     }
 
-    public void setCoordinates(List<String> coordinates) {
+    public void setCoordinates(List<Double> coordinates) {
         this.coordinates = coordinates;
     }
 }

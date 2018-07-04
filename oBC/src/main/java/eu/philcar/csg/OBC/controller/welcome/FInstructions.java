@@ -61,7 +61,14 @@ public class FInstructions extends FBase {
 				case MSG_CLOSE_FRAGMENT:
 					try {
 						dlog.d("FInstruction timeout ");
-						((ABase)getActivity()).pushFragment(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true);
+						if(App.Instance.BannerName.getBundle("START")==null){
+							Intent i = new Intent(getActivity(), AMainOBC.class);
+							i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							startActivity(i);
+							getActivity().finish();
+						}else {
+							((ABase) getActivity()).pushFragment(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true);
+						}
 					}catch(Exception e){
 						dlog.e("FInstruction : MSG_CLOSE_FRAGMENT Exception",e);
 					}
@@ -94,7 +101,13 @@ public class FInstructions extends FBase {
 			public void onClick(View v) {
 				dlog.d("FInstructions finsNextIB click : " + login);
 				if (login) {
-					((ABase)getActivity()).pushFragmentnoBack(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true,FInstructions.this);
+					if(App.Instance.BannerName.getBundle("START")==null){
+						Intent i = new Intent(getActivity(), AMainOBC.class);
+						i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(i);
+						getActivity().finish();
+					}else
+						((ABase)getActivity()).pushFragmentnoBack(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true,FInstructions.this);
 				} else {
 					((ABase)getActivity()).pushFragment(FGoodbye.newInstance(), FGoodbye.class.getName(), true);
 				}

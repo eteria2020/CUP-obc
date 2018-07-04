@@ -196,6 +196,7 @@ public class ObcService extends Service implements OnTripCallback {
     public static final int MSG_AUDIO_CHANNEL = 80;
     public static final int MSG_NAVIGATE_TO = 81;
     public static final int MSG_CHECK_TIME = 82;
+    public static final int MSG_FAILED_SOS = 83;
 
 
     public static final int MSG_DEBUG_CARD = 90;
@@ -273,7 +274,7 @@ public class ObcService extends Service implements OnTripCallback {
         public void run() {
 
             long sharengoTime=0;
-            long fix =SystemClock.elapsedRealtime();
+            //long fix =SystemClock.elapsedRealtime();
             try {
                 sharengoTime = App.sharengoTime;//doGet(App.URL_Time));
             }catch (Exception e){
@@ -286,7 +287,7 @@ public class ObcService extends Service implements OnTripCallback {
             try {
                 Date sharengo_time=null;
                 if(App.sharengoTime!=0){//lastResponseCode==200) {
-                    sharengo_time = new Date(sharengoTime*1000 + SystemClock.elapsedRealtime() - fix);
+                    sharengo_time = new Date(sharengoTime*1000 + SystemClock.elapsedRealtime() - App.sharengoTimeFix);
                 }
                 Date gps_time = new Date(carInfo.intGpsLocation.getTime() + SystemClock.elapsedRealtime() - carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000);
                 Date android_time = new Date(System.currentTimeMillis());
@@ -578,7 +579,8 @@ public class ObcService extends Service implements OnTripCallback {
 
         //Start dequeueing  trips  and events
         privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
-        privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
+        privateHandler.removeMessages(Connectors.MSG_EVENTS_SENT_OFFLINE);
+        privateHandler.sendEmptyMessageDelayed(Connectors.MSG_EVENTS_SENT_OFFLINE,10000);
 
         dataLoggerScheduler = Executors.newSingleThreadScheduledExecutor();
         // Start scheduler for server query
@@ -955,7 +957,7 @@ public class ObcService extends Service implements OnTripCallback {
         }, 40, 300, TimeUnit.SECONDS);
 
 
-        timeCheckFuture = timeCheckScheduler.scheduleAtFixedRate(timeCheckRunnable, 1, 360, TimeUnit.MINUTES);
+        timeCheckFuture = timeCheckScheduler.scheduleAtFixedRate(timeCheckRunnable, 1, 10, TimeUnit.MINUTES);//360
 
 
         //Register receiver for battery data
@@ -990,6 +992,10 @@ public class ObcService extends Service implements OnTripCallback {
         if(App.hasNetworkConnection()) {
             new DocumentControl().execute();
         }
+    }
+
+    public void sendMessage(Message msg){
+        localHandler.sendMessage(msg);
     }
 
     @Override
@@ -1074,7 +1080,8 @@ public class ObcService extends Service implements OnTripCallback {
 
             //Dequeue eventual offline trip or events
             privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
-            privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
+            privateHandler.removeMessages(Connectors.MSG_EVENTS_SENT_OFFLINE);
+            privateHandler.sendEmptyMessageDelayed(Connectors.MSG_EVENTS_SENT_OFFLINE,10000);
 
 
             //Force time check for best time
@@ -1403,7 +1410,7 @@ public class ObcService extends Service implements OnTripCallback {
             dlog.d("CarInfo created");
         }
 
-        Bundle res = carInfo.betterHandleUpdate(b);
+        Bundle res = carInfo.betterHandleUpdate(b,this);
 
         if (res.getBoolean("force"))
             sendBeacon();
@@ -1748,6 +1755,11 @@ public class ObcService extends Service implements OnTripCallback {
                     corse.ResetFailed();
                     privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
                     break;
+                case "RESEND_EVENTS":
+                    Events events = App.Instance.getDbManager().getEventiDao();
+                    events.ResetFailed();
+                    privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
+                    break;
 
                 case "SET_DOORS":
                     obc_io.setDoors(null, cmd.intarg1, "COMANDO DA  CALL-CENTER");
@@ -1965,36 +1977,36 @@ public class ObcService extends Service implements OnTripCallback {
             else
                 return phpRepository.getReservation(App.CarPlate);})
 
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<Reservation>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
+        .subscribeOn(Schedulers.newThread())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Observer<Reservation>() {
+            @Override
+            public void onSubscribe(Disposable d) {
 
-                        }
+            }
 
-                        @Override
-                        public void onNext(Reservation reservation) {
-                            setReservation(reservation);
-                        }
+            @Override
+            public void onNext(Reservation reservation) {
+                setReservation(reservation);
+            }
 
-                        @Override
-                        public void onError(Throwable e) {
+            @Override
+            public void onError(Throwable e) {
 
-                            if(e instanceof ErrorResponse) {
-                                if (((ErrorResponse) e).errorType == ErrorResponse.ErrorType.EMPTY) {
-                                    setReservation(null);
-                                }
-                            }
-                            else if(e instanceof NullPointerException)
-                                    setReservation(null);
-                        }
+                if(e instanceof ErrorResponse) {
+                    if (((ErrorResponse) e).errorType == ErrorResponse.ErrorType.EMPTY) {
+                        setReservation(null);
+                    }
+                }
+                else if(e instanceof NullPointerException)
+                        setReservation(null);
+            }
 
-                        @Override
-                        public void onComplete() {
+            @Override
+            public void onComplete() {
 
-                        }
-                    });
+            }
+        });
 
 
 //        HttpConnector http = new HttpConnector(this);
@@ -2365,7 +2377,8 @@ public class ObcService extends Service implements OnTripCallback {
 
             //Dequeue eventual offline trip or events
             privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
-            privateHandler.sendEmptyMessage(Connectors.MSG_EVENTS_SENT_OFFLINE);
+            privateHandler.removeMessages(Connectors.MSG_EVENTS_SENT_OFFLINE);
+            privateHandler.sendEmptyMessageDelayed(Connectors.MSG_EVENTS_SENT_OFFLINE,10000);
 
             //if(fourHurScheduler%2==0) {
                 localHandler.sendMessage(MessageFactory.zmqRestart());
@@ -2628,14 +2641,14 @@ public class ObcService extends Service implements OnTripCallback {
 
 
                 case MSG_CUSTOMER_SOS:
-                    eventRepository.eventSos((String) msg.obj);
+                    eventRepository.eventSos((String) msg.obj,ObcService.this);
                     //startCallCenterCall(msg.replyTo, (String) msg.obj);
                     break;
 
                 case MSG_CUSTOMER_DMG:
                     eventRepository.eventDmg((String) msg.obj);
                     //Events.eventDmg((String) msg.obj);
-                    startCallCenterCall(msg.replyTo, (String) msg.obj);
+                    //startCallCenterCall(msg.replyTo, (String) msg.obj);
                     break;
 
 
@@ -2921,6 +2934,9 @@ public class ObcService extends Service implements OnTripCallback {
                     timeCheckScheduler.schedule(timeCheckRunnable,0,TimeUnit.SECONDS);
                     break;
 
+                case MSG_FAILED_SOS:
+                    sendAll(MessageFactory.failedSOS());
+                    break;
 
             }
 
@@ -2993,9 +3009,9 @@ public class ObcService extends Service implements OnTripCallback {
             public void run() {
                 try {
 
-                   /* if(System.currentTimeMillis()/1000- App.currentTripInfo.trip.begin_timestamp<60*5 || carInfo.batteryLevel>=25 || App.lastLocation==null )
+                    if(System.currentTimeMillis()/1000- App.currentTripInfo.trip.begin_timestamp<60*5 || carInfo.batteryLevel>=25 || App.lastLocation==null )
                         return;
-                   */
+
                     for(Poi singlePoi : PoiList){
                         if(App.lastLocation.distanceTo(singlePoi.getLoc())<=90){
                                 sendAll(MessageFactory.notifyTripPoiUpdate(1,singlePoi));

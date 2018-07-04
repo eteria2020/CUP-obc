@@ -246,7 +246,7 @@ public class FWelcome extends FBase {
 		        String pwd =  input.getText().toString();
 		        App.isAdmin=0;
 		        //TODO: use external config for password in hashed form
-		        if (pwd.equals("Jupiter18")) App.isAdmin=1;
+		        if (pwd.equals("Roger18")) App.isAdmin=1;
 		        if (pwd.equals("redrum18"))  App.isAdmin=2;
 		        	
 		        if (App.isAdmin>0) {
