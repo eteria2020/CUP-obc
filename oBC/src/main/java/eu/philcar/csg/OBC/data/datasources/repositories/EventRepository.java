@@ -242,7 +242,7 @@ public class EventRepository {
             event.lat = App.lastLocation.getLatitude();
         }
         if(App.fullNode)
-            apiRepository.sendEvent(event);
+            apiRepository.sendEvent(event,service);
         else
             phpRepository.sendEvent(event);
 

@@ -31,6 +31,7 @@ import eu.philcar.csg.OBC.service.AdvertisementService;
 import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.service.MessageFactory;
 import eu.philcar.csg.OBC.service.ObcService;
+import eu.philcar.csg.OBC.service.ParkMode;
 import eu.philcar.csg.OBC.service.ServiceConnector;
 import eu.philcar.csg.OBC.task.OdoController;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;

@@ -102,7 +102,7 @@ public class FWelcome extends FBase {
 
 		View view = inflater.inflate(R.layout.f_welcome, container, false);
 
-		ButterKnife.bind( this,view);
+		unbinder = ButterKnife.bind( this,view);
 
 		dlog.d("OnCreareView FWelcome");
 

@@ -120,6 +120,7 @@ public class Events extends DbTable<Event,Integer> {
 			UpdateBuilder<Event, Integer> updateBuilder = updateBuilder();
 
 			updateBuilder.updateColumnValue("sent", false);
+			updateBuilder.where().ne("event",9);//escludo gli eventi SOS per evitare falsi positivi
 			updateBuilder.update();
 			updateBuilder.reset();
 		} catch (SQLException e) {
@@ -344,10 +345,11 @@ public class Events extends DbTable<Event,Integer> {
 		try {
 			Where<Event,Integer> where  = queryBuilder().orderBy("timestamp", true).where();
 
-				where.eq("sent",false);
+			where.and(
+				where.eq("sent",false),
 				//where.eq("sending_error", false)
-				//where.ge("timestamp",((System.currentTimeMillis()/1000)-60*60*24*7))
-
+				where.ge("timestamp",((System.currentTimeMillis()/1000)-60*60*24*7))
+			);
 
 
 

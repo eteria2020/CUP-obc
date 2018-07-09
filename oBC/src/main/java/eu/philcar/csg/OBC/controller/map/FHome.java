@@ -26,12 +26,10 @@ import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
-import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
-import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
@@ -39,7 +37,6 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.CarInfo;
-import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -195,6 +192,7 @@ public class FHome extends FBase implements OnClickListener {
         ((Button) view.findViewById(R.id.fmapAssicurazione)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapLibretto)).setOnClickListener(this);
         view.findViewById(R.id.fmapAlertCloseBTN).setOnClickListener(this);
+        view.findViewById(R.id.fmapAlertSOCFL).setOnClickListener(this);
 
         dayTV = (TextView) view.findViewById(R.id.fmap_date_TV);
         timeTV = (TextView) view.findViewById(R.id.fmap_hour_TV);
@@ -564,11 +562,11 @@ public class FHome extends FBase implements OnClickListener {
                 break;
 
             case R.id.fmapCancelB://End Trip
-                ((ABase) getActivity()).pushFragment(FMenu.newInstance("CANCEL"), FMenu.class.getName(), true);
+                ((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_END_RENT), FMenu.class.getName(), true);
                 break;
 
             case R.id.fmapParkB://End Trip
-                ((ABase) getActivity()).pushFragment(FMenu.newInstance("PARK"), FMenu.class.getName(), true);
+                ((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_PARK), FMenu.class.getName(), true);
                 break;
 
 
@@ -607,7 +605,7 @@ public class FHome extends FBase implements OnClickListener {
                         if (App.Instance.BannerName.getBundle("CAR").getString("CLICK").compareTo("null") != 0) {
 
                             if (!handleClick) {
-                                adIV.setColorFilter(R.color.overlay_banner);
+                                adIV.setColorFilter(R.color.overlay_click);
                                 timer_2min.cancel();
                                 handleClick = true;
                                 dlog.d(" Banner: Click su banner ");
@@ -639,6 +637,7 @@ public class FHome extends FBase implements OnClickListener {
                 }
                 break;
             case R.id.fmapAlertCloseBTN:
+            case R.id.fmapAlertSOCFL:
 
                 localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
 
@@ -1079,7 +1078,7 @@ public class FHome extends FBase implements OnClickListener {
         }
 
         DLog.D(FHome.class.toString()+" loadBanner: risposta "+jsonStr);
-        File file = new File(outDir, "placeholder.lol");;
+        File file = new File(outDir, "placeholder.lol");
 
         try {
             JSONObject json = new JSONObject(jsonStr);

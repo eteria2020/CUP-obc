@@ -246,7 +246,7 @@ public class FDriveMessage_new extends FBase {
 					if(App.Instance.BannerName.getBundle("START").getString("CLICK").compareTo("null")!=0){
 
 						if(!handleClick) {
-							adIV.setColorFilter(R.color.overlay_banner);
+							adIV.setColorFilter(R.color.overlay_click);
 							handleClick=true;
 							dlog.i(FDriveMessage.class.toString()+" Click su banner ");
 							new Thread(new Runnable() {
@@ -330,6 +330,8 @@ public class FDriveMessage_new extends FBase {
 				video.start();
 				localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,45000);
 
+			}else {
+				localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,10000);
 			}
 		}else{
 			localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,10000);

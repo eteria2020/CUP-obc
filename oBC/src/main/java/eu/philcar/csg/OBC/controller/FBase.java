@@ -2,8 +2,12 @@ package eu.philcar.csg.OBC.controller;
 
 import android.app.Fragment;
 
+import butterknife.Unbinder;
+
 public abstract class FBase extends Fragment {
-	
+
+	protected Unbinder unbinder;
+
 	/**
 	 * When required, this method allows fragments to properly handle the back button navigation. 
 	 * 
@@ -12,5 +16,13 @@ public abstract class FBase extends Fragment {
 	 */
 	public boolean handleBackButton() {
 		return true;
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		if(unbinder!=null){
+			//unbinder.unbind();
+		}
 	}
 }

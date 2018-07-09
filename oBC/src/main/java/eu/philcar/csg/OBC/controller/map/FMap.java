@@ -55,7 +55,6 @@ import com.skobbler.ngx.map.SKMapSurfaceView.SKOrientationIndicatorType;
 import com.skobbler.ngx.map.SKMapViewHolder;
 import com.skobbler.ngx.map.SKPOICluster;
 import com.skobbler.ngx.map.SKPolygon;
-import com.skobbler.ngx.map.SKPolyline;
 import com.skobbler.ngx.map.SKScreenPoint;
 import com.skobbler.ngx.map.realreach.SKRealReachSettings;
 import com.skobbler.ngx.navigation.SKNavigationListener;
@@ -122,7 +121,6 @@ import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.DbManager;
-import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
@@ -1343,7 +1341,7 @@ public class FMap extends FBase implements OnClickListener {
 				if(App.Instance.BannerName.getBundle("CAR").getString("CLICK").compareTo("null")!=0){
 
 					if(!handleClick) {
-						adIV.setColorFilter(R.color.overlay_banner);
+						adIV.setColorFilter(R.color.overlay_click);
 						FHome.timer_2min.cancel();
 						handleClick=true;
 						dlog.d(FMap.class.toString()+" Banner: Click su banner ");

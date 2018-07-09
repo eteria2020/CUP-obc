@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="border_corner_radius">15dp</dimen>
+    <dimen name="border_stroke_width">9dp</dimen>
+    <dimen name="side_square_big_icon">140dp</dimen>
+</resources>

@@ -25,7 +25,7 @@
         android:orientation="vertical" >
 
         <LinearLayout
-            android:id="@+id/llCancel"
+            android:id="@+id/endRentLL"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
 

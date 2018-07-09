@@ -5,6 +5,9 @@ import eu.philcar.csg.OBC.controller.sos.FSOS;
 import eu.philcar.csg.OBC.helpers.Clients;
 import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.ServiceConnector;
+
+import android.annotation.SuppressLint;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
@@ -70,6 +73,7 @@ public class ASOS extends ABase {
 	}
 	
 	
+	@SuppressLint("HandlerLeak")
 	private  Handler serviceHandler = new Handler() {
 		 @Override
 		 public void handleMessage(Message msg) {
@@ -83,7 +87,14 @@ public class ASOS extends ABase {
 				startActivity(i);
 				ASOS.this.finish();
 	
-				break;					
+				break;
+
+			case ObcService.MSG_FAILED_SOS:
+				FSOS fSos = (FSOS) getFragmentManager().findFragmentByTag(FSOS.class.getName());
+
+				fSos.failedSos();
+
+				break;
 				
 			default:
 				super.handleMessage(msg);

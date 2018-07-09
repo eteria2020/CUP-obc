@@ -440,8 +440,11 @@ public class App extends MultiDexApplication {
 	public static String URL_UpdateEndImages;
 	public static String URL_Configs;
 	public static String URL_Time;
-	public static String URL_NRD;
 
+	public static final String TIME_SERVER = "time.google.com"; // change the server here to fit what you need
+
+	public static String URL_NRD;
+	public static String NRD = "0";
 	public static String IP_UDP_Beacon;
 	public static int    Port_UDP_Beacon;
 
@@ -491,10 +494,11 @@ public class App extends MultiDexApplication {
 	private static final String  KEY_IdAskClose = "id_ask_close";
 	private static final String  KEY_CounterCleanliness = "Cleanliness";
 	private static final String  KEY_TimeZone = "time_zone";
+	private static final String  KEY_CallCenterNumer = "call_center_numer";
 	private static final String  KEY_NewBatteryShutdownLevel = "new_battery_shutdown_level";
 	private static final String  KEY_FullNode = "full_node";
 
-	public static String NRD = "-1";
+
 
 
 	public static final String  KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
@@ -502,6 +506,8 @@ public class App extends MultiDexApplication {
 
 	public static RadioSetup radioSetup;
 	public static CardRfidCollection openDoorsCards;
+
+	public static String callCenterNumer = "+390287317140";
 
 	public static String CarPlate="ND";
 	public static String Damages = "";
@@ -848,6 +854,14 @@ public class App extends MultiDexApplication {
 		if (this.preferences != null ) {
 			Editor e = this.preferences.edit();
 			e.putString(KEY_TimeZone, timeZone);
+			e.apply();
+		}
+	}
+
+	public void persistCallCenterNumer() {
+		if (this.preferences != null ) {
+			Editor e = this.preferences.edit();
+			e.putString(KEY_CallCenterNumer, callCenterNumer);
 			e.apply();
 		}
 	}
@@ -1614,7 +1628,7 @@ private void  initPhase2() {
 			App.fuel_level=fuel_level;
 			return;
 		}
-		
+
 
 		editor.putInt(KEY_fuel_level, fuel_level);
 		editor.apply();
@@ -1800,6 +1814,10 @@ private void  initPhase2() {
 //					fullNode = jo.getBoolean(key);
 //					persistFullNode();
 				}
+				else if (key.equalsIgnoreCase("SosNumber")) {
+					callCenterNumer = jo.getString(key);
+					persistCallCenterNumer();
+				}
 			}
 			loadPreferences();
 		} catch (JSONException e) {
@@ -1936,7 +1954,12 @@ private void  initPhase2() {
 				}
 			}
 		}
-			
+
+		if(App.AreaPolygons.size() ==0){
+			App.Instance.initAreaPolygon();
+			return true;
+		}
+
 		return false;
 	}
 	
@@ -1984,6 +2007,7 @@ private void  initPhase2() {
 
 		ServerIP = preferences.getInt(KEY_ServerIP, 0);
 		timeZone = preferences.getString(KEY_TimeZone,"Europe/Rome");
+		callCenterNumer = preferences.getString(KEY_CallCenterNumer,"+390287317140");
 //		fullNode = preferences.getBoolean(KEY_FullNode,false);
 		saveLog = preferences.getBoolean(KEY_PersistLog, true);
 		checkKeyOff = preferences.getBoolean(KEY_CheckKeyOff, true);
@@ -2076,7 +2100,7 @@ private void  initPhase2() {
 
 	
 	public void initAreaPolygon() {
-		
+
 		File areaFile = new File(getAppDataPath(),"area.json");
 		
 		if (!areaFile.exists()) {
@@ -2143,7 +2167,8 @@ private void  initPhase2() {
 		
 
 		int n = jArray.length();
-				
+
+
 		for (int i = 0; i < n; i++) {
 
 			try {

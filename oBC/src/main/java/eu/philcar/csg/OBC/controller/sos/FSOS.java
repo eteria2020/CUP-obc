@@ -136,7 +136,14 @@ public class FSOS extends FBase implements OnClickListener {
 		
 		numberTV.setText(customerCenterNumber);
 	}
-	
+
+	public void failedSos(){
+
+		messageTV.setText(R.string.call_dealt);
+		messageTV.setText(String.format(getString(R.string.call_error),App.callCenterNumer));
+	}
+
+
 	@Override
 	public void onClick(View v) {
 		

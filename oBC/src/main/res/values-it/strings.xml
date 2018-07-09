@@ -247,4 +247,9 @@
     <string name="maintenance_status_wait">Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.</string>
 
 
+    <string name="call_error">Si è verificato un errore inoltrando la richiesta al servizio clienti, per piacere prova a chiamare: %s</string>
+
+    <string name="menu_cancel_action"><b>ANNULLA -</b> Permi per annullare</string>
+
+    <string name="menu_rent_end_instruction">Il motore si spegnerà nel tempo indicato, per annullare clicca quì sotto</string>
 </resources>

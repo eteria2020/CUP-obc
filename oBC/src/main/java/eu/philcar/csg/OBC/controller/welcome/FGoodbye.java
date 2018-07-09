@@ -244,7 +244,7 @@ public class FGoodbye extends FBase {
 						if (App.BannerName.getBundle("END").getString("CLICK", "null").compareTo("null") != 0) {
 
 							if (!handleClick) {
-								adIV.setColorFilter(R.color.overlay_banner);
+								adIV.setColorFilter(R.color.overlay_click);
 								handleClick = true;
 								dlog.i(FDriveMessage.class.toString() + " Click su banner ");
 								Thread onBannerClick = new Thread(new Runnable() {
@@ -291,7 +291,7 @@ public class FGoodbye extends FBase {
 		final Activity activity =this.getActivity();
 		if(selfclose!=null)
 			selfclose.cancel();
-		selfclose = new CountDownTimer(41000,1000) {
+		selfclose = new CountDownTimer(26000,1000) {
 			@Override
 		     public void onTick(long millisUntilFinished) {
 		    	 ((TextView)view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished/1000)+ " s");

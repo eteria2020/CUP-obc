@@ -190,7 +190,7 @@ public class SharengoApiRepository {
                         @Override
                         public void onError(@NonNull Throwable e) {
                             if(e instanceof ErrorResponse)
-                                DLog.E("Error syncing getConfig" + ((ErrorResponse) e).rawMessage, e);
+                                DLog.E("Error syncing getConfig " + ((ErrorResponse) e).rawMessage, e);
                             RxUtil.dispose(configDisposable);
                         }
 
@@ -287,6 +287,7 @@ public class SharengoApiRepository {
 
         if(!RxUtil.isRunning(areaDisposable)) {
             mRemoteDataSource.getArea(App.AreaPolygonMD5)
+                    .filter(n->n.size()!=0)
                     .concatMap(n -> mDataManager.saveArea(n))
                     //Emit single Area Response at time
                     .concatMap(Observable::fromIterable)

@@ -22,6 +22,7 @@ import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.service.MessageFactory;
 
+@Deprecated
 public class FInstructionsClose extends FBase implements OnClickListener {
 	
 	private DLog dlog = new DLog(this.getClass());

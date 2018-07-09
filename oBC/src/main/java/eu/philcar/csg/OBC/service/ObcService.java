@@ -69,6 +69,7 @@ import eu.philcar.csg.OBC.server.ZmqRequester;
 import eu.philcar.csg.OBC.server.ZmqSubscriber;
 //import eu.philcar.csg.OBC.task.DataLogger;
 import eu.philcar.csg.OBC.task.OldLogCleamup;
+import eu.philcar.csg.OBC.task.GetTimeFromNetwork;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 import eu.philcar.csg.OBC.task.UDPServer;
 import io.reactivex.Observable;
@@ -273,56 +274,67 @@ public class ObcService extends Service implements OnTripCallback {
         @Override
         public void run() {
 
-            long sharengoTime=0;
-            //long fix =SystemClock.elapsedRealtime();
-            try {
-                sharengoTime = App.sharengoTime;//doGet(App.URL_Time));
-            }catch (Exception e){
-                dlog.e("Exception while retreiving sharengoTime",e);
-                lastResponseCode=0;
-            }
+//            long sharengoTime=0;
+//            long fix =SystemClock.elapsedRealtime();
+//            try {
+//                sharengoTime = Long.parseLong(doGet(App.URL_Time));
+//            }catch (Exception e){
+//                dlog.e("Exception while retreiving sharengoTime",e);
+//                lastResponseCode=0;
+//            }
 
+            new GetTimeFromNetwork(ObcService.this).execute(carInfo);
 
-            Runtime rt = Runtime.getRuntime();
-            try {
-                Date sharengo_time=null;
-                if(App.sharengoTime!=0){//lastResponseCode==200) {
-                    sharengo_time = new Date(sharengoTime*1000 + SystemClock.elapsedRealtime() - App.sharengoTimeFix);
-                }
-                Date gps_time = new Date(carInfo.intGpsLocation.getTime() + SystemClock.elapsedRealtime() - carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000);
-                Date android_time = new Date(System.currentTimeMillis());
-
-
-
-                if(sharengo_time!=null && sharengo_time.getTime() > 1234567890000L){
-
-                    dlog.d("timeCheckScheduler: imposto ora Sharengo "+sharengo_time.toString()+ "ora android: "+android_time.toString());
-                    rt.exec(new String[]{"/system/xbin/su", "-c", "time -s " + sdf.format(sharengo_time) + ";\n"}); //
-                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //time -s 20120423.130000
-
-                }else if(carInfo.intGpsLocation.getTime()>1234567890000L) {
-                    //if(android_time.getTime()<1234567890000L) {
-                    dlog.d("timeCheckScheduler: imposto ora gps "+gps_time.toString()+ "ora android: "+android_time.toString());
-                    rt.exec(new String[]{"/system/xbin/su", "-c", "time -s " + sdf.format(gps_time) + ";\n"}); //
-                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //time -s 20120423.130000
-                    //}
-
-                }
-                else
-                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 1"}); //time -s 20120423.130000*/
-                dlog.d("timeCheckScheduler: rawGpsTime: " + new Date(carInfo.intGpsLocation.getTime()).toString() + " elapsed: " + (System.currentTimeMillis() - (carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000)) + " android time: " + android_time.toString() + " fixed gps time: " + gps_time.toString() +" Sharengo time: "+(sharengo_time!=null?sharengo_time.toString():" response code "+lastResponseCode));
-
-                rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time_zone 0"}); //time -s 20120423.130000
-                AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                am.setTimeZone(App.timeZone);
-                am = null;
-
-
-
-
-            } catch (Exception e) {
-                dlog.e("timeCheckScheduler error", e);
-            }
+//            long sharengoTime=0;
+//            long fix =SystemClock.elapsedRealtime();
+//            try {
+//                sharengoTime = Long.parseLong(doGet(App.URL_Time));
+//            }catch (Exception e){
+//                dlog.e("Exception while retreiving sharengoTime",e);
+//                lastResponseCode=0;
+//            }
+//
+//
+//            Runtime rt = Runtime.getRuntime();
+//            try {
+//                Date sharengo_time=null;
+//                if(lastResponseCode==200) {
+//                    sharengo_time = new Date(sharengoTime*1000 + SystemClock.elapsedRealtime() - fix);
+//                }
+//                Date gps_time = new Date(carInfo.intGpsLocation.getTime() + SystemClock.elapsedRealtime() - carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000);
+//                Date android_time = new Date(System.currentTimeMillis());
+//
+//
+//
+//                if(sharengo_time!=null && sharengo_time.getTime() > 1234567890000L){
+//
+//                    dlog.d("timeCheckScheduler: imposto ora Sharengo "+sharengo_time.toString()+ "ora android: "+android_time.toString());
+//                    rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(sharengo_time) + ";\n"}); //
+//                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
+//
+//                }else if(carInfo.intGpsLocation.getTime()>1234567890000L) {
+//                    //if(android_time.getTime()<1234567890000L) {
+//                    dlog.d("timeCheckScheduler: imposto ora gps "+gps_time.toString()+ "ora android: "+android_time.toString());
+//                    rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(gps_time) + ";\n"}); //
+//                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 0"}); //date -s 20120423.130000
+//                    //}
+//
+//                }
+//                else
+//                    rt.exec(new String[]{"/system/xbin/su","-c", "settings put global auto_time 1"}); //date -s 20120423.130000*/
+//                dlog.d("timeCheckScheduler: rawGpsTime: " + new Date(carInfo.intGpsLocation.getTime()).toString() + " elapsed: " + (System.currentTimeMillis() - (carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000)) + " android time: " + android_time.toString() + " fixed gps time: " + gps_time.toString() +" Sharengo time: "+(sharengo_time!=null?sharengo_time.toString():" response code "+lastResponseCode));
+//
+//                rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time_zone 0"}); //date -s 20120423.130000
+//                AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+//                am.setTimeZone(App.timeZone);
+//                am = null;
+//
+//
+//
+//
+//            } catch (Exception e) {
+//                dlog.e("timeCheckScheduler error", e);
+//            }
         }
 
         public String doGet(String url) throws Exception {
@@ -563,7 +575,7 @@ public class ObcService extends Service implements OnTripCallback {
 
         startPoiDownload();
 
-        startAreaPolygonDownload(this, null);
+        startAreaPolygonDownload();
 
         //Start reservation update
         startDownloadReservations();
@@ -1949,7 +1961,7 @@ public class ObcService extends Service implements OnTripCallback {
 //        http.SetHandler(localHandler);
 //        http.Execute(connector);
     }
-    public void startAreaPolygonDownload(Context ctx, Handler handler) {
+    public void startAreaPolygonDownload() {
         DLog.D("Start area download..");
 
         if(App.fullNode)
@@ -2371,6 +2383,8 @@ public class ObcService extends Service implements OnTripCallback {
                 startDownloadConfigs();
             }*/
             startDownloadReservations();
+            if(App.AreaPolygons.size()==0)
+                startAreaPolygonDownload();
             //startDownloadCommands();
 
 

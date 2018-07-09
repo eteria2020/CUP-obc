@@ -246,6 +246,9 @@
     <string name="maintenance_status_plug_insert">IMPOSSIBILE TERMINARE RICARCA: spina ancora inserita</string>
     <string name="maintenance_status_wait">Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.</string>
     <string name="number_plus">+</string>
+    <string name="call_error">Error while forwarding help request try calling %s</string>
+    <string name="menu_cancel_action">Cancel</string>
+    <string name="menu_rent_end_instruction">The engine will stop in the time indicated, if you want to cancel click below</string>
 
 
 </resources>

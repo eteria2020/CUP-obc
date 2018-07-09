@@ -157,7 +157,7 @@ public abstract class BaseRetrofitDataSource {
                     DLog.E("Retrofit Exception CONVERSION ",er.error);
                     break;
                 case NO_NETWORK:
-                    DLog.E("Retrofit Exception NO_NETWORK ",er.error);
+                    DLog.E("Retrofit Exception NO_NETWORK ");
                     break;
                 case UNEXPECTED:
                     DLog.E("Retrofit Exception UNEXPECTED ",er.error);

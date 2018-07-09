@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item android:drawable="@drawable/white_border">
+
+    </item>
+    <item>
+        <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+            <solid android:color="@color/overlay_click"/>
+            <corners android:radius="@dimen/border_corner_radius"/>
+        </shape>
+    </item>
+
+</layer-list>
