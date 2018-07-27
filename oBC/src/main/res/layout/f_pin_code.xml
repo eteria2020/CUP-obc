@@ -175,24 +175,24 @@
             android:background="@drawable/sel_button_sos" />
         
         <ImageButton android:id="@+id/fpcaBackIB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/side_square_big_icon"
+            android:layout_height="@dimen/side_square_big_icon"
             android:layout_centerHorizontal="true"
             android:layout_above="@+id/fpcaNextIB"
             android:layout_marginBottom="8dp"
-            android:src="@drawable/sel_button_back"
+            android:src="@drawable/ic_arrow_left"
             android:contentDescription="@string/content_description"
-            android:background="@null" />
+            android:background="@drawable/sel_button_white" />
         
         <ImageButton android:id="@+id/fpcaNextIB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/side_square_big_icon"
+            android:layout_height="@dimen/side_square_big_icon"
             android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="25dp"
-            android:src="@drawable/sel_button_next"
+            android:src="@drawable/ic_arrow_right"
             android:contentDescription="@string/content_description"
-            android:background="@null" />
+            android:background="@drawable/sel_button_white" />
         
     </RelativeLayout>
     

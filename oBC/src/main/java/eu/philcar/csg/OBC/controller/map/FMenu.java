@@ -70,7 +70,7 @@ public class FMenu extends FBase implements OnClickListener{
 	private boolean Checkkey = App.checkKeyOff;
 	public boolean changed =true;
 	public static final String CLICKED_BUTTON = "button";
-	private boolean requestPause =true;
+	private boolean actionTaken =false;
 
 	public String clickedButton; // to determinate which button is clicked
 	
@@ -196,19 +196,25 @@ public class FMenu extends FBase implements OnClickListener{
 		}
 	};
 
+	/**
+	 * Quando si chiude la corsa con la nuova logica dovremo:
+	 * visualizzare la pagina fGoodby quindi con la sua activity però con la possibilità di annullare e tornare indietro.
+	 * spegnere il motore solamente alla fine dei 40s di FGoodbye
+	 * Al click annulla dovremo controllare di annullare perfettamente tutto il resto per tornare in uno stato coerente con la logica interna
+	 */
 	private void closeTrip(){
 		AMainOBC activity = (AMainOBC)getActivity();
 		if (activity!=null && activity.checkisInsideParkingArea()) {
 			eventRepository.menuclick("END RENT");
 			resetBanner();
 			dlog.d("Banner: end rent stopping update, start countdown");
-			((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(false));
+			//((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(false));
 
 			Intent i = new Intent(getActivity(), AGoodbye.class);
 			i.putExtra(AGoodbye.EUTHANASIA, false);
 
 			startActivity(i);
-			((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(25));
+			((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
 			getActivity().finish();
 		}
 	}
@@ -231,11 +237,8 @@ public class FMenu extends FBase implements OnClickListener{
 		case R.id.fmenEndRentIB:
 		case R.id.fmenEndRentTV:
 			resetBanner();
-			startSelfCloseTrip(rootView,CLOSE_TRIP_DELAY);
-			localHandler.sendEmptyMessageDelayed(MSG_CLOSE_TRIP,CLOSE_TRIP_DELAY*1000);
-			//(rootView.findViewById(R.id.endRentLL)).animate().alpha(0.25f);
-			(rootView.findViewById(R.id.cancelActionLL)).setVisibility(View.VISIBLE);
-			updateUIUsingAppValues();
+			closeTrip();//chiudo immediatamente la pagina
+//			updateUIUsingAppValues();
 			break;
 			
 		case R.id.fmenPauseRentIB:
@@ -326,7 +329,7 @@ public class FMenu extends FBase implements OnClickListener{
 			UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end, this,
 					 R.drawable.ic_letter_p, R.string.menu_park_mode_suspend, this,
 					 R.drawable.ic_letter_x_red, R.string.menu_cancel_action, null,
-					 R.drawable.sel_button_back, this);
+					 R.drawable.ic_arrow_left, this);
 			
 			return;
 		}
@@ -339,22 +342,22 @@ public class FMenu extends FBase implements OnClickListener{
 				case PARK_OFF: 		// (TRUE, DATE, OFF) - WTF STATE
 					UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_shutdown_engine, null,
 							 R.drawable.ic_letter_p, R.string.menu_park_mode_suspend_shutdown_engine, null,
-							 R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action, null,
-							 R.drawable.button_back_pushed, null);
+							 R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+							 R.drawable.ic_arrow_left, null);
 					DLog.E("FMENU: illegal state reached on updateUIUsingAppValues: (Engine On, ParkModeStarted On, Park_OFF)");
 					break;
 				case PARK_STARTED:	// (TRUE, DATE, STARTED) - WTF STATE
 					UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_shutdown_engine, null,
 							 R.drawable.ic_letter_p, R.string.menu_park_mode_suspend_shutdown_engine, null,
-							 R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action, null,
-							 R.drawable.button_back_pushed, null);
+							 R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+							 R.drawable.ic_arrow_left, null);
 					DLog.E("FMENU: illegal state reached on updateUIUsingAppValues: (Engine On, ParkModeStarted On, Park_STARTED)");
 					break;
 				case PARK_ENDED:	// (TRUE, DATE, ENDED) - WTF STATE
 					UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_shutdown_engine, null,
 							 R.drawable.ic_letter_p, R.string.menu_park_mode_suspend_shutdown_engine, null,
-							 R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action, null,
-							 R.drawable.button_back_pushed, null);
+							 R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+							 R.drawable.ic_arrow_left, null);
 					DLog.E("FMENU: illegal state reached on updateUIUsingAppValues: (Engine On, ParkModeStarted On, Park_ENDED)");
 					break;
 				}
@@ -365,21 +368,21 @@ public class FMenu extends FBase implements OnClickListener{
 				case PARK_OFF: 		// (TRUE, NULL, OFF) //
 					UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_shutdown_engine, null,
 							 R.drawable.ic_letter_p, R.string.menu_park_mode_suspend_shutdown_engine, null,
-							 R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action, null,
-							 R.drawable.sel_button_back, this);
+							 R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+							 R.drawable.ic_arrow_left, this);
 					break;
 				case PARK_STARTED:	// (TRUE, NULL, STARTED) - WTF STATE
 					UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_shutdown_engine, null,
 							 R.drawable.ic_letter_p, R.string.menu_park_mode_suspend_shutdown_engine, null,
-							 R.drawable.ic_letter_x_yellow, R.string.menu_refuel_shutdown_engine, null,
-							 R.drawable.button_back_pushed, null);
+							 R.drawable.ic_arrow_left, R.string.menu_refuel_shutdown_engine, null,
+							 R.drawable.ic_arrow_left, null);
 					DLog.E("FMENU: illegal state reached on updateUIUsingAppValues: (Engine On, ParkMode NOT started, Park_STARTED)");
 					break;
 				case PARK_ENDED:	// (TRUE, NULL, ENDED) - WTF STATE
 					UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_shutdown_engine, null,
 							 R.drawable.ic_letter_p, R.string.menu_park_mode_suspend_shutdown_engine, null,
-							 R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action, null,
-							 R.drawable.button_back_pushed, null);
+							 R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+							 R.drawable.ic_arrow_left, null);
 					DLog.E("FMENU: illegal state reached on updateUIUsingAppValues: (Engine On, ParkMode NOT started, Park_ENDED)");
 					break;
 				}
@@ -393,14 +396,14 @@ public class FMenu extends FBase implements OnClickListener{
 				case PARK_OFF: 		// (FALSE, DATE, OFF) //
 					UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_off, null,
 							 R.drawable.ic_letter_p, R.string.menu_park_mode_suspend_instructions, null,
-							 R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action, this,
-							 R.drawable.button_back_pushed, this);
+							 R.drawable.ic_arrow_left, R.string.menu_cancel_action, this,
+							 R.drawable.ic_arrow_left, this);
 					break;
 				case PARK_STARTED:	// (FALSE, DATE, STARTED)
 					UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_off, null,
 							 R.drawable.ic_letter_p, R.string.menu_park_mode_started, null,
-							 R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action, null,
-							 R.drawable.button_back_pushed, null);
+							 R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+							 R.drawable.ic_arrow_left, null);
 					stopSelfClose(rootView);
 					if(endRentLL!=null)
 						endRentLL.setVisibility(View.GONE);
@@ -408,8 +411,8 @@ public class FMenu extends FBase implements OnClickListener{
 				case PARK_ENDED:	// (FALSE, DATE, ENDED)
 					UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_off, null,
 							 R.drawable.ic_letter_p, R.string.menu_park_mode_resume, this,
-							 R.drawable.ic_letter_x_red, R.string.menu_cancel_action, null,
-							 R.drawable.button_back_pushed, null);
+							 R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+							 R.drawable.ic_arrow_left, null);
 					if(endRentLL!=null)
 						endRentLL.setVisibility(View.GONE);
 					break;
@@ -422,36 +425,46 @@ public class FMenu extends FBase implements OnClickListener{
 					if( CarInfo.getKeyStatus() != null && !CarInfo.getKeyStatus().equalsIgnoreCase("OFF") && App.checkKeyOff) {
 						UIHelper(R.drawable.ic_key_red, R.string.menu_rent_end_key_on, null,
 								R.drawable.ic_key_green, R.string.menu_park_mode_suspend_key_on, null,
-								R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action, null,
-								R.drawable.sel_button_back, this);
+								R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+								R.drawable.ic_arrow_left, this);
 
 					}else {
 						if (activity.checkisInsideParkingArea()) {
-							if(requestPause){
+							if(!actionTaken){
 								UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end, this,
 										R.drawable.ic_letter_p, R.string.menu_park_mode_suspend, this,
-										R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action, null,
-										R.drawable.sel_button_back, this);
-								requestPause = false;
-								if(clickedButton.equalsIgnoreCase(REQUEST_PARK))
+										R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+										R.drawable.ic_arrow_left, this);
+
+								if(clickedButton.equalsIgnoreCase(REQUEST_PARK)) {
 									onClick(pauseRentIB);
-								else if(clickedButton.equalsIgnoreCase(REQUEST_END_RENT))
+									actionTaken = true;
+									clickedButton = "";
+								}
+								else if(clickedButton.equalsIgnoreCase(REQUEST_END_RENT)) {
 									onClick(endRentIB);
+									actionTaken = true;
+									clickedButton = "";
+								}
 							}
 							else {
 								if(clickedButton.equalsIgnoreCase(REQUEST_END_RENT))
 									UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_instruction, null,
 											R.drawable.ic_letter_p, R.string.menu_park_mode_resume, null,
-											R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action, this,
-											R.drawable.button_back_pushed, null);
+											R.drawable.ic_arrow_left, R.string.menu_cancel_action, this,
+											R.drawable.ic_arrow_left, this);
 							}
 
 
 						} else {
 							UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_outside_park_area, null,
 									R.drawable.ic_letter_p, R.string.menu_park_mode_suspend, this,
-									R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action, null,
-									R.drawable.sel_button_back, this);
+									R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+									R.drawable.ic_arrow_left, this);
+							if(!actionTaken && clickedButton.equalsIgnoreCase(REQUEST_PARK)) {
+								onClick(pauseRentIB);
+								actionTaken = true;
+							}
 						}
 					}
 					break;
@@ -459,13 +472,13 @@ public class FMenu extends FBase implements OnClickListener{
 					if (activity.checkisInsideParkingArea()) {
 						UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end, this,
 								 R.drawable.ic_letter_p, R.string.menu_park_mode_suspend_off, null,
-								 R.drawable.ic_letter_x_yellow, R.string.menu_refuel, this,
-								 R.drawable.sel_button_back, this);
+								 R.drawable.ic_arrow_left, R.string.menu_refuel, this,
+								 R.drawable.ic_arrow_left, this);
 					} else {
 						UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_outside_park_area, null,
 								 R.drawable.ic_letter_p, R.string.menu_park_mode_suspend_off, null,
-								 R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action, this,
-								 R.drawable.sel_button_back, this);
+								 R.drawable.ic_arrow_left, R.string.menu_cancel_action, this,
+								 R.drawable.ic_arrow_left, this);
 					}
 					DLog.E("FMENU: illegal state reached on updateUIUsingAppValues: (Engine OFF, ParkMode NOT started, Park_STARTED)");
 					break;
@@ -473,13 +486,13 @@ public class FMenu extends FBase implements OnClickListener{
 					if (activity.checkisInsideParkingArea()) {
 						UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end, this,
 								 R.drawable.ic_letter_p, R.string.menu_park_mode_suspend, this,
-								 R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action, null,
-								 R.drawable.sel_button_back, this);
+								 R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+								 R.drawable.ic_arrow_left, this);
 					} else {
 						UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_outside_park_area, null,
 								 R.drawable.ic_letter_p, R.string.menu_park_mode_suspend, this,
-								 R.drawable.ic_letter_x_yellow, R.string.menu_cancel_action	, null,
-								 R.drawable.sel_button_back, this);
+								 R.drawable.ic_arrow_left, R.string.menu_cancel_action	, null,
+								 R.drawable.ic_arrow_left, this);
 					}
 					DLog.E("FMENU: illegal state reached on updateUIUsingAppValues: (Engine OFF, ParkMode NOT started, Park_ENDED)");
 					break;
@@ -639,6 +652,9 @@ public class FMenu extends FBase implements OnClickListener{
 		try {
 			if(getActivity()!=null)
 				((AMainOBC) this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(0));
+
+			if(App.isCloseable)
+				App.isCloseable = false;
 
 			(root.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
 			(root.findViewById(R.id.llSelfClose)).setOnClickListener(null);

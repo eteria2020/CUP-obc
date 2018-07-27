@@ -83,16 +83,16 @@
         
          <ImageButton
              android:id="@+id/fmenBackIB"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
+             android:layout_width="@dimen/side_square_big_icon"
+             android:layout_height="@dimen/side_square_big_icon"
              android:layout_alignParentBottom="true"
              android:layout_alignParentRight="true"
              android:layout_centerHorizontal="true"
              android:layout_gravity="center_vertical|center_horizontal"
              android:layout_marginBottom="15dp"
              android:layout_marginRight="15dp"
-             android:background="@null"
-             android:src="@drawable/sel_button_back"
+             android:background="@drawable/sel_button_white"
+             android:src="@drawable/ic_arrow_left"
              android:visibility="gone" />
         
     </RelativeLayout>

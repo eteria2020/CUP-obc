@@ -284,7 +284,7 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 			localHandler.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					((ABase)getActivity()).pushFragmentnoBack(FInstructions.newInstance(true), FInstructions.class.getName(), true, FPin.this);
+					((ABase)getActivity()).pushFragmentNoBack(FInstructions.newInstance(true), FInstructions.class.getName(), true, FPin.this);
 				}
 			}, 500);
 			

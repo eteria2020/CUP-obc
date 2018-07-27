@@ -262,7 +262,7 @@
 
             <Button
                 android:id="@+id/fmapCancelB"
-                android:layout_width="158dp"
+                android:layout_width="140dp"
                 android:layout_height="120dp"
                 android:layout_alignBottom="@+id/fmapSearchB"
                 android:layout_alignTop="@+id/fmapSearchB"
@@ -311,22 +311,36 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="55dp">
 
-            <Button
-                android:id="@+id/ODO"
+            <FrameLayout
                 android:layout_width="140dp"
                 android:layout_height="120dp"
-                android:layout_alignBottom="@+id/fmapSearchB"
-                android:layout_alignTop="@+id/fmapSearchB"
-                android:layout_gravity="center_vertical"
                 android:layout_marginLeft="25dp"
-                android:layout_toRightOf="@+id/fmapRadioB"
-                android:layout_weight="1"
+                android:layout_weight="1">
+            <Button
+                android:id="@+id/fmapDamagesIB"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:drawablePadding="2dp"
+                android:paddingTop="8dp"
+
                 android:background="@drawable/sel_button_nav_white"
+                android:drawableTop="@drawable/ic_car_damages"
                 android:textColor="@color/text_green"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:visibility="visible" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DANNI"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/text_green"
+                    android:layout_gravity="center_horizontal|bottom"
+                    android:layout_marginBottom="22dp"/>
+            </FrameLayout>
             <Button
                 android:id="@+id/fmapVideo"
                 android:layout_width="140dp"
@@ -352,7 +366,6 @@
                 android:layout_alignTop="@+id/fmapSearchB"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="25dp"
-                android:layout_toRightOf="@+id/fmapRadioB"
                 android:layout_weight="1"
                 android:background="@drawable/sel_button_libretto_menu"
                 android:text="@string/button_libretto"

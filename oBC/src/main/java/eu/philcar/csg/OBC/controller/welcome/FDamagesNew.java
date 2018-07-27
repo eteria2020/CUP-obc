@@ -269,7 +269,7 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
                         newDamagesLL.setVisibility(View.GONE);
                         callDealtLL.setVisibility(View.GONE);
 
-                        nextIB.setImageResource(R.drawable.sel_button_next);
+                        nextIB.setImageResource(R.drawable.ic_arrow_right);
                     } else if (newDamagesLL.getVisibility()==View.GONE) {
                         if (login) {
                             ((ABase)getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
@@ -319,7 +319,7 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
                 newDamagesLL.setVisibility(View.GONE);
                 callDealtLL.setVisibility(View.GONE);
 
-                nextIB.setImageResource(R.drawable.sel_button_next);
+                nextIB.setImageResource(R.drawable.ic_arrow_right);
 
                 break;
         }

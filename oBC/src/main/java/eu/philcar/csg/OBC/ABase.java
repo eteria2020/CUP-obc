@@ -237,7 +237,7 @@ public abstract class ABase extends Activity implements ServiceClient{
 	 * @param fragmentName The name associated with the transaction (e.g., [YourClassHere].class.getName()). If the back button won't be used, then this parameter will be removed before release but until then you should stick with it.
 	 * @param animated		Self-explanatory
 	 */
-	public void pushFragmentnoBack(FBase fragment, String fragmentName, boolean animated, FBase closingFragment) {
+	public void pushFragmentNoBack(FBase fragment, String fragmentName, boolean animated, FBase closingFragment) {
 
 		//getFragmentManager().popBackStack();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();

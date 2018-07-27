@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -107,7 +106,7 @@ public class FInstructions extends FBase {
 						startActivity(i);
 						getActivity().finish();
 					}else
-						((ABase)getActivity()).pushFragmentnoBack(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true,FInstructions.this);
+						((ABase)getActivity()).pushFragmentNoBack(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true,FInstructions.this);
 				} else {
 					((ABase)getActivity()).pushFragment(FGoodbye.newInstance(), FGoodbye.class.getName(), true);
 				}

@@ -1067,6 +1067,8 @@ public class TripInfo {
             DbManager dbm = App.Instance.dbManager;
             BusinessEmployees employees = dbm.getDipendentiDao();
             BusinessEmployee employee = employees.getBusinessEmployee(customer.id);
+            if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+                employee.isBusinessEnabled = true;
             if (!customer.isCompanyPinEnabled() || employee==null || !employee.isBusinessEnabled() || !employee.isWithinTimeLimits()) {
                 dlog.e("CheckPin : can't open business trip");
                 return false;

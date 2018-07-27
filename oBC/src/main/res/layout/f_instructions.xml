@@ -213,8 +213,16 @@
         
         
         <ImageButton android:id="@+id/finsNextIB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:layout_gravity="bottom|right" android:layout_marginBottom="25dp" android:layout_marginRight="10dp" android:src="@drawable/sel_button_next" android:contentDescription="@string/content_description" android:background="@null"/>
+            android:layout_width="@dimen/side_square_big_icon"
+            android:layout_height="@dimen/side_square_big_icon"
+			android:layout_alignParentBottom="true"
+			android:layout_alignParentRight="true"
+			android:layout_gravity="bottom|right"
+			android:layout_marginBottom="25dp"
+			android:layout_marginRight="10dp"
+			android:src="@drawable/ic_arrow_right"
+			android:contentDescription="@string/content_description"
+			android:background="@drawable/sel_button_white"/>
         
     </RelativeLayout>
     

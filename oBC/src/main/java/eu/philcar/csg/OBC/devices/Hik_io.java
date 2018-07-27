@@ -960,7 +960,8 @@ public class Hik_io implements LowLevelInterface {
 	            	return;
 				
 				Bundle b = new Bundle();
-				b.putString("VIN", carId);
+				//b.putString("VIN", carId);
+				mVehicleObserver.onVinCodeChange(carId);
 				String version;
 				if(data.contains("~")){
 						version = data.substring(0, data.indexOf("~"));
@@ -1023,7 +1024,7 @@ public class Hik_io implements LowLevelInterface {
 					 vin = vinCode.substring(0,vinCode.indexOf("~"));
 				 }
 
-				 if (vin.isEmpty() || vin.equalsIgnoreCase(""))
+				 if (vin.isEmpty() || vin.equalsIgnoreCase("") || vin.length()<7)
 					 return;
 
 		            Bundle b = new Bundle();

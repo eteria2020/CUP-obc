@@ -1,8 +1,12 @@
 package eu.philcar.csg.OBC.controller;
 
 import android.app.Fragment;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.View;
 
 import butterknife.Unbinder;
+import eu.philcar.csg.OBC.helpers.DLog;
 
 public abstract class FBase extends Fragment {
 
@@ -24,5 +28,11 @@ public abstract class FBase extends Fragment {
 		if(unbinder!=null){
 			//unbinder.unbind();
 		}
+	}
+
+	@Override
+	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		DLog.D("OnViewCreated " + this.getClass());
 	}
 }

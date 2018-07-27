@@ -13,6 +13,8 @@ import eu.philcar.csg.OBC.helpers.StubActivity;
 import eu.philcar.csg.OBC.service.MessageFactory;
 import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.ServiceConnector;
+
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -93,6 +95,7 @@ public class AGoodbye extends ABase {
 		this.sendMessage(MessageFactory.AudioChannel(mode, volume));
 	}
 	
+	@SuppressLint("HandlerLeak")
 	private  Handler serviceHandler = new Handler() {
 		 @Override
 		 public void handleMessage(Message msg) {

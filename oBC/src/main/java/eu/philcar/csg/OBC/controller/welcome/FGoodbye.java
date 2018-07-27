@@ -1,10 +1,13 @@
 package eu.philcar.csg.OBC.controller.welcome;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -36,8 +39,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AGoodbye;
+import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
@@ -278,12 +284,15 @@ public class FGoodbye extends FBase {
 				}
 			}
 		});
+		view.findViewById(R.id.cancelActionIB).setOnClickListener(this::undoCloseTrip);
 		String name = "";
 		if (App.currentTripInfo!=null && App.currentTripInfo.customer!=null) {
 			name = " " + App.currentTripInfo.customer.name + " " + App.currentTripInfo.customer.surname;
 		} else if (Debug.IGNORE_HARDWARE) {
 			name = "Gino Panino";
 		}
+		if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+			name = "Gino Panino cotto e rosa";
 		((TextView)view.findViewById(R.id.fgodGoodbyeTV)).setText(name);
 		
 		((AGoodbye)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
@@ -291,7 +300,7 @@ public class FGoodbye extends FBase {
 		final Activity activity =this.getActivity();
 		if(selfclose!=null)
 			selfclose.cancel();
-		selfclose = new CountDownTimer(26000,1000) {
+		selfclose = new CountDownTimer(40000,1000) {
 			@Override
 		     public void onTick(long millisUntilFinished) {
 		    	 ((TextView)view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished/1000)+ " s");
@@ -347,8 +356,8 @@ public class FGoodbye extends FBase {
 		else{
 			(view.findViewById(R.id.fgodTopTV)).setVisibility(View.VISIBLE);
 			((TextView)view.findViewById(R.id.fgodInstructionTV)).setText(R.string.goodbye_instructions);
-			((TextView)view.findViewById(R.id.fgodInstructionTV)).setTextSize(24f);
-			((TextView)view.findViewById(R.id.fgodTopTV)).setTextSize(35f);
+//			((TextView)view.findViewById(R.id.fgodInstructionTV)).setTextSize(24f);
+//			((TextView)view.findViewById(R.id.fgodTopTV)).setTextSize(30f);
 			(view.findViewById(R.id.fgodBonusLL)).setVisibility(View.GONE);
 
 			((TextView)view.findViewById(R.id.fgodBonusTV)).setText("");
@@ -369,6 +378,14 @@ public class FGoodbye extends FBase {
 	public boolean handleBackButton() {
 		
 		return true;
+	}
+
+	private void undoCloseTrip(View v){
+		App.isCloseable = false;
+		((ABase) getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(0));
+		startActivity(new Intent(getActivity(),AMainOBC.class));
+		getActivity().finish();
+
 	}
 
 	@Override

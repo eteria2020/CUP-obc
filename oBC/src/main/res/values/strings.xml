@@ -111,7 +111,7 @@
 
     <string name="push_to_cancel">Push to\ncancel</string>
 
-    <string name="goodbye_instructions">You can leave. The doors will automatically close it the time shown in the right.\n\nIf you change your mind let the doors close, and then open a new rent session</string>
+    <string name="goodbye_instructions">You have closed the trip, you can leave now. The doors will automatically close in: </string>
 
 
     <string name="menu_rent_end">End rent</string>

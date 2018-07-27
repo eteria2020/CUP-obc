@@ -594,7 +594,7 @@ public class App extends MultiDexApplication {
 	private static long		lastApiError = 0;
 	public static Date    lastNetworkOn = new Date();
 
-	public static Date    AppStartupTime = new Date(), AppScheduledReboot=new Date();
+	public static Date    AppStartupTime = new Date(), AppScheduledReboot=new Date(SystemClock.elapsedRealtime());
 	public static Date    lastUpdateCAN =new Date();
 
 	public static String APP_DATA_PATH = "/csg/";
@@ -1935,7 +1935,8 @@ private void  initPhase2() {
 	}
 	
 	public static boolean checkParkArea(double latitude, double longitude) {
-		
+//		if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+//			return false;
 		if (latitude==0 || longitude==0 || AreaPolygons == null) { 
 			return true;
 		}

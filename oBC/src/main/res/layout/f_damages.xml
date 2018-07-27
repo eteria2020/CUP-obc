@@ -146,7 +146,8 @@
     	    	android:layout_marginLeft="45dp"
                 android:orientation="horizontal" >
                 
-                <eu.philcar.csg.OBC.controller.welcome.VerticalSeekBar android:id="@+id/fdamDamageListSB"
+                <eu.philcar.csg.OBC.controller.welcome.VerticalSeekBar
+					android:id="@+id/fdamDamageListSB"
     				android:layout_width="wrap_content"
     				android:layout_height="match_parent"
     				android:progressDrawable="@drawable/red_scrubber_progress"
@@ -262,7 +263,7 @@
             	<Button android:id="@+id/fdamCallB"
 		           	android:layout_width="wrap_content"
             		android:layout_height="wrap_content"
-            	    android:layout_marginTop="25dp"
+            	    android:layout_margin="25dp"
             	    android:layout_gravity="center_horizontal"
             		android:text="@string/button_call"
             		android:textSize="46sp"
@@ -273,7 +274,8 @@
             	<Button android:id="@+id/fdamChangeNumberB"
 		           	android:layout_width="wrap_content"
             		android:layout_height="wrap_content"
-            	    android:layout_marginTop="25dp"
+            	    android:layout_margin="25dp"
+					android:padding="25dp"
             	    android:layout_gravity="center_horizontal"
             		android:text="@string/change"
             		android:textSize="46sp"

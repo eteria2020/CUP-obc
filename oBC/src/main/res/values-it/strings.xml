@@ -133,7 +133,7 @@
 
     <string name="push_to_cancel">Premi per\nannullare</string>
 
-    <string name="goodbye_instructions">Puoi scendere. Le porte si chiuderanno automaticamente nel tempo indicato sotto.\n\nSe cambiassi idea  esci, lascia chiudere le porte e apri una nuova sessione di noleggio</string>
+    <string name="goodbye_instructions">Hai chiuso la corsa, ora puoi scendere, le porte si chiuderanno automaticamente in:</string>
 
     <string name="milan">Milano</string>
     <string name="minutes_saved">Minuti guadagnati&#58;</string>
@@ -236,7 +236,7 @@
     <string name="alert_bonus_park">Da questo momento puoi guadagnare 5 minuti bonus lasciando l’auto da ricaricare in uno dei parcheggi indicati sul navigatore</string>
     <string name="music_hint">Collega il cavo AUX per ascoltare la musica dal tuo cellulare</string>
     <string name="pin_business">Hai usato il pin business</string>
-    <string name="menu_rent_end_key_on">Si prega di spegnere il quadro prima di poter terminare il noleggio</string>
+    <string name="menu_rent_end_key_on">Si prega di spegnere il quadro girando la chiave prima di terminare il noleggio</string>
     <string name="menu_park_mode_suspend_key_on">Si prega di spegnere il quadro prima di poter lasciare la macchina in sosta</string>
     <string name="button_video_tutorial">ISTRUZIONI</string>
     <string name="button_assicurazione">ASSICURAZIONE</string>
@@ -249,7 +249,7 @@
 
     <string name="call_error">Si è verificato un errore inoltrando la richiesta al servizio clienti, per piacere prova a chiamare: %s</string>
 
-    <string name="menu_cancel_action"><b>ANNULLA -</b> Permi per annullare</string>
+    <string name="menu_cancel_action"><b>ANNULLA</b> \n Permi per annullare</string>
 
     <string name="menu_rent_end_instruction">Il motore si spegnerà nel tempo indicato, per annullare clicca quì sotto</string>
 </resources>

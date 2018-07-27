@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +24,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.philcar.csg.OBC.ABase;
+import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.controller.welcome.FDamages;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
@@ -37,6 +42,7 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.ProTTS;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.CarInfo;
+import eu.philcar.csg.OBC.service.MessageFactory;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -58,6 +64,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -185,7 +192,7 @@ public class FHome extends FBase implements OnClickListener {
         ((Button) view.findViewById(R.id.fmapSOSB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapSearchB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapRadioB)).setOnClickListener(this);
-        ((Button) view.findViewById(R.id.ODO)).setOnClickListener(this); // momo debug
+         view.findViewById(R.id.fmapDamagesIB).setOnClickListener(this); // momo debug
         //((Button) view.findViewById(R.id.fmapFuelStationsB)).setOnClickListener(this); rimosso su richiesta mkt
         ((Button) view.findViewById(R.id.fmapCancelB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapParkB)).setOnClickListener(this);
@@ -362,8 +369,10 @@ public class FHome extends FBase implements OnClickListener {
         }
 
         //timer per aggiornamento advertisment
-
-        timer_2min = new CountDownTimer((120)*1000,1000) {
+        int second = 120;
+        if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+            second = 10;
+        timer_2min = new CountDownTimer((second)*1000,1000) {
             @Override
             public void onTick(long millisUntilFinished) {
 
@@ -552,8 +561,10 @@ public class FHome extends FBase implements OnClickListener {
 
                 break;
 
-            case R.id.ODO://Search
+            case R.id.fmapDamagesIB://Search
                 //((ABase) getActivity()).pushFragment(OptimizeDistanceCalc.newInstance(), OptimizeDistanceCalc.class.getName(), true);
+
+                ((ABase)getActivity()).pushFragment(FDamages.newInstance(false), FDamages.class.getName(), true);
 
                 break;
 
@@ -562,7 +573,12 @@ public class FHome extends FBase implements OnClickListener {
                 break;
 
             case R.id.fmapCancelB://End Trip
-                ((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_END_RENT), FMenu.class.getName(), true);
+                //((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_END_RENT), FMenu.class.getName(), true);
+                if (((AMainOBC)getActivity()).checkisInsideParkingArea() && !( CarInfo.getKeyStatus() != null && !CarInfo.getKeyStatus().equalsIgnoreCase("OFF") && App.checkKeyOff)) {
+                    closeTrip();
+                }
+                else
+                    ((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_END_RENT), FMenu.class.getName(), true);
                 break;
 
             case R.id.fmapParkB://End Trip
@@ -643,6 +659,33 @@ public class FHome extends FBase implements OnClickListener {
 
                 break;
         }
+    }
+
+    private void closeTrip(){
+        AMainOBC activity = (AMainOBC)getActivity();
+        if (activity!=null && activity.checkisInsideParkingArea()) {
+            eventRepository.menuclick("END RENT");
+            resetBanner();
+            dlog.d("Banner: end rent stopping update, start countdown");
+            //((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(false));
+
+            Intent i = new Intent(getActivity(), AGoodbye.class);
+            i.putExtra(AGoodbye.EUTHANASIA, false);
+
+            startActivity(i);
+            ((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
+            getActivity().finish();
+        }
+    }
+
+    private void resetBanner(){
+        try {
+            FHome.timer_2min.cancel();
+            FHome.timer_5sec.cancel();
+        }catch (Exception e){
+            dlog.e("Exeption while park",e);
+        }
+        FHome.firstRun=true;
     }
 
 /**
@@ -1021,6 +1064,8 @@ public class FHome extends FBase implements OnClickListener {
 
 
             if (App.currentTripInfo != null && App.currentTripInfo.customer != null)
+                if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+                    paramsList.add(new BasicNameValuePair("id", "26740"));// App.currentTripInfo.customer.id + "")); //"3"));
                 paramsList.add(new BasicNameValuePair("id",App.currentTripInfo.customer.id + ""));// App.currentTripInfo.customer.id + "")); //"3"));
 
             if (App.lastLocation != null) {
@@ -1099,7 +1144,7 @@ public class FHome extends FBase implements OnClickListener {
             App.Instance.BannerName.putBundle(type,Image);
 
             //ricavo nome file
-            URL urlImg = new URL(Image.getString("URL"));
+            URL urlImg = new URL(Image.getString("URL").replace(" ","%20"));
             String extension = urlImg.getFile().substring(urlImg.getFile().lastIndexOf('.') + 1);
             String filename = Image.getString("ID").concat(".").concat(extension);
 

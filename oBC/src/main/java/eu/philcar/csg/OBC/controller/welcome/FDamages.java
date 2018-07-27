@@ -180,7 +180,8 @@ public class FDamages extends FBase implements OnClickListener, OnSeekBarChangeL
 			dlog.d("FDamages fdamAlternativeNoB click : ");
 			secondLL.setVisibility(View.INVISIBLE);
 			//getActivity().finish();
-			((ABase)getActivity()).pushBackFragment(FMenu.newInstance(), FMenu.class.getName(), true);
+			((ABase)getActivity()).popFragment();
+			//((ABase)getActivity()).pushBackFragment(FMenu.newInstance(), FMenu.class.getName(), true);
 			
 			break;
 		
@@ -192,7 +193,8 @@ public class FDamages extends FBase implements OnClickListener, OnSeekBarChangeL
 				((ABase)getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
 			} else {
 
-				((ABase)getActivity()).pushBackFragment(FMenu.newInstance(), FMenu.class.getName(), true);
+				((ABase)getActivity()).popFragment();
+				//((ABase)getActivity()).pushBackFragment(FMenu.newInstance(), FMenu.class.getName(), true);
 				//getActivity().finish();
 			}
 			
@@ -216,13 +218,14 @@ public class FDamages extends FBase implements OnClickListener, OnSeekBarChangeL
 					questionLL.setVisibility(View.GONE);
 					newDamagesLL.setVisibility(View.GONE);
 					callDealtLL.setVisibility(View.GONE);
-					
-					nextIB.setImageResource(R.drawable.sel_button_next);
+					nextIB.setImageResource(R.drawable.ic_arrow_right);
+					((ABase)getActivity()).popFragment();
 				} else if (newDamagesLL.getVisibility()==View.GONE) { 
 					if (login) {
 						((ABase)getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
 					} else {
-						((ABase)getActivity()).pushFragment(FMenu.newInstance(), FMenu.class.getName(), true);
+						((ABase)getActivity()).popFragment();
+						//((ABase)getActivity()).pushFragment(FMenu.newInstance(), FMenu.class.getName(), true);
 					}
 				} else {
 					editMode = false;
@@ -233,7 +236,9 @@ public class FDamages extends FBase implements OnClickListener, OnSeekBarChangeL
 				if (login) {
 					((ABase)getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
 				} else {
-					((ABase)getActivity()).pushFragment(FMenu.newInstance(), FMenu.class.getName(), true);
+
+					((ABase)getActivity()).popFragment();
+					//((ABase)getActivity()).pushFragment(FMenu.newInstance(), FMenu.class.getName(), true);
 				}
 			}
 			break;
@@ -257,7 +262,6 @@ public class FDamages extends FBase implements OnClickListener, OnSeekBarChangeL
 			questionLL.setVisibility(View.GONE);
 			newDamagesLL.setVisibility(View.GONE);
 			callDealtLL.setVisibility(View.VISIBLE);
-						
 			break;
 			
 		case R.id.fdam_call_reserved_close_B:
@@ -265,8 +269,9 @@ public class FDamages extends FBase implements OnClickListener, OnSeekBarChangeL
 			questionLL.setVisibility(View.GONE);
 			newDamagesLL.setVisibility(View.GONE);
 			callDealtLL.setVisibility(View.GONE);
-			
-			nextIB.setImageResource(R.drawable.sel_button_next);
+
+			nextIB.setImageResource(R.drawable.ic_arrow_right);
+			((ABase)getActivity()).popFragment();
 			
 			break;
 		}
@@ -276,6 +281,7 @@ public class FDamages extends FBase implements OnClickListener, OnSeekBarChangeL
 		
 		if (editMode) {
 			questionLL.setVisibility(View.GONE);
+			questionLL.postInvalidate();
 			newDamagesLL.setVisibility(View.VISIBLE);
 			callDealtLL.setVisibility(View.GONE);
 			

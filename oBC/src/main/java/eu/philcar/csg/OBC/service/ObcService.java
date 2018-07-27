@@ -2398,7 +2398,7 @@ public class ObcService extends Service implements OnTripCallback {
                 localHandler.sendMessage(MessageFactory.zmqRestart());
                 App.canRestartZMQ=true;
             //}
-            if(App.currentTripInfo==null && System.currentTimeMillis()- App.AppScheduledReboot.getTime()>24*60*60*1000 && !startedReboot){
+            if(App.currentTripInfo==null && SystemClock.elapsedRealtime()- App.AppScheduledReboot.getTime()>24*60*60*1000 && !startedReboot){
                 startedReboot=true;
                 if(App.reservation!=null) {
                     if (!App.reservation.isMaintenance()) {
