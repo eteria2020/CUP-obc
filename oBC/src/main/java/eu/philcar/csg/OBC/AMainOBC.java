@@ -31,7 +31,6 @@ import eu.philcar.csg.OBC.service.AdvertisementService;
 import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.service.MessageFactory;
 import eu.philcar.csg.OBC.service.ObcService;
-import eu.philcar.csg.OBC.service.ParkMode;
 import eu.philcar.csg.OBC.service.ServiceConnector;
 import eu.philcar.csg.OBC.task.OdoController;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
@@ -149,8 +148,8 @@ public class AMainOBC extends ABase implements LocationListener {
 //		if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
 //			inside = false;
 		try{
-		if (App.lastLocation!=null)
-		 	inside = App.checkParkArea(App.lastLocation.getLatitude(), App.lastLocation.getLongitude());
+		if (App.getLastLocation() !=null)
+		 	inside = App.checkParkArea(App.getLastLocation().getLatitude(), App.getLastLocation().getLongitude());
 		}catch(Exception e){
 			dlog.e("Exception while checking inside area ",e);
 		}
@@ -211,8 +210,8 @@ public class AMainOBC extends ABase implements LocationListener {
 			}
 		}*/
 
-		if (App.lastLocation!=null)
-			currentPosition = App.lastLocation;
+		if (App.getLastLocation() !=null)
+			currentPosition = App.getLastLocation();
 		else
 			currentPosition = new Location("");
 
@@ -379,8 +378,8 @@ public class AMainOBC extends ABase implements LocationListener {
 
 		Location pll = null;
 
-	    if (App.lastLocation!=null && App.lastLocation.getLatitude()!=0 && App.lastLocation.getLatitude()!=0) {
-	     pll = App.lastLocation;
+	    if (App.getLastLocation() !=null && App.getLastLocation().getLatitude()!=0 && App.getLastLocation().getLatitude()!=0) {
+	     pll = App.getLastLocation();
 	    }
 
 		for(Poi p : list) {

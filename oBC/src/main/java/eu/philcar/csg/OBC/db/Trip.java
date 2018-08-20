@@ -3,6 +3,7 @@ package eu.philcar.csg.OBC.db;
 import android.location.Location;
 
 import java.util.Date;
+import java.util.Locale;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -120,7 +121,7 @@ public class Trip  extends DbRecord<TripResponse> {
 	}
 
 	public String toString() {
-			return String.format("Trip { Id:%d , RId:%d  Tms begin:%d , Tms end:%d  TX 1 : %b , TX 2  : %b , n_pin : %d , id_parent : %d }", id,remote_id,begin_timestamp, end_timestamp, begin_sent, end_sent,n_pin, id_parent);
+			return String.format(Locale.getDefault(),"Trip { Id:%d ,CustomerId: %d , RId:%d  Tms begin:%d , Tms end:%d  TX 1 : %b , TX 2  : %b , n_pin : %d , id_parent : %d }", id,id_customer,remote_id,begin_timestamp, end_timestamp, begin_sent, end_sent,n_pin, id_parent);
 		}
 		
 		public long getMinutiDurata() {

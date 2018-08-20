@@ -10,11 +10,13 @@ public class TripResponse extends BaseResponse {
     private int result;
     private String message;
     private String extra;
+    private boolean preauthDone;
 
-    public TripResponse(int result, String message, String extra) {
+    public TripResponse(int result, String message, String extra, boolean preauthDone) {
         this.result = result;
         this.message = message;
         this.extra = extra;
+        this.preauthDone = preauthDone;
     }
 
     public int getResult() {
@@ -39,5 +41,13 @@ public class TripResponse extends BaseResponse {
 
     public void setExtra(String extra) {
         this.extra = extra;
+    }
+
+    public boolean isPreauthDone() {
+        return preauthDone;
+    }
+
+    public void setPreauthDone(boolean preauthDone) {
+        this.preauthDone = preauthDone;
     }
 }

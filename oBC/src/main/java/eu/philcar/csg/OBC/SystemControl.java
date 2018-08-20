@@ -196,6 +196,7 @@ public class SystemControl {
 		@Override
 		public void run() {
 			dlog.d("Begin restart 3G");
+			dlog.cr("Inizio restart No3g mod aereo");
 			Runtime rt = Runtime.getRuntime();
 			try {
 				rt.exec(new String[]{"/system/xbin/su","-c", "settings put global airplane_mode_on 1"});
@@ -207,6 +208,7 @@ public class SystemControl {
 				Thread.sleep(2000);
 				rt.exec(new String[]{"/system/xbin/su","-c", "am broadcast -a android.intent.action.AIRPLANE_MODE --ez state true"});
 				dlog.d("...Enabled 3G");
+				dlog.cr("Fine restart No3g mod aereo");
 			} catch (IOException | InterruptedException e) {
 				dlog.e("Restarting 3G",e);				
 			}
@@ -325,11 +327,12 @@ public class SystemControl {
 			e.printStackTrace();
 		}
 	}
-	public static void doReboot() {
+	public static void doReboot(String label) {
 		//If there is another reboot in progress not older than 6 hour : ignore
 
 		if (System.currentTimeMillis() - rebootInProgress>21600000) {
 
+			dlog.cr("Eseguo reboot per " + label);
 			//Events.Reboot("No 3G Reboot");
 			Thread th = new Thread(new Reboot());
 			th.start();
@@ -337,6 +340,7 @@ public class SystemControl {
 			if(System.currentTimeMillis() - rebootInProgress<0 && System.currentTimeMillis()-App.AppStartupTime.getTime()>3600000) { //if time is 01/01/2000 reboot every hour
 
 				//Events.Reboot("No 3G Reboot");
+				dlog.cr("Eseguo reboot per " + label);
 				Thread th = new Thread(new Reboot());
 				th.start();
 			}

@@ -21,7 +21,6 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.controller.map.FRadio;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
-import eu.philcar.csg.OBC.data.common.ExcludeSerialization;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
@@ -38,12 +37,10 @@ import eu.philcar.csg.OBC.helpers.CardRfid;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import io.reactivex.Observable;
-import eu.philcar.csg.OBC.server.ReservationConnector;
 import eu.philcar.csg.OBC.task.OdoController;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -250,6 +247,7 @@ public class TripInfo {
         Customers customers = dbm.getClientiDao();
         Customer customer = customers.getClienteByCardCode(code);
 
+
         // If the Card is unknown, send a visual alert and do nothing
         if (customer==null) {
             if(App.reservation!=null && App.reservation.getCustomer_id()!=null){
@@ -280,6 +278,8 @@ public class TripInfo {
         }
 
         customer.decrypt();
+
+        DLog.CR("Ricevuto codice RFID appartenente a: " + customer.toString());
 
         dlog.d(TripInfo.class.toString()+" handleCard: Card :  N." + customer.id + " " + customer.name + " " + customer.surname);
 
@@ -524,9 +524,9 @@ public class TripInfo {
             if (App.currentTripInfo != null && App.currentTripInfo.customer != null)
                 paramsList.add(new BasicNameValuePair("id", App.currentTripInfo.customer.id + ""));//App.currentTripInfo.customer.id + "")); //"3"));
 
-            if (App.lastLocation != null) {
-                paramsList.add(new BasicNameValuePair("lat", App.lastLocation.getLatitude() + ""));
-                paramsList.add(new BasicNameValuePair("lon", App.lastLocation.getLongitude() + ""));
+            if (App.getLastLocation() != null) {
+                paramsList.add(new BasicNameValuePair("lat", App.getLastLocation().getLatitude() + ""));
+                paramsList.add(new BasicNameValuePair("lon", App.getLastLocation().getLongitude() + ""));
             }
             paramsList.add(new BasicNameValuePair("id_fleet", App.FleetId + ""));
             paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));//"ED93107"));//App.CarPlate));
@@ -685,7 +685,7 @@ public class TripInfo {
         trip.begin_battery = App.fuel_level;
         trip.begin_km = km;
 //        Trip trip = new Trip(this.customer.id,App.CarPlate,new Date(), DbManager.getTimestamp(), App.fuel_level, km);
-        trip.setBeginLocation(App.lastLocation);
+        trip.setBeginLocation(App.getLastLocation());
 
         return trip;
     }
@@ -709,9 +709,9 @@ public class TripInfo {
                     if(service!=null)
                         service.onTripResult(TripInfo.this);
 
+                    dlog.cr("Aperta nuova corsa: " + trip.toString());
                     obc_io.setLcd(null, " Auto in uso");
-                    obc_io.setDoors(null, 1,customer.info_display);  //Sole se trip registrata su db apri le portiere
-                    //obc_io.setEngine(null, 1); //TODO: RIMUOVERE!!!! Il motore si dovr? abilitare solo dopo il check del pin
+                    obc_io.setDoors(null, 1,customer.info_display);
                     obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
                     obc_io.setTag(null,cardCode);
 
@@ -905,6 +905,7 @@ public class TripInfo {
                 .delay(50,TimeUnit.MILLISECONDS)
                 .map(n ->{
                     cardCode="";
+                    dlog.cr("Chiusa corsa: "+trip.toString());
                     obc_io.setLcd(null, "   Auto Libera");
                     obc_io.setDoors(null, 0,"ARRIVEDERCI");
                     obc_io.setEngine(null, 0);
@@ -996,6 +997,7 @@ public class TripInfo {
 
         if (mode==1 && App.getParkModeStarted()==null) {
             dlog.d("Starting park mode");
+            dlog.cr("Inizio sosta su trip:" + trip.toString());
             App.Instance.setParkModeStarted(new Date());
             App.Instance.persistParkModeStarted();
             rmsg.arg1 = 1;
@@ -1003,6 +1005,7 @@ public class TripInfo {
         } else if (mode == 0 && App.getParkModeStarted() != null) {
             OptimizeDistanceCalc.resume();
             dlog.d("Stopping park mode");
+            dlog.cr("Fine sosta su trip:" + trip.toString());
             long diff = (new Date()).getTime() - App.getParkModeStarted().getTime();
             if (hasBeenStopped) {
                 trip.park_seconds += diff/1000;
@@ -1062,6 +1065,7 @@ public class TripInfo {
 
         int n_pin = customer.checkPin(pin);
         dlog.d("CheckPin : "+n_pin);
+        dlog.cr("Inserito pin corretto, tipo: "+n_pin);
 
         if (n_pin == Customer.N_COMPANY_PIN) {
             DbManager dbm = App.Instance.dbManager;

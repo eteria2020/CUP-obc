@@ -14,6 +14,7 @@ public class DLog
 {
     private static final String LOGTAG = "OBC";
     private static final Logger Log4j = LoggerFactory.getLogger("OBC");
+    private static final Logger LogCr = LoggerFactory.getLogger("ControlRoom");
 
     /** Logging functions to generate ADB logcat messages. */
 
@@ -45,6 +46,12 @@ public class DLog
         Log.i(LOGTAG, nMessage);
         if(App.saveLog)
         Log4j.info(nMessage);
+    }
+
+    public static final void CR(String nMessage) {
+        Log.d("ControlRoom", nMessage);
+        if(App.saveLog)
+            LogCr.debug(nMessage);
     }
 
 
@@ -87,7 +94,11 @@ public class DLog
     }
 
 
-
+    public final void cr(String nMessage) {
+        Log.d("ControlRoom", nMessage);
+        if(App.saveLog)
+            LogCr.debug(nMessage);
+    }
 
 
 }

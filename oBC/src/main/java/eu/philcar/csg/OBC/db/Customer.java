@@ -206,6 +206,24 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 		return info_display.compareTo("sharengo")==0;
 	}
 
+	@Override
+	public String toString() {
+		return "Customer{" +
+				"id=" + id +
+				", name='" + name + '\'' +
+				", surname='" + surname + '\'' +
+				", language='" + language + '\'' +
+				", mobile='" + mobile + '\'' +
+				", enabled=" + enabled +
+				", info_display='" + info_display + '\'' +
+				", pin='" + pin + '\'' +
+				", card_code='" + card_code + '\'' +
+				", update_timestamp=" + update_timestamp +
+				", pins=" + pins +
+				", isEnctypted=" + isEnctypted +
+				'}';
+	}
+
 	public boolean isCompanyPinEnabled() {
 		try {
 			JSONObject pinJson = new JSONObject(pin);

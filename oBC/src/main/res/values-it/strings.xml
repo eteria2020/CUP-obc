@@ -110,7 +110,7 @@
 
     <string name="menu_rent_end"><b>TERMINA NOLEGGIO</b> - <u>Prima</u> controlla di non lasciare cose a bordo, togli le tue cose dal bagagliaio, chiudi luci e finestrini e spegni il quadro girando la chiave</string>
     <string name="menu_rent_end_off"><b>TERMINA NOLEGGIO</b> - <u>Prima</u> controlla di non lasciare cose a bordo, togli le tue cose dal bagagliaio, chiudi luci e finestrini e spegni il quadro girando la chiave(disabilitato)</string>
-    <string name="menu_rent_end_outside_park_area"><b>TERMINA NOLEGGIO</b> - Non disponibile: sei al di fuori dell’area di parcheggio. Rientra nell’area autorizzata per chiudere la corsa.</string>
+    <string name="menu_rent_end_outside_park_area"><b>FUORI AREA</b> - Impossibile terminare la corsa: sei al di fuori dell’area di parcheggio. Rientra nell’area autorizzata per chiudere la corsa.</string>
     <string name="menu_rent_end_shutdown_engine"><b>TERMINA NOLEGGIO</b> - <u>Prima</u> controlla di non lasciare cose a bordo, togli le tue cose dal bagagliaio, chiudi luci e finestrini e spegni il quadro girando la chiave(spegni prima il motore)</string>
 
     <string name="inside_area">Interno</string>

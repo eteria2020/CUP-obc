@@ -1677,9 +1677,9 @@ public class FMap extends FBase implements OnClickListener {
 	private void resetMapSettings() {
     	SKCoordinate currentPoint = new SKCoordinate(12.9788f, 45.9559f);
 
-        if (App.lastLocation!=null && App.lastLocation.getLatitude()!=0 && App.lastLocation.getLongitude()!=0) {
-        	currentPoint.setLatitude(App.lastLocation.getLatitude());
-        	currentPoint.setLongitude(App.lastLocation.getLongitude());
+        if (App.getLastLocation() !=null && App.getLastLocation().getLatitude()!=0 && App.getLastLocation().getLongitude()!=0) {
+        	currentPoint.setLatitude(App.getLastLocation().getLatitude());
+        	currentPoint.setLongitude(App.getLastLocation().getLongitude());
         }
 
 
@@ -1707,9 +1707,9 @@ public class FMap extends FBase implements OnClickListener {
 	private void initMapSettings() {
 		SKCoordinate currentPoint = new SKCoordinate(12.9788f, 45.9559f);
 
-		if (App.lastLocation!=null && App.lastLocation.getLatitude()!=0 && App.lastLocation.getLongitude()!=0) {
-			currentPoint.setLatitude(App.lastLocation.getLatitude());
-			currentPoint.setLongitude(App.lastLocation.getLongitude());
+		if (App.getLastLocation() !=null && App.getLastLocation().getLatitude()!=0 && App.getLastLocation().getLongitude()!=0) {
+			currentPoint.setLatitude(App.getLastLocation().getLatitude());
+			currentPoint.setLongitude(App.getLastLocation().getLongitude());
 		}
 
 
@@ -2408,6 +2408,7 @@ public class FMap extends FBase implements OnClickListener {
 					case MSG_CLOSE_SOC_ALERT:
 
 						localHandler.removeMessages(MSG_CLOSE_SOC_ALERT);
+						dlog.cr("Chiusura alert SOC");
 						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
 						//rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
 						break;
@@ -3312,9 +3313,9 @@ public class FMap extends FBase implements OnClickListener {
 			if (App.currentTripInfo != null && App.currentTripInfo.customer != null)
 				paramsList.add(new BasicNameValuePair("id", App.currentTripInfo.customer.id + ""));//App.currentTripInfo.customer.id + "")); //"3"));
 
-			if (App.lastLocation != null) {
-				paramsList.add(new BasicNameValuePair("lat", App.lastLocation.getLatitude() + ""));
-				paramsList.add(new BasicNameValuePair("lon", App.lastLocation.getLongitude() + ""));
+			if (App.getLastLocation() != null) {
+				paramsList.add(new BasicNameValuePair("lat", App.getLastLocation().getLatitude() + ""));
+				paramsList.add(new BasicNameValuePair("lon", App.getLastLocation().getLongitude() + ""));
 			}
 			paramsList.add(new BasicNameValuePair("id_fleet", App.FleetId + ""));
 			paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));//"ED93107"));//App.CarPlate));
@@ -3662,6 +3663,7 @@ public class FMap extends FBase implements OnClickListener {
 			}
 			player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ resID));
 			dlog.d("playAlertAdvice: play " +name);
+			dlog.cr("Riproduco avviso vocale: play " +name);
 
 		}catch (Exception e){
 			dlog.e("playAlertAdvice exception while start speak",e);

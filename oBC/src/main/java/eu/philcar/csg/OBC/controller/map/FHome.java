@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +62,6 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -574,7 +571,7 @@ public class FHome extends FBase implements OnClickListener {
 
             case R.id.fmapCancelB://End Trip
                 //((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_END_RENT), FMenu.class.getName(), true);
-                if (((AMainOBC)getActivity()).checkisInsideParkingArea() && !( CarInfo.getKeyStatus() != null && !CarInfo.getKeyStatus().equalsIgnoreCase("OFF") && App.checkKeyOff)) {
+                if (App.checkKeyOff &&(((AMainOBC)getActivity()).checkisInsideParkingArea() && !CarInfo.isKeyOn())) {
                     closeTrip();
                 }
                 else
@@ -769,7 +766,7 @@ public class FHome extends FBase implements OnClickListener {
                 if(SOC<15) {
 
                     if (statusAlertSOC <= 1) {
-                        dlog.d("Display popup 5km");
+                        dlog.cr("Display popup 5km");
                         statusAlertSOC = 2;
                         eventRepository.eventSoc(SOC, "Popup 5km");
                         rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
@@ -787,7 +784,7 @@ public class FHome extends FBase implements OnClickListener {
                 }else
                 if(SOC<=30) {
                     if (statusAlertSOC <= 0) {
-                        dlog.d("Display popup 20km");
+                        dlog.cr("Display popup 20km");
 
                         statusAlertSOC = 1;
                         eventRepository.eventSoc(SOC, "Popup 20km");
@@ -981,6 +978,7 @@ public class FHome extends FBase implements OnClickListener {
                 case MSG_CLOSE_SOC_ALERT:
 
                     localHandler.removeMessages(MSG_CLOSE_SOC_ALERT);
+                    dlog.cr("Chiusura alert SOC");
                     rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
                     //rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
                     break;
@@ -1045,156 +1043,151 @@ public class FHome extends FBase implements OnClickListener {
  * After Put the ID inside the App variable to share the current banner
  * */
     private void loadBanner(String Url, String type, Boolean isClick) {
-
-        File outDir = new File(App.getBannerImagesFolder());
-        if (!outDir.isDirectory()) {
-            outDir.mkdir();
-        }
-
-
-
-        if (!App.hasNetworkConnection()) {
-            dlog.e(FHome.class.toString()+" loadBanner: nessuna connessione");
-            App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
-            return;
-        }
-        StringBuilder  builder = new StringBuilder();
-        List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
-        if(!isClick) {
-
-
-            if (App.currentTripInfo != null && App.currentTripInfo.customer != null)
-                if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
-                    paramsList.add(new BasicNameValuePair("id", "26740"));// App.currentTripInfo.customer.id + "")); //"3"));
-                paramsList.add(new BasicNameValuePair("id",App.currentTripInfo.customer.id + ""));// App.currentTripInfo.customer.id + "")); //"3"));
-
-            if (App.lastLocation != null) {
-                paramsList.add(new BasicNameValuePair("lat", App.lastLocation.getLatitude() + ""));
-                paramsList.add(new BasicNameValuePair("lon", App.lastLocation.getLongitude() + ""));
-            }
-            paramsList.add(new BasicNameValuePair("id_fleet", App.FleetId + ""));
-            paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));
-        }
         try {
-            if (App.BannerName.getBundle(type) != null )
-                paramsList.add(new BasicNameValuePair("index", App.Instance.BannerName.getBundle(type).getString("INDEX",null)));
 
+            File outDir = new File(App.getBannerImagesFolder());
+            if (!outDir.isDirectory()) {
+                outDir.mkdir();
+            }
 
+            if (!App.hasNetworkConnection()) {
+                dlog.e(FHome.class.toString() + " loadBanner: nessuna connessione");
+                App.Instance.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+                return;
+            }
+            StringBuilder builder = new StringBuilder();
+            List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
+            if (!isClick) {
 
-            Url= UrlTools.buildQuery(Url.concat("?"),paramsList).toString();
-            //connessione per scaricare id immagine
+                if (App.currentTripInfo != null && App.currentTripInfo.customer != null)
+                    if (BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+                        paramsList.add(new BasicNameValuePair("id", "26740"));// App.currentTripInfo.customer.id + "")); //"3"));
+                paramsList.add(new BasicNameValuePair("id", App.currentTripInfo.customer.id + ""));// App.currentTripInfo.customer.id + "")); //"3"));
 
-            HttpClient client = new DefaultHttpClient();
-            HttpGet httpGet = new HttpGet(Url);
-
-            HttpResponse response = client.execute(httpGet);
-            DLog.D(FHome.class.toString()+" loadBanner: Url richiesta "+Url);
-            StatusLine statusLine = response.getStatusLine();
-            int statusCode = statusLine.getStatusCode();
-            if (statusCode == 200) {
-                //App.update_StartImages = new Date();
-                HttpEntity entity = response.getEntity();
-                InputStream content = entity.getContent();
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(content));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line);
+                if (App.getLastLocation() != null) {
+                    paramsList.add(new BasicNameValuePair("lat", App.getLastLocation().getLatitude() + ""));
+                    paramsList.add(new BasicNameValuePair("lon", App.getLastLocation().getLongitude() + ""));
                 }
-                content.close();
-                reader.close();
-                reader.close();
-            } else {
+                paramsList.add(new BasicNameValuePair("id_fleet", App.FleetId + ""));
+                paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));
+            }
+            try {
+                if (App.BannerName.getBundle(type) != null)
+                    paramsList.add(new BasicNameValuePair("index", App.Instance.BannerName.getBundle(type).getString("INDEX", null)));
 
-                dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode));
-                App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+                Url = UrlTools.buildQuery(Url.concat("?"), paramsList).toString();
+                //connessione per scaricare id immagine
+
+                HttpClient client = new DefaultHttpClient();
+                HttpGet httpGet = new HttpGet(Url);
+
+                HttpResponse response = client.execute(httpGet);
+                DLog.D(FHome.class.toString() + " loadBanner: Url richiesta " + Url);
+                StatusLine statusLine = response.getStatusLine();
+                int statusCode = statusLine.getStatusCode();
+                if (statusCode == 200) {
+                    //App.update_StartImages = new Date();
+                    HttpEntity entity = response.getEntity();
+                    InputStream content = entity.getContent();
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(content));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        builder.append(line);
+                    }
+                    content.close();
+                    reader.close();
+                    reader.close();
+                } else {
+
+                    dlog.e(" loadBanner: Failed to connect " + String.valueOf(statusCode));
+                    App.Instance.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+                    return;
+                }
+            } catch (Exception e) {
+                dlog.e(" loadBanner: eccezione in connessione ", e);
+                App.Instance.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
                 return;
             }
-        }catch (Exception e){
-            dlog.e(" loadBanner: eccezione in connessione ",e);
-            App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
-            return;
-        }
-        String jsonStr = builder.toString();
-        if(jsonStr.compareTo("")==0){
-            dlog.e(" loadBanner: nessuna connessione");
-            App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
-            return;
-        }
-
-        DLog.D(FHome.class.toString()+" loadBanner: risposta "+jsonStr);
-        File file = new File(outDir, "placeholder.lol");
-
-        try {
-            JSONObject json = new JSONObject(jsonStr);
-
-            //Get the instance of JSONArray that contains JSONObjects
-            JSONArray jsonArray = json.optJSONArray("Image");
-
-            //Iterate the jsonArray and print the info of JSONObjects
-
-            Bundle Image = new Bundle();
-            JSONObject jsonObject = jsonArray.getJSONObject(0);
-
-            Image.putString("ID",jsonObject.getString("ID"));
-            Image.putString("URL",jsonObject.getString("URL"));
-            Image.putString(("CLICK"),jsonObject.getString("CLICK"));
-            Image.putString(("INDEX"),jsonObject.getString("INDEX"));
-
-            App.Instance.BannerName.putBundle(type,Image);
-
-            //ricavo nome file
-            URL urlImg = new URL(Image.getString("URL").replace(" ","%20"));
-            String extension = urlImg.getFile().substring(urlImg.getFile().lastIndexOf('.') + 1);
-            String filename = Image.getString("ID").concat(".").concat(extension);
-
-            //download imagine se non esiste
-            file = new File(outDir, filename);
-
-            if(file.exists()){
-                Image.putString(("FILENAME"),filename);
-                App.Instance.BannerName.putBundle(type,Image);
-                dlog.i(FHome.class.toString()+" loadBanner: file già esistente: "+filename);
+            String jsonStr = builder.toString();
+            if (jsonStr.compareTo("") == 0) {
+                dlog.e(" loadBanner: nessuna connessione");
+                App.Instance.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
                 return;
             }
 
+            DLog.D(FHome.class.toString() + " loadBanner: risposta " + jsonStr);
+            File file = new File(outDir, "placeholder.lol");
 
-            dlog.i(FHome.class.toString()+" loadBanner: file mancante inizio download a url: "+urlImg.toString());
-            HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setDoOutput(true);
-            urlConnection.connect();
-            if (file.createNewFile()) {
-                file.createNewFile();
+            try {
+                JSONObject json = new JSONObject(jsonStr);
+
+                //Get the instance of JSONArray that contains JSONObjects
+                JSONArray jsonArray = json.optJSONArray("Image");
+
+                //Iterate the jsonArray and print the info of JSONObjects
+
+                Bundle Image = new Bundle();
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+
+                Image.putString("ID", jsonObject.getString("ID"));
+                Image.putString("URL", jsonObject.getString("URL"));
+                Image.putString(("CLICK"), jsonObject.getString("CLICK"));
+                Image.putString(("INDEX"), jsonObject.getString("INDEX"));
+
+                App.Instance.BannerName.putBundle(type, Image);
+
+                //ricavo nome file
+                URL urlImg = new URL(Image.getString("URL").replace(" ", "%20"));
+                String extension = urlImg.getFile().substring(urlImg.getFile().lastIndexOf('.') + 1);
+                String filename = Image.getString("ID").concat(".").concat(extension);
+
+                //download imagine se non esiste
+                file = new File(outDir, filename);
+
+                if (file.exists()) {
+                    Image.putString(("FILENAME"), filename);
+                    App.Instance.BannerName.putBundle(type, Image);
+                    dlog.i(FHome.class.toString() + " loadBanner: file già esistente: " + filename);
+                    return;
+                }
+
+                dlog.i(FHome.class.toString() + " loadBanner: file mancante inizio download a url: " + urlImg.toString());
+                HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setDoOutput(true);
+                urlConnection.connect();
+                if (file.createNewFile()) {
+                    file.createNewFile();
+                }
+                FileOutputStream fileOutput = new FileOutputStream(file);
+                InputStream inputStream = urlConnection.getInputStream();
+                int totalSize = urlConnection.getContentLength();
+                int downloadedSize = 0;
+                byte[] buffer = new byte[1024];
+                int bufferLength = 0;
+                while ((bufferLength = inputStream.read(buffer)) > 0) {
+                    fileOutput.write(buffer, 0, bufferLength);
+                    //downloadedSize += bufferLength;
+                    //Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
+                }
+                fileOutput.close();
+                inputStream.close();
+                Image.putString(("FILENAME"), filename);
+                App.Instance.BannerName.putBundle(type, Image);
+                dlog.i(FHome.class.toString() + " loadBanner: File scaricato e creato " + filename);
+                urlConnection.disconnect();
+
+            } catch (Exception e) {
+                if (file.exists()) file.delete();
+                dlog.e(FHome.class.toString() + " loadBanner: eccezione in creazione e download file ", e);
+
+                e.printStackTrace();
             }
-            FileOutputStream fileOutput = new FileOutputStream(file);
-            InputStream inputStream = urlConnection.getInputStream();
-            int totalSize = urlConnection.getContentLength();
-            int downloadedSize = 0;
-            byte[] buffer = new byte[1024];
-            int bufferLength = 0;
-            while ((bufferLength = inputStream.read(buffer)) > 0) {
-                fileOutput.write(buffer, 0, bufferLength);
-                //downloadedSize += bufferLength;
-                //Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
-            }
-            fileOutput.close();
-            inputStream.close();
-            Image.putString(("FILENAME"),filename);
-            App.Instance.BannerName.putBundle(type,Image);
-            dlog.i(FHome.class.toString()+" loadBanner: File scaricato e creato "+filename);
-            urlConnection.disconnect();
 
-
-        } catch (Exception e) {
-            if(file.exists()) file.delete();
-            dlog.e(FHome.class.toString()+" loadBanner: eccezione in creazione e download file ",e);
-
-            e.printStackTrace();
+        }catch (Exception e) {
+            dlog.e("loadBanner: Exception", e);
         }
-
-
-
     }
 /**
  * Set to screen the current banner from the App variable
@@ -1286,6 +1279,7 @@ public class FHome extends FBase implements OnClickListener {
             }
             player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/"+ resID));
             dlog.d("playAlertAdvice: play " +name);
+            dlog.cr("Riproduco avviso vocale: play " +name);
 
         }catch (Exception e){
             dlog.e("playAlertAdvice exception while start speak",e);

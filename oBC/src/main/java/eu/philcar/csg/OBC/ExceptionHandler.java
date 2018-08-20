@@ -36,7 +36,7 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 	    // This code restarts the ObcService
 
 		PendingIntent pendingIntent = PendingIntent.getActivity(mApp.getBaseContext(), 0, new Intent(mApp.getApplicationContext(), StubActivity.class), 0);
-		
+		DLog.CR("Crash di OBC a causa di un errore in:");
 		DLog.E("Uncaught Exception ", e);
 		e.printStackTrace();
 		Crashlytics.logException(e);

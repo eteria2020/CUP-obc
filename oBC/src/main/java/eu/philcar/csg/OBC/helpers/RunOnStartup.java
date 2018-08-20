@@ -18,6 +18,7 @@ public class RunOnStartup extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
             DLog.D(this.getClass().toString()+" Ricevuto boot del dispositivo, non è un crash");
+            DLog.CR("Avvio in seguito ad un boot di Android");
 
            /* Runtime rt = Runtime.getRuntime();
             try {

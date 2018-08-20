@@ -53,6 +53,9 @@ public class CarInfo {
     @Inject
     EventRepository eventRepository;
 
+    @Inject
+    GPSController gpsController;
+
     private Handler serviceHandler;
 
     private String id = "";
@@ -103,7 +106,7 @@ public class CarInfo {
     public String versions = "";
     private static Boolean sent = false;
 
-    public Location location;
+    public Location location = new Location("");
 
     public Location intGpsLocation = new Location(LocationManager.GPS_PROVIDER);
     public Location extGpsLocation = new Location(LocationManager.GPS_PROVIDER){
@@ -239,13 +242,13 @@ public class CarInfo {
             setLongitude(App.mockLocation.getLongitude());
             setLatitude(App.mockLocation.getLatitude());
             accuracy = App.mockLocation.getAccuracy();
-            App.lastLocation = App.mockLocation;
+            App.setLastLocation(App.mockLocation);
             return;
         }
 
         if (loc != null) {
 
-            location = loc;
+            location.set(loc);
             long a=loc.getTime();
             String time = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS").format(location.getTime());
             if (getLongitude() != loc.getLongitude() || getLatitude() != loc.getLatitude()) {
@@ -258,7 +261,8 @@ public class CarInfo {
             if (serviceHandler != null)
                 serviceHandler.sendMessage(MessageFactory.sendLocationChange(location));
 
-            App.lastLocation = location;
+            App.setLastLocation(location);
+            gpsController.onNewLocation(location);
         }
 
     }
@@ -1190,6 +1194,10 @@ public class CarInfo {
 
     public static String getKeyStatus() {
         return keyStatus;
+    }
+
+    public static boolean isKeyOn(){
+        return CarInfo.getKeyStatus() == null || !CarInfo.getKeyStatus().equalsIgnoreCase("OFF");
     }
 
     private void setKeyStatus(String keyStatus) {

@@ -351,6 +351,7 @@ public class Hik_io implements LowLevelInterface {
 	@Override
 	public void setDoors(Messenger replyTo, int state, String message) {
 		dlog.d("setDoors :" + state );
+		dlog.cr("Ricevuto messaggio per azione su porte: " +state);
 		int ctl = (state==0?LeaseInfoItaly.LEASE_CTL_DOOR_CLOSE:LeaseInfoItaly.LEASE_CTL_DOOR_OPEN);
 		if (mLeaseManagerItaly!=null) {
 			mLeaseManagerItaly.SetDoorStatus(ctl);
@@ -360,7 +361,7 @@ public class Hik_io implements LowLevelInterface {
 	@Override
 	public void setEngine(Messenger replyTo, int status) {
 		dlog.d("setEngine :" + status );
-
+		dlog.cr("Ricevuta azione sul motore: "+status);
 		int ctl = (status==0?LeaseInfoItaly.LEASE_CTL_DISABLE_POWER:LeaseInfoItaly.LEASE_CTL_ENABLE_POWER);
 		if (mLeaseManagerItaly!=null) {
 			if (mLeaseManagerItaly.SetPowerStatus(ctl))

@@ -682,9 +682,9 @@ public class FDriveMessage_new extends FBase {
 			if (App.currentTripInfo != null && App.currentTripInfo.customer != null)
 				paramsList.add(new BasicNameValuePair("id", App.currentTripInfo.customer.id + ""));//App.currentTripInfo.customer.id + "")); //"3"));
 
-			if (App.lastLocation != null) {
-				paramsList.add(new BasicNameValuePair("lat", App.lastLocation.getLatitude() + ""));
-				paramsList.add(new BasicNameValuePair("lon", App.lastLocation.getLongitude() + ""));
+			if (App.getLastLocation() != null) {
+				paramsList.add(new BasicNameValuePair("lat", App.getLastLocation().getLatitude() + ""));
+				paramsList.add(new BasicNameValuePair("lon", App.getLastLocation().getLongitude() + ""));
 			}
 			paramsList.add(new BasicNameValuePair("id_fleet", App.FleetId + ""));
 			paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));//"ED93107"));//App.CarPlate));

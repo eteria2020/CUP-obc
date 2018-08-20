@@ -25,6 +25,7 @@ import eu.philcar.csg.OBC.injection.ApplicationContext;
 import eu.philcar.csg.OBC.injection.module.ApplicationModule;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoService;
 import eu.philcar.csg.OBC.service.CarInfo;
+import eu.philcar.csg.OBC.service.GPSController;
 import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.TripInfo;
 
@@ -53,6 +54,7 @@ public interface ApplicationComponent {
     void inject(TripInfo tripInfo);
     void inject(FHome fHome);
     void inject(ObcService obcService);
+    void inject(GPSController.ResetHandler resetHandler);
 
     @ApplicationContext Context context();
     Application application();

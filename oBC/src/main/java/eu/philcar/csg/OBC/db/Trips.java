@@ -47,7 +47,7 @@ public class Trips extends DbTable<Trip,Integer> {
 	
 	public Trip getLastOpenTrip() {
 		try {
-			PreparedQuery<Trip> query =  queryBuilder().orderBy("id", false).prepare();		
+			PreparedQuery<Trip> query =  queryBuilder().orderBy("id", false).limit(1L).prepare();
 
 			List<Trip> list = this.query(query);
 			

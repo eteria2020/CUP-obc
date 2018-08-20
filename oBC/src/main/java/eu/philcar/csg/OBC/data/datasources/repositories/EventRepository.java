@@ -7,8 +7,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import eu.philcar.csg.OBC.App;
-import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Event;
+import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.service.ObcService;
 
 import static eu.philcar.csg.OBC.db.Events.*;
@@ -86,6 +86,7 @@ public class EventRepository {
         generateEvent(EVT_SOS,1,number);
     }
     public  void eventSos(String number, ObcService service) {
+        DLog.CR("Prenotata chiamata asistenza: " + number);
         generateEvent(EVT_SOS,1,number, service);
     }
 
@@ -114,7 +115,7 @@ public class EventRepository {
     }
 
     public  void outOfArea(Boolean status) {
-        if(App.lastLocation.getLongitude()!=0.0 && App.lastLocation.getLatitude()!=0.0)
+        if(App.getLastLocation().getLongitude()!=0.0 && App.getLastLocation().getLatitude()!=0.0)
             generateEvent(EVT_OUTOFAREA,status?1:0,status?"Uscita Area Operativa":"Rientro Area Operativa");
     }
 
@@ -237,10 +238,11 @@ public class EventRepository {
             event.id_customer = App.currentTripInfo.trip.id_customer;
         }
 
-        if (App.lastLocation!=null) {
-            event.lon = App.lastLocation.getLongitude();
-            event.lat = App.lastLocation.getLatitude();
+        if (App.getLastLocation() !=null) {
+            event.lon = App.getLastLocation().getLongitude();
+            event.lat = App.getLastLocation().getLatitude();
         }
+        DLog.CR("Invio evento " +event.toStringOneLine());
         if(App.fullNode)
             apiRepository.sendEvent(event,service);
         else

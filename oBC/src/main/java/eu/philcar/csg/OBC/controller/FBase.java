@@ -33,6 +33,6 @@ public abstract class FBase extends Fragment {
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		DLog.D("OnViewCreated " + this.getClass());
+		DLog.CR("OnViewCreated " + this.getClass().getSimpleName());
 	}
 }

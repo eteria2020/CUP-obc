@@ -8,16 +8,16 @@ public class BannerJsInterface {
 	
 	@JavascriptInterface
 	public double getLongitude() {
-		if (App.lastLocation!=null)
-			return App.lastLocation.getLongitude();
+		if (App.getLastLocation() !=null)
+			return App.getLastLocation().getLongitude();
 		else
 			return 0;				
 	}
 	
 	@JavascriptInterface
 	public double getLatitude() {
-		if (App.lastLocation!=null)
-			return App.lastLocation.getLongitude();
+		if (App.getLastLocation() !=null)
+			return App.getLastLocation().getLongitude();
 		else
 			return 0;				
 	}

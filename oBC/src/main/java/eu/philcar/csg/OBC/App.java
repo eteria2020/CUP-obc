@@ -193,6 +193,7 @@ public class App extends MultiDexApplication {
 	}
 
 	public static void setNetworkStable(boolean networkStable) {
+		//DLog.CR("Ricevuta modifica riguardo network stabile: " +networkStable);
 		if(networkStable && !App.hasNetworkConnection())
 			setHasNetworkConnection(true);
 		App.networkStable = networkStable;
@@ -217,9 +218,17 @@ public class App extends MultiDexApplication {
 	}
 
 	public static void setHasNetworkConnection(boolean hasNetworkConnection) {
+		DLog.CR("Ricevuto cambio di stato del network: " + hasNetworkConnection);
 		App.hasNetworkConnection = hasNetworkConnection;
 	}
 
+	public static Location getLastLocation() {
+		return lastLocation;
+	}
+
+	public static void setLastLocation(Location lastLocation) {
+		App.lastLocation.set(lastLocation);
+	}
 
 	public static class Versions {
 
@@ -545,7 +554,7 @@ public class App extends MultiDexApplication {
 	public static int   tabletBatteryLevel=0;
 	public static int   tabletBatteryPlugged=0;
 	public static long   networkExceptions=0;
-	public static Location lastLocation;
+	private static Location lastLocation = new Location("default");
 	public static Boolean saveLog =true;
 	public static Boolean checkKeyOff=true;
 	private static int bmsCountTo90 =0;
@@ -1184,7 +1193,7 @@ public void loadRadioSetup() {
 				    	App.mockLocation.setLongitude(Double.parseDouble(p[1]));
 				    	App.mockLocation.setAccuracy(1);
 
-				    	App.lastLocation = App.mockLocation;
+				    	App.setLastLocation(App.mockLocation);
 			    	}
 
 			    }
@@ -1255,6 +1264,7 @@ public void loadRadioSetup() {
 		dlog.i("CPU_ABI: " +Build.CPU_ABI);
 		dlog.i("RADIO: " +Build.getRadioVersion());
 		dlog.i("ANDROID VERSION: " +Build.VERSION.SDK_INT);
+		dlog.cr("Avvio applicazione");
 
 		/*
 		File skmaps = new File("/sdcard/skmaps.zip");
@@ -2437,9 +2447,9 @@ private void  initPhase2() {
 		double lat=0;
 		double lon=0;
 		
-		if (App.lastLocation!=null) {
-			lat = App.lastLocation.getLatitude();
-			lon = App.lastLocation.getLongitude();
+		if (App.getLastLocation() !=null) {
+			lat = App.getLastLocation().getLatitude();
+			lon = App.getLastLocation().getLongitude();
 		}
 		
 		text = "*ALARM: " + App.CarPlate + "  https://maps.google.com/maps?q="+lat+","+lon;
@@ -2457,8 +2467,8 @@ private void  initPhase2() {
 		
 		String text;
 		
-		if (App.lastLocation!=null) 
-			text = App.CarPlate + ":" + App.lastLocation.getLatitude() +","+ App.lastLocation.getLongitude();
+		if (App.getLastLocation() !=null)
+			text = App.CarPlate + ":" + App.getLastLocation().getLatitude() +","+ App.getLastLocation().getLongitude();
 		else
 			text = App.CarPlate + ": NO GPS";
 		

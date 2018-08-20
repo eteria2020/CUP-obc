@@ -441,7 +441,7 @@ public class FMenu extends FBase implements OnClickListener{
 									actionTaken = true;
 									clickedButton = "";
 								}
-								else if(clickedButton.equalsIgnoreCase(REQUEST_END_RENT)) {
+								else if(clickedButton.equalsIgnoreCase(REQUEST_END_RENT) && App.checkKeyOff) {
 									onClick(endRentIB);
 									actionTaken = true;
 									clickedButton = "";
@@ -515,7 +515,7 @@ public class FMenu extends FBase implements OnClickListener{
 		}else {
 			endRentIB.setEnabled(false);
 			if(!( CarInfo.getKeyStatus() != null && !CarInfo.getKeyStatus().equalsIgnoreCase("OFF") && App.checkKeyOff))
-				endRentIB.animate().alpha(0.4f);
+				endRentIB.animate().alpha(0.33f);
 		}
 
 		endRentIB.setOnClickListener(rentListener);
@@ -529,7 +529,7 @@ public class FMenu extends FBase implements OnClickListener{
 		}else {
 			pauseRentIB.setEnabled(false);
 			if(!( CarInfo.getKeyStatus() != null && !CarInfo.getKeyStatus().equalsIgnoreCase("OFF") && App.checkKeyOff))
-				pauseRentIB.animate().alpha(0.4f);
+				pauseRentIB.animate().alpha(0.33f);
 		}
 		pauseRentIB.setOnClickListener(parkListener);
 		pauseRentIB.setImageResource(parkImage);
