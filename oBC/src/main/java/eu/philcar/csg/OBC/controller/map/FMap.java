@@ -1285,7 +1285,7 @@ public class FMap extends FBase implements OnClickListener {
 		case R.id.fmapAlertCloseBTN:
 
 			localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
-
+			dlog.cr("Chiusura alert SOC");
 			break;
 
 		/*case R.id.fmapPOIIB:
@@ -2408,7 +2408,7 @@ public class FMap extends FBase implements OnClickListener {
 					case MSG_CLOSE_SOC_ALERT:
 
 						localHandler.removeMessages(MSG_CLOSE_SOC_ALERT);
-						dlog.cr("Chiusura alert SOC");
+//						dlog.cr("Chiusura alert SOC");
 						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
 						//rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
 						break;

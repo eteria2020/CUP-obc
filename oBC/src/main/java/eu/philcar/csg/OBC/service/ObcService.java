@@ -1720,9 +1720,9 @@ public class ObcService extends Service implements OnTripCallback {
                                 this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
                             else
                                 dlog.d("Received expired close_trip");
-                        }else if(cmd.txtarg1!=null){//chiusura tramite API
+                        }/*else if(cmd.txtarg1!=null){//chiusura tramite API
                             startRequestCloseTrip();
-                        }else
+                        }*/else
                         try{
                             JSONObject commandJson = new JSONObject(cmd.txtarg2);
 
@@ -2221,7 +2221,7 @@ public class ObcService extends Service implements OnTripCallback {
             @Override
             public void run() {
                 try {
-                    if(!App.currentTripInfo.isOpen) {
+                    if(App.currentTripInfo ==null || !App.currentTripInfo.isOpen) {
                         stopRequestCloseTrip();
                         return;
                     }
@@ -2235,6 +2235,8 @@ public class ObcService extends Service implements OnTripCallback {
 
                 } catch (Exception e) {
                     dlog.e("Exception inside tripUpdateScheduler", e);
+                    stopRequestCloseTrip();
+                    return;
                 }
 
             }

@@ -436,7 +436,7 @@ public class FMenu extends FBase implements OnClickListener{
 										R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
 										R.drawable.ic_arrow_left, this);
 
-								if(clickedButton.equalsIgnoreCase(REQUEST_PARK)) {
+								if(clickedButton.equalsIgnoreCase(REQUEST_PARK) && App.checkKeyOff) {
 									onClick(pauseRentIB);
 									actionTaken = true;
 									clickedButton = "";
@@ -461,7 +461,7 @@ public class FMenu extends FBase implements OnClickListener{
 									R.drawable.ic_letter_p, R.string.menu_park_mode_suspend, this,
 									R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
 									R.drawable.ic_arrow_left, this);
-							if(!actionTaken && clickedButton.equalsIgnoreCase(REQUEST_PARK)) {
+							if(!actionTaken && clickedButton.equalsIgnoreCase(REQUEST_PARK) && App.checkKeyOff) {
 								onClick(pauseRentIB);
 								actionTaken = true;
 							}

@@ -978,7 +978,7 @@ public class FHome extends FBase implements OnClickListener {
                 case MSG_CLOSE_SOC_ALERT:
 
                     localHandler.removeMessages(MSG_CLOSE_SOC_ALERT);
-                    dlog.cr("Chiusura alert SOC");
+                    //dlog.cr("Chiusura alert SOC");
                     rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
                     //rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
                     break;
