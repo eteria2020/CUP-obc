@@ -181,7 +181,7 @@ try {
 			
 		} else {
 			try {
-				App.isCloseable = true;
+				App.setIsCloseable(true);
 
 				((AGoodbye) this.getActivity()).sendMessage(MessageFactory.sendBeacon());
 				((AGoodbye) this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));

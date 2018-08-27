@@ -653,8 +653,8 @@ public class FMenu extends FBase implements OnClickListener{
 			if(getActivity()!=null)
 				((AMainOBC) this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(0));
 
-			if(App.isCloseable)
-				App.isCloseable = false;
+			if(App.isIsCloseable())
+				App.setIsCloseable(false);
 
 			(root.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
 			(root.findViewById(R.id.llSelfClose)).setOnClickListener(null);

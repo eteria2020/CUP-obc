@@ -833,7 +833,7 @@ public class CarInfo {
         StringWriter sw = new StringWriter();
         JsonWriter jw = new JsonWriter(sw);
         //Per chiudere da remoto una corsa (da app utente finale) dobbiamo essere nell'ultima schermata, essere in area accettabile e non in sosta.
-        boolean enableRemoteClose = App.isCloseable && App.checkParkArea(getLatitude(), getLongitude()) && (App.getParkModeStarted() == null);
+        boolean enableRemoteClose = App.isIsCloseable() && App.checkParkArea(getLatitude(), getLongitude()) && (App.getParkModeStarted() == null);
 
         try {
             jw.beginObject();
@@ -937,7 +937,7 @@ public class CarInfo {
         try {
 
             //Per chiudere da remoto una corsa (da app utente finale) dobbiamo essere nell'ultima schermata, essere in area accettabile e non in sosta.
-            boolean enableRemoteClose = App.isCloseable && App.checkParkArea(getLatitude(), getLongitude()) && (App.getParkModeStarted() == null);
+            boolean enableRemoteClose = App.isIsCloseable() && App.checkParkArea(getLatitude(), getLongitude()) && (App.getParkModeStarted() == null);
 
             try {
                 beacon.setGPS(App.UseExternalGPS ? "EXT" : "INT");
@@ -989,7 +989,7 @@ public class CarInfo {
                         beacon.setGps_info(gpsInfo);
                     }
 
-                    beacon.setVersions(gson.toJson(App.versions));
+                    beacon.setVersions(App.Versions.toJson());
 
                     if (allData.containsKey("GPSBOX"))
                         beacon.setGPSBOX(allData.getString("GPSBOX"));
@@ -1011,7 +1011,7 @@ public class CarInfo {
         JsonWriter jw = new JsonWriter(sw);
 
         //Per chiudere da remoto una corsa (da app utente finale) dobbiamo essere nell'ultima schermata, essere in area accettabile e non in sosta.
-        boolean enableRemoteClose = App.isCloseable && App.checkParkArea(getLatitude(), getLongitude()) && (App.getParkModeStarted() == null);
+        boolean enableRemoteClose = App.isIsCloseable() && App.checkParkArea(getLatitude(), getLongitude()) && (App.getParkModeStarted() == null);
 
         try {
             jw.beginObject();

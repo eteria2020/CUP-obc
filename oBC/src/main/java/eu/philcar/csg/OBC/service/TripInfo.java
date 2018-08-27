@@ -434,7 +434,7 @@ public class TripInfo {
                     }
                 } else {  // l'auto viene rilasciata
 
-                    if (! App.isCloseable && closeType !=CloseType.forced) {
+                    if (!App.isIsCloseable() && closeType !=CloseType.forced) {
                         obc_io.setLcd(null, "CHIUDERE CORSA");
                         dlog.d("handleCard: corsa non chiudibile");
                         return null;

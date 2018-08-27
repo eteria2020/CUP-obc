@@ -259,7 +259,7 @@ public class FMap extends FBase implements OnClickListener {
     	super.onCreate(savedInstanceState);
 		context=getActivity();
 		player=new AudioPlayer(getActivity());
-        App.isCloseable = false;
+        App.setIsCloseable(false);
         App.get(getActivity()).getComponent().inject(this);
 
 

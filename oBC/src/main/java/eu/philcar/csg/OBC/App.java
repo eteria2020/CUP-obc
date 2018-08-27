@@ -230,6 +230,14 @@ public class App extends MultiDexApplication {
 		App.lastLocation.set(lastLocation);
 	}
 
+	public static boolean isIsCloseable() {
+		return isCloseable;
+	}
+
+	public static void setIsCloseable(boolean isCloseable) {
+		App.isCloseable = isCloseable;
+	}
+
 	public static class Versions {
 
 		static  {
@@ -577,7 +585,7 @@ public class App extends MultiDexApplication {
 	public static boolean pinChecked = false;
 	public static boolean userDrunk = false;
 
-	public static boolean isCloseable=true;
+	private static boolean isCloseable=true;
 	public static boolean isClosing=false;
 
 	public static boolean  ObcIoError=false;

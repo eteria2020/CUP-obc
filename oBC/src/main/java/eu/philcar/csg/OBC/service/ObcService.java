@@ -29,7 +29,6 @@ import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.AMainOBC;
-import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.controller.welcome.FMaintenance;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
@@ -1062,6 +1061,7 @@ public class ObcService extends Service implements OnTripCallback {
 
 
     // Set the speed of locations updates
+    @SuppressLint("MissingPermission")
     private void setLocationMode(long minTime) {
         if (locationManager != null) {
             dlog.d("setLocationMode "+minTime);
@@ -2227,8 +2227,12 @@ public class ObcService extends Service implements OnTripCallback {
                     }
                     boolean keyOff = !CarInfo.isKeyOn() ;
                     boolean isMoving = GPSController.isMoving();
-                    if(!isMoving || (App.checkKeyOff && keyOff)){//closeTrip
+                    if(!isMoving && (!App.checkKeyOff || keyOff)){//closeTrip
+                        App.setIsCloseable(true);
                         localHandler.sendMessage(MessageFactory.scheduleSelfCloseTrip(1));
+                        dlog.d("tripUpdateScheduler: sheduled close trip");
+                    }else {
+                        dlog.d("tripUpdateScheduler: unable to close trip is Moving : " + isMoving + "keyOff: " + keyOff);
                     }
 
 
@@ -2243,7 +2247,7 @@ public class ObcService extends Service implements OnTripCallback {
 
         }, 100, 20, TimeUnit.SECONDS);
 
-        dlog.d("Started remote Update Cycle");
+        dlog.d("Started startRequestCloseTrip");
     }
 
     void stopRequestCloseTrip() {
@@ -2728,7 +2732,7 @@ public class ObcService extends Service implements OnTripCallback {
                             if (isVerified) {
                                 dlog.d("Pin OK");
                                 //obc_io.setEngine(rmsg.replyTo, 1);
-                                App.isCloseable = false;
+                                App.setIsCloseable(false);
                                 removeSelfCloseTrip();
                             } else {
                                 dlog.w("Pin wrong");
@@ -2776,7 +2780,7 @@ public class ObcService extends Service implements OnTripCallback {
 
                 case MSG_TRIP_SELFCLOSE:
                     dlog.d("RECEIVED MSG_TRIP_SELFCLOSE  arg1=" + msg.arg1);
-                    if (App.currentTripInfo != null && App.currentTripInfo.isOpen && ((App.getParkModeStarted() == null && App.isCloseable) || App.getParkModeStarted() != null)) {
+                    if (App.currentTripInfo != null && App.currentTripInfo.isOpen && ((App.getParkModeStarted() == null && App.isIsCloseable()) || App.getParkModeStarted() != null)) {
 
                         localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,1));
                         eventRepository.selfCloseTrip(App.currentTripInfo.trip.remote_id, msg.arg1);

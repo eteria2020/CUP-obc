@@ -140,7 +140,7 @@ public class FHome extends FBase implements OnClickListener {
 
         player=new AudioPlayer(getActivity());
 
-        App.isCloseable = false;
+        App.setIsCloseable(false);
     }
 
 /**This function create the view for the home fragment

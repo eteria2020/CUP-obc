@@ -143,7 +143,7 @@ public class FGoodbye extends FBase {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        App.isCloseable = true;
+        App.setIsCloseable(true);
         App.isClosing = true;
         dlog.d("OnCreareView FGoodbye");
         try {
@@ -368,7 +368,7 @@ public class FGoodbye extends FBase {
     }
 
     private void undoCloseTrip(View v) {
-        App.isCloseable = false;
+        App.setIsCloseable(false);
         ((ABase) getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(0));
         startActivity(new Intent(getActivity(), AMainOBC.class));
         getActivity().finish();
