@@ -1744,6 +1744,8 @@ public class ObcService extends Service implements OnTripCallback {
                                             this.notifyCard(customer.card_code, "CLOSE", false, forced);
 
                                         }
+                                        else
+                                            throw new Exception("No customer found");
                                     }catch (Exception e){
                                         dlog.e("queryForId - customers not found ",e);
                                     }

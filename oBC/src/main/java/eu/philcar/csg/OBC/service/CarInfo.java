@@ -578,15 +578,15 @@ public class CarInfo {
                     this.setChargingPlug(bo);
                     eventRepository.eventCharge(bo ? 1 : 0);
 
-                    if (!App.Charging && this.isChargingPlug()) {
-
-                        App.Charging = true;
-                        serviceHandler.sendMessage(MessageFactory.notifyStartCharging(this));
-                        App.Instance.persistCharging();
-                        forceBeacon = true;
-                    }
-
                 }
+                if (!App.Charging && this.isChargingPlug()) {
+
+                    App.Charging = true;
+                    serviceHandler.sendMessage(MessageFactory.notifyStartCharging(this));
+                    App.Instance.persistCharging();
+                    forceBeacon = true;
+                }
+
             } else if (key.equalsIgnoreCase("ReadyOn")) {
                 bo = b.getBoolean(key);
                 if (bo != this.isReady()) {
@@ -969,7 +969,7 @@ public class CarInfo {
                 if (longVersion) {
                     updateTrips();
 
-                    //beacon.setFwVer(getFw_version().equals("") ? App.fw_version : getFw_version());
+                    beacon.setFwVer(App.fw_version);
                     beacon.setSwVer(App.sw_Version);
                     //beacon.setSdkVer(getSdk_version());
                     beacon.setHwVer(android.os.Build.MODEL + " " + android.os.Build.DEVICE + " " + android.os.Build.ID);

@@ -544,50 +544,53 @@ public class FGoodbye extends FBase {
     }
 
     private void updateBanner(String type) {
+        try {
+            File ImageV;
+            Bundle Banner = App.BannerName.getBundle(type);
+            if (Banner != null) {
+                ImageV = new File(App.getBannerImagesFolder(), Banner.getString("FILENAME", ""));
 
-        File ImageV;
-        Bundle Banner = App.BannerName.getBundle(type);
-        if (Banner != null) {
-            ImageV = new File(App.getBannerImagesFolder(), Banner.getString("FILENAME", null));
+                try {
+                    if (ImageV != null && ImageV.exists()) {
+                        dlog.i(FGoodbye.class.toString() + " updateBanner: file trovato imposto immagine " + ImageV.getName());
+                        Bitmap myBitmap = BitmapFactory.decodeFile(ImageV.getAbsolutePath());
+                        if (myBitmap == null) {
 
-            try {
-                if (ImageV != null && ImageV.exists()) {
-                    dlog.i(FGoodbye.class.toString() + " updateBanner: file trovato imposto immagine " + ImageV.getName());
-                    Bitmap myBitmap = BitmapFactory.decodeFile(ImageV.getAbsolutePath());
-                    if (myBitmap == null) {
-
-                        dlog.e(FGoodbye.class.toString() + " updateBanner: file corrotto, elimino e visualizzo offline ");
-                        ImageV.delete();
-                        //initWebBanner(Banner.getString("URL",null));
+                            dlog.e(FGoodbye.class.toString() + " updateBanner: file corrotto, elimino e visualizzo offline ");
+                            ImageV.delete();
+                            //initWebBanner(Banner.getString("URL",null));
+                            //webViewBanner.setVisibility(View.INVISIBLE);
+                            adIV.setImageResource(R.drawable.offline_goodbye);
+                            adIV.setVisibility(View.VISIBLE);
+                            return;
+                        }
                         //webViewBanner.setVisibility(View.INVISIBLE);
-                        adIV.setImageResource(R.drawable.offline_goodbye);
+
+                        adIV.setImageBitmap(myBitmap);
                         adIV.setVisibility(View.VISIBLE);
+                        adIV.invalidate();
                         return;
+
                     }
+                } catch (Exception e) {
+                    dlog.e(FGoodbye.class.toString() + " updateBanner: eccezione in caricamento file visualizzo offline ", e);
+                    e.printStackTrace();
+                    //initWebBanner(Banner.getString("URL",null));
                     //webViewBanner.setVisibility(View.INVISIBLE);
-
-                    adIV.setImageBitmap(myBitmap);
+                    adIV.setImageResource(R.drawable.offline_goodbye);
                     adIV.setVisibility(View.VISIBLE);
-                    adIV.invalidate();
                     return;
-
                 }
-            } catch (Exception e) {
-                dlog.e(FGoodbye.class.toString() + " updateBanner: eccezione in caricamento file visualizzo offline ", e);
-                e.printStackTrace();
+            } else {
+                dlog.e(FGoodbye.class.toString() + " updateBanner: Bundle null, visualizzo offline");
                 //initWebBanner(Banner.getString("URL",null));
                 //webViewBanner.setVisibility(View.INVISIBLE);
                 adIV.setImageResource(R.drawable.offline_goodbye);
                 adIV.setVisibility(View.VISIBLE);
                 return;
             }
-        } else {
-            dlog.e(FGoodbye.class.toString() + " updateBanner: Bundle null, visualizzo offline");
-            //initWebBanner(Banner.getString("URL",null));
-            //webViewBanner.setVisibility(View.INVISIBLE);
-            adIV.setImageResource(R.drawable.offline_goodbye);
-            adIV.setVisibility(View.VISIBLE);
-            return;
+        }catch (Exception e){
+
         }
 
     }

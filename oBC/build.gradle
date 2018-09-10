@@ -97,8 +97,6 @@ android {
         }
         develop {
         }
-        node {
-        }
     }
 }
 
@@ -124,7 +122,6 @@ dependencies {
     implementation files('libs/activation.jar')
     implementation files('libs/additionnal.jar')
     implementation files('libs/mail.jar')
-
     implementation 'commons-net:commons-net:3.3'
     implementation 'com.github.barteksc:android-pdf-viewer:2.8.1'
     implementation 'com.j256.ormlite:ormlite-core:4.48'
