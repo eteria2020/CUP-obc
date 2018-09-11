@@ -210,7 +210,7 @@ public class FPdfViewer extends FBase {
                     }
 
                 else {
-                    Toast.makeText(getActivity(), "EMAIL NON VALIDA", Toast.LENGTH_LONG).show();
+                   // Toast.makeText(getActivity(), "EMAIL NON VALIDA", Toast.LENGTH_LONG).show();
                     return;
                 }
                 //  sendemail.execute();
@@ -252,11 +252,11 @@ public class FPdfViewer extends FBase {
 
         if (pdf != null && pdf.exists()) {
             Uri path = Uri.fromFile(pdf);
-            Toast.makeText(getActivity(), "Caricamento", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "Caricamento", Toast.LENGTH_SHORT).show();
             pdfView.fromUri(path).load();
         } else {
 
-            Toast.makeText(getActivity(), "Problemi durante l'apertura del file", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "Problemi durante l'apertura del file", Toast.LENGTH_SHORT).show();
             getFragmentManager().popBackStack();
         }
 
@@ -383,10 +383,10 @@ public class FPdfViewer extends FBase {
                 if (needUpdate(pdf)) {
                     setUpdate(true);
                     if (App.hasNetworkConnection()) {
-                        Toast.makeText(getActivity(), "Scaricamento file aggiornato...", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getActivity(), "Scaricamento file aggiornato...", Toast.LENGTH_LONG).show();
                         new DownloadFile().execute();
                     } else {
-                        Toast.makeText(getActivity(), "No Application available to view PDF", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getActivity(), "No Application available to view PDF", Toast.LENGTH_SHORT).show();
                         openPdf(file, PDFView);
                     }
 
@@ -396,18 +396,18 @@ public class FPdfViewer extends FBase {
                 }
             } else if(App.hasNetworkConnection()) {
                 setDownload(true);
-                Toast.makeText(getActivity(), "Scaricamento file, Attendere...", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getActivity(), "Scaricamento file, Attendere...", Toast.LENGTH_LONG).show();
                 new DownloadFile().execute();
             }else
             {
-                Toast.makeText(getActivity(), "Nessuna connessione internet", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "Nessuna connessione internet", Toast.LENGTH_SHORT).show();
             }
 
         } else if (App.hasNetworkConnection()) {
-            Toast.makeText(getActivity(), "Scaricamento file, Attendere...", Toast.LENGTH_LONG).show();
+//            Toast.makeText(getActivity(), "Scaricamento file, Attendere...", Toast.LENGTH_LONG).show();
             new DownloadFile().execute();
         } else {
-            Toast.makeText(getActivity(), "Nessuna connessione internet", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "Nessuna connessione internet", Toast.LENGTH_SHORT).show();
             getFragmentManager().popBackStack();
         }
     }
@@ -517,8 +517,8 @@ public class FPdfViewer extends FBase {
                     return null;
 
                 }
-            } catch (JSONException e) {
-                Toast.makeText(getActivity(), "problemi durante lo scaricamento del file", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                //Toast.makeText(getActivity(), "problemi durante lo scaricamento del file", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
 

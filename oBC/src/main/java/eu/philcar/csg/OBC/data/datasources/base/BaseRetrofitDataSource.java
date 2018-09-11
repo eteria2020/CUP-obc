@@ -5,10 +5,12 @@ import android.os.SystemClock;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.model.SharengoResponse;
 import eu.philcar.csg.OBC.db.DbRecord;
@@ -161,6 +163,10 @@ public abstract class BaseRetrofitDataSource {
                     break;
                 case UNEXPECTED:
                     DLog.E("Retrofit Exception UNEXPECTED ",er.error);
+                    if(er.error instanceof SocketException){ //controllare nel caso che sea tipo emfile (too many open file)
+                        DLog.D("qui farei un EMFILE REBOOT ");
+                        //SystemControl.emfileException(er.error);
+                    }
                     break;
                 case SERVER_TIMEOUT:
                     DLog.E("Retrofit Exception SERVER_TIMEOUT ",er.error);

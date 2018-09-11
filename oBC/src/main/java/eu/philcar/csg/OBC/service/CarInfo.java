@@ -94,9 +94,9 @@ public class CarInfo {
     public float currVoltage = App.max_voltage;
 
 
-    private boolean ready;
-    private boolean brakes;
-    private boolean chargingPlug;
+    private boolean ready = false;
+    private boolean brakes = false;
+    private boolean chargingPlug = false;
     public double currentAmpere = App.currentAmp;
     public double chargingAmpere = App.chargingAmp;
     public double maxAmpere = App.maxAmp;
@@ -131,16 +131,13 @@ public class CarInfo {
     public Location ntwkLocation = new Location(LocationManager.NETWORK_PROVIDER);
 
 
-    private double longitude;
-    private double latitude;
-    public double accuracy;
+    private double longitude = 0;
+    private double latitude = 0;
+    public double accuracy = 0;
 
-    public long lastLocationChange;
+    public long lastLocationChange = 0;
     public long lastUpdate = 0;
 
-    public String danni;
-    public int pulizia_int = 2;
-    public int pulizia_ext = 2;
 
     public long tripsOpened = 0;
     public long tripsToSend = 0;
@@ -434,7 +431,7 @@ public class CarInfo {
 		/*if(b.containsKey("SOC"))
 			b.putInt("SOC",batteryLevel); //replace the value read from the can with the calculated one*/
         allData.putAll(b);
-
+        beacon = Beacon.handleUpdate(beacon,b);
         //Scan receive budle element to update relevant local values and events
 
         for (String key : b.keySet()) {

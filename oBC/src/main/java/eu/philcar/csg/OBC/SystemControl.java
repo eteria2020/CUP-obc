@@ -158,6 +158,12 @@ public class SystemControl {
 		th.start();			
 	}
 
+	public static void emfileException(Throwable e){
+
+		doReboot("EMFILE");
+
+	}
+
 	
 	public static void ResycNTP() {
 		Thread th = new Thread(new RestartNTP());

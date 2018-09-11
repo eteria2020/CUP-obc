@@ -1720,9 +1720,9 @@ public class ObcService extends Service implements OnTripCallback {
                                 this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
                             else
                                 dlog.d("Received expired close_trip");
-                        }/*else if(cmd.txtarg1!=null){//chiusura tramite API
+                        }else if(cmd.txtarg1!=null){//chiusura tramite API
                             startRequestCloseTrip();
-                        }*/else
+                        }else
                         try{
                             JSONObject commandJson = new JSONObject(cmd.txtarg2);
 
@@ -3130,7 +3130,7 @@ public class ObcService extends Service implements OnTripCallback {
         },15000);*/
     }
 
-    private class DocumentControl extends AsyncTask<URL, Integer, Long> {
+    private static class DocumentControl extends AsyncTask<URL, Integer, Long> {
 
 
         @Override

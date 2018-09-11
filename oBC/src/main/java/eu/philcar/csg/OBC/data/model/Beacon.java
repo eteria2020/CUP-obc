@@ -1,5 +1,11 @@
 package eu.philcar.csg.OBC.data.model;
 
+import android.os.Bundle;
+
+import com.google.gson.Gson;
+
+import java.lang.reflect.Field;
+
 import eu.philcar.csg.OBC.data.common.ExcludeSerialization;
 
 /**
@@ -526,5 +532,30 @@ public class Beacon {
 
     public void setMotV(float motV) {
         MotV = motV;
+    }
+
+    public static Beacon handleUpdate(Beacon beacon ,Bundle b){
+        Gson gson = new Gson();
+        try{
+            Beacon received = gson.fromJson(gson.toJson(b),Beacon.class);
+            return mergeObjects(beacon, received);
+        }catch (Exception e) {
+            return beacon;
+        }
+    }
+
+
+    public static <T> T mergeObjects(T first, T second) throws IllegalAccessException, InstantiationException {
+        Class<?> clazz = first.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        Object returnValue = clazz.newInstance();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            Object value1 = field.get(first);
+            Object value2 = field.get(second);
+            Object value = (value1 != null) ? value1 : value2;
+            field.set(returnValue, value);
+        }
+        return (T) returnValue;
     }
 }

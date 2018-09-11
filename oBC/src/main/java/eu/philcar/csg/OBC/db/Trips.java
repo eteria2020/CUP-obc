@@ -19,6 +19,7 @@ import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.helpers.RxUtil;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -151,9 +152,14 @@ public class Trips extends DbTable<Trip,Integer> {
 	}
 	
 	
-	
+	private Disposable offlineDisposable =null;
 	public boolean sendOffline(Context context, Handler handler, SharengoApiRepository apiRepository, SharengoPhpRepository phpRepository) {
 		//HttpConnector http;
+		if(RxUtil.isRunning(offlineDisposable)) {
+			dlog.d("offlineDisposable is running");
+			return false;
+		}
+
 		List<Trip> list = getTripsToSend();
 
 		
@@ -170,7 +176,6 @@ public class Trips extends DbTable<Trip,Integer> {
 			return false;
 		}
 
-		//Dato che l'invio � asincrono viene richiesto l'invio solo della prima corsa non spedito, quando arriva il messaggio di risposto di invio eseguito(o fallito) passa alla successiva
 		Observable.just(1)
 				.concatMap(i->{
 					if(App.fullNode)
@@ -182,7 +187,7 @@ public class Trips extends DbTable<Trip,Integer> {
 				.subscribe(new Observer<Trip>() {
 					@Override
 					public void onSubscribe(Disposable d) {
-
+						offlineDisposable = d;
 					}
 
 					@Override
@@ -194,11 +199,13 @@ public class Trips extends DbTable<Trip,Integer> {
 					@Override
 					public void onError(Throwable e) {
 						dlog.e("Error while communicating offline trip, ",e);
+						offlineDisposable.dispose();
 					}
 
 					@Override
 					public void onComplete() {
 						dlog.d("Completed sendOfflineTrip successfully");
+						offlineDisposable.dispose();
 					}
 				});
 
