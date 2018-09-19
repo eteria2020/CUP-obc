@@ -126,7 +126,7 @@ public class AGoodbye extends ABase {
 			switch (msg.what) {
 			
 			case ObcService.MSG_CLIENT_REGISTER:
-				DLog.D(AGoodbye.class.getName() + ": MSG_CLIENT_REGISTER");
+				dlog.i( ": MSG_CLIENT_REGISTER");
 				
 				// Since this is the first fragment, we need to use the "add" method to show it to the user, and not the "replace"
 				FragmentTransaction transaction = getFragmentManager().beginTransaction();

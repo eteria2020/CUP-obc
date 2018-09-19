@@ -110,7 +110,7 @@ public class ServiceConnector {
 			msg.replyTo = localMessenger;
 			try {
 				serviceMessenger.send(msg);
-				DLog.D("Sent message : " + msg.what);
+				DLog.I("Sent message : " + msg.what);
 				
 				return true;
 			} catch (RemoteException e) {

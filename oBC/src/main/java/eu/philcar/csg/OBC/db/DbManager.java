@@ -198,7 +198,7 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 		}
 	}
 
-	public  Trips getCorseDao() {
+	public  Trips getTripDao() {
 		try {
 			Trips c = getDao(Trip.class);
 			//c.setAutoCommit(true);

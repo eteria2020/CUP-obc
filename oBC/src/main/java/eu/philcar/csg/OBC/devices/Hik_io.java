@@ -41,6 +41,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
@@ -139,7 +140,7 @@ public class Hik_io implements LowLevelInterface {
 			mCANManager.attachVehicleInfoObserver(mVehicleObserver);
 			App.Versions.SDK =  mCANManager.getSDKVersion();
 			SDKVersion =  App.Versions.SDK;
-			dlog.d("Initial SDK version:" + SDKVersion);
+			dlog.i("Initial SDK version:" + SDKVersion);
 		}
 
 		mBTManager = BTManager.get(context);
@@ -184,7 +185,7 @@ public class Hik_io implements LowLevelInterface {
 		
 		ServiceVersion = getServiceVersion();
 		App.Versions.Service = ServiceVersion;
-		dlog.d("Initial SDK SERVICE VERSION: " + ServiceVersion );
+		dlog.i("Initial SDK SERVICE VERSION: " + ServiceVersion );
 
 		try{
 		if (App.Versions.getLevel()>0) {
@@ -219,7 +220,7 @@ public class Hik_io implements LowLevelInterface {
 		threadKeepAlive = new Thread() {
 			public void run() {
 				int prescaler=6;
-				dlog.d("threadKeepAlive started");
+				dlog.i("threadKeepAlive started");
 				while (!this.isInterrupted()) {
 
 					setDisplayStatus(null,displayStatus);
@@ -312,7 +313,7 @@ public class Hik_io implements LowLevelInterface {
 		if (this.forceLedBlinking == status)
 			return;
 		
-		dlog.d("forceLedBlinking=" + status);
+		dlog.i("forceLedBlinking=" + status);
 		this.forceLedBlinking = status;
 	}
 	
@@ -341,7 +342,7 @@ public class Hik_io implements LowLevelInterface {
 				data[1] = LeaseInfoItaly.LED_STATUS_LIGHT_FLASH;
 			
 			boolean result = mLeaseManagerItaly.SetLEDStatus(data);
-			//dlog.d("setLed Led=" + data[0] + ", state="+data[1] + " result=" + result);
+			//dlog.i("setLed Led=" + data[0] + ", state="+data[1] + " result=" + result);
 		}
 		
 
@@ -350,7 +351,7 @@ public class Hik_io implements LowLevelInterface {
 
 	@Override
 	public void setDoors(Messenger replyTo, int state, String message) {
-		dlog.d("setDoors :" + state );
+		dlog.i("setDoors :" + state );
 		dlog.cr("Ricevuto messaggio per azione su porte: " +state);
 		int ctl = (state==0?LeaseInfoItaly.LEASE_CTL_DOOR_CLOSE:LeaseInfoItaly.LEASE_CTL_DOOR_OPEN);
 		if (mLeaseManagerItaly!=null) {
@@ -378,7 +379,7 @@ public class Hik_io implements LowLevelInterface {
 		displayStatus = on || Debug.FORCE_BACKLIGHT_ON;
 		if (mLeaseManagerItaly!=null) {
 			mLeaseManagerItaly.SetLeaseStatus(ctl);
-			//dlog.d("setLeaseStatus=" + ctl);
+			//dlog.i("setLeaseStatus=" + ctl);
 		}		
 	}
 	
@@ -438,20 +439,20 @@ public class Hik_io implements LowLevelInterface {
 			addAdminCard(card);
 		}
 		
-		dlog.d("Added N."+cards.size()+" cards");
+		dlog.i("Added N."+cards.size()+" cards");
 
 	}
 	
 	@Override 
 	public void addAdminCard(String card) {
-		dlog.d("Card:" + card);
+		dlog.i("Card:" + card);
 		byte[] data0 = hexStringToByteArray(card);
 		byte[] data = Converts.hexStringToByte(card);
 
 		
 		if (mLeaseManagerItaly!=null && data!=null) {
 			boolean result = mLeaseManagerItaly.AddAdmin(data);
-			dlog.d("Added admin card : " + card + ", result=" + result);
+			dlog.i("Added admin card : " + card + ", result=" + result);
 		}	
 	}
 	
@@ -461,7 +462,7 @@ public class Hik_io implements LowLevelInterface {
 		
 		if (mLeaseManagerItaly!=null && data!=null) {
 			boolean result = mLeaseManagerItaly.DeleteAdmin(data);
-			dlog.d("Removed admin card : " + card + ", result=" + result);
+			dlog.i("Removed admin card : " + card + ", result=" + result);
 		}	
 	}
 	
@@ -469,7 +470,7 @@ public class Hik_io implements LowLevelInterface {
 	public void resetAdminCards() {
 		if (mLeaseManagerItaly!=null) {
 			boolean result =  mLeaseManagerItaly.CleanAllAdmin();
-			dlog.d("Removed all admin cards, result=" + result);
+			dlog.i("Removed all admin cards, result=" + result);
 		}	
 	}
 	
@@ -484,7 +485,7 @@ public class Hik_io implements LowLevelInterface {
 		
 		threadGpsUpdate = new Thread() {
 			public void run() {
-				dlog.d("threadGpsUpdate started with period: " + period);
+				dlog.i("threadGpsUpdate started with period: " + period);
 				while (!this.isInterrupted()) {
 			        
 					String gpsInfo =  getGpsInfo();
@@ -499,7 +500,7 @@ public class Hik_io implements LowLevelInterface {
 					try {
 						Thread.sleep(period);
 					} catch (InterruptedException e) {
-						dlog.d("Thread interrupted");
+						dlog.i("Thread interrupted");
 						break;
 					}
 				}
@@ -527,7 +528,7 @@ public class Hik_io implements LowLevelInterface {
 			mAudioManager.audioSetChannel(AudioInfo.HIK_AUDIO_CHANNEL_RADIO);
 			mAudioManager.audioSetVol(0);
 			mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_OFF);	
-			dlog.d("HIK Audio channel : NONE");
+			dlog.i("HIK Audio channel : NONE");
 			break;
 
 		case AUDIO_RADIO:
@@ -537,7 +538,7 @@ public class Hik_io implements LowLevelInterface {
 			else
 				mAudioManager.audioSetVol(lastVolumeValue);
 			mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
-			dlog.d("HIK Audio channel : RADIO");
+			dlog.i("HIK Audio channel : RADIO");
 			break;
 			
 		case AUDIO_SYSTEM:
@@ -547,7 +548,7 @@ public class Hik_io implements LowLevelInterface {
 			else
 				mAudioManager.audioSetVol(lastVolumeValue);
 			mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
-			dlog.d("HIK Audio channel : SYSTEM");
+			dlog.i("HIK Audio channel : SYSTEM");
 			break;
 
 		case AUDIO_AUX:
@@ -557,7 +558,7 @@ public class Hik_io implements LowLevelInterface {
 			else
 				mAudioManager.audioSetVol(lastVolumeValue);
 			mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
-			dlog.d("HIK Audio channel : AUX");
+			dlog.i("HIK Audio channel : AUX");
 			break;
 		
 		}
@@ -573,7 +574,7 @@ public class Hik_io implements LowLevelInterface {
 			 	iBand = RadioInfo.BAND_TYPE_AM;
 			
 			mRadioManager.radioSetBand(iBand);
-			dlog.d("Radio: set band : " + iBand+ " - " + band);
+			dlog.i("Radio: set band : " + iBand+ " - " + band);
 			
 			if (iBand == RadioInfo.BAND_TYPE_FM) {
 				if (freq > RadioInfo.BAND_FM_FREQ_MAX_VALUE) freq =  RadioInfo.BAND_FM_FREQ_MAX_VALUE;
@@ -584,7 +585,7 @@ public class Hik_io implements LowLevelInterface {
 			}
 			
 			mRadioManager.radioSetFreq(freq);
-			dlog.d("Radio: set freq : " + freq);
+			dlog.i("Radio: set freq : " + freq);
 			
 		}
 	}
@@ -595,16 +596,16 @@ public class Hik_io implements LowLevelInterface {
 			
 			if (volume<0) {
 				mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
-				dlog.d("Radio: set AMPLIFIER ON");
+				dlog.i("Radio: set AMPLIFIER ON");
 			} else  if(volume==0) { 				
 				mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_OFF);
-				dlog.d("Radio: set AMPLIFIER OFF");
+				dlog.i("Radio: set AMPLIFIER OFF");
 			} else {
 				float coeff = AudioInfo.VOLUME_MAX_VALUE/100f;
 				int vol = Math.min((int)(volume*coeff),  AudioInfo.VOLUME_MAX_VALUE);
 				mAudioManager.audioSetVol(vol);
 				mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
-				dlog.d("Radio: set VOLUME : " + volume  + " - " + vol);
+				dlog.i("Radio: set VOLUME : " + volume  + " - " + vol);
 				mAudioObserver.onVolumeValueChange(AudioInfo.HIK_AUDIO_CHANNEL_RADIO, vol);
 			}
 		}
@@ -613,7 +614,7 @@ public class Hik_io implements LowLevelInterface {
 	@Override
 	public void SetSeek(int direction, boolean auto) {
 		if (mRadioManager!=null) {
-			dlog.d("Radio: set seek dir=" + direction + " auto="+auto);
+			dlog.i("Radio: set seek dir=" + direction + " auto="+auto);
 			if (direction>0)
 				mRadioManager.radioSetSeekDirection(RadioInfo.SEEK_DIRECTION_DOWN);
 			else if (direction<0)
@@ -637,7 +638,7 @@ public class Hik_io implements LowLevelInterface {
 			try {
 				boolean result = mLeaseManagerItaly.configHeartbeatTime(secs);
 				watchdogActive = result;
-				dlog.d("Watchdog timeout set to " +secs +" Result="+result);
+				dlog.i("Watchdog timeout set to " +secs +" Result="+result);
 			} catch (Exception e) {
 				dlog.e("Watchdog setup failed");
 			}
@@ -648,7 +649,7 @@ public class Hik_io implements LowLevelInterface {
 		if (mLeaseManagerItaly!=null && watchdogActive) {
 			try {				
 				mLeaseManagerItaly.cancelHeartbeat();
-				dlog.d("Watchdog remove");
+				dlog.i("Watchdog remove");
 			} catch (Exception e) {
 				dlog.e("Watchdog remove failed");
 			}				
@@ -891,7 +892,7 @@ public class Hik_io implements LowLevelInterface {
 		 b.putString("SDKVer",SDKVersion);
 
 		 
-		 dlog.d("Refresh info:" + b.toString());
+		 dlog.i("Refresh info:" + b.toString());
 		 
 		 obcService.notifyCarInfo(b);
 	}
@@ -945,7 +946,7 @@ public class Hik_io implements LowLevelInterface {
 
 				String Hex=Integer.toHexString(cardID);
 				dlog.i("onLeaseReportCard : " + cardID + ", hex="+Hex);
-				dlog.d("perf: onLeaseReportCard");
+				dlog.i("perf: onLeaseReportCard");
 				obcService.notifyCard(Hex,"OPEN",false);
 				
 			}
@@ -1031,8 +1032,8 @@ public class Hik_io implements LowLevelInterface {
 		            Bundle b = new Bundle();
 		            b.putString("VIN", vin);
 		            obcService.notifyCarInfo(b);
-		            
-		            dlog.i("onVinCodeChange(vinCode):" + vinCode );
+				 	if(!BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+		            	dlog.i("onVinCodeChange(vinCode):" + vinCode );
 	    	 }
 	    	
 	    	
@@ -1309,7 +1310,7 @@ public class Hik_io implements LowLevelInterface {
 					Bundle b = new Bundle();
 					b.putInt("PackAmp", currentValue);
 					b.putLong("timestampAmp", System.currentTimeMillis() - App.lastUpdateCAN.getTime());
-					dlog.d("onPackCurrentValueChange: " + currentValue+" "+b.getLong("timestampAmp"));
+					dlog.i("onPackCurrentValueChange: " + currentValue+" "+b.getLong("timestampAmp"));
 					App.lastUpdateCAN = new Date();
 					obcService.notifyCANData(b);
 				}*/
@@ -1385,7 +1386,7 @@ public class Hik_io implements LowLevelInterface {
 		    		b.putString("what", "RadioVolume");
 		    		b.putInt("volume", (int)((double)volume*coeff));
 		    		obcService.notifyRadioInfo(b);	   
-		    		dlog.d("Radio: Volume change = " + volume);
+		    		dlog.i("Radio: Volume change = " + volume);
 
 	    		}
 				if(ProTTS.ignoreVolume || AudioPlayer.ignoreVolume) {

@@ -54,7 +54,7 @@ public class Beacon {
     private Boolean charging;
     private String KeyStatus;
     private String gps_info;
-    private Boolean PPStatus;
+    private Boolean PPStatus =false;
     private Boolean noGPS;
     private int SOC;
     private int Speed;

@@ -128,7 +128,7 @@ public class TripInfo {
         Customers customers = dbm.getClientiDao();
 
         // Extracting data
-        Trips trips = dbm.getCorseDao();
+        Trips trips = dbm.getTripDao();
         Trip lastOpenTrip = trips.getLastOpenTrip();
 
         dlog.d("Loading from db: ");
@@ -547,7 +547,7 @@ public class TripInfo {
             HttpGet httpGet = new HttpGet(Url);
 
             response = client.execute(httpGet);
-            DLog.D(" loadBanner: Url richiesta "+Url);
+            DLog.I(" loadBanner: Url richiesta "+Url);
             StatusLine statusLine = response.getStatusLine();
             int statusCode = statusLine.getStatusCode();
             if (statusCode == 200) {
@@ -580,7 +580,7 @@ public class TripInfo {
             return;
         }
 
-        DLog.D(" loadBanner: risposta "+jsonStr);
+        DLog.I(" loadBanner: risposta "+jsonStr);
         File file = new File(outDir, "placeholder.lol");;
 
         try {
@@ -642,7 +642,7 @@ public class TripInfo {
             urlConnection.disconnect();
             Image.putString(("FILENAME"),filename);
             App.Instance.BannerName.putBundle(type,Image);
-            dlog.d(" loadBanner: File scaricato e creato "+filename);
+            dlog.i(" loadBanner: File scaricato e creato "+filename);
 
 
         } catch (Exception e) {
@@ -787,7 +787,7 @@ public class TripInfo {
         //TODO: gestire se gi? aperta
 
         DbManager dbm = App.Instance.dbManager;
-        Trips trips = dbm.getCorseDao();
+        Trips trips = dbm.getTripDao();
 
         this.customer = customer;
         this.isOpen=true;
@@ -816,11 +816,11 @@ public class TripInfo {
             App.Instance.persistCounterCleanlines();
         }
         //check for charge
-        if(App.Charging && !carInfo.isChargingPlug()){
-            App.Charging=false;
+        if(App.isCharging() && !carInfo.isChargingPlug()){
+            App.setCharging(false);
         }
         App.currentTripInfo = null;
-
+        dlog.i("closing trip reset currentTripInfo");
         this.isOpen=false;
         this.isMaintenance = false;
         OptimizeDistanceCalc.Controller(OdoController.STOP);
@@ -1033,7 +1033,7 @@ public class TripInfo {
     }
 
     public void UpdateCorsa() {
-        Trips trips = App.Instance.dbManager.getCorseDao();
+        Trips trips = App.Instance.dbManager.getTripDao();
         try {
             dlog.d("UpdateCorsa: updating trip "+trip.toString());
             trips.createOrUpdate(trip);
@@ -1064,7 +1064,7 @@ public class TripInfo {
         }
 
         int n_pin = customer.checkPin(pin);
-        dlog.d("CheckPin : "+n_pin);
+        dlog.i("CheckPin : "+n_pin);
         dlog.cr("Inserito pin corretto, tipo: "+n_pin);
 
         if (n_pin == Customer.N_COMPANY_PIN) {
@@ -1134,7 +1134,7 @@ public class TripInfo {
             return;
 
 
-        UpdateBuilder<Trip,Integer> builder =  App.Instance.getDbManager().getCorseDao().updateBuilder();
+        UpdateBuilder<Trip,Integer> builder =  App.Instance.getDbManager().getTripDao().updateBuilder();
         try {			
             builder.updateColumnValue("offline", true).where().idEq(trip.id);
             builder.update();
@@ -1151,7 +1151,7 @@ public class TripInfo {
             return;
 
 
-        UpdateBuilder<Trip,Integer> builder =  App.Instance.getDbManager().getCorseDao().updateBuilder();
+        UpdateBuilder<Trip,Integer> builder =  App.Instance.getDbManager().getTripDao().updateBuilder();
         try {
             builder.updateColumnValue("begin_sent", true);
             builder.updateColumnValue("remote_id", trip.remote_id).where().idEq(trip.id);
@@ -1168,7 +1168,7 @@ public class TripInfo {
             return;
 
 
-        UpdateBuilder<Trip,Integer> builder =  App.Instance.getDbManager().getCorseDao().updateBuilder();
+        UpdateBuilder<Trip,Integer> builder =  App.Instance.getDbManager().getTripDao().updateBuilder();
         try {
             builder.updateColumnValue("end_sent", true).where().idEq(trip.id);
             builder.update();
@@ -1184,7 +1184,7 @@ public class TripInfo {
             return;
 
 
-        UpdateBuilder<Trip,Integer> builder =  App.Instance.getDbManager().getCorseDao().updateBuilder();
+        UpdateBuilder<Trip,Integer> builder =  App.Instance.getDbManager().getTripDao().updateBuilder();
         try {			
             builder.updateColumnValue("warning", warning).where().idEq(trip.id);
             builder.update();
@@ -1218,7 +1218,7 @@ public class TripInfo {
                     App.Instance.persistParkModeStarted();
                 }
 
-                int id_parent = trip.id_parent;
+                int id_parent = trip.id_parent == -1? -2 : trip.id_parent; //-1 la prima volta -2 per indicare di dover cercare la corsa padre
                 int n_pin = trip.n_pin;
                 //Se ? passata la durata massima chiudi la trip amministrativamente...
                 CloseCorsaMaxDurata(carInfo);
@@ -1235,7 +1235,7 @@ public class TripInfo {
 
                 // Apri una nuova trip che sostituisce la precedente
 //                DbManager dbm = App.Instance.dbManager;
-//                Trips trips = dbm.getCorseDao();
+//                Trips trips = dbm.getTripDao();
 
 
                 trip = buildOpenTrip();

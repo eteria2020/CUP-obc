@@ -189,7 +189,7 @@ public class App extends MultiDexApplication {
 	}
 
 	public static boolean isNetworkStable() {
-		return networkStable || getDiffLastApiError()>20*60*1000;//20 min
+		return true;//networkStable || getDiffLastApiError()>20*60*1000;//20 min //commentata per problema no3g CSD-3144
 	}
 
 	public static void setNetworkStable(boolean networkStable) {
@@ -236,6 +236,15 @@ public class App extends MultiDexApplication {
 
 	public static void setIsCloseable(boolean isCloseable) {
 		App.isCloseable = isCloseable;
+	}
+
+	public static boolean isCharging() {
+		return Charging;
+	}
+
+	public static void setCharging(boolean charging) {
+		DLog.I("setCharging: old/new value = " + Charging + " / " +charging);
+		Charging = charging;
 	}
 
 	public static class Versions {
@@ -589,7 +598,7 @@ public class App extends MultiDexApplication {
 	public static boolean isClosing=false;
 
 	public static boolean  ObcIoError=false;
-	public static boolean  Charging = false;
+	private static boolean  Charging = false;
 
 	public static boolean  AlarmSOCSent=false;
 
@@ -810,7 +819,7 @@ public class App extends MultiDexApplication {
 	public void persistCharging() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
-			e.putBoolean(KEY_Charging, App.Charging);
+			e.putBoolean(KEY_Charging, App.isCharging());
 			e.apply();
 		}
 	}
@@ -974,9 +983,9 @@ public class App extends MultiDexApplication {
 
 	public void loadCharging() {
 		if (this.preferences != null) {
-			App.Charging = this.preferences.getBoolean(KEY_Charging, false);
+			App.setCharging(this.preferences.getBoolean(KEY_Charging, false));
 		} else {
-			App.Charging = false;
+			App.setCharging(false);
 		}
 	}
 
@@ -993,7 +1002,7 @@ public class App extends MultiDexApplication {
 				for(int i=0; i< ja.length(); i++) {
 					if (!ja.isNull(i)) {
 						BatteryAlarmSmsNumbers.add(ja.getString(i));
-						dlog.d("Add to BatteryAlarmSmsNumbers : " +ja.getString(i));
+//						dlog.d("Add to BatteryAlarmSmsNumbers : " +ja.getString(i));
 					}
 				}
 			} catch (JSONException e) {
@@ -1014,7 +1023,7 @@ public void loadRadioSetup() {
 
 		if (this.preferences != null) {
 			String json = preferences.getString(KEY_RadioSetup, "");
-			dlog.d("RadioSetup from preferences : " + json);
+			dlog.i("RadioSetup from preferences : " + json);
 			radioSetup = RadioSetup.fromJson(json);
 
 		}
@@ -1038,7 +1047,7 @@ public void loadRadioSetup() {
 
 		if (this.preferences != null) {
 			String json = preferences.getString(KEY_OpenDoorsCards, "");
-			dlog.d("RadioSetup from preferences : " + json);
+			//dlog.d("OpenDoorCards from preferences : " + json);
 			openDoorsCards = CardRfidCollection.decodeFromJson(json);
 
 		}
@@ -1053,6 +1062,8 @@ public void loadRadioSetup() {
 	}
 
 	public int loadSplitTripConfig() {
+		/*if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+			return 10;*/
 		File f = new File(getSPLIT_TRIP_CONFIG_FILE());
 		if (f.exists()) {
 			try {
@@ -1382,7 +1393,7 @@ public void loadRadioSetup() {
 		public void handleMessage(Message msg) {
 
 
-			DLog.D("Service: received msg id:" + msg.what);
+			DLog.I("Service: received msg id:" + msg.what);
 
 			switch (msg.what) {
 
@@ -1510,7 +1521,7 @@ private void  initPhase2() {
 		
 		
 		
-		//Trips corse = dbManager.getCorseDao();
+		//Trips corse = dbManager.getTripDao();
 		//corse.sendOffline(this, null);
 
 		
@@ -1998,7 +2009,7 @@ private void  initPhase2() {
 		}
 		CarPlate = preferences.getString(KEY_CarPlate,"NO_PLATE");
 		fw_version = preferences.getString(KEY_fw_version,"nd");
-		fuel_level = preferences.getInt(KEY_fuel_level, 0); dlog.d("loadPreferences: fuel_level is "+fuel_level);
+		fuel_level = preferences.getInt(KEY_fuel_level, 0); dlog.i("loadPreferences: fuel_level is "+fuel_level);
 		max_voltage = preferences.getFloat(KEY_MaxVoltage,83);
 			max_voltage=(max_voltage > 85f || max_voltage < 80f ? 83f : max_voltage); //controllo bontà maxVoltage
 		km = preferences.getInt(KEY_Km, 0);		

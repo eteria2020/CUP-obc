@@ -348,7 +348,7 @@ public class Events extends DbTable<Event,Integer> {
 			where.and(
 				where.eq("sent",false),
 				//where.eq("sending_error", false)
-				where.ge("timestamp",((System.currentTimeMillis()/1000)-60*60*24*7))
+				where.ge("timestamp",((System.currentTimeMillis()/1000)-60*60*24*7)) //7 giorni sempre
 			);
 
 
@@ -433,7 +433,7 @@ public class Events extends DbTable<Event,Integer> {
 			EventsConnector ec = new EventsConnector();
 			ec.event = e;
 			/*if(ec.event.id_trip==0 && ec.event.id_trip_local!=0){
-				Trips corse = App.Instance.getDbManager().getCorseDao();
+				Trips corse = App.Instance.getDbManager().getTripDao();
 				ec.event.id_trip=corse.getRemoteIDfromLocal(ec.event.id_trip_local);
 			}
 			ec.returnMessageId = Connectors.MSG_EVENTS_SENT_OFFLINE;

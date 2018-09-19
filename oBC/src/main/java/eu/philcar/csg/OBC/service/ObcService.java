@@ -427,13 +427,13 @@ public class ObcService extends Service implements OnTripCallback {
         public void onGpsStatusChanged(int event) {
             switch (event) {
                 case GpsStatus.GPS_EVENT_STARTED:
-                    dlog.d("GPS STARTED");
+//                    dlog.d("GPS STARTED");
                     break;
                 case GpsStatus.GPS_EVENT_STOPPED:
-                    dlog.d("GPS STOPPED");
+//                    dlog.d("GPS STOPPED");
                     break;
                 case GpsStatus.GPS_EVENT_FIRST_FIX:
-                    dlog.d("GPS FIRST FIX");
+//                    dlog.d("GPS FIRST FIX");
                     break;
                 case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
                     break;
@@ -736,7 +736,7 @@ public class ObcService extends Service implements OnTripCallback {
                         }
                     }
                     if(!bmsCellError && !bmsSocError && !ampError) {
-                        dlog.d("virtualBMSUpdateScheduler: reset count to 0"+bmsCellError+bmsSocError+ampError);
+                        dlog.i("virtualBMSUpdateScheduler: reset count to 0"+bmsCellError+bmsSocError+ampError);
                         App.Instance.setBmsCountTo90(0);
                     }
 
@@ -771,7 +771,7 @@ public class ObcService extends Service implements OnTripCallback {
 
                             if(bmsSocError){
                                 if(App.Instance.incrementBmsCountTo90()<90) {
-                                    dlog.d("virtualBMSUpdateScheduler: all fault keep last valid value to 0 is "+ App.getBmsCountTo90() +" times | error: "+bmsCellError+bmsSocError+ampError);
+                                    dlog.i("virtualBMSUpdateScheduler: all fault keep last valid value to 0 is "+ App.getBmsCountTo90() +" times | error: "+bmsCellError+bmsSocError+ampError);
                                     carInfo.SOCR = carInfo.batteryLevel;
                                 }
                                 else{
@@ -783,7 +783,7 @@ public class ObcService extends Service implements OnTripCallback {
                             }else{
 
                                 if( App.Instance.incrementBmsCountTo90()<90) {
-                                    dlog.d("virtualBMSUpdateScheduler: bms cells fault using bms SOC to 0 is " +  App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + ampError);
+                                    dlog.i("virtualBMSUpdateScheduler: bms cells fault using bms SOC to 0 is " +  App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + ampError);
                                     carInfo.SOCR = Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS);
                                 }
                                 else{
@@ -796,7 +796,7 @@ public class ObcService extends Service implements OnTripCallback {
 
                         }else if(bmsSocError){
                             if( App.Instance.incrementBmsCountTo90()<90) {
-                                dlog.d("virtualBMSUpdateScheduler: bms SOC fault using SOC2 to 0 is " + App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + ampError);
+                                dlog.i("virtualBMSUpdateScheduler: bms SOC fault using SOC2 to 0 is " + App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + ampError);
                                 carInfo.SOCR = carInfo.virtualSOC;
                             }
                             else{
@@ -808,7 +808,7 @@ public class ObcService extends Service implements OnTripCallback {
                         else{
                             carInfo.SOCR = Math.min(carInfo.bmsSOC, carInfo.virtualSOC);
                         }
-                        dlog.d("virtualBMSUpdateScheduler:error calculation VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
+                        dlog.i("virtualBMSUpdateScheduler:error calculation VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
 
                     }else {
                         if (Math.abs(carInfo.bmsSOC - carInfo.bmsSOC_GPRS) <= 2) {
@@ -837,8 +837,8 @@ public class ObcService extends Service implements OnTripCallback {
                     //check car bms usage
                     if (carInfo.currVoltage <= 0 || (carInfo.getOutAmp() >= 25 && carInfo.getOutAmp() !=350)){
                         carInfo.setBatteryLevel((Math.min(carInfo.batteryLevel,Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS))));
-                        dlog.d("virtualBMSUpdateScheduler: value "+ (carInfo.currVoltage<=0?"packVoltage null":"outAmp greater than 25")+" ignoring virtual data.");
-                        dlog.d("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
+                        dlog.i("virtualBMSUpdateScheduler: value "+ (carInfo.currVoltage<=0?"packVoltage null":"outAmp greater than 25")+" ignoring virtual data.");
+                        dlog.i("virtualBMSUpdateScheduler: VBATT: " + carInfo.currVoltage + "V V100%: " + App.max_voltage + "V cell voltage: " + cellsVoltage + " soc: " + carInfo.bmsSOC + "% SOCR: " + carInfo.SOCR + "% SOC2:" + carInfo.virtualSOC + "% SOC.ADMIN:" + carInfo.batteryLevel + "% bmsSOC_GPRS:" + carInfo.bmsSOC_GPRS + "%");
                         return;
                     }
                         if ((carInfo.isCellLowVoltage) || carInfo.currVoltage <= 67f) {
@@ -849,15 +849,15 @@ public class ObcService extends Service implements OnTripCallback {
                     /*if (carInfo.bmsSOC >= 100 || carInfo.bmsSOC_GPRS >= 100) {
                         if (!carInfo.Charging || (carInfo.currVoltage > App.getMax_voltage())) {
                             //App.Instance.setMaxVoltage(carInfo.currVoltage > 85f || carInfo.currVoltage < 80f ? 83f : carInfo.currVoltage);
-                            dlog.d("virtualBMSUpdateScheduler: set maxVoltage to " + App.getMax_voltage() + "% bmsSOC: " + carInfo.bmsSOC + " % bmsSOC_GPRS: " + carInfo.bmsSOC_GPRS + "% currVoltage " + carInfo.currVoltage + "% Charging: " + carInfo.Charging);
+                            dlog.i("virtualBMSUpdateScheduler: set maxVoltage to " + App.getMax_voltage() + "% bmsSOC: " + carInfo.bmsSOC + " % bmsSOC_GPRS: " + carInfo.bmsSOC_GPRS + "% currVoltage " + carInfo.currVoltage + "% Charging: " + carInfo.Charging);
                             carInfo.Charging = true;
                         }
                     } else {
                         carInfo.Charging = false;
                     }*/
 
-                    //set SOCR value
-                    dlog.d("virtualBMSUpdateScheduler: alarm state: amp: "+ampError +" cell: "+bmsCellError+" soc: "+bmsSocError);
+                    //set SOCR valued
+                    dlog.i("virtualBMSUpdateScheduler: alarm state: amp: "+ampError +" cell: "+bmsCellError+" soc: "+bmsSocError);
 
                         carInfo.setBatteryLevel(Math.round(carInfo.SOCR));
 
@@ -1064,7 +1064,7 @@ public class ObcService extends Service implements OnTripCallback {
     @SuppressLint("MissingPermission")
     private void setLocationMode(long minTime) {
         if (locationManager != null) {
-            dlog.d("setLocationMode "+minTime);
+            dlog.i("setLocationMode "+minTime);
             locationManager.removeUpdates(carInfo.serviceLocationListener);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, 0, carInfo.serviceLocationListener);
         }
@@ -1205,7 +1205,7 @@ public class ObcService extends Service implements OnTripCallback {
             //udpServer.sendBeacon(msg);
             Observable.just(1).delay(100,TimeUnit.MILLISECONDS)
                     .concatMap(i->
-            beaconRepository.sendBeacon(carinfo.getJsonGson(true)))
+            beaconRepository.sendBeacon(carinfo.getJson(true)))
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(Schedulers.computation())
                     .subscribe(new Observer<BeaconResponse>() {
@@ -1227,7 +1227,7 @@ public class ObcService extends Service implements OnTripCallback {
 
                         @Override
                         public void onComplete() {
-                            DLog.I("Synced successfully!");
+                            DLog.I("Beacon sent successfully!");
                         }
                     });
 
@@ -1292,7 +1292,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     public void setDisplayStatus(boolean on, int delay) {
 
-        dlog.d("Set displayStatus  : " + on + " delay:" + delay);
+        dlog.i("Set displayStatus  : " + on + " delay:" + delay);
         if (on) {
             if (screenLockTrip != null)
                 screenLockTrip.acquire();
@@ -1422,8 +1422,10 @@ public class ObcService extends Service implements OnTripCallback {
 
         Bundle res = carInfo.betterHandleUpdate(b,this);
 
-        if (res.getBoolean("force"))
+        if (res.getBoolean("force")) {
+            dlog.i("forse beaconUpdate");
             sendBeacon();
+        }
         if (!res.getBoolean("changed"))
             return;
 
@@ -1765,7 +1767,7 @@ public class ObcService extends Service implements OnTripCallback {
                     break;
 
                 case "RESEND_TRIP":
-                    Trips corse = App.Instance.getDbManager().getCorseDao();
+                    Trips corse = App.Instance.getDbManager().getTripDao();
                     corse.ResetFailed();
                     privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
                     break;
@@ -1915,7 +1917,7 @@ public class ObcService extends Service implements OnTripCallback {
                 msg.arg1 = ObcService.SERVER_NOTIFY_RESERVATION;
                 msg.arg2 = n;
                 localHandler.sendMessage(msg);
-                dlog.d("MSG_SERVER_NOTIFY - SERVER_NOTIFY_RESERVATION sent :" + n);
+                dlog.i("MSG_SERVER_NOTIFY - SERVER_NOTIFY_RESERVATION sent :" + n);
             }
         }
 
@@ -1931,7 +1933,7 @@ public class ObcService extends Service implements OnTripCallback {
                 msg.arg1 = ObcService.SERVER_NOTIFY_COMMAND;
                 msg.arg2 = n;
                 localHandler.sendMessage(msg);
-                dlog.d("MSG_SERVER_NOTIFY - SERVER_NOTIFY_COMMAND sent :" + n);
+                dlog.i("MSG_SERVER_NOTIFY - SERVER_NOTIFY_COMMAND sent :" + n);
             }
         }
 
@@ -1947,7 +1949,7 @@ public class ObcService extends Service implements OnTripCallback {
 
     public void startDownloadCustomers() {
 
-        apiRepository.getCustomer(200);
+        apiRepository.getCustomer(1000);
 
 //        Customers customers = App.Instance.dbManager.getClientiDao();
 //        customers.startWhitelistDownload(this, privateHandler);
@@ -1984,7 +1986,7 @@ public class ObcService extends Service implements OnTripCallback {
     public void startDownloadReservations() {
         dlog.d("Start Downloading reservations");
         Observable.just(1)
-        .delay(150,TimeUnit.MILLISECONDS)
+        .delay(2000,TimeUnit.MILLISECONDS)
         .concatMap(i->{
             if(App.fullNode)
                 return apiRepository.getReservation();
@@ -2109,7 +2111,7 @@ public class ObcService extends Service implements OnTripCallback {
     }
 
     public void notifyServerMessage(int what, int value, String response) {
-        dlog.d("Handle notifyServerMessage : " + what + " => " + value);
+        dlog.i("Handle notifyServerMessage : " + what + " => " + value);
         switch (what) {
 
             case SERVER_NOTIFY_RAW:
@@ -2447,12 +2449,12 @@ public class ObcService extends Service implements OnTripCallback {
 
 
             //Dequeue eventual offline trip or events
-            privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
+            privateHandler.sendEmptyMessageDelayed(Connectors.MSG_TRIPS_SENT_OFFLINE,20000);
             privateHandler.removeMessages(Connectors.MSG_EVENTS_SENT_OFFLINE);
             privateHandler.sendEmptyMessageDelayed(Connectors.MSG_EVENTS_SENT_OFFLINE,10000);
 
             //if(fourHurScheduler%2==0) {
-                localHandler.sendMessage(MessageFactory.zmqRestart());
+                localHandler.sendMessageDelayed(MessageFactory.zmqRestart(),10000);
                 App.canRestartZMQ=true;
             //}
             if(App.currentTripInfo==null && SystemClock.elapsedRealtime()- App.AppScheduledReboot.getTime()>24*60*60*1000 && !startedReboot){
@@ -2513,7 +2515,7 @@ public class ObcService extends Service implements OnTripCallback {
 
                 case Connectors.MSG_TRIPS_SENT_OFFLINE:
                 case Connectors.MSG_TRIPS_SENT_REALTIME:
-                    Trips corse = App.Instance.getDbManager().getCorseDao();
+                    Trips corse = App.Instance.getDbManager().getTripDao();
                     corse.sendOffline(ObcService.this, this, apiRepository,phpRepository);
                     carInfo.updateTrips();
                     break;
@@ -2558,7 +2560,7 @@ public class ObcService extends Service implements OnTripCallback {
         public void handleMessage(Message msg) {
 
             if(msg.what != MSG_CAR_LOCATION)
-                DLog.D("Service: received msg id:" + msg.what);
+                DLog.I("Service: received msg id:" + msg.what);
 
             switch (msg.what) {
 
@@ -2732,7 +2734,7 @@ public class ObcService extends Service implements OnTripCallback {
                         if (tripInfo != null) {
                             boolean isVerified = tripInfo.CheckPin(pin, false);
                             if (isVerified) {
-                                dlog.d("Pin OK");
+                                dlog.i("Pin OK");
                                 //obc_io.setEngine(rmsg.replyTo, 1);
                                 App.setIsCloseable(false);
                                 removeSelfCloseTrip();
@@ -2951,8 +2953,8 @@ public class ObcService extends Service implements OnTripCallback {
 
 
                     dlog.d("Received endCharging message");
-                    if (!carInfo.isChargingPlug() && App.Charging) {
-                        App.Charging = false;
+                    if (!carInfo.isChargingPlug() && App.isCharging()) {
+                        App.setCharging(false);
                         App.Instance.persistCharging();
                         if(FMaintenance.Instance!=null)
                             FMaintenance.Instance.update(carInfo);

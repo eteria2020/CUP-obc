@@ -50,4 +50,9 @@ public class TripResponse extends BaseResponse {
     public void setPreauthDone(boolean preauthDone) {
         this.preauthDone = preauthDone;
     }
+
+    public int getRemoteID(){
+        int response =  getResult()>0?getResult():Integer.parseInt(getExtra());
+        return response;
+    }
 }

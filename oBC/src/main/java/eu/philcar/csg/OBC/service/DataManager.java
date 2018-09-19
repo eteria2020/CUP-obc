@@ -57,13 +57,13 @@ public class DataManager { //TODO change to interface-type system like api does 
 
     public Observable<Trip> saveTrip(Trip trip) {
 
-        return  mDbManager.getCorseDao().createOrUpdateOne(trip);
+        return  mDbManager.getTripDao().createOrUpdateOne(trip);
 
     }
 
     public Observable<Trip> saveTrips(Collection<Trip> trip) {
 
-        return  mDbManager.getCorseDao().createOrUpdateMany(trip);
+        return  mDbManager.getTripDao().createOrUpdateMany(trip);
 
     }
 
@@ -103,7 +103,7 @@ public class DataManager { //TODO change to interface-type system like api does 
     }
 
     public void updateBeginSentDone(Trip trip){
-        UpdateBuilder<Trip,Integer> builder = mDbManager.getCorseDao().updateBuilder();
+        UpdateBuilder<Trip,Integer> builder = mDbManager.getTripDao().updateBuilder();
         try {
             builder.updateColumnValue("warning", trip.warning);
             builder.updateColumnValue("recharge", trip.recharge);
@@ -123,7 +123,7 @@ public class DataManager { //TODO change to interface-type system like api does 
             return;
 
 
-        UpdateBuilder<Trip,Integer> builder =  mDbManager.getCorseDao().updateBuilder();
+        UpdateBuilder<Trip,Integer> builder =  mDbManager.getTripDao().updateBuilder();
         try {
             builder.updateColumnValue("recharge", trip.recharge);
             builder.updateColumnValue("offline", trip.offline);
@@ -160,7 +160,7 @@ public class DataManager { //TODO change to interface-type system like api does 
             return;
 
 
-        UpdateBuilder<Trip,Integer> builder =  mDbManager.getCorseDao().updateBuilder();
+        UpdateBuilder<Trip,Integer> builder =  mDbManager.getTripDao().updateBuilder();
         try {
             builder.updateColumnValue("end_sent", true);
             builder.where().idEq(trip.id);
@@ -248,8 +248,13 @@ public class DataManager { //TODO change to interface-type system like api does 
         return mDbManager.getClientiDao().mostRecentTimestamp();
     }
 
+    public Observable<Integer> findTripParent(Trip trip){
+        return mDbManager.getTripDao().findTripParentfromTrip(trip)
+                .concatMap(trip1 -> Observable.just(trip1.remote_id));
+    }
+
     public int getTripIdFromEvent(Event event){
-        List<Trip> trips =  mDbManager.getCorseDao().getTripfromTime(event.timestamp);
+        List<Trip> trips =  mDbManager.getTripDao().getTripfromTime(event.timestamp);
         if(trips.size()>0)
             return trips.get(0).remote_id;
         else

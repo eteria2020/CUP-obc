@@ -216,7 +216,7 @@ public class CarInfo {
         }*/
         if(batteryLevel>100)
             batteryLevel=100;
-        dlog.d("setBatteryLevel: first "+this.batteryLevel +" target: "+batteryLevel);
+        dlog.i("setBatteryLevel: first "+this.batteryLevel +" target: "+batteryLevel);
 
         if (this.batteryLevel - batteryLevel>= 5) {
             this.batteryLevel = (this.batteryLevel > batteryLevel ? this.batteryLevel - 5 : this.batteryLevel + 5);
@@ -228,7 +228,7 @@ public class CarInfo {
 
         App.Instance.setBatteryLevel(this.batteryLevel);
         beacon.setSOC(this.batteryLevel);
-        dlog.d("setBatteryLevel: result "+this.batteryLevel);
+        dlog.i("setBatteryLevel: result "+this.batteryLevel);
     }
 
     private void setLocation(Location loc) {
@@ -358,8 +358,8 @@ public class CarInfo {
                     eventRepository.eventCharge(v ? 1 : 0);
                 }
 
-                if (!App.Charging && this.isChargingPlug()) {
-                    App.Charging = true;
+                if (!App.isCharging() && this.isChargingPlug()) {
+                    App.setCharging(true);
                     serviceHandler.sendMessage(MessageFactory.notifyStartCharging(this));
                     App.Instance.persistCharging();
                     forceBeacon = true;
@@ -574,11 +574,12 @@ public class CarInfo {
                 if (bo != this.isChargingPlug()) {
                     this.setChargingPlug(bo);
                     eventRepository.eventCharge(bo ? 1 : 0);
+                    forceBeacon = true;
 
                 }
-                if (!App.Charging && this.isChargingPlug()) {
+                if (!App.isCharging() && this.isChargingPlug()) {
 
-                    App.Charging = true;
+                    App.setCharging(true);
                     serviceHandler.sendMessage(MessageFactory.notifyStartCharging(this));
                     App.Instance.persistCharging();
                     forceBeacon = true;
@@ -728,7 +729,7 @@ public class CarInfo {
 
 
     public void updateTrips() {
-        Trips corse = App.Instance.getDbManager().getCorseDao();
+        Trips corse = App.Instance.getDbManager().getTripDao();
         if (corse != null) {
             tripsToSend = corse.getNTripsToSend();
 
@@ -825,7 +826,7 @@ public class CarInfo {
     }
 
 
-    @Deprecated
+
     public String getJson(boolean longVersion) {
         StringWriter sw = new StringWriter();
         JsonWriter jw = new JsonWriter(sw);
@@ -863,7 +864,7 @@ public class CarInfo {
             jw.name("closeEnabled").value(enableRemoteClose);
             jw.name("parkEnabled").value(!App.motoreAvviato && App.getParkModeStarted() != null);
             jw.name("parking").value(App.getParkModeStarted() != null && App.parkMode.isOn());
-            jw.name("charging").value(App.Charging);
+            jw.name("charging").value(App.isCharging());
             jw.name("noGPS").value(App.getNoGPSAlarm());
             jw.name("PPStatus").value(this.isChargingPlug());
             if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
@@ -947,7 +948,7 @@ public class CarInfo {
                 beacon.setCloseEnabled(enableRemoteClose);
                 beacon.setParkEnabled(!App.motoreAvviato && App.getParkModeStarted() != null);
                 beacon.setParking(App.getParkModeStarted() != null && App.parkMode.isOn());
-                beacon.setCharging(App.Charging);
+                beacon.setCharging(App.isCharging());
                 beacon.setNoGPS(App.getNoGPSAlarm());
 
                 if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
@@ -1037,7 +1038,7 @@ public class CarInfo {
             jw.name("closeEnabled").value(enableRemoteClose);
             jw.name("parkEnabled").value(!App.motoreAvviato && App.getParkModeStarted() != null);
             jw.name("parking").value(App.getParkModeStarted() != null && App.parkMode.isOn());
-            jw.name("charging").value(App.Charging);
+            jw.name("charging").value(App.isCharging());
             jw.name("noGPS").value(App.getNoGPSAlarm());
             if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
                 jw.name("id_trip").value(App.currentTripInfo.trip.remote_id);

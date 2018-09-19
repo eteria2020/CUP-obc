@@ -102,7 +102,7 @@ public class FMenu extends FBase implements OnClickListener{
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		dlog.d("onCreateView FMenu");
+		dlog.d("onCreateView FMenu " +clickedButton + " key is " + CarInfo.getKeyStatus() + " checkKey is " + App.checkKeyOff);
 		
 		// No more model logic, trip/car status in this method. It should only load UI items
 		
@@ -245,7 +245,7 @@ public class FMenu extends FBase implements OnClickListener{
 		case R.id.fmenPauseRentTV:
 			resetBanner();
 			((AMainOBC)getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE,-1));
-			dlog.d("Banner: pause rent stopping update");
+			dlog.d("Banner: click on pauseRent starting park countdown");
 			boolean startParkingMode = (App.getParkModeStarted() == null);
 			((AMainOBC)getActivity()).setParkModeStarted( startParkingMode );
 
@@ -423,6 +423,7 @@ public class FMenu extends FBase implements OnClickListener{
 				switch (App.parkMode) {
 				case PARK_OFF: 		// (FALSE, NULL, OFF)
 					if( CarInfo.getKeyStatus() != null && !CarInfo.getKeyStatus().equalsIgnoreCase("OFF") && App.checkKeyOff) {
+					dlog.d("updateUI: display key error " + CarInfo.getKeyStatus() +" " + App.checkKeyOff);
 						UIHelper(R.drawable.ic_key_red, R.string.menu_rent_end_key_on, null,
 								R.drawable.ic_key_green, R.string.menu_park_mode_suspend_key_on, null,
 								R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
@@ -437,11 +438,14 @@ public class FMenu extends FBase implements OnClickListener{
 										R.drawable.ic_arrow_left, this);
 
 								if(clickedButton.equalsIgnoreCase(REQUEST_PARK) && App.checkKeyOff) {
+
+									dlog.cr(" auto click on Park");
 									onClick(pauseRentIB);
 									actionTaken = true;
 									clickedButton = "";
 								}
 								else if(clickedButton.equalsIgnoreCase(REQUEST_END_RENT) && App.checkKeyOff) {
+									dlog.cr(" auto click on End Rent");
 									onClick(endRentIB);
 									actionTaken = true;
 									clickedButton = "";

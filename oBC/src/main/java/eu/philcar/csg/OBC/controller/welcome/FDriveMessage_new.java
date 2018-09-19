@@ -705,7 +705,7 @@ public class FDriveMessage_new extends FBase {
 			HttpGet httpGet = new HttpGet(Url);
 
 			response = client.execute(httpGet);
-			DLog.D(" loadBanner: Url richiesta "+Url);
+			DLog.I(" loadBanner: Url richiesta "+Url);
 			StatusLine statusLine = response.getStatusLine();
 			int statusCode = statusLine.getStatusCode();
 			if (statusCode == 200) {
@@ -738,7 +738,7 @@ public class FDriveMessage_new extends FBase {
 			return;
 		}
 
-		DLog.D(" loadBanner: risposta "+jsonStr);
+		DLog.I(" loadBanner: risposta "+jsonStr);
 		File file = new File(outDir, "placeholder.lol");;
 
 		try {
@@ -805,7 +805,7 @@ public class FDriveMessage_new extends FBase {
 			urlConnection.disconnect();
 			Image.putString(("FILENAME"),filename);
 			App.Instance.BannerName.putBundle(type,Image);
-			dlog.d(" loadBanner: File scaricato e creato "+filename);
+			dlog.i(" loadBanner: File scaricato e creato "+filename);
 
 
 		} catch (Exception e) {

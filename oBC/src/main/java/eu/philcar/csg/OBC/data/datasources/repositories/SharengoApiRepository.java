@@ -3,6 +3,7 @@ package eu.philcar.csg.OBC.data.datasources.repositories;
 import android.support.annotation.NonNull;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -286,7 +287,9 @@ public class SharengoApiRepository {
     public void getArea(){
 
         if(!RxUtil.isRunning(areaDisposable)) {
-            mRemoteDataSource.getArea(App.AreaPolygonMD5)
+            Observable.just(1)
+                    .delay(3, TimeUnit.SECONDS)
+                    .concatMap(i-> mRemoteDataSource.getArea(App.AreaPolygonMD5))
                     .filter(n->n.size()!=0)
                     .concatMap(n -> mDataManager.saveArea(n))
                     //Emit single Area Response at time
@@ -480,12 +483,19 @@ public class SharengoApiRepository {
         if(!sendingEvents)
             Observable.interval(60,TimeUnit.SECONDS)
                     .take(event.size())
-                    .concatMap(i->Observable.just(event.get(i.intValue()))).concatMap(event1 -> {
+                    .concatMap(i->Observable.just(event.get(i.intValue())))
+                    .concatMap(event1 -> {
                         if(event1.id_trip==0)
                             event1.id_trip = mDataManager.getTripIdFromEvent(event1);
                         return Observable.just(event1);
 
                     })
+                    .concatMap(event1 -> {
+                        if(event1.label.equalsIgnoreCase("SOS") && event1.timestamp < System.currentTimeMillis() -1000*60*60){
+                            event1.label = "SOS_EXPIRED";
+                        }
+                        return Observable.just(event1);
+                    })//check is sos expired
                     .concatMap(mDataManager::saveEvent)
             /*mDataManager.saveEvents(event)
                     .delay(10, TimeUnit.SECONDS)*/
@@ -525,6 +535,7 @@ public class SharengoApiRepository {
     public Observable<TripResponse> openTrip(final Trip trip, final TripInfo tripInfo) {
 
         return mDataManager.saveTrip(trip)
+                .delay(1000,TimeUnit.MILLISECONDS)
                 .concatMap(n -> mRemoteDataSource.openTrip(n, mDataManager))
                 .doOnSubscribe(n -> {
                     //RxUtil.dispose(openTripDisposable);
@@ -564,6 +575,23 @@ public class SharengoApiRepository {
                         return mRemoteDataSource.openTripPassive(n, mDataManager);
                     return Observable.just(n);
                 })
+                /*.concatMap(trip1 -> {Trip t =  new Trip();
+                t.remote_id = 3747321;
+                t.plate = "EG73874";
+                t.id_customer = 97843;
+                t.end_timestamp = 1536900806;
+                t.end_time = new Date(1536900806);
+                t.end_km = 224;
+                t.end_battery = 33;
+                t.end_lon = 12.499987500000001;
+                t.end_lat = 41.91617766666666;
+                t.warning = null;
+                t.int_cleanliness = 0;
+                t.ext_cleanliness = 0;
+                t.park_seconds = 0;
+                t.n_pin = 1;
+                return Observable.just(t);
+                })*/
                 .concatMap(n -> mRemoteDataSource.closeTrip(n, mDataManager))
                 .doOnSubscribe(n -> {
                     //RxUtil.dispose(openTripDisposable);
@@ -579,8 +607,11 @@ public class SharengoApiRepository {
 
     }
 
-    public Observable<Trip> closeTrips(final Collection<Trip> trip) {
-        return mDataManager.saveTrips(trip)
+    public Observable<Trip> closeTrips(final List<Trip> trip) {
+        return Observable.interval(30,TimeUnit.SECONDS)
+                .take(trip.size())
+                .concatMap(i->Observable.just(trip.get(i.intValue())))
+                .concatMap(mDataManager::saveTrip)
                 .concatMap(n -> {
                     if(!n.begin_sent)
                         return mRemoteDataSource.openTripPassive(n, mDataManager);

@@ -84,7 +84,7 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 			isEnctypted=false;
 	}
 
-	@Deprecated
+
 	public Customer() {
 	}
 
@@ -142,7 +142,7 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 			return N_ERROR_PIN;
 		}
 
-		DLog.D("Customer hashed pin : " + hashStr);
+		DLog.I("Customer hashed pin : " + hashStr);
 
 		if (pin==null)
 			return N_ERROR_PIN;
@@ -151,7 +151,7 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 
 		try {
 			JSONObject jobj = new JSONObject(pin);
-			DLog.D("Valid JSON : " + pin);
+			DLog.I("Valid JSON : " + pin);
 
 			if (jobj.has("primary") && jobj.getString("primary").equals(hashStr)) {
 				return N_PRIMARY_PIN;
@@ -173,7 +173,7 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 
 			JSONArray jarray = new JSONArray(pin);
 
-			DLog.D("Valid JSON : " + pin);
+			DLog.I("Valid JSON : " + pin);
 
 			if (jarray.length()>0)
 				pin1= jarray.getString(0);

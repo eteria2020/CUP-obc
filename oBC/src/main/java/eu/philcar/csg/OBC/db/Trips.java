@@ -24,6 +24,7 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Retrofit;
 
 public class Trips extends DbTable<Trip,Integer> {
 
@@ -168,8 +169,11 @@ public class Trips extends DbTable<Trip,Integer> {
 			dlog.d("Trips to send : null");
 			return false;
 		}
-		
+
+
 		dlog.d("Trips to send : " + list.size());
+		if(list.size()==0)
+			return false;
 		
 		if (!App.hasNetworkConnection()) {
 			dlog.w("No connection: aborted");
@@ -323,6 +327,38 @@ public class Trips extends DbTable<Trip,Integer> {
 			dlog.d("Query : " + query.toString());
 
 			return this.query(query);
+
+		} catch (SQLException e) {
+			dlog.e("getEventsToSend fail:",e);
+			return null;
+
+		}
+	}
+
+	public Observable<Trip> findTripParentfromTrip(Trip trip) {
+
+		try {
+			Where<Trip,Integer> where  = queryBuilder().orderBy("remote_id", false).limit(1L).where();
+
+			where.and(where.gt("id_parent",0),
+					where.le("end_timestamp",trip.begin_timestamp),
+					where.eq("id_customer",trip.id_customer),
+					where.ge("end_timestamp",trip.begin_timestamp-1000*60*4));
+			//where.eq("sending_error", false)
+			//where.ge("timestamp",((System.currentTimeMillis()/1000)-60*60*24*7))
+
+
+
+
+
+			PreparedQuery<Trip> query =  where.prepare();
+			dlog.d("Query : " + query.toString());
+			List<Trip> result = this.query(query);
+			if(result.size()>0) {
+				return Observable.just(this.query(query))
+						.concatMap(Observable::fromIterable);
+			}
+			else return Observable.just(new Trip());
 
 		} catch (SQLException e) {
 			dlog.e("getEventsToSend fail:",e);

@@ -174,7 +174,7 @@ public class UdpServer {
 							msg.arg1 = ObcService.SERVER_NOTIFY_RAW;
 							msg.obj = plainstr;
 							serviceHandler.sendMessage(msg);
-							dlog.d("MSG_SERVER_NOTIFY RAW sent");
+							dlog.i("MSG_SERVER_NOTIFY RAW sent");
 					}
 					
 					

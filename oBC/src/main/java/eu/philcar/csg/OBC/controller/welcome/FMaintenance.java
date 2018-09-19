@@ -15,7 +15,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.text.InputType;
@@ -203,8 +202,8 @@ public class FMaintenance extends FBase {
 		if(!FMaintenance.this.isVisible()){
 			return;
 		}
-		dlog.d("update App.Charging: "+App.Charging+" chargingPlug: "+ carinfo.isChargingPlug());
-		if (App.Charging && !carinfo.isChargingPlug()) {
+		dlog.d("update App.Charging: "+ App.isCharging() +" chargingPlug: "+ carinfo.isChargingPlug());
+		if (App.isCharging() && !carinfo.isChargingPlug()) {
 			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(true);
 			((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_done);
 		} else {

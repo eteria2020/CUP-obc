@@ -37,6 +37,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AMainOBC;
@@ -44,6 +46,7 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.AudioPlayer;
 import eu.philcar.csg.OBC.helpers.DLog;
@@ -53,6 +56,10 @@ import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.service.MessageFactory;
 
 public class FGoodbye extends FBase {
+
+
+    @Inject
+    EventRepository eventRepository;
 
     private final static int MSG_CLOSE_ACTIVITY = 1;
     private final static int MSG_PLAY_ADVICE = 2;
@@ -119,6 +126,7 @@ public class FGoodbye extends FBase {
 
         super.onCreate(savedInstanceState);
         closingTripid = App.currentTripInfo.trip.id;
+        App.Instance.getComponent().inject(this);
 		/*if(App.first_UP_End && App.hasNetworkConnection){
 			App.first_UP_End=false;
 
@@ -370,6 +378,7 @@ public class FGoodbye extends FBase {
     private void undoCloseTrip(View v) {
         App.setIsCloseable(false);
         ((ABase) getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(0));
+        eventRepository.menuclick("UNDO END RENT");
         startActivity(new Intent(getActivity(), AMainOBC.class));
         getActivity().finish();
 
@@ -433,7 +442,7 @@ public class FGoodbye extends FBase {
             HttpGet httpGet = new HttpGet(Url);
 
             response = client.execute(httpGet);
-            DLog.D(" loadBanner: Url richiesta " + Url);
+            DLog.I(" loadBanner: Url richiesta " + Url);
             StatusLine statusLine = response.getStatusLine();
             int statusCode = statusLine.getStatusCode();
             if (statusCode == 200) {
@@ -466,7 +475,7 @@ public class FGoodbye extends FBase {
             return;
         }
 
-        DLog.D(" loadBanner: risposta " + jsonStr);
+        DLog.I(" loadBanner: risposta " + jsonStr);
         File file = new File(outDir, "placeholder.lol");
 
         try {
@@ -529,7 +538,7 @@ public class FGoodbye extends FBase {
             fileOutput.close();
             Image.putString(("FILENAME"), filename);
             App.BannerName.putBundle(type, Image);
-            dlog.d(" loadBanner: File scaricato e creato " + filename);
+            dlog.i(" loadBanner: File scaricato e creato " + filename);
             urlConnection.disconnect();
             inputStream.close();
 

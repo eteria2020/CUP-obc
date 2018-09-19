@@ -110,7 +110,7 @@ public class Event extends DbRecord<EventResponse> {
 				"id=" + id +
 				", timestamp=" + timestamp +
 				", event=" + event +
-				", label='" + label +
+				", label=" + label +
 				", intval=" + intval +
 				", txtval='" + txtval +
 				", id_customer=" + id_customer +

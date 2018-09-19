@@ -33,7 +33,7 @@ public class ZmqSubscriber {
 	public void Start(Handler serviceHandler) {
 		try {
 
-			dlog.d("Starting ZMQ thread");
+			dlog.i("Starting ZMQ thread");
 			//handler = serviceHandler;
 			zmqRunnable = new ZmqRunnable();
 			zmqThread = new Thread(zmqRunnable);
@@ -44,7 +44,7 @@ public class ZmqSubscriber {
 	}
 
 	public void Restart(Handler serviceHandler) {
-		dlog.d("Restarting ZMQ thread");
+		dlog.i("Restarting ZMQ thread");
 		if (zmqThread!=null && zmqRunnable!=null) {
 
 			if (zmqRunnable.isStarting)
@@ -67,7 +67,7 @@ public class ZmqSubscriber {
 
 
 	public void Stop() {
-		dlog.d("Stopping ZMQ thread");
+		dlog.i("Stopping ZMQ thread");
 		if (zmqThread!=null) {
 			zmqThread.interrupt();
 		}
@@ -98,9 +98,9 @@ public class ZmqSubscriber {
 					try {
 
 						context.term();
-						dlog.d("ZMQ context terminated");
+						dlog.i("ZMQ context terminated");
 						th.interrupt();
-						dlog.d("Thread interrupted");
+						dlog.i("Thread interrupted");
 					}catch(Exception e){
 						dlog.e("Exception in zmqStop",e);
 					}
@@ -132,15 +132,15 @@ public class ZmqSubscriber {
 				socket.setTCPKeepAliveInterval(60);
 				socket.setReconnectIVL(1000);  //TODO: Add random  component
 
-				dlog.d("ZMQ Connecting to:" + App.Instance.getString(R.string.endpointSharengoZMQ));
+				dlog.i("ZMQ Connecting to:" + App.Instance.getString(R.string.endpointSharengoZMQ));
 				socket.connect(App.Instance.getString(R.string.endpointSharengoZMQ));
 				//socket.subscribe(ZMQ.SUBSCRIPTION_ALL);
-				dlog.d("ZMQ Subscribing to channels: COMMON," + App.CarPlate);
+				dlog.i("ZMQ Subscribing to channels: COMMON," + App.CarPlate);
 				socket.subscribe(App.CarPlate.getBytes());
 				socket.subscribe("COMMON".getBytes());
 
 				String channel = "";
-				dlog.d("ZMQ thread started");
+				dlog.i("ZMQ thread started");
 				isStarting = false;
 				while (!Thread.currentThread().isInterrupted()) {
 					try {
@@ -171,9 +171,9 @@ public class ZmqSubscriber {
 					}
 				}
 
-				dlog.d("ZMQ thread exited");
+				dlog.i("ZMQ thread exited");
 				socket.close();
-				dlog.d("ZMQ socket closed");
+				dlog.i("ZMQ socket closed");
 
 
 			}catch(ZError.IOException e){

@@ -3295,7 +3295,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		if(App.parkMode.isOn()) {
 
-			dlog.d("loadBanner: Park mode ON");
+			dlog.i("loadBanner: Park mode ON");
 			return;
 		}
 
@@ -3332,7 +3332,7 @@ public class FMap extends FBase implements OnClickListener {
 			Url= UrlTools.buildQuery(Url.concat("?"),paramsList).toString();
 			//connessione per scaricare id immagine
 
-			DLog.D(FMap.class.toString()+" loadBanner: Url richiesta "+Url);
+			DLog.I(FMap.class.toString()+" loadBanner: Url richiesta "+Url);
 			HttpClient client = new DefaultHttpClient();
 			HttpGet httpGet = new HttpGet(Url);
 
@@ -3371,7 +3371,7 @@ public class FMap extends FBase implements OnClickListener {
 			return;
 		}
 
-		DLog.D(FMap.class.toString()+" loadBanner: risposta "+jsonStr);
+		DLog.I(FMap.class.toString()+" loadBanner: risposta "+jsonStr);
 		File file = new File(outDir, "placeholder.lol");;
 
 		try {
@@ -3435,7 +3435,7 @@ public class FMap extends FBase implements OnClickListener {
 			inputStream.close();
 			Image.putString(("FILENAME"),filename);
 			App.Instance.BannerName.putBundle(type,Image);
-			dlog.d(FMap.class.toString()+" loadBanner: File scaricato e creato "+filename);
+			dlog.I(FMap.class.toString()+" loadBanner: File scaricato e creato "+filename);
 
 
 		} catch (Exception e) {

@@ -28,13 +28,13 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
 
 
         try {
-            dlog.d("CheckOldLogSize ~ Start cleaning log");
+            dlog.i("CheckOldLogSize ~ Start cleaning log");
             File logRoot = new File(App.getAppLogPath());
             long logsize = FileTools.getFileSize(logRoot);
 
-            dlog.d("CheckOldLogSize ~ Log directory weight: " + logsize);
+            dlog.i("CheckOldLogSize ~ Log directory weight: " + logsize);
             if(logsize>2147483648L) {
-                dlog.d("CheckOldLogSize ~ Folder too big deleting last 30 record");
+                dlog.i("CheckOldLogSize ~ Folder too big deleting last 30 record");
 
                 retreiveAllLogs(logRoot);
                 logs.removeFromBottom(30);
@@ -45,7 +45,7 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
 
                 retreiveAllLogs(logRoot);
 
-                dlog.d("CheckOldLogSize ~ Let's delete some trash");
+                dlog.i("CheckOldLogSize ~ Let's delete some trash");
 
 
                 Date date = new Date();
@@ -75,10 +75,10 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
                 return;
             File logsFile[] = logRoot.listFiles();
             if (logsFile.length == 0) {
-                dlog.d("CheckOldLogSize ~ Root folder Empty");
+                dlog.i("CheckOldLogSize ~ Root folder Empty");
                 if (!logRoot.getName().equalsIgnoreCase("log")){
                     logRoot.delete();
-                    dlog.d("CheckOldLogSize ~ deleting empty folder"+logRoot.getPath());
+                    dlog.i("CheckOldLogSize ~ deleting empty folder"+logRoot.getPath());
                 }
                 return;
             }
@@ -92,7 +92,7 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
                             String fileType = name.substring(name.lastIndexOf(".") + 1);
                             if (fileType.equalsIgnoreCase("tmp")) {
                                 boolean succes = logFile.delete();
-                                dlog.d("CheckOldLogSize ~ Found .tmp file, deleting" + succes);
+                                dlog.i("CheckOldLogSize ~ Found .tmp file, deleting" + succes);
                                 continue;
                             }
                             Log log = new Log();
@@ -108,7 +108,7 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
                             if (fileType.equalsIgnoreCase("tmp")) {
                                 boolean succes = logFile.delete();
 
-                                dlog.d("CheckOldLogSize ~ Found .tmp file, deleting" + succes);
+                                dlog.i("CheckOldLogSize ~ Found .tmp file, deleting" + succes);
                             }
                         }
                     }
@@ -128,7 +128,7 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);
         logs=null;
-        dlog.d("LogCleanup ~ finished with result: " + aBoolean);
+        dlog.i("LogCleanup ~ finished with result: " + aBoolean);
     }
 
     @Override

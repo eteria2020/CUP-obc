@@ -99,7 +99,7 @@ public class LogCleanup extends AsyncTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);
         logs = null;
-        dlog.d("LogCleanup ~ finished with result: "+aBoolean);
+        dlog.i("LogCleanup ~ finished with result: "+aBoolean);
     }
 
     @Override

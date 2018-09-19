@@ -42,13 +42,13 @@ public class GetTimeFromNetwork extends AsyncTask<CarInfo, Void, Void> { // The 
             TimeInfo timeInfo = timeClient.getTime(inetAddress);
             long returnTime = timeInfo.getMessage().getTransmitTimeStamp().getTime();   //server time
             time = new Date(returnTime);
-            dlog.d("getCurrentNetworkTime: Time: " + TIME_SERVER_IP + ": " + time);
+            dlog.i("getCurrentNetworkTime: Time: " + TIME_SERVER_IP + ": " + time);
 
         }catch (Exception e){
             dlog.e("Exception while retrieving NTP time",e);
             if(carInfo!=null && carInfo.intGpsLocation.getTime()>1234567890) {
                 time = new Date(carInfo.intGpsLocation.getTime() + SystemClock.elapsedRealtime() - carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000);
-                dlog.d("getCurrentNetworkTime: Time: GPS " + time);
+                dlog.i("getCurrentNetworkTime: Time: GPS " + time);
             }
         }
 

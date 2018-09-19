@@ -35,7 +35,6 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
-import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
@@ -219,7 +218,7 @@ public class FWelcome extends FBase {
 	private void nextPage() {
 		// if the charge mode is active go to Maintenance page for resetting it.
 		// We assume that if the car is in charging mode no one but the admins can get in
-		if (App.Charging) {
+		if (App.isCharging()) {
 			((ABase)getActivity()).pushFragment(FMaintenance.newInstance(), FMaintenance.class.getName(), true);
 			DLog.D("Request FMaintenance");
 		} else

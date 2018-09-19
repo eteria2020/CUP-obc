@@ -367,8 +367,8 @@ public class FHome extends FBase implements OnClickListener {
 
         //timer per aggiornamento advertisment
         int second = 120;
-        if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
-            second = 10;
+//        if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+//            second = 10;
         timer_2min = new CountDownTimer((second)*1000,1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -546,19 +546,23 @@ public class FHome extends FBase implements OnClickListener {
         switch (v.getId()) {
 
             case R.id.fmapVideo://SOS
+                dlog.cr("MENU CLICK VIDEO");
                 ((ABase) getActivity()).pushBackFragment(FVideo.newInstance(), FVideo.class.getName(), true);
                 break;
 
             case R.id.fmapSOSB://SOS
+                dlog.cr("MENU CLICK SOS");
                 startActivity(new Intent(getActivity(), ASOS.class));
                 break;
 
             case R.id.fmapSearchB://Search
+                dlog.cr("MENU CLICK MAP");
                 ((ABase) getActivity()).pushBackFragment(FMap.newInstance(), FMap.class.getName(), true);
 
                 break;
 
             case R.id.fmapDamagesIB://Search
+                dlog.cr("MENU CLICK DAMAGES");
                 //((ABase) getActivity()).pushFragment(OptimizeDistanceCalc.newInstance(), OptimizeDistanceCalc.class.getName(), true);
 
                 ((ABase)getActivity()).pushFragment(FDamages.newInstance(false), FDamages.class.getName(), true);
@@ -566,10 +570,12 @@ public class FHome extends FBase implements OnClickListener {
                 break;
 
             case R.id.fmapRadioB://Radio
+                dlog.cr("MENU CLICK RADIO");
                 ((ABase) getActivity()).pushFragment(FRadio.newInstance(), FRadio.class.getName(), true);
                 break;
 
             case R.id.fmapCancelB://End Trip
+                dlog.cr("MENU CLICK END RENT");
                 //((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_END_RENT), FMenu.class.getName(), true);
                 if (App.checkKeyOff &&(((AMainOBC)getActivity()).checkisInsideParkingArea() && !CarInfo.isKeyOn())) {
                     closeTrip();
@@ -579,6 +585,7 @@ public class FHome extends FBase implements OnClickListener {
                 break;
 
             case R.id.fmapParkB://End Trip
+                dlog.cr("MENU CLICK PARK RENT");
                 ((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_PARK), FMenu.class.getName(), true);
                 break;
 
@@ -603,11 +610,13 @@ public class FHome extends FBase implements OnClickListener {
 
 
             case R.id.fmapAssicurazione:
+                dlog.cr("MENU CLICK ASSICURAZIONE");
                 ((ABase) getActivity()).pushFragment(FPdfViewer.newInstance("ASSICURAZIONE"), FPdfViewer.class.getName(), true);
                 //startActivity(new Intent(getActivity(), FPdfViewer.class)); //pushfragment usare
 
                 break;
             case R.id.fmapLibretto:
+                dlog.cr("MENU CLICK LIBRETTO");
                 ((ABase) getActivity()).pushFragment(FPdfViewer.newInstance("LIBRETTO"), FPdfViewer.class.getName(), true);
                 //startActivity(new Intent(getActivity(), FPdfViewer.class)); //pushfragment usare
 
@@ -1082,7 +1091,7 @@ public class FHome extends FBase implements OnClickListener {
                 HttpGet httpGet = new HttpGet(Url);
 
                 HttpResponse response = client.execute(httpGet);
-                DLog.D(FHome.class.toString() + " loadBanner: Url richiesta " + Url);
+                DLog.I(FHome.class.toString() + " loadBanner: Url richiesta " + Url);
                 StatusLine statusLine = response.getStatusLine();
                 int statusCode = statusLine.getStatusCode();
                 if (statusCode == 200) {
@@ -1116,7 +1125,7 @@ public class FHome extends FBase implements OnClickListener {
                 return;
             }
 
-            DLog.D(FHome.class.toString() + " loadBanner: risposta " + jsonStr);
+            DLog.I(FHome.class.toString() + " loadBanner: risposta " + jsonStr);
             File file = new File(outDir, "placeholder.lol");
 
             try {

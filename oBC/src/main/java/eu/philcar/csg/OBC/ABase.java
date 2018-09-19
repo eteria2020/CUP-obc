@@ -33,7 +33,7 @@ public abstract class ABase extends Activity implements ServiceClient{
 	protected void onCreate(Bundle savedInstanceState) {
 		
 		super.onCreate(savedInstanceState);
-		dlog.d("ABase onCreate");
+		//dlog.d("ABase onCreate");
 		
 		// This has to be isSystem each time an activity starts ('cause we are fighting the standard way android deals with string localization)
 		changeLanguage(getActivityLocale());
