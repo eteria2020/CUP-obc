@@ -214,7 +214,7 @@ public class FMenu extends FBase implements OnClickListener{
 			i.putExtra(AGoodbye.EUTHANASIA, false);
 
 			startActivity(i);
-			((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
+			((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(39));
 			getActivity().finish();
 		}
 	}
@@ -590,7 +590,7 @@ public class FMenu extends FBase implements OnClickListener{
 
 	}
 	private void startSelfClose(View root) {
-		startSelfClose(root, 40);
+		startSelfClose(root, 39);
 
 	}
 

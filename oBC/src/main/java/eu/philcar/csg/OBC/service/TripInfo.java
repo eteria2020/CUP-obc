@@ -97,6 +97,7 @@ public class TripInfo {
 
     // Status
     public boolean isOpen;
+    public boolean remoteCloseRequested = false;
     public boolean isBonusEnabled=false;
     public boolean isMaintenance;
     public boolean hasBeenStopped = false;
@@ -167,6 +168,7 @@ public class TripInfo {
             customer = null;
             cardCode = null;
             isOpen = false;
+            remoteCloseRequested = false;
         }
     }
 
@@ -822,6 +824,7 @@ public class TripInfo {
         App.currentTripInfo = null;
         dlog.i("closing trip reset currentTripInfo");
         this.isOpen=false;
+        this.remoteCloseRequested = false;
         this.isMaintenance = false;
         OptimizeDistanceCalc.Controller(OdoController.STOP);
     }
@@ -1083,7 +1086,7 @@ public class TripInfo {
             trip.n_pin=n_pin;
             UpdateCorsa();
             try {
-                if(notify) {
+                if(notify && n_pin == Customer.N_COMPANY_PIN) {
                     sendUpdateTrip(trip);
                 }
             }catch(Exception e){

@@ -1247,20 +1247,19 @@ public class ObcService extends Service implements OnTripCallback {
 
         Message myMsg;
         if (msg == null) {
-            dlog.e("sendAll, Message==null");
+            dlog.e("sendAll, Message==null client: " +clients.size());
             return;
         }
 //TODO change with foreach
 
         if (msg.what != ObcService.MSG_CAR_INFO &&
-                msg.what != ObcService.MSG_RADIO_SEEK_INFO &&
-                msg.what != ObcService.MSG_CAR_LOCATION)
+                msg.what != ObcService.MSG_RADIO_SEEK_INFO)
             dlog.i("Sending to " + clients.size() + " clients MSG id " + msg.what);
 
         try {
             if (clients.size() > 0)
                 for(Clients cliente:clients){
-                    //dlog.d("Sending to client "+cliente.getName());
+//                    dlog.d("Sending to client "+cliente.getClass());
                   myMsg=Message.obtain();
                     myMsg.copyFrom(msg);
                     cliente.getClient().send(myMsg);
@@ -1722,8 +1721,8 @@ public class ObcService extends Service implements OnTripCallback {
                                 this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
                             else
                                 dlog.d("Received expired close_trip");
-                        }else if(cmd.txtarg1!=null){//chiusura tramite API
-                            startRequestCloseTrip();
+                        }else if(cmd.txtarg1!=null && cmd.txtarg1.equalsIgnoreCase( App.currentTripInfo.customer.card_code) && !App.currentTripInfo.remoteCloseRequested){//chiusura tramite API
+                            startRequestCloseTrip(cmd.txtarg1);
                         }else
                         try{
                             JSONObject commandJson = new JSONObject(cmd.txtarg2);
@@ -2211,10 +2210,11 @@ public class ObcService extends Service implements OnTripCallback {
     }
 
 
-    void startRequestCloseTrip() {
+    void startRequestCloseTrip(String card_code) {
 
         stopRequestCloseTrip();
 
+        eventRepository.remoteTripClose(card_code);
 
         closeTripScheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -2234,15 +2234,15 @@ public class ObcService extends Service implements OnTripCallback {
                     if(!isMoving && (!App.checkKeyOff || keyOff)){//closeTrip
                         App.setIsCloseable(true);
                         localHandler.sendMessage(MessageFactory.scheduleSelfCloseTrip(1));
-                        dlog.d("tripUpdateScheduler: sheduled close trip");
+                        dlog.d("closeTripScheduler: sheduled close trip");
                     }else {
-                        dlog.d("tripUpdateScheduler: unable to close trip is Moving : " + isMoving + "keyOff: " + keyOff);
+                        dlog.d("closeTripScheduler: unable to close trip is Moving : " + isMoving + "keyOff: " + keyOff);
                     }
 
 
 
                 } catch (Exception e) {
-                    dlog.e("Exception inside tripUpdateScheduler", e);
+                    dlog.e("Exception inside closeTripScheduler", e);
                     stopRequestCloseTrip();
                     return;
                 }
@@ -2251,10 +2251,17 @@ public class ObcService extends Service implements OnTripCallback {
 
         }, 100, 20, TimeUnit.SECONDS);
 
-        dlog.d("Started startRequestCloseTrip");
+        App.currentTripInfo.remoteCloseRequested = true;
+        dlog.d("closeTripScheduler: Started startRequestCloseTrip");
     }
 
     void stopRequestCloseTrip() {
+        try {
+            if(App.currentTripInfo!=null)
+                App.currentTripInfo.remoteCloseRequested = false;
+        }catch (Exception e) {
+            dlog.e( "stopRequestCloseTrip: Exception", e);
+        }
 
         if (closeTripScheduler != null) {
             closeTripScheduler.shutdown();
@@ -2806,7 +2813,7 @@ public class ObcService extends Service implements OnTripCallback {
 
                         ObcService.this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, true);
                     } else {
-                        dlog.d("MSG_TRIP_SELFCLOSE discarded");
+                        dlog.d("MSG_TRIP_SELFCLOSE discarded already closed");
                     }
                     break;
 

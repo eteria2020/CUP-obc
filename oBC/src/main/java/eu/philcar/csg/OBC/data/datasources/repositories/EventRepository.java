@@ -56,6 +56,7 @@ public class EventRepository {
         labels.put(EVT_OUTOFAREA, "AREA");
         labels.put(EVT_MENU_CLICK, "MENU_CLICK");
         labels.put(EVT_CAN_ANOMALIES, "CAN_ANOMALIES");
+        labels.put(EVT_REMOTE_CLOSE_TRIP, "EVT_REMOTE_CLOSE_TRIP");
     }
     public  void eventEngine(int state) {
         generateEvent(EVT_ENGINE,state,null);
@@ -180,6 +181,11 @@ public class EventRepository {
     public  void DeviceInfo(String versions) {
         generateEvent(EVT_DEVICEINFO,App.id_Version,versions);
     }
+
+    public void remoteTripClose(String card_code){
+        generateEvent(EVT_REMOTE_CLOSE_TRIP,App.currentTripInfo.customer.id,card_code);
+    }
+
     public  void eventSoc(int level, String type) {
         generateEvent(EVT_SOC,level,type);
     }

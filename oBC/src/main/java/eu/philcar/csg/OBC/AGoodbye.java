@@ -94,35 +94,40 @@ public class AGoodbye extends ABase {
 	public void setAudioSystem(int mode, int volume){
 		this.sendMessage(MessageFactory.AudioChannel(mode, volume));
 	}
-	
+
 	@SuppressLint("HandlerLeak")
 	private  Handler serviceHandler = new Handler() {
 		 @Override
 		 public void handleMessage(Message msg) {
 			FPark fPark;
+			if(msg.what != ObcService.MSG_TRIP_END) {
 
-			 if(! App.isForegroundActivity(AGoodbye.this)) {
-				 DLog.W(AGoodbye.class.getName() + " MSG to non foreground activity. ignoring");
-				 if(App.currentTripInfo==null) {
-					 DLog.W(AGoodbye.class.getName() + " no trip found wrong foreground activity restarting AWelcome");
-					 if( !App.isForegroundActivity(AWelcome.class.getName()) ) {
-						 Intent i = new Intent(AGoodbye.this, AWelcome.class);
-						 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						 startActivity(i);
-					 }
-					 AGoodbye.this.finish();
-				 }
-				 return;
-			 }
-			 if(App.currentTripInfo==null){
+				if (!App.isForegroundActivity(AGoodbye.this)) {
+					DLog.W(AGoodbye.class.getName() + " MSG to non foreground activity. ignoring");
+					if (App.currentTripInfo == null) {
+						DLog.W(AGoodbye.class.getName() + " no trip found wrong foreground activity restarting AWelcome");
+						if (!App.isForegroundActivity(AWelcome.class.getName())) {
+							Intent i = new Intent(AGoodbye.this, AWelcome.class);
+							i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							startActivity(i);
+						}
 
-				 DLog.W(AGoodbye.class.getName() + " no trip found wrong foreground activity restarting AWelcome");
-				 Intent i = new Intent(AGoodbye.this, AWelcome.class);
-				 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				 startActivity(i);
-				 AGoodbye.this.finish();
-				 return;
-			 }
+						serviceConnector.unregister();
+						serviceConnector.disconnect();
+						AGoodbye.this.finish();
+					}
+					return;
+				}
+				if (App.currentTripInfo == null) {
+
+					DLog.W(AGoodbye.class.getName() + " no trip found restarting AWelcome");
+					Intent i = new Intent(AGoodbye.this, AWelcome.class);
+					i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(i);
+					AGoodbye.this.finish();
+					return;
+				}
+			}
 			switch (msg.what) {
 			
 			case ObcService.MSG_CLIENT_REGISTER:

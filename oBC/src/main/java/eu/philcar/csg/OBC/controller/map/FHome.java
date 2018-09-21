@@ -679,7 +679,7 @@ public class FHome extends FBase implements OnClickListener {
             i.putExtra(AGoodbye.EUTHANASIA, false);
 
             startActivity(i);
-            ((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
+            ((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(39));
             getActivity().finish();
         }
     }

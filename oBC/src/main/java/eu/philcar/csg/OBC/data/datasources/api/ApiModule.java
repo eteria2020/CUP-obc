@@ -211,6 +211,7 @@ public class ApiModule {
         );
         httpClient.readTimeout(20, TimeUnit.SECONDS);
         httpClient.connectTimeout(20, TimeUnit.SECONDS);
+        httpClient.retryOnConnectionFailure(false);
 
         return httpClient.build();
     }
@@ -249,6 +250,7 @@ public class ApiModule {
 
         httpClient.readTimeout(20, TimeUnit.SECONDS);
         httpClient.connectTimeout(20, TimeUnit.SECONDS);
+        //httpClient.retryOnConnectionFailure(false);
 
         return httpClient.build();
     }

@@ -39,6 +39,7 @@ public abstract class ABase extends Activity implements ServiceClient{
 		changeLanguage(getActivityLocale());
 
         mApp = (App)getApplicationContext();
+		DLog.I("Lifecycle - onCreateActivity: " + this.getClass().getSimpleName());
 	}
 
 	@Override
@@ -61,6 +62,7 @@ public abstract class ABase extends Activity implements ServiceClient{
 	protected void onDestroy() {
 		
         clearReferences();
+        DLog.I("Lifecycle - onDestroyActivity: " + this.getClass().getSimpleName());
         
         super.onDestroy();
     }

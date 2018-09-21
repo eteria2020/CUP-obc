@@ -60,6 +60,7 @@ public class Events extends DbTable<Event,Integer> {
 	public static final int EVT_OUTOFAREA	=29;
 	public static final int EVT_MENU_CLICK	=30;
 	public static final int EVT_CAN_ANOMALIES	=31;
+	public static final int EVT_REMOTE_CLOSE_TRIP	=32;
 	
 	
 	
@@ -103,6 +104,7 @@ public class Events extends DbTable<Event,Integer> {
 		labels.put(EVT_OUTOFAREA, "AREA");
 		labels.put(EVT_MENU_CLICK, "MENU_CLICK");
 		labels.put(EVT_CAN_ANOMALIES, "CAN_ANOMALIES");
+		labels.put(EVT_REMOTE_CLOSE_TRIP, "EVT_REMOTE_CLOSE_TRIP");
 
 		
 		

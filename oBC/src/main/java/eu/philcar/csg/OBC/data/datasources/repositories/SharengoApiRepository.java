@@ -3,6 +3,8 @@ package eu.philcar.csg.OBC.data.datasources.repositories;
 import android.support.annotation.NonNull;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -480,8 +482,27 @@ public class SharengoApiRepository {
     }
 
     public void sendEvents(final List<Event> event){
+        try {
+
+            Collections.sort(event, (o1, o2) -> {
+                boolean is1SOS = "SOS".equalsIgnoreCase(o1.label),
+                        is2SOS = "SOS".equalsIgnoreCase(o2.label);
+                if (is1SOS)
+                    if (is2SOS)
+                        return (int) (o2.timestamp - o1.timestamp);
+                    else
+                        return -1;
+                else if (is2SOS)
+                    return 1;
+                else
+                    return 0;
+            });
+        }catch (Exception e) {
+            DLog.E("sendEvents: Exception", e);
+        }
+
         if(!sendingEvents)
-            Observable.interval(60,TimeUnit.SECONDS)
+            Observable.interval(30,TimeUnit.SECONDS)
                     .take(event.size())
                     .concatMap(i->Observable.just(event.get(i.intValue())))
                     .concatMap(event1 -> {

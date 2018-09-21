@@ -25,6 +25,7 @@ public abstract class FBase extends Fragment {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
+		DLog.CR("Lifecycle - onDestroyView " + this.getClass().getSimpleName());
 		if(unbinder!=null){
 			//unbinder.unbind();
 		}
@@ -33,6 +34,6 @@ public abstract class FBase extends Fragment {
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		DLog.CR("OnViewCreated " + this.getClass().getSimpleName());
+		DLog.CR("Lifecycle - OnViewCreated " + this.getClass().getSimpleName());
 	}
 }

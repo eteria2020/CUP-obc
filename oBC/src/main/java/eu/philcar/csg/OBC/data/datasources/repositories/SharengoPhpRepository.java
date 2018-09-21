@@ -286,7 +286,7 @@ public class SharengoPhpRepository {
     @Deprecated
     public void sendEvents(final List<Event> event){
         if(!sendingEvents)
-            Observable.interval(60,TimeUnit.SECONDS)
+            Observable.interval(30,TimeUnit.SECONDS)
                     .take(event.size())
                     .concatMap(i->Observable.just(event.get(i.intValue())))
                     .concatMap(mDataManager::saveEvent)
