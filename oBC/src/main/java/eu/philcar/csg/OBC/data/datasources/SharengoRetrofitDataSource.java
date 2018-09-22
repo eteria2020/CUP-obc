@@ -140,19 +140,7 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
     @Override
     public Observable<Trip> openTripPassive(final Trip trip, final DataManager dataManager) {
         return openTrip(trip,dataManager)
-                .concatMap(tripResponse -> {
-                    if(trip.id_parent== -1){
-                        trip.id_parent = tripResponse.getRemoteID();
-                    }
-                    else if(trip.id_parent == -2){
-                        return dataManager.findTripParent(trip)
-                                .concatMap(remoteId -> {
-                                    trip.remote_id = remoteId;
-                                    return Observable.just(trip);
-                                });
-                    }
-                    return Observable.just(trip);
-                });
+                .concatMap(tripResponse -> Observable.just(trip));
     }
 
 

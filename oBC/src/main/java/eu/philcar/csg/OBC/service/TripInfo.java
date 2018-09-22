@@ -1221,7 +1221,7 @@ public class TripInfo {
                     App.Instance.persistParkModeStarted();
                 }
 
-                int id_parent = trip.id_parent == -1? -2 : trip.id_parent; //-1 la prima volta -2 per indicare di dover cercare la corsa padre
+                int id_parent = trip.id_parent;
                 int n_pin = trip.n_pin;
                 //Se ? passata la durata massima chiudi la trip amministrativamente...
                 CloseCorsaMaxDurata(carInfo);
