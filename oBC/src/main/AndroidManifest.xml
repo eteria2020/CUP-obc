@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="eu.philcar.csg.OBC"
 
-	android:versionCode="169"
-	android:versionName="0.108.17" >
+	android:versionCode="170"
+	android:versionName="0.108.18" >
 
 
 	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />

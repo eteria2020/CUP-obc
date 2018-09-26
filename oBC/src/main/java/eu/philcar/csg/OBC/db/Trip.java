@@ -8,7 +8,6 @@ import java.util.Locale;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.service.DataManager;
@@ -121,7 +120,7 @@ public class Trip  extends DbRecord<TripResponse> {
 	}
 
 	public String toString() {
-			return String.format(Locale.getDefault(),"Trip { Id:%d ,CustomerId: %d , RId:%d  Tms begin:%d , Tms end:%d  TX 1 : %b , TX 2  : %b , n_pin : %d , id_parent : %d }", id,id_customer,remote_id,begin_timestamp, end_timestamp, begin_sent, end_sent,n_pin, id_parent);
+			return String.format(Locale.getDefault(),"Trip { Id:%d ,CustomerId: %d , RId:%d  Tms begin:%d , Tms end:%d  TX 1 : %b , TX 2  : %b , n_pin : %d , id_parent : %d }", id,id_customer,remote_id,begin_timestamp, end_timestamp, begin_sent, end_sent,n_pin, getId_parent());
 		}
 		
 		public long getMinutiDurata() {
@@ -223,5 +222,13 @@ public class Trip  extends DbRecord<TripResponse> {
 				dataManager.updateTripEndSentDone(this);
 				break;
 		}
+	}
+
+	public int getId_parent() {
+		return id_parent>=-1?id_parent:-1;
+	}
+
+	public void setId_parent(int id_parent) {
+		this.id_parent = id_parent;
 	}
 }

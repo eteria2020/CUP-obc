@@ -1205,8 +1205,8 @@ public class TripInfo {
             if (mins>=maxDurata) {
                 dlog.d("Max durata reached: " + mins + " > " + maxDurata);
 
-                if (trip.id_parent==0) {
-                    trip.id_parent = trip.remote_id>0?trip.remote_id:-1;
+                if (trip.getId_parent() ==0) {
+                    trip.setId_parent(trip.remote_id>0?trip.remote_id:-1);
                 }
 
                 //Se era in sosta calcola i secondi accumulati e fai ripartire il conteggio
@@ -1221,7 +1221,7 @@ public class TripInfo {
                     App.Instance.persistParkModeStarted();
                 }
 
-                int id_parent = trip.id_parent;
+                int id_parent = trip.getId_parent();
                 int n_pin = trip.n_pin;
                 //Se ? passata la durata massima chiudi la trip amministrativamente...
                 CloseCorsaMaxDurata(carInfo);
@@ -1242,7 +1242,7 @@ public class TripInfo {
 
 
                 trip = buildOpenTrip();
-                trip.id_parent = id_parent;
+                trip.setId_parent(id_parent);
                 trip.n_pin = n_pin;
                 Observable.just(1)
                         .concatMap(i-> {

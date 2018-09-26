@@ -63,7 +63,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
     public Observable<TripResponse> openTrip(final Trip trip, final DataManager dataManager) {
 
             return mSharengoPhpApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat,
-                    trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin, trip.id_parent==0?null:String.valueOf(trip.id_parent))
+                    trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin, trip.getId_parent() ==0?null:String.valueOf(trip.getId_parent()))
                     .compose(this.handleRetrofitRequest())
                     .doOnError(e -> {
                         trip.recharge = 0; //server result
@@ -109,7 +109,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
     public Observable<TripResponse> updateTrip(final Trip trip) {
 
             return mSharengoPhpApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat,
-                    trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin,trip.id_parent==0?null:String.valueOf(trip.id_parent))
+                    trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin, trip.getId_parent() ==0?null:String.valueOf(trip.getId_parent()))
                     .compose(this.handleRetrofitRequest());
 
     }
@@ -119,7 +119,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
     @Override
     public Observable<TripResponse> closeTrip(final Trip trip,final DataManager dataManager) {
             return mSharengoPhpApi.closeTrip(2,trip.remote_id, trip.plate, trip.id_customer, trip.end_timestamp, trip.end_km, trip.end_battery, trip.end_lon, trip.end_lat,
-                    trip.warning, trip.int_cleanliness, trip.ext_cleanliness, trip.park_seconds, trip.n_pin, trip.id_parent==0?null:String.valueOf(trip.id_parent))
+                    trip.warning, trip.int_cleanliness, trip.ext_cleanliness, trip.park_seconds, trip.n_pin, trip.getId_parent() ==0?null:String.valueOf(trip.getId_parent()))
                     .compose(this.handleRetrofitRequest())
                     .doOnError(e ->{
                         trip.offline=true;

@@ -93,7 +93,7 @@ public class TripsConnector implements RemoteEntityInterface {
 				list.add(new BasicNameValuePair("mac", App.MacAddress));
 				list.add(new BasicNameValuePair("imei", App.IMEI));
 				list.add(new BasicNameValuePair("n_pin", corsa.n_pin+""));
-				if (corsa.id_parent!=0) list.add(new BasicNameValuePair("id_parent", corsa.id_parent+""));
+				if (corsa.getId_parent() !=0) list.add(new BasicNameValuePair("id_parent", corsa.getId_parent() +""));
 			} else if (!corsa.end_sent && corsa.end_timestamp>0) {
 				
 				dlog.d("GetParams, sending chiusura tripInfo:"+tripInfo.toString());
@@ -112,7 +112,7 @@ public class TripsConnector implements RemoteEntityInterface {
 				list.add(new BasicNameValuePair("pulizia_ext", corsa.ext_cleanliness+""));
 				list.add(new BasicNameValuePair("park_seconds", corsa.park_seconds+""));
 				list.add(new BasicNameValuePair("n_pin", corsa.n_pin+""));
-				if (corsa.id_parent!=0)  list.add(new BasicNameValuePair("id_parent", corsa.id_parent+""));
+				if (corsa.getId_parent() !=0)  list.add(new BasicNameValuePair("id_parent", corsa.getId_parent() +""));
 			} else {
 				dlog.e("Case not handled sending opening: " + corsa.toString());
 				dlog.d("GetParams, sending apertura tripInfo:"+tripInfo.toString());
@@ -134,7 +134,7 @@ public class TripsConnector implements RemoteEntityInterface {
 				list.add(new BasicNameValuePair("mac", App.MacAddress));
 				list.add(new BasicNameValuePair("imei", App.IMEI));
 				list.add(new BasicNameValuePair("n_pin", corsa.n_pin+""));
-				if (corsa.id_parent!=0) list.add(new BasicNameValuePair("id_parent", corsa.id_parent+""));
+				if (corsa.getId_parent() !=0) list.add(new BasicNameValuePair("id_parent", corsa.getId_parent() +""));
 			}
 	
 			for (NameValuePair pair : list) {

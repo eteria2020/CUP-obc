@@ -24,6 +24,7 @@ import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.db.Event;
+import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.db.Trip;
 import eu.philcar.csg.OBC.helpers.DLog;
@@ -254,9 +255,13 @@ public class DataManager { //TODO change to interface-type system like api does 
     }
 
     public int getTripIdFromEvent(Event event){
-        List<Trip> trips =  mDbManager.getTripDao().getTripfromTime(event.timestamp);
-        if(trips.size()>0)
-            return trips.get(0).remote_id;
+        if(event.id != Events.EVT_SOS) {
+            List<Trip> trips = mDbManager.getTripDao().getTripfromTime(event.timestamp);
+            if (trips.size() > 0)
+                return trips.get(0).remote_id;
+            else
+                return 0;
+        }
         else
             return 0;
     }

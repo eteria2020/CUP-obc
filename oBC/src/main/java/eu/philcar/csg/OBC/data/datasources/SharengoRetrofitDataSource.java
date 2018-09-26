@@ -16,7 +16,6 @@ import eu.philcar.csg.OBC.db.Event;
 import eu.philcar.csg.OBC.db.Events;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.db.Trip;
-import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.DataManager;
 import eu.philcar.csg.OBC.service.Reservation;
@@ -118,7 +117,7 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
     public Observable<TripResponse> openTrip(final Trip trip, final DataManager dataManager) {
 
         return mSharengoApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat,
-                trip.warning==null?"":trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress==null?"":App.MacAddress, App.IMEI, trip.n_pin, trip.id_parent==0?null:String.valueOf(trip.id_parent))
+                trip.warning==null?"":trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress==null?"":App.MacAddress, App.IMEI, trip.n_pin, trip.getId_parent() ==0?null:String.valueOf(trip.getId_parent()))
                 .compose(this.handleSharengoRetrofitRequest())
                 .doOnError(e -> {
                     trip.recharge = 0; //server result
@@ -165,7 +164,7 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
     public Observable<TripResponse> updateTrip(final Trip trip) {
 
         return mSharengoApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat,
-                trip.warning==null?"":trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin,trip.id_parent==0?null:String.valueOf(trip.id_parent))
+                trip.warning==null?"":trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin, trip.getId_parent() ==0?null:String.valueOf(trip.getId_parent()))
                 .compose(this.handleSharengoRetrofitRequest());
 
     }
@@ -173,7 +172,7 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
     @Override
     public Observable<TripResponse> closeTrip(final Trip trip,final DataManager dataManager) {
         return mSharengoApi.closeTrip(2,trip.remote_id, trip.plate, trip.id_customer, trip.end_timestamp, trip.end_km, trip.end_battery, trip.end_lon, trip.end_lat,
-                trip.warning==null?"":trip.warning, trip.int_cleanliness, trip.ext_cleanliness, trip.park_seconds, trip.n_pin, trip.id_parent==0?null:String.valueOf(trip.id_parent))
+                trip.warning==null?"":trip.warning, trip.int_cleanliness, trip.ext_cleanliness, trip.park_seconds, trip.n_pin, trip.getId_parent() ==0?null:String.valueOf(trip.getId_parent()))
                 .compose(this.handleSharengoRetrofitRequest())
                 .doOnError(e ->{
                     trip.offline=true;

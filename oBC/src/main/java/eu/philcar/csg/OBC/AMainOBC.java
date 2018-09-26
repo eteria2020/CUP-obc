@@ -52,7 +52,6 @@ import android.os.Message;
 import android.support.v4.util.LongSparseArray;
 import android.view.View;
 
-@SuppressLint("HandlerLeak")
 public class AMainOBC extends ABase implements LocationListener {
 
 	private DLog dlog = new DLog(this.getClass());
@@ -197,7 +196,7 @@ public class AMainOBC extends ABase implements LocationListener {
 		// Location
 		/*
 		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-		
+
 		Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		if (loc != null) {
 			currentPosition = loc;
@@ -384,7 +383,7 @@ public class AMainOBC extends ABase implements LocationListener {
 
 		for(Poi p : list) {
 			if (p.lat!=0 && p.lon!=0) {
-				Location ll = null; //TODO			
+				Location ll = null; //TODO
 				int  d = (int) Math.round(GeoUtils.harvesineDistance(ll, pll)/100)*100;;
 				map.put(d, new FuelStation( p.id, "Total Erg", p.address,"",(int)d,0,ll));
 			}
@@ -522,11 +521,11 @@ public class AMainOBC extends ABase implements LocationListener {
 				//DLog.D(AMainOBC.class.toString() + " onLocationChanged: " + String.valueOf(isInsideParkingArea) + String.valueOf(currentPosition.getLatitude()) + " : " + String.valueOf(currentPosition.getLongitude()));
 
 				// Replace this three lines with the ones commented below
-			
-			/*			
+
+			/*
 			double polygonAngle = GeoUtils.bearing(currentPosition.latitude, currentPosition.longitude, App.polygonCenter[0], App.polygonCenter[1]);
 			double bearingAngle = GeoUtils.bearing(previousPosition.latitude, previousPosition.longitude, currentPosition.latitude, currentPosition.longitude);
-					
+
 			rotationToParkingArea = (float)((bearingAngle-polygonAngle)*-1);
 			*/
 
@@ -605,227 +604,7 @@ public class AMainOBC extends ABase implements LocationListener {
 
 
 	private int bearing=0;
-	private Handler serviceHandler = new Handler() {
-		 @Override
-		 public void handleMessage(Message msg) {
-			 FMenu fMenu;
-			 FMap  fMap;
-			 FPark fPark;
-			 FHome fHome;
-
-
-
-
-			// Random random = new Random();
-			// Location l = new Location("dummyprovider");
-			 //(12.9788f, 45.9559f);
-			 // 9.1910f, 45.4602f
-
-			 //MI
-			// l.setLatitude(45.4602f + random.nextFloat()*0.0 );
-			// l.setLongitude( 9.1910f+ random.nextFloat()*0.0 );
-
-			 //Codroipo
-			 //l.setLatitude(45.9559f + random.nextFloat()*0.0 );
-			 //l.setLongitude( 12.9788f+ random.nextFloat()*0.0 );
-
-			// l.setBearing(bearing);
-			 //bearing = (bearing+1) % 359;
-
-			 //onLocationChanged(l);
-
-			 if(! App.isForegroundActivity(AMainOBC.this)) {
-				 DLog.W(AMainOBC.class.getName() + " MSG to non foreground activity");
-				 if(App.currentTripInfo==null) {
-					 DLog.W(AMainOBC.class.getName() + " no trip found kill activity");
-
-					 finish();
-				 }
-				 return;
-			 }
-
-			switch (msg.what) {
-
-			case ObcService.MSG_CLIENT_REGISTER:
-				DLog.E(AMainOBC.class.getName() + ": MSG_CLIENT_REGISTER");
-				break;
-
-			case ObcService.MSG_CMD_TIMEOUT:
-				DLog.E(AMainOBC.class.getName() + ": MSG_CMD_TIMEOUT");
-				break;
-
-			case ObcService.MSG_PING:
-				DLog.D(AMainOBC.class.getName() + ": MSG_PING");
-				break;
-
-			case ObcService.MSG_IO_RFID:
-
-				DLog.E(AMainOBC.class.getName() + ": MSG_IO_RFID");
-				break;
-
-			case ObcService.MSG_CAR_UPDATE:
-			case ObcService.MSG_CAR_INFO:
-
-				fMenu = (FMenu)getFragmentManager().findFragmentByTag(FMenu.class.getName());
-				if (fMenu != null) {
-					fMenu.updateUIUsingAppValues();
-				}
-
-				fHome = (FHome)getFragmentManager().findFragmentByTag(FHome.class.getName());
-				if (fHome != null) {
-					fHome.updateCarInfo((CarInfo)msg.obj);
-				}
-
-
-				fMap = (FMap)getFragmentManager().findFragmentByTag(FMap.class.getName());
-				if (fMap != null) {
-					fMap.updateCarInfo((CarInfo)msg.obj);
-				}
-
-				break;
-
-
-			case ObcService.MSG_TRIP_PARK:
-
-				fMenu = (FMenu)getFragmentManager().findFragmentByTag(FMenu.class.getName());
-
-				if (fMenu != null) {
-
-					fMenu.updateUIUsingAppValues();
-				}
-
-				break;
-
-			case ObcService.MSG_TRIP_PARK_CARD_BEGIN:
-				/*fPark = (FPark)getFragmentManager().findFragmentByTag(FPark.class.getName());
-				
-				if (fPark != null) {
-					fPark.showBeginPark();
-				}	*/
-
-				fMenu = (FMenu)getFragmentManager().findFragmentByTag(FMenu.class.getName());
-
-				if (fMenu != null) {
-					fMenu.updateUIUsingAppValues();
-				}
-
-				break;
-
-			case ObcService.MSG_TRIP_PARK_CARD_END:
-				/*fPark = (FPark)getFragmentManager().findFragmentByTag(FPark.class.getName());
-				
-				if (fPark != null) {
-					fPark.showEndPark();
-				}*/
-
-				fMenu = (FMenu)getFragmentManager().findFragmentByTag(FMenu.class.getName());
-
-				if (fMenu != null) {
-					fMenu.updateUIUsingAppValues();
-				}
-
-				break;
-
-			case ObcService.MSG_TRIP_BEGIN:
-				if(!App.pinChecked) {
-					Intent in = new Intent(AMainOBC.this, AWelcome.class);
-					in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					startActivity(in);
-					finish();
-				}
-					break;
-			case ObcService.MSG_TRIP_END:
-				FMap fragmentMap = (FMap)getFragmentManager().findFragmentByTag(FMap.class.getName());
-				if (fragmentMap != null) {
-					fragmentMap.stopRouteNavigation();
-				}
-
-				FSearch fragmentSearch = (FSearch)getFragmentManager().findFragmentByTag(FSearch.class.getName());
-				if (fragmentSearch != null) {
-					//fragmentSearch.shutdownSearch();
-				}
-
-				if (serviceConnector.isConnected()) {
-					serviceConnector.unregister();
-					serviceConnector.disconnect();
-				}
-
-				Intent i = new Intent(AMainOBC.this, AWelcome.class);
-				i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(i);
-				AMainOBC.this.finish();
-				break;
-
-			case ObcService.MSG_CAR_LOCATION:
-				if (msg.obj!=null && msg.obj instanceof Location) {
-					onLocationChanged((Location)msg.obj);
-				}
-				break;
-
-			case ObcService.MSG_RADIO_CURPLAY_INFO :
-			case ObcService.MSG_RADIO_SEEK_INFO:
-			case ObcService.MSG_RADIO_SEEK_VALID_INFO:
-			case ObcService.MSG_RADIO_SEEK_STATUS:
-			case ObcService.MSG_RADIO_VOLUME_INFO:
-				FRadio fRadio = (FRadio)getFragmentManager().findFragmentByTag(FRadio.class.getName());
-				if (fRadio!=null) {
-					Message fmsg = this.obtainMessage();
-					fmsg.copyFrom(msg);
-					fRadio.notifyRadioMsg(fmsg);
-				}
-				break;
-
-
-			case ObcService.MSG_NAVIGATE_TO:
-
-				if (msg.obj!=null && (msg.obj instanceof Location)) {
-					navigateTo((Location) msg.obj);
-				}
-
-				break;
-			case ObcService.MSG_TRIP_NEAR_POI:
-				App.currentTripInfo.isBonusEnabled=msg.arg1>0;
-
-				if(firstUpCharging) {
-					firstUpCharging=false;
-					if(App.USE_TTS_ALERT)
-
-						queueTTS(getResources().getString(R.string.alert_bonus));
-					else {
-						switch (App.DefaultCity.toLowerCase()){
-							case "milano":
-								playAlertAdvice(R.raw.alert_tts_bonus_park, " alert bonus park");
-								break;
-							case "firenze":
-								playAlertAdvice(R.raw.alert_tts_bonus_park, " alert bonus park");
-								break;
-						}
-					}
-
-				}
-
-				fMenu = (FMenu)getFragmentManager().findFragmentByTag(FMenu.class.getName());
-				if (fMenu != null) {
-					fMenu.updateUIUsingAppValues();
-				}
-
-				fHome = (FHome)getFragmentManager().findFragmentByTag(FHome.class.getName());
-				if (fHome != null) {
-					fHome.updatePoiInfo(msg.arg1,(Poi)msg.obj);
-				}
-
-
-				fMap = (FMap)getFragmentManager().findFragmentByTag(FMap.class.getName());
-				if (fMap != null) {
-					fMap.updatePoiInfo(msg.arg1,(Poi)msg.obj);
-				}
-				break;
-
-			default:
-				super.handleMessage(msg);
-			 }
-		 }
-	};
+	private MainOBCServiceHandler serviceHandler = new MainOBCServiceHandler(new WeakReference<AMainOBC>(this)) ;
 
 	private void queueTTS(String text){
 		try{
@@ -882,7 +661,7 @@ public class AMainOBC extends ABase implements LocationListener {
 					try {
 						strongActivity.updateAd();
 					} catch (NullPointerException npe) {
-						// This could happen if method is called during activity deallocation, so we catch 
+						// This could happen if method is called during activity deallocation, so we catch
 						// the exception and let the activity be collected, user won't be affected
 					}
 				}
@@ -946,5 +725,236 @@ public class AMainOBC extends ABase implements LocationListener {
 		intent.putExtra("enabled", status);
 		sendBroadcast(intent);
 	}
+
+
+	static class MainOBCServiceHandler extends Handler {
+
+		private final WeakReference<AMainOBC> mainOBCWeakReference;
+
+		public MainOBCServiceHandler(WeakReference<AMainOBC> mainOBCWeakReference) {
+			this.mainOBCWeakReference = mainOBCWeakReference;
+		}
+
+		@Override
+		public void handleMessage(Message msg) {
+			FMenu fMenu;
+			FMap  fMap;
+			FPark fPark;
+			FHome fHome;
+
+
+
+
+			// Random random = new Random();
+			// Location l = new Location("dummyprovider");
+			//(12.9788f, 45.9559f);
+			// 9.1910f, 45.4602f
+
+			//MI
+			// l.setLatitude(45.4602f + random.nextFloat()*0.0 );
+			// l.setLongitude( 9.1910f+ random.nextFloat()*0.0 );
+
+			//Codroipo
+			//l.setLatitude(45.9559f + random.nextFloat()*0.0 );
+			//l.setLongitude( 12.9788f+ random.nextFloat()*0.0 );
+
+			// l.setBearing(bearing);
+			//bearing = (bearing+1) % 359;
+
+			//onLocationChanged(l);
+
+			if(! App.isForegroundActivity(mainOBCWeakReference.get())) {
+				DLog.W(AMainOBC.class.getName() + " MSG to non foreground activity");
+				if(App.currentTripInfo==null) {
+					DLog.W(AMainOBC.class.getName() + " no trip found kill activity");
+
+					mainOBCWeakReference.get().finish();
+				}
+				return;
+			}
+
+			switch (msg.what) {
+
+				case ObcService.MSG_CLIENT_REGISTER:
+					DLog.E(AMainOBC.class.getName() + ": MSG_CLIENT_REGISTER");
+					break;
+
+				case ObcService.MSG_CMD_TIMEOUT:
+					DLog.E(AMainOBC.class.getName() + ": MSG_CMD_TIMEOUT");
+					break;
+
+				case ObcService.MSG_PING:
+					DLog.D(AMainOBC.class.getName() + ": MSG_PING");
+					break;
+
+				case ObcService.MSG_IO_RFID:
+
+					DLog.E(AMainOBC.class.getName() + ": MSG_IO_RFID");
+					break;
+
+				case ObcService.MSG_CAR_UPDATE:
+				case ObcService.MSG_CAR_INFO:
+
+					fMenu = (FMenu)mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FMenu.class.getName());
+					if (fMenu != null) {
+						fMenu.updateUIUsingAppValues();
+					}
+
+					fHome = (FHome)mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FHome.class.getName());
+					if (fHome != null) {
+						fHome.updateCarInfo((CarInfo)msg.obj);
+					}
+
+
+					fMap = (FMap)mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FMap.class.getName());
+					if (fMap != null) {
+						fMap.updateCarInfo((CarInfo)msg.obj);
+					}
+
+					break;
+
+
+				case ObcService.MSG_TRIP_PARK:
+
+					fMenu = (FMenu)mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FMenu.class.getName());
+
+					if (fMenu != null) {
+
+						fMenu.updateUIUsingAppValues();
+					}
+
+					break;
+
+				case ObcService.MSG_TRIP_PARK_CARD_BEGIN:
+				/*fPark = (FPark)getFragmentManager().findFragmentByTag(FPark.class.getName());
+
+				if (fPark != null) {
+					fPark.showBeginPark();
+				}	*/
+
+					fMenu = (FMenu)mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FMenu.class.getName());
+
+					if (fMenu != null) {
+						fMenu.updateUIUsingAppValues();
+					}
+
+					break;
+
+				case ObcService.MSG_TRIP_PARK_CARD_END:
+				/*fPark = (FPark)getFragmentManager().findFragmentByTag(FPark.class.getName());
+
+				if (fPark != null) {
+					fPark.showEndPark();
+				}*/
+
+					fMenu = (FMenu)mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FMenu.class.getName());
+
+					if (fMenu != null) {
+						fMenu.updateUIUsingAppValues();
+					}
+
+					break;
+
+				case ObcService.MSG_TRIP_BEGIN:
+					if(!App.pinChecked) {
+						Intent in = new Intent(mainOBCWeakReference.get(), AWelcome.class);
+						in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						mainOBCWeakReference.get().startActivity(in);
+						mainOBCWeakReference.get().finish();
+					}
+					break;
+				case ObcService.MSG_TRIP_END:
+					FMap fragmentMap = (FMap)mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FMap.class.getName());
+					if (fragmentMap != null) {
+						fragmentMap.stopRouteNavigation();
+					}
+
+					FSearch fragmentSearch = (FSearch)mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FSearch.class.getName());
+					if (fragmentSearch != null) {
+						//fragmentSearch.shutdownSearch();
+					}
+
+					if (mainOBCWeakReference.get().serviceConnector.isConnected()) {
+						mainOBCWeakReference.get().serviceConnector.unregister();
+						mainOBCWeakReference.get().serviceConnector.disconnect();
+					}
+
+					Intent i = new Intent(mainOBCWeakReference.get(), AWelcome.class);
+					i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					mainOBCWeakReference.get().startActivity(i);
+					mainOBCWeakReference.get().finish();
+					break;
+
+				case ObcService.MSG_CAR_LOCATION:
+					if (msg.obj!=null && msg.obj instanceof Location) {
+						mainOBCWeakReference.get().onLocationChanged((Location)msg.obj);
+					}
+					break;
+
+				case ObcService.MSG_RADIO_CURPLAY_INFO :
+				case ObcService.MSG_RADIO_SEEK_INFO:
+				case ObcService.MSG_RADIO_SEEK_VALID_INFO:
+				case ObcService.MSG_RADIO_SEEK_STATUS:
+				case ObcService.MSG_RADIO_VOLUME_INFO:
+					FRadio fRadio = (FRadio)mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FRadio.class.getName());
+					if (fRadio!=null) {
+						Message fmsg = this.obtainMessage();
+						fmsg.copyFrom(msg);
+						fRadio.notifyRadioMsg(fmsg);
+					}
+					break;
+
+
+				case ObcService.MSG_NAVIGATE_TO:
+
+					if (msg.obj!=null && (msg.obj instanceof Location)) {
+						mainOBCWeakReference.get().navigateTo((Location) msg.obj);
+					}
+
+					break;
+				case ObcService.MSG_TRIP_NEAR_POI:
+					App.currentTripInfo.isBonusEnabled=msg.arg1>0;
+
+					if(mainOBCWeakReference.get().firstUpCharging) {
+						mainOBCWeakReference.get().firstUpCharging=false;
+						if(App.USE_TTS_ALERT)
+
+							mainOBCWeakReference.get().queueTTS(mainOBCWeakReference.get().getResources().getString(R.string.alert_bonus));
+						else {
+							switch (App.DefaultCity.toLowerCase()){
+								case "milano":
+									mainOBCWeakReference.get().playAlertAdvice(R.raw.alert_tts_bonus_park, " alert bonus park");
+									break;
+								case "firenze":
+									mainOBCWeakReference.get().playAlertAdvice(R.raw.alert_tts_bonus_park, " alert bonus park");
+									break;
+							}
+						}
+
+					}
+
+					fMenu = (FMenu)mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FMenu.class.getName());
+					if (fMenu != null) {
+						fMenu.updateUIUsingAppValues();
+					}
+
+					fHome = (FHome)mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FHome.class.getName());
+					if (fHome != null) {
+						fHome.updatePoiInfo(msg.arg1,(Poi)msg.obj);
+					}
+
+
+					fMap = (FMap)mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FMap.class.getName());
+					if (fMap != null) {
+						fMap.updatePoiInfo(msg.arg1,(Poi)msg.obj);
+					}
+					break;
+
+				default:
+					super.handleMessage(msg);
+			}
+		}
+	}
+
 
 }
