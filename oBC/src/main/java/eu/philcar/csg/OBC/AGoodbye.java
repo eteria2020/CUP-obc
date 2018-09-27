@@ -68,7 +68,7 @@ public class AGoodbye extends ABase {
         super.onPause();
 
         App.setForegroundActivity("Pause");
-        if (!serviceConnector.isConnected()) {
+        if (serviceConnector.isConnected()) {
             serviceConnector.unregister();
             serviceConnector.disconnect();
         }
