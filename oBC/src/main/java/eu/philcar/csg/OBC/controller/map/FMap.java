@@ -1316,7 +1316,7 @@ public class FMap extends FBase implements OnClickListener {
 
 			break; */
 
-		case R.id.fmapCancelB:
+		case R.id.fmapCloseTriplB:
 			FHome.timer_2min.cancel();
 			FHome.timer_5sec.cancel();
 			firstRun=true;

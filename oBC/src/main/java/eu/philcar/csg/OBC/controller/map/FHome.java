@@ -89,6 +89,7 @@ public class FHome extends FBase implements OnClickListener {
 
 
 
+    private final static int  MSG_OPEN_ALERT_AREA = 7;
     private final static int  MSG_CLOSE_SOC_ALERT = 8;
     private final static int  MSG_OPEN_SOC_ALERT = 9;
 
@@ -116,10 +117,15 @@ public class FHome extends FBase implements OnClickListener {
     public static Boolean started=false;
 
     private List<String> animQueue =new ArrayList<String>();
-    private Uri uri;
+    private boolean lastInsideArea = true;
     private static int statusAlertSOC=0, lastInside=0;//0 none played | 1 played 20km | 2 player 5km  //0:no anim 1:anim3g 2:animArea 3:animBoth
     private static Boolean RequestBanner=false;
     private long updateArea=0;
+    private int alertFLMode = 0;
+    private static final int NO_ALERT = 0;
+    private static final int ALERT_SOC = 1;
+    private static final int ALERT_AREA = 2;
+
 
     private static Boolean handleClick=false;
 
@@ -191,7 +197,7 @@ public class FHome extends FBase implements OnClickListener {
         ((Button) view.findViewById(R.id.fmapRadioB)).setOnClickListener(this);
          view.findViewById(R.id.fmapDamagesIB).setOnClickListener(this); // momo debug
         //((Button) view.findViewById(R.id.fmapFuelStationsB)).setOnClickListener(this); rimosso su richiesta mkt
-        ((Button) view.findViewById(R.id.fmapCancelB)).setOnClickListener(this);
+        ((Button) view.findViewById(R.id.fmapCloseTriplB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapParkB)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapAssicurazione)).setOnClickListener(this);
         ((Button) view.findViewById(R.id.fmapLibretto)).setOnClickListener(this);
@@ -482,6 +488,7 @@ public class FHome extends FBase implements OnClickListener {
         //lastInside=1;
         seenA=false;
         seenB=false;
+        lastInsideArea = true;
         try{
             getActivity().unregisterReceiver(this.ConnectivityChangeReceiver);
         }catch(Exception e){
@@ -500,7 +507,7 @@ public class FHome extends FBase implements OnClickListener {
         ((Button) rootView.findViewById(R.id.fmapSOSB)).setOnClickListener(null);
         ((Button) rootView.findViewById(R.id.fmapSearchB)).setOnClickListener(null);
         ((Button) rootView.findViewById(R.id.fmapRadioB)).setOnClickListener(null);
-        ((Button) rootView.findViewById(R.id.fmapCancelB)).setOnClickListener(null);
+        ((Button) rootView.findViewById(R.id.fmapCloseTriplB)).setOnClickListener(null);
         ((Button) rootView.findViewById(R.id.fmapParkB)).setOnClickListener(null);
 
         localHandler.removeCallbacksAndMessages(null);
@@ -574,14 +581,19 @@ public class FHome extends FBase implements OnClickListener {
                 ((ABase) getActivity()).pushFragment(FRadio.newInstance(), FRadio.class.getName(), true);
                 break;
 
-            case R.id.fmapCancelB://End Trip
+            case R.id.fmapCloseTriplB://End Trip
                 dlog.cr("MENU CLICK END RENT");
                 //((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_END_RENT), FMenu.class.getName(), true);
-                if (App.checkKeyOff &&(((AMainOBC)getActivity()).checkisInsideParkingArea() && !CarInfo.isKeyOn())) {
-                    closeTrip();
+                if(((AMainOBC)getActivity()).checkisInsideParkingArea()) {
+                    if (App.checkKeyOff && !CarInfo.isKeyOn()) {
+                        closeTrip();
+                    } else
+                        ((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_END_RENT), FMenu.class.getName(), true);
                 }
-                else
-                    ((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_END_RENT), FMenu.class.getName(), true);
+                else {
+                    localHandler.sendEmptyMessage(MSG_OPEN_ALERT_AREA);
+                    dlog.i("Open Alert Area");
+                }
                 break;
 
             case R.id.fmapParkB://End Trip
@@ -702,6 +714,8 @@ public class FHome extends FBase implements OnClickListener {
         //isInside = false;
         //rotationAngle =0;
 
+        updateCloseButton(isInside);
+
         if (isInside) {
 
                 if(animQueue.contains("area")){
@@ -747,6 +761,28 @@ public class FHome extends FBase implements OnClickListener {
 
 
         //parkingDirectionIV.setRotation((float)rotationAngle);
+        lastInsideArea = isInside;
+    }
+
+    private void updateCloseButton(boolean isInsideParkArea){
+        if(lastInsideArea != isInsideParkArea){
+            Button closeTripBtn = ((Button) rootView.findViewById(R.id.fmapCloseTriplB));
+            if (closeTripBtn == null) {
+                dlog.i("updateCloseTripButton: button not found");
+                return;
+            }
+            if(isInsideParkArea){
+                dlog.i("updateCloseTripButton: enabling Button");
+                closeTripBtn.setEnabled(true);
+                closeTripBtn.setAlpha(1);
+
+            }else {
+                dlog.i("updateCloseTripButton: disabling Button");
+                //closeTripBtn.setEnabled(false);
+                closeTripBtn.setAlpha(0.5f);
+
+            }
+        }
     }
 /**
  * Update the Range indicator and handle the out of charge button display
@@ -777,6 +813,7 @@ public class FHome extends FBase implements OnClickListener {
                     if (statusAlertSOC <= 1) {
                         dlog.cr("Display popup 5km");
                         statusAlertSOC = 2;
+                        alertFLMode = ALERT_SOC;
                         eventRepository.eventSoc(SOC, "Popup 5km");
                         rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
                         rootView.findViewById(R.id.ivDamages).setBackgroundResource(R.drawable.outofcharge);
@@ -796,6 +833,7 @@ public class FHome extends FBase implements OnClickListener {
                         dlog.cr("Display popup 20km");
 
                         statusAlertSOC = 1;
+                        alertFLMode = ALERT_SOC;
                         eventRepository.eventSoc(SOC, "Popup 20km");
                         rootView.findViewById(R.id.ivDamages).setBackgroundResource(R.drawable.almostoutofcharge);
                         rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
@@ -824,10 +862,11 @@ public class FHome extends FBase implements OnClickListener {
                 fmapAlarm.setVisibility(View.VISIBLE);
                 fmapRange.setVisibility(View.GONE);
             } else {
-                localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
-                rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
-                fmapAlarm.setVisibility(View.GONE);
-                fmapRange.setVisibility(View.VISIBLE);
+                if(alertFLMode == ALERT_SOC) {
+                    localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
+                    fmapAlarm.setVisibility(View.GONE);
+                    fmapRange.setVisibility(View.VISIBLE);
+                }
             }
             tvRange.setText((SOC>=50?SOC:SOC-10) + " Km");
 
@@ -985,13 +1024,14 @@ public class FHome extends FBase implements OnClickListener {
                     }
                     break;
                 case MSG_CLOSE_SOC_ALERT:
-
+                    alertFLMode = NO_ALERT;
                     localHandler.removeMessages(MSG_CLOSE_SOC_ALERT);
                     //dlog.cr("Chiusura alert SOC");
                     rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
                     //rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
                     break;
                 case MSG_OPEN_SOC_ALERT:
+                    alertFLMode = ALERT_SOC;
                     localHandler.removeMessages(MSG_OPEN_SOC_ALERT);
                     if(localCarInfo!=null && localCarInfo.batteryLevel<=15) {
                         rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
@@ -1003,6 +1043,16 @@ public class FHome extends FBase implements OnClickListener {
                         rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
                         //rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
                     }
+                    break;
+                case MSG_OPEN_ALERT_AREA:
+                    alertFLMode = ALERT_AREA;
+                    localHandler.removeMessages(MSG_OPEN_ALERT_AREA);
+                    rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+                    ((rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_orangealertbox);
+                    ((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
+                    ((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_area_box);
+                    //rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
+
                     break;
 
 
