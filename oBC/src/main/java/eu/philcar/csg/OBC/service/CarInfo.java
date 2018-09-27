@@ -155,10 +155,7 @@ public class CarInfo {
 
 
     private boolean checkLastBatterySafety(boolean newBatterySafety) {
-        if(lastBatterySafetyTx.getTime()+1000*60*10<=System.currentTimeMillis()){
-            return true;
-        }else
-        return false;
+        return lastBatterySafetyTx.getTime() + 1000 * 60 * 10 <= System.currentTimeMillis();
     }
 
     private void setLastBatterySafety(boolean lastBatterySafety) {
@@ -319,7 +316,7 @@ public class CarInfo {
                 else
                     rangeKm = batteryLevel;
             } else if (key.equalsIgnoreCase("Speed")) {
-                setSpeed((int) Math.round(b.getFloat(key)));
+                setSpeed(Math.round(b.getFloat(key)));
             }
 /*			
 			else if (key.equalsIgnoreCase("RPM")) {
@@ -508,7 +505,7 @@ public class CarInfo {
                         rangeKm = batteryLevel;
                 }
             } else if (key.equalsIgnoreCase("Speed")) {
-                i = (int) Math.round(b.getFloat(key));
+                i = Math.round(b.getFloat(key));
                 if (i != getSpeed()) {
                     hasChanged = true;
                     setSpeed(i);

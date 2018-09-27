@@ -313,8 +313,8 @@ public class Ctx
                 }
 
                 //  In the unused part of the slot array, create a list of empty slots.
-                for (int i = (int) slotCount - 1;
-                      i >= (int) ios + 2; i--) {
+                for (int i = slotCount - 1;
+                     i >= ios + 2; i--) {
                     emptySlots.add(i);
                     slots[i] = null;
                 }
@@ -425,10 +425,7 @@ public class Ctx
         finally {
             endpointsSync.unlock();
         }
-        if (inserted != null) {
-            return false;
-        }
-        return true;
+        return inserted == null;
     }
 
     public void unregisterEndpoints(SocketBase socket)

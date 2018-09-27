@@ -514,7 +514,7 @@ public class TripInfo {
 
         if (!App.hasNetworkConnection()) {
             dlog.w(" loadBanner: nessuna connessione");
-            App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+            App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
             return;
         }
         StringBuilder  builder = new StringBuilder();
@@ -535,10 +535,10 @@ public class TripInfo {
         }
         try {
             if (App.BannerName.getBundle(type) != null )
-                paramsList.add(new BasicNameValuePair("index", App.Instance.BannerName.getBundle(type).getString("INDEX",null)));
+                paramsList.add(new BasicNameValuePair("index", App.BannerName.getBundle(type).getString("INDEX",null)));
 
             if (App.BannerName.getBundle(type) != null )
-                paramsList.add(new BasicNameValuePair("end", App.Instance.BannerName.getBundle(type).getString("END",null)));
+                paramsList.add(new BasicNameValuePair("end", App.BannerName.getBundle(type).getString("END",null)));
 
 
 
@@ -567,23 +567,23 @@ public class TripInfo {
             } else {
 
                 dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode) + " url "+Url);
-                App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+                App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
                 return;
             }
         }catch (Exception e){
             dlog.e(" loadBanner: eccezione in connessione ",e);
-            App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+            App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
             return;
         }
         String jsonStr = builder.toString();
         if(jsonStr.compareTo("")==0){
             dlog.w(TripInfo.class.toString()+" loadBanner: nessuna connessione");
-            App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+            App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
             return;
         }
 
         DLog.I(" loadBanner: risposta "+jsonStr);
-        File file = new File(outDir, "placeholder.lol");;
+        File file = new File(outDir, "placeholder.lol");
 
         try {
             JSONObject json = new JSONObject(jsonStr);
@@ -602,7 +602,7 @@ public class TripInfo {
             Image.putString(("INDEX"), jsonObject.getString("INDEX"));
             Image.putString(("END"), jsonObject.getString("END"));
 
-            App.Instance.BannerName.putBundle(type,Image);
+            App.BannerName.putBundle(type,Image);
 
             //ricavo nome file
             URL urlImg = new URL(Image.getString("URL"));
@@ -614,7 +614,7 @@ public class TripInfo {
 
             if(file.exists()){
                 Image.putString(("FILENAME"),filename);
-                App.Instance.BannerName.putBundle(type,Image);
+                App.BannerName.putBundle(type,Image);
                 dlog.i(" loadBanner: file già esistente: "+filename);
                 return;
             }
@@ -643,13 +643,13 @@ public class TripInfo {
             inputStream.close();
             urlConnection.disconnect();
             Image.putString(("FILENAME"),filename);
-            App.Instance.BannerName.putBundle(type,Image);
+            App.BannerName.putBundle(type,Image);
             dlog.i(" loadBanner: File scaricato e creato "+filename);
 
 
         } catch (Exception e) {
             if(file.exists()) file.delete();
-            App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+            App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
             dlog.e(" loadBanner: eccezione in creazione e download file ",e);
 
             e.printStackTrace();
@@ -1311,11 +1311,7 @@ public class TripInfo {
              return false;
          }
 
-         if(!customer.equals(((TripInfo) o).customer)){
-             return false;
-         }
-
-         return true;
+            return customer.equals(((TripInfo) o).customer);
 
         }
 

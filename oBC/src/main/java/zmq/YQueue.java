@@ -39,7 +39,7 @@ public class YQueue<T>
                 memoryPtr++;
             }
         }
-    };
+    }
 
     //  Back position may point to invalid memory if the queue is empty,
     //  while begin & end positions are always valid. Begin position is

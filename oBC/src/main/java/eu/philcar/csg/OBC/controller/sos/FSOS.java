@@ -91,7 +91,7 @@ public class FSOS extends FBase implements OnClickListener {
 		changeNumberB = (Button)view.findViewById(R.id.fsosChangeNumberB);
 		
 		messageTV.setText(R.string.call_book);
-		((ImageView)view.findViewById(R.id.fsosAlertIV)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.fsosAlertIV).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				logoTaps++;
@@ -99,7 +99,7 @@ public class FSOS extends FBase implements OnClickListener {
 		});
 
 		// Verify long press after min 5 taps for show service login dialog
-		((ImageView)view.findViewById(R.id.fsosAlertIV)).setOnLongClickListener(new View.OnLongClickListener() {
+		view.findViewById(R.id.fsosAlertIV).setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
 				if (logoTaps>=5) {

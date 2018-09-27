@@ -198,11 +198,11 @@ public class HttpConnector {
 		         }
 				bf.close();
 			} catch (UnsupportedEncodingException e) {
-				dlog.e("DeGzip",e);;
+				dlog.e("DeGzip",e);
 
-			} catch (IOException e) {
-				dlog.e("DeGzip",e);;				
-			}
+            } catch (IOException e) {
+				dlog.e("DeGzip",e);
+            }
 	
 	         return outStr;
 	     }

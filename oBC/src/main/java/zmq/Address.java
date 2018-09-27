@@ -29,7 +29,7 @@ public class Address
         String toString();
         void resolve(String name, boolean ip4only);
         SocketAddress address();
-    };
+    }
 
     private final String protocol;
     private final String address;

@@ -182,9 +182,9 @@ public class FMap extends FBase implements OnClickListener {
 
 
 
-	private static View panelRealReach, panelNavigation, panelNavMenu, no3gwarning;;
+	private static View panelRealReach, panelNavigation, panelNavMenu, no3gwarning;
 
-	private TextView no3gtxt,txtCurrentStreet;
+    private TextView no3gtxt,txtCurrentStreet;
 	private TextView  txtNextStreet, titleAnnotation, descriptionAnnotation;
 	private ArrayList<SKAnnotation> annotationList = new ArrayList<SKAnnotation>();
 
@@ -273,7 +273,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		dlog.d("OnCreareView FMap");
 		rootView = view;
-		if(App.Instance.BannerName.getBundle("CAR")==null&&!RequestBanner){          //App.Instance.BannerName.getBundle("CAR")==null&&
+		if(App.BannerName.getBundle("CAR")==null&&!RequestBanner){          //App.Instance.BannerName.getBundle("CAR")==null&&
 			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
 			RequestBanner=true;
 			new Thread(new Runnable() {
@@ -301,7 +301,7 @@ public class FMap extends FBase implements OnClickListener {
 		}
 
 
-		if(App.Instance.BannerName.getBundle("END")==null){          //App.Instance.BannerName.getBundle("CAR")==null&&
+		if(App.BannerName.getBundle("END")==null){          //App.Instance.BannerName.getBundle("CAR")==null&&
 			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
 
 			new Thread(new Runnable() {
@@ -842,7 +842,7 @@ public class FMap extends FBase implements OnClickListener {
 /**
  * Init no touch area for crash onClick on the bottom right write "provided by Scout by OSM"*/
 	public void initNoTouchArea() {
-		((FrameLayout)rootView.findViewById(R.id.flNoTouch)).setOnTouchListener(new OnTouchListener() {
+		rootView.findViewById(R.id.flNoTouch).setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent e) {
 				return true;
@@ -1111,7 +1111,7 @@ public class FMap extends FBase implements OnClickListener {
 						eventRepository.eventSoc(SOC, "Popup 5km");
 						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
 						rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
-						((FrameLayout) (rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_redalertbox);
+						rootView.findViewById(R.id.fmapAlertSOCFL).setBackgroundResource(R.drawable.sha_redalertbox);
 						((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
 						((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_5km);
 						localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
@@ -1143,7 +1143,7 @@ public class FMap extends FBase implements OnClickListener {
 						eventRepository.eventSoc(SOC, "Popup 20km");
 						rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
 						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
-						((FrameLayout) (rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_orangealertbox);
+						rootView.findViewById(R.id.fmapAlertSOCFL).setBackgroundResource(R.drawable.sha_orangealertbox);
 						((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
 
 						((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_20km);
@@ -1189,8 +1189,8 @@ public class FMap extends FBase implements OnClickListener {
 	private void updateUI() {
 
 
-		if (this.navigationActive) {
-			((Button)rootView.findViewById(R.id.btnCloseNav)).setVisibility(View.VISIBLE);
+		if (navigationActive) {
+			rootView.findViewById(R.id.btnCloseNav).setVisibility(View.VISIBLE);
 		}
 
 
@@ -1337,8 +1337,8 @@ public class FMap extends FBase implements OnClickListener {
 			break;
 
 		case R.id.fmapLeftBorderIV:
-			if(App.Instance.BannerName.getBundle("CAR")!=null){
-				if(App.Instance.BannerName.getBundle("CAR").getString("CLICK").compareTo("null")!=0){
+			if(App.BannerName.getBundle("CAR")!=null){
+				if(App.BannerName.getBundle("CAR").getString("CLICK").compareTo("null")!=0){
 
 					if(!handleClick) {
 						adIV.setColorFilter(R.color.overlay_click);
@@ -1836,7 +1836,7 @@ public class FMap extends FBase implements OnClickListener {
 
 			txtCurrentStreet.setVisibility(View.VISIBLE);
 			txtNextStreet.setVisibility(View.VISIBLE);
-			((Button) rootView.findViewById(R.id.btnCloseNav)).setVisibility(View.VISIBLE);
+			rootView.findViewById(R.id.btnCloseNav).setVisibility(View.VISIBLE);
 
 			dlog.d("startRouteNavigation: Imposto Audio a AUDIO_SYSTEM");
 			if(getActivity()!=null)
@@ -1879,7 +1879,7 @@ public class FMap extends FBase implements OnClickListener {
 				txtNextStreet.setVisibility(View.INVISIBLE);
 				mapView.getMapSettings().setMapDisplayMode(SKMapDisplayMode.MODE_2D);
 				hideLeftPanel();
-				((Button) rootView.findViewById(R.id.btnCloseNav)).setVisibility(View.INVISIBLE);
+				rootView.findViewById(R.id.btnCloseNav).setVisibility(View.INVISIBLE);
 
 
 				navigationActive = false;
@@ -2180,7 +2180,7 @@ public class FMap extends FBase implements OnClickListener {
     	LayoutInflater inflater =    (LayoutInflater)this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	View view = inflater.inflate(R.layout.la_realreach, null);
 
-    	((Button)view.findViewById(R.id.btnCloseRealReach)).setOnClickListener(listener);
+    	view.findViewById(R.id.btnCloseRealReach).setOnClickListener(listener);
 
     	return view;
     }
@@ -2190,9 +2190,9 @@ public class FMap extends FBase implements OnClickListener {
     	LayoutInflater inflater =    (LayoutInflater)this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	View view = inflater.inflate(R.layout.la_navmenu, null);
 
-		((Button)view.findViewById(R.id.btnClose)).setOnClickListener(listener);
-		((Button)view.findViewById(R.id.btnSearch)).setOnClickListener(listener);
-		((Button)view.findViewById(R.id.btnFavorites)).setOnClickListener(listener);
+		view.findViewById(R.id.btnClose).setOnClickListener(listener);
+		view.findViewById(R.id.btnSearch).setOnClickListener(listener);
+		view.findViewById(R.id.btnFavorites).setOnClickListener(listener);
 
 		return view;
     }
@@ -2258,12 +2258,12 @@ public class FMap extends FBase implements OnClickListener {
 							@Override
 							public void onFinish() {
 								hideLeftPanel();
-								((Button) parent.findViewById(R.id.btnCloseRealReach)).setTag(null);
+								parent.findViewById(R.id.btnCloseRealReach).setTag(null);
 								localHandler.sendEmptyMessage(MSG_HIDE_REAL_REACH);
 							}
 
 						}.start();
-						((Button) parent.findViewById(R.id.btnCloseRealReach)).setTag(tmr);
+						parent.findViewById(R.id.btnCloseRealReach).setTag(tmr);
 					}
 
 
@@ -3301,7 +3301,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		if (!App.hasNetworkConnection()) {
 			dlog.e(FMap.class.toString()+" loadBanner: nessuna connessione");
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 		}
 		StringBuilder  builder = new StringBuilder();
@@ -3322,10 +3322,10 @@ public class FMap extends FBase implements OnClickListener {
 		}
 		try {
 			if (App.BannerName.getBundle(type) != null )
-				paramsList.add(new BasicNameValuePair("index", App.Instance.BannerName.getBundle(type).getString("INDEX",null)));
+				paramsList.add(new BasicNameValuePair("index", App.BannerName.getBundle(type).getString("INDEX",null)));
 
 			if (App.BannerName.getBundle(type) != null )
-				paramsList.add(new BasicNameValuePair("end", App.Instance.BannerName.getBundle(type).getString("END",null)));
+				paramsList.add(new BasicNameValuePair("end", App.BannerName.getBundle(type).getString("END",null)));
 
 
 
@@ -3354,27 +3354,27 @@ public class FMap extends FBase implements OnClickListener {
 			} else {
 
 				dlog.e(FMap.class.toString()+" loadBanner: Failed to connect "+String.valueOf(statusCode));
-				App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+				App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 				return;
 			}
 			client.getConnectionManager().shutdown();
 		}catch (Exception e){
 			dlog.e(FMap.class.toString()+" loadBanner: eccezione in connessione ",e);
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 	}
 		String jsonStr = builder.toString();
 		builder.delete(0,builder.length());
 		if(jsonStr.compareTo("")==0){
 			dlog.e(FMap.class.toString()+" loadBanner: nessuna connessione");
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 		}
 
 		DLog.I(FMap.class.toString()+" loadBanner: risposta "+jsonStr);
-		File file = new File(outDir, "placeholder.lol");;
+		File file = new File(outDir, "placeholder.lol");
 
-		try {
+        try {
 			JSONObject json = new JSONObject(jsonStr);
 
 			//Get the instance of JSONArray that contains JSONObjects
@@ -3393,7 +3393,7 @@ public class FMap extends FBase implements OnClickListener {
 				if(jsonObject.has("FLEET"))
 					updateFleet(jsonObject.getInt("FLEET"));
 
-			App.Instance.BannerName.putBundle(type,Image);
+			App.BannerName.putBundle(type,Image);
 
 			//ricavo nome file
 			URL urlImg = new URL(Image.getString("URL"));
@@ -3405,7 +3405,7 @@ public class FMap extends FBase implements OnClickListener {
 
 			if(file.exists()){
 				Image.putString(("FILENAME"),filename);
-				App.Instance.BannerName.putBundle(type,Image);
+				App.BannerName.putBundle(type,Image);
 				dlog.i(FMap.class.toString()+" loadBanner: file già esistente: "+filename);
 				return;
 			}
@@ -3434,13 +3434,13 @@ public class FMap extends FBase implements OnClickListener {
 			urlConnection.disconnect();
 			inputStream.close();
 			Image.putString(("FILENAME"),filename);
-			App.Instance.BannerName.putBundle(type,Image);
-			dlog.I(FMap.class.toString()+" loadBanner: File scaricato e creato "+filename);
+			App.BannerName.putBundle(type,Image);
+			DLog.I(FMap.class.toString()+" loadBanner: File scaricato e creato "+filename);
 
 
 		} catch (Exception e) {
 			if(file.exists()) file.delete();
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			dlog.e(FMap.class.toString()+" loadBanner: eccezione in creazione e download file ",e);
 
 			e.printStackTrace();
@@ -3453,7 +3453,7 @@ public class FMap extends FBase implements OnClickListener {
 	public void updateBanner(String type){
 
 		File ImageV;
-		Bundle Banner = App.Instance.BannerName.getBundle(type);
+		Bundle Banner = App.BannerName.getBundle(type);
 		if(Banner!=null){
 			ImageV=new File(App.getBannerImagesFolder(),Banner.getString("FILENAME","nope"));
 

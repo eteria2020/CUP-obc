@@ -173,10 +173,7 @@ public class SKToolsDownloadManager {
     public boolean isDownloadProcessRunning() {
         synchronized (SKToolsDownloadPerformer.class) {
             // if download thread is alive, stop it and return true
-            if ((downloadThread != null) && downloadThread.isAlive()) {
-                return true;
-            }
-            return false;
+            return (downloadThread != null) && downloadThread.isAlive();
         }
     }
 

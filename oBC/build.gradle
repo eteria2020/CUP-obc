@@ -141,6 +141,6 @@ dependencies {
     androidTestAnnotationProcessor daggerCompiler
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile('com.crashlytics.sdk.android:crashlytics:2.9.3@aar') {
-        transitive = true;
+        transitive = true
     }
 }

@@ -26,10 +26,10 @@ import java.nio.channels.WritableByteChannel;
 
 public interface Transfer
 {
-    public int transferTo(WritableByteChannel s) throws IOException;
-    public int remaining();
+    int transferTo(WritableByteChannel s) throws IOException;
+    int remaining();
 
-    public static class ByteBufferTransfer implements Transfer
+    class ByteBufferTransfer implements Transfer
     {
         private ByteBuffer buf;
 
@@ -51,7 +51,7 @@ public interface Transfer
         }
     }
 
-    public static class FileChannelTransfer implements Transfer
+    class FileChannelTransfer implements Transfer
     {
         private Transfer parent;
         private FileChannel channel;

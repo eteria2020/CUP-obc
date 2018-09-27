@@ -49,8 +49,9 @@ public class FRadio  extends FBase {
 	private double amFreq = 0;
 	private final int MSG_CLOSE = 1;
 	
-	private enum Bands { AM , FM };
-	private Bands band = Bands.FM;
+	private enum Bands { AM , FM }
+
+    private Bands band = Bands.FM;
 	
 	public static void setVolume(int volume) {
 		if (savedInstance==null)
@@ -82,7 +83,7 @@ public class FRadio  extends FBase {
 		
 		
 		
-		((Button)view.findViewById(R.id.btnMax)).setOnClickListener(new View.OnClickListener() {
+		view.findViewById(R.id.btnMax).setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {				
@@ -91,10 +92,9 @@ public class FRadio  extends FBase {
 				rescheduleClose();
 			}
 			
-		});;
-		
-		
-		((Button)view.findViewById(R.id.btnMin)).setOnClickListener(new View.OnClickListener() {
+		});
+
+        view.findViewById(R.id.btnMin).setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {				
@@ -103,9 +103,9 @@ public class FRadio  extends FBase {
 				rescheduleClose();
 			}
 			
-		});;
-		
-		((Button)view.findViewById(R.id.btnZero)).setOnClickListener(new View.OnClickListener() {
+		});
+
+        view.findViewById(R.id.btnZero).setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -125,9 +125,9 @@ public class FRadio  extends FBase {
 				}
 			}
 			
-		});;
-		
-		((Button)view.findViewById(R.id.btnSeekSx)).setOnClickListener(new View.OnClickListener() {
+		});
+
+        view.findViewById(R.id.btnSeekSx).setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {	
@@ -136,9 +136,9 @@ public class FRadio  extends FBase {
 				rescheduleClose();
 			}
 			
-		});;
-		
-		((Button)view.findViewById(R.id.btnSeekDx)).setOnClickListener(new View.OnClickListener() {
+		});
+
+        view.findViewById(R.id.btnSeekDx).setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {	
@@ -147,9 +147,9 @@ public class FRadio  extends FBase {
 				rescheduleClose();
 			}
 			
-		});;
-		
-		View.OnTouchListener btnChannelTouchListener =  new View.OnTouchListener() {
+		});
+
+        View.OnTouchListener btnChannelTouchListener =  new View.OnTouchListener() {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -214,7 +214,7 @@ public class FRadio  extends FBase {
 			RadioButton[i].setOnTouchListener(btnChannelTouchListener);
 		}
 		
-		((View)view.findViewById(R.id.rlAmFm)).setOnTouchListener(btnAmFmlTouchListener);
+		view.findViewById(R.id.rlAmFm).setOnTouchListener(btnAmFmlTouchListener);
 		
 		if (savedInstance!=null && savedInstance.containsKey(BND_BAND) && savedInstance.containsKey(BND_FREQ) ) {			
 			requestChannel(savedInstance.getString(BND_BAND), savedInstance.getDouble(BND_FREQ));
@@ -287,18 +287,18 @@ public class FRadio  extends FBase {
 
 		
 		if (band==Bands.FM) {
-			((TextView)rootView.findViewById(R.id.tvBtnFM)).setBackgroundColor(Color.rgb(0x18,0x7B,0x21));
+			rootView.findViewById(R.id.tvBtnFM).setBackgroundColor(Color.rgb(0x18,0x7B,0x21));
 			((TextView)rootView.findViewById(R.id.tvBtnFM)).setTextColor(Color.rgb(0xff, 0xff, 0xff));
 			
-			((TextView)rootView.findViewById(R.id.tvBtnAM)).setBackgroundColor(Color.TRANSPARENT);
+			rootView.findViewById(R.id.tvBtnAM).setBackgroundColor(Color.TRANSPARENT);
 			((TextView)rootView.findViewById(R.id.tvBtnAM)).setTextColor(Color.rgb(0x30, 0x30, 0x30));			
 			if (changeChannel) requestChannel("FM", fmFreq);
 			
 		} else {
-			((TextView)rootView.findViewById(R.id.tvBtnAM)).setBackgroundColor(Color.rgb(0x18,0x7B,0x21));
+			rootView.findViewById(R.id.tvBtnAM).setBackgroundColor(Color.rgb(0x18,0x7B,0x21));
 			((TextView)rootView.findViewById(R.id.tvBtnAM)).setTextColor(Color.rgb(0xff, 0xff, 0xff));
 			
-			((TextView)rootView.findViewById(R.id.tvBtnFM)).setBackgroundColor(Color.TRANSPARENT);
+			rootView.findViewById(R.id.tvBtnFM).setBackgroundColor(Color.TRANSPARENT);
 			((TextView)rootView.findViewById(R.id.tvBtnFM)).setTextColor(Color.rgb(0x30, 0x30, 0x30));		
 			if (changeChannel) requestChannel("AM", amFreq);
 			

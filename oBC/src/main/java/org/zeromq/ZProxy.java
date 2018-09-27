@@ -138,15 +138,15 @@ public class ZProxy
     /**
      * Possible places for sockets in the proxy.
      */
-    public static enum Plug
+    public enum Plug
     {
         FRONT,   // The position of the frontend socket.
         BACK,    // The position of the backend socket.
-        CAPTURE; // The position of the capture socket.
+        CAPTURE // The position of the capture socket.
     }
 
     // Contract for socket creation and customizable configuration in proxy threading.
-    public static interface Proxy
+    public interface Proxy
     {
         /**
          * Creates and initializes (bind, options ...) the socket for the given plug in the proxy.
@@ -215,7 +215,7 @@ public class ZProxy
         boolean custom(Socket pipe, String cmd, Socket frontend, Socket backend, Socket capture, Object[] args);
 
         // this may be useful
-        public abstract static class SimpleProxy implements Proxy
+        abstract class SimpleProxy implements Proxy
         {
             @Override
             public boolean restart(ZMsg cfg, Socket socket, Plug place,
@@ -551,7 +551,7 @@ public class ZProxy
     }
 
     // to handle commands in a more java-centric way
-    public static enum Command
+    public enum Command
     {
         START,
         PAUSE,
@@ -559,7 +559,7 @@ public class ZProxy
         RESTART,
         EXIT,
         STATUS,
-        CONFIG;
+        CONFIG
     }
 
     // commands for the control pipe
@@ -572,13 +572,13 @@ public class ZProxy
     private static final String CONFIG  = Command.CONFIG.name();
 
     // to handle states in a more java-centric way
-    public static enum State
+    public enum State
     {
         ALIVE,
         STARTED,
         PAUSED,
         STOPPED,
-        EXITED;
+        EXITED
     }
 
     // state responses from the control pipe
@@ -669,7 +669,7 @@ public class ZProxy
     }
 
     // defines a pump that will flow messages from one socket to another
-    public static interface Pump
+    public interface Pump
     {
         /**
          * Transfers a message from one source to one destination, with an optional capture.
@@ -983,7 +983,7 @@ public class ZProxy
         private final Transformer transformer;
 
         // transforms one message into another
-        public static interface Transformer
+        public interface Transformer
         {
             /**
              * Transforms a ZMsg into another ZMsg.

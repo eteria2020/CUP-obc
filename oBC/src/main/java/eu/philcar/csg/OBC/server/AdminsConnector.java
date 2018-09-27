@@ -27,9 +27,9 @@ public class AdminsConnector implements RemoteEntityInterface {
 
 	private DLog dlog = new DLog(this.getClass());
 	
-	public List<String> AdminsList = new ArrayList<String>();;
-	
-	public static  AdminsConnector GetDownloadConnector() {
+	public List<String> AdminsList = new ArrayList<String>();
+
+    public static  AdminsConnector GetDownloadConnector() {
 		return new AdminsConnector();
 	}
 	

@@ -108,7 +108,7 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 		btnSearch2.setOnClickListener(this);
 		btnSearch3.setOnClickListener(this);
 		
-		((ImageButton)view.findViewById(R.id.fseaGotoBTN)).setOnClickListener(this);
+		view.findViewById(R.id.fseaGotoBTN).setOnClickListener(this);
 
 		cityET.setRawInputType(InputType.TYPE_CLASS_TEXT);
 		cityET.setTextIsSelectable(true);
@@ -573,9 +573,9 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before, int count) {}
 		
-	};
-	
-	private class SearchSteps {
+	}
+
+    private class SearchSteps {
 		
 		public static final int BEGIN = 0;
 		public static final int CITY = 1;

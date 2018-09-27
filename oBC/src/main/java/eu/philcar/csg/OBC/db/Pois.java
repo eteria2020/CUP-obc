@@ -47,7 +47,7 @@ public class Pois extends DbTable<Poi,Integer> {
 			PreparedQuery<Poi> query =  queryBuilder().setCountOf(true).where().eq("id",id).and().eq("update", update).prepare();	
 			long c = this.countOf(query);
 			
-			return (c>0)?true:false;
+			return c > 0;
 					
 		} catch (SQLException e) {
 			DLog.E("isPresent fail:",e);

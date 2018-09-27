@@ -141,7 +141,7 @@ public class Req extends Dealer
             IDENTITY,
             BOTTOM,
             BODY
-        };
+        }
 
         private State state;
 

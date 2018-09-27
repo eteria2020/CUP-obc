@@ -100,7 +100,7 @@ public class UsbSerialConnection {
             if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) || UsbReceiverActivity.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
                 synchronized(this)
                 {
-                    UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                     dlog.d("Extra_device:" + device.toString());
                     enumerate(context);
                     setPort(1);

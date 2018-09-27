@@ -34,13 +34,13 @@ public class FDrunk extends FBase implements OnClickListener {
 		((TextView)view.findViewById(R.id.fdruMessageTV)).setTypeface(font);
 		
 		((Button)view.findViewById(R.id.fdruYesB)).setTypeface(font);
-		((Button)view.findViewById(R.id.fdruYesB)).setOnClickListener(this);
+		view.findViewById(R.id.fdruYesB).setOnClickListener(this);
 		
 		((Button)view.findViewById(R.id.fdruNoB)).setTypeface(font);
-		((Button)view.findViewById(R.id.fdruNoB)).setOnClickListener(this);
+		view.findViewById(R.id.fdruNoB).setOnClickListener(this);
 		
 		((Button)view.findViewById(R.id.fdruSOSB)).setTypeface(font);
-		((Button)view.findViewById(R.id.fdruSOSB)).setOnClickListener(this);
+		view.findViewById(R.id.fdruSOSB).setOnClickListener(this);
 		
 		return view;
 	}

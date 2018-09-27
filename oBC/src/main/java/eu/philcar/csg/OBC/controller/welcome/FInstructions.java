@@ -60,7 +60,7 @@ public class FInstructions extends FBase {
 				case MSG_CLOSE_FRAGMENT:
 					try {
 						dlog.d("FInstruction timeout ");
-						if(App.Instance.BannerName.getBundle("START")==null){
+						if(App.BannerName.getBundle("START")==null){
 							Intent i = new Intent(getActivity(), AMainOBC.class);
 							i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 							startActivity(i);
@@ -93,14 +93,14 @@ public class FInstructions extends FBase {
 			http.Execute(rd);
 		}
 		
-		((LinearLayout)view.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
+		view.findViewById(R.id.llSelfClose).setVisibility(View.INVISIBLE);
 		
-		((ImageButton)view.findViewById(R.id.finsNextIB)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.finsNextIB).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dlog.d("FInstructions finsNextIB click : " + login);
 				if (login) {
-					if(App.Instance.BannerName.getBundle("START")==null){
+					if(App.BannerName.getBundle("START")==null){
 						Intent i = new Intent(getActivity(), AMainOBC.class);
 						i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(i);
@@ -113,7 +113,7 @@ public class FInstructions extends FBase {
 			}
 		});
 		
-		((Button)view.findViewById(R.id.finsSOSB)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.finsSOSB).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(getActivity(), ASOS.class));
@@ -144,8 +144,8 @@ try {
 		((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_2);
 		((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_3);
 		((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_4)));
-		((TextView) view.findViewById(R.id.finsInstructions4TV)).setVisibility(View.GONE);
-		((TextView) view.findViewById(R.id.fbullet4TV)).setVisibility(View.GONE);
+		view.findViewById(R.id.finsInstructions4TV).setVisibility(View.GONE);
+		view.findViewById(R.id.fbullet4TV).setVisibility(View.GONE);
 	} else {
 		((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_1);
 		((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_2);
@@ -159,9 +159,9 @@ try {
 	((TextView) view.findViewById(R.id.finsInstructions4TV)).setText(R.string.instruction_start_4);
 
 }
-			((TextView)view.findViewById(R.id.fins_message_bottom_TV)).setVisibility(View.GONE);
+			view.findViewById(R.id.fins_message_bottom_TV).setVisibility(View.GONE);
 			
-			((ImageView)view.findViewById(R.id.ivDamages)).setOnClickListener(new OnClickListener() {
+			view.findViewById(R.id.ivDamages).setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
@@ -170,7 +170,7 @@ try {
 				
 			});
 			
-			((ImageView)view.findViewById(R.id.ivDirty)).setOnClickListener(new OnClickListener() {
+			view.findViewById(R.id.ivDirty).setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
@@ -185,7 +185,7 @@ try {
 
 				((AGoodbye) this.getActivity()).sendMessage(MessageFactory.sendBeacon());
 				((AGoodbye) this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
-				((LinearLayout) view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
+				view.findViewById(R.id.llSelfClose).setVisibility(View.VISIBLE);
 
 				new CountDownTimer(41000, 1000) {
 					@Override
@@ -207,10 +207,10 @@ try {
 				((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_close_3);
 				((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(R.string.instruction_close_4);
 
-				((LinearLayout) view.findViewById(R.id.fins_fourth_LL)).setVisibility(View.GONE);
+				view.findViewById(R.id.fins_fourth_LL).setVisibility(View.GONE);
 
 
-				((TextView) view.findViewById(R.id.fins_message_bottom_TV)).setVisibility(View.VISIBLE);
+				view.findViewById(R.id.fins_message_bottom_TV).setVisibility(View.VISIBLE);
 			}catch(Exception e){
 				dlog.e("Exception in FInstruction wtf login is: "+login,e);
 			}

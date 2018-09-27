@@ -253,11 +253,8 @@ public class Reservation  implements ServerResponse{
     	
     	if (this.duration!= r.duration)
     		return false;
-    	
-    	if (this.date != r.date)
-    		return false;
-    	
-    	return true;
+
+        return this.date == r.date;
     }
 
 	public String getCustomer_id() {

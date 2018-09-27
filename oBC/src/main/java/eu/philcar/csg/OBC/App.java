@@ -425,8 +425,7 @@ public class App extends MultiDexApplication {
 
 	}
 
-	public enum Fleets { SHARENGO };
-
+	public enum Fleets { SHARENGO }
 
 	public static final Fleets FLEET_IDENTITY = Fleets.SHARENGO;
 
@@ -1956,11 +1955,7 @@ private void  initPhase2() {
 	
 	public boolean isConfigMode() {
 		File f = new File(getCONFIG_FILE());
-		if ( f.exists()  ) {
-			return true;
-		} else {
-			return false;
-		}
+		return f.exists();
 	}
 	
 	public static boolean checkParkArea(double latitude, double longitude) {
@@ -2434,21 +2429,13 @@ private void  initPhase2() {
 	}
 	
 	public static boolean isForegroundActivity(Activity activity) {
-		
-		if (foregroundActivity!=null && foregroundActivity.equals(activity.getClass().getName())) {
-			return true;
-		} else {
-			return false;
-		}
+
+		return foregroundActivity != null && foregroundActivity.equals(activity.getClass().getName());
 	}
 
 	public static boolean isForegroundActivity(String activity) {
 
-		if (foregroundActivity!=null && foregroundActivity.equals(activity)) {
-			return true;
-		} else {
-			return false;
-		}
+		return foregroundActivity != null && foregroundActivity.equals(activity);
 	}
 	
 	
@@ -2534,7 +2521,7 @@ private void  initPhase2() {
 			dlog.e("Can't get airplane mode status",e);
 		}
 		
-		return  (mode==0?false:true);
+		return  (mode != 0);
 	}
 	
 	public void ToggleAirplaneMode() {
@@ -2561,10 +2548,7 @@ private void  initPhase2() {
 	public boolean isOnline() {
 	    ConnectivityManager cm =   (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
-	    if (netInfo != null && netInfo.isConnected()) {
-	        return true;
-	    }
-	    return false;
+		return netInfo != null && netInfo.isConnected();
 	}
 	
 	
@@ -2579,7 +2563,7 @@ private void  initPhase2() {
 
         // post an intent to reload so the menu button switches to the new state we set
         Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
-        intent.putExtra("state", radio_component_enabled ? false : true);
+        intent.putExtra("state", !radio_component_enabled);
         context.sendBroadcast(intent);
 
         // revert to default system behavior or not

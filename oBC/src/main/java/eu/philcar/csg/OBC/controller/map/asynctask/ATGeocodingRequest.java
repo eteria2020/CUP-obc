@@ -27,8 +27,8 @@ public class ATGeocodingRequest extends AsyncTask<String, String, ArrayList<Geoc
 	private static final String REQUEST_URL_END   = "&component=administrative_area:MI&sensor=true";
 	
 	public interface ATGeocodingRequestDelegate {
-		public void onResultReceived(ArrayList<GeocodedLocation> locations);
-		public void onErrorMessageReceived(String error);
+		void onResultReceived(ArrayList<GeocodedLocation> locations);
+		void onErrorMessageReceived(String error);
 	}
 	
 	private ATGeocodingRequestDelegate delegate;

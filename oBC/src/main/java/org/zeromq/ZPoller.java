@@ -73,7 +73,7 @@ import org.zeromq.ZMQ.Socket;
 public class ZPoller implements Closeable
 {
     // contract for events
-    public static interface EventsHandler
+    public interface EventsHandler
     {
         /**
          * Called when the poller intercepts events.
@@ -95,7 +95,7 @@ public class ZPoller implements Closeable
     }
 
     // contract for items. Useful for providing own implementation.
-    public static interface ItemHolder
+    public interface ItemHolder
     {
         // the inner ZMQ poll item
         zmq.PollItem item();
@@ -108,7 +108,7 @@ public class ZPoller implements Closeable
     }
 
     // contract for items creation. Useful for delegating.
-    public static interface ItemCreator
+    public interface ItemCreator
     {
         /**
          * Creates a new holder for a poll item.

@@ -140,12 +140,8 @@ public class Trip  extends DbRecord<TripResponse> {
 			if(id_customer != ((Trip) o).id_customer) {
 				return false;
 			}
-			if(begin_timestamp != ((Trip) o).begin_timestamp) {
-				return false;
-			}
-
-			return true;
-		}
+            return begin_timestamp == ((Trip) o).begin_timestamp;
+        }
 		return false;
 	}
 

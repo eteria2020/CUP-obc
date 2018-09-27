@@ -126,7 +126,7 @@ public class FDriving extends FBase implements OnClickListener {
     		parkingDirectionIV.setImageResource(R.drawable.img_parking_arrow);
     	}
 		
-		parkingDirectionIV.setRotation((float)rotationAngle);
+		parkingDirectionIV.setRotation(rotationAngle);
 	}
     
     public void updateAd(File theFile) {

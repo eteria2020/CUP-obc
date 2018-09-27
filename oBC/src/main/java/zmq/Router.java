@@ -67,7 +67,7 @@ public class Router extends SocketBase
             this.pipe = pipe;
             this.active = active;
         }
-    };
+    }
 
     //  We keep a set of pipes that have not been identified yet.
     private final Set<Pipe> anonymousPipes;

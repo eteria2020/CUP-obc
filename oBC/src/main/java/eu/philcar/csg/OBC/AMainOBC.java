@@ -356,8 +356,7 @@ public class AMainOBC extends ABase implements LocationListener {
             if (p.lat != 0 && p.lon != 0) {
                 Location ll = null; //TODO
                 int d = (int) Math.round(GeoUtils.harvesineDistance(ll, pll) / 100) * 100;
-                ;
-                map.put(d, new FuelStation(p.id, "Total Erg", p.address, "", (int) d, 0, ll));
+                map.put(d, new FuelStation(p.id, "Total Erg", p.address, "", d, 0, ll));
             }
         }
 

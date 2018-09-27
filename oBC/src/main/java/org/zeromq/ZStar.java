@@ -87,7 +87,7 @@ public class ZStar implements ZAgent
      * Contract interface when acting in plain sight.
      */
     // contract interface for acting with the spot lights on
-    public static interface Star
+    public interface Star
     {
         /**
          * Called when the star is in the wings.<br/>
@@ -140,7 +140,7 @@ public class ZStar implements ZAgent
     /**
      * Utility class with callback for when the Star has finished its performances.
      */
-    public static interface TimeTaker
+    public interface TimeTaker
     {
         /**
          * Called when the show is finished but no cleaning is still isSystem.
@@ -159,7 +159,7 @@ public class ZStar implements ZAgent
     }
 
     // contract for a creator of stars
-    public static interface Fortune extends TimeTaker
+    public interface Fortune extends TimeTaker
     {
         /**
          * This is the grand premiere!
@@ -513,7 +513,7 @@ public class ZStar implements ZAgent
         agent.nova();
     }
 
-    public static interface Set
+    public interface Set
     {
         /**
          * Puts the performance name on the front door with big lights.
@@ -555,7 +555,7 @@ public class ZStar implements ZAgent
     /**
      * Utility class with calls surrounding the execution of the Star.
      */
-    public static interface Entourage extends TimeTaker
+    public interface Entourage extends TimeTaker
     {
         /**
          * Called when the show is about to start.

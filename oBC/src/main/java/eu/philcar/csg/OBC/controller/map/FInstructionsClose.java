@@ -47,7 +47,7 @@ public class FInstructionsClose extends FBase implements OnClickListener {
 		rootView = view;
 		dlog.d("OnCreareViewFInstructionClose");
 		
-		((ImageButton)view.findViewById(R.id.fmenBackIB)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.fmenBackIB).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				((ABase)getActivity()).popFragment();
@@ -58,7 +58,7 @@ public class FInstructionsClose extends FBase implements OnClickListener {
 
 		
 		
-		((Button)view.findViewById(R.id.finsSOSB)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.finsSOSB).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(getActivity(), ASOS.class));
@@ -81,10 +81,10 @@ public class FInstructionsClose extends FBase implements OnClickListener {
 		fins_right_FL=(RelativeLayout)view.findViewById(R.id.fins_right_FL);
 		
 		
-		((View)view.findViewById(R.id.ivDamages)).setOnClickListener(this);
-		((Button)view.findViewById(R.id.fmenPauseRentIB)).setOnClickListener(this);
+		view.findViewById(R.id.ivDamages).setOnClickListener(this);
+		view.findViewById(R.id.fmenPauseRentIB).setOnClickListener(this);
 		End=(Button)view.findViewById(R.id.fmenEndRentIB);
-		((Button)view.findViewById(R.id.fmenEndRentIB)).setOnClickListener(this);
+		view.findViewById(R.id.fmenEndRentIB).setOnClickListener(this);
 
 		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fins_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));

@@ -458,11 +458,11 @@ public class ObcService extends Service implements OnTripCallback {
 
 
         if (App.Instance.loadZmqDisabledConfig()) {
-            this.WITH_ZMQNOTIFY = false;
+            WITH_ZMQNOTIFY = false;
             //this.WITH_HTTP_NOTIFIES = true;
             dlog.d("** Notify protocol: HTTP");
         } else {
-            this.WITH_ZMQNOTIFY = true;
+            WITH_ZMQNOTIFY = true;
            // this.WITH_HTTP_NOTIFIES = true;
             dlog.d("** Notify protocol: ZMQ");
         }
@@ -487,7 +487,7 @@ public class ObcService extends Service implements OnTripCallback {
             udpServer.init(localHandler);
         }
 
-        if (this.WITH_ZMQNOTIFY) {
+        if (WITH_ZMQNOTIFY) {
             zmqSubscriber = new ZmqSubscriber(localHandler);
             localHandler.sendMessageDelayed(MessageFactory.zmqRestart(), 15000);
             //zmqSubscriber.Start(localHandler);
@@ -982,7 +982,7 @@ public class ObcService extends Service implements OnTripCallback {
             startActivity(i);
         }
 
-        if (this.WITH_ZMQREQREP) {
+        if (WITH_ZMQREQREP) {
             zmqRequester = new ZmqRequester();
             zmqRequester.Send("Hello", null, null);
         }
@@ -1390,7 +1390,7 @@ public class ObcService extends Service implements OnTripCallback {
             Message tripMsg = tripInfo.handleCard(id, event, carInfo, obc_io, this, screenLockTrip, forced?TripInfo.CloseType.forced:TripInfo.CloseType.normal);
             dlog.d("perf: end handleCard");
             if (tripMsg != null) {
-                if (tripMsg.what == this.MSG_TRIP_END && App.reservation != null) {
+                if (tripMsg.what == MSG_TRIP_END && App.reservation != null) {
                     setReservation(App.reservation);
                 }
                 dlog.d("perf: sendAll "+ tripMsg.what);
@@ -1429,7 +1429,7 @@ public class ObcService extends Service implements OnTripCallback {
             return;
 
         //TODO: FORZATURA DA RIMUOVERE UNA VOLTA RISOLTO IL PROBLEMA AGGIORNAMENTO DALL AUTO
-        if (false && (carInfo.getKeyStatus().equalsIgnoreCase("ON") || carInfo.getKeyStatus().equalsIgnoreCase("ACC"))) {
+        if (false && (CarInfo.getKeyStatus().equalsIgnoreCase("ON") || CarInfo.getKeyStatus().equalsIgnoreCase("ACC"))) {
 
             if (!App.motoreAvviato) {
                 dlog.d("set motore avviato:" + App.motoreAvviato);
@@ -2407,7 +2407,7 @@ public class ObcService extends Service implements OnTripCallback {
         dlog.d("Schedule selfclose in " + seconds + "secs. BeforePin=" + beforePin);
         Message msg = handler.obtainMessage(ObcService.MSG_TRIP_SELFCLOSE);  //TODO chiudere porte e corsa
         msg.arg1 = beforePin ? 1 : 0;
-        msg.obj = (String) "Tempo scaduto";
+        msg.obj = "Tempo scaduto";
         handler.sendMessageDelayed(msg, seconds * 1000);
     }
 
@@ -2879,17 +2879,17 @@ public class ObcService extends Service implements OnTripCallback {
                     break;
 
                 case MSG_SERVER_CHANGE_IP:
-                    App.Instance.ServerIP = msg.arg1;
+                    App.ServerIP = msg.arg1;
                     App.Instance.persistServerIP();
                     App.Instance.initSharengo();
                     break;
 
                 case MSG_CAR_KEY_CHECK:
-                    App.checkKeyOff = (msg.arg1 == 1 ? true : false);
+                    App.checkKeyOff = (msg.arg1 == 1);
                     App.Instance.checkKeyOff();
                     break;
                 case MSG_SERVER_CHANGE_LOG:
-                    App.saveLog = (msg.arg1 == 1 ? true : false);
+                    App.saveLog = (msg.arg1 == 1);
                     App.Instance.persistSaveLog();
                     break;
 

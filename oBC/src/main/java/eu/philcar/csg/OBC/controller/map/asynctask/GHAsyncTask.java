@@ -22,9 +22,7 @@ public abstract class GHAsyncTask<A, B, C> extends AsyncTask<A, B, C>
         }
     }
 
-    ;
-
-	public boolean hasError()
+    public boolean hasError()
     {
         return error != null;
     }

@@ -137,7 +137,7 @@ public class FPdfViewer extends FBase {
         tv1 = (TextView)view.findViewById(R.id.resp);
         tv1.setVisibility(View.INVISIBLE);
 
-        ((ImageButton) view.findViewById(R.id.fmenBackIB)).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.fmenBackIB).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ((ABase) getActivity()).popFragment();
@@ -242,10 +242,7 @@ public class FPdfViewer extends FBase {
         Pattern pattern = Pattern.compile(regExpn,Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(inputStr);
 
-        if(matcher.matches())
-            return true;
-        else
-            return false;
+        return matcher.matches();
     }
     protected void openPdf(File pdf, PDFView pdfView) {
 
@@ -294,13 +291,8 @@ public class FPdfViewer extends FBase {
         String TodayDate = sdf.format(new Date());
         int x = Integer.parseInt(TodayDate);
         int y = Integer.parseInt(name);
-        if (x > y) {
+        return x > y;
 
-            return true;
-        }
-
-
-        return false;
     }
 
     public void fileType(String fileType) {

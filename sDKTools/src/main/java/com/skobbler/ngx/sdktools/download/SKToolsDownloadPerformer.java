@@ -820,9 +820,6 @@ public class SKToolsDownloadPerformer extends Thread {
         } catch (final IOException e) {
             totalBytesRead = 0;
         }
-        if (totalBytesRead == currentDownloadItem.getCurrentDownloadStep().getDownloadItemSize()) {
-            return true;
-        }
-        return false;
+        return totalBytesRead == currentDownloadItem.getCurrentDownloadStep().getDownloadItemSize();
     }
 }

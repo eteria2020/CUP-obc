@@ -114,7 +114,7 @@ public interface ZAgent
      */
     Socket pipe();
 
-    public static class Creator
+    class Creator
     {
         public static ZAgent create(Socket pipe, String lock)
         {
@@ -125,7 +125,7 @@ public interface ZAgent
     /**
      * Creates a very simple agent with an easy lock mechanism.
      */
-    public static final class SimpleAgent implements ZAgent
+    final class SimpleAgent implements ZAgent
     {
         // the pipe used for communicating with the star
         private final Socket pipe;
@@ -236,7 +236,7 @@ public interface ZAgent
      */
     // Contract for selector creation.
     // will be called in backstage side.
-    public static interface SelectorCreator
+    interface SelectorCreator
     {
         /**
          * Creates and opens a selector.
@@ -253,7 +253,7 @@ public interface ZAgent
     }
 
     // very simple selector creator
-    public static class VerySimpleSelectorCreator implements SelectorCreator
+    class VerySimpleSelectorCreator implements SelectorCreator
     {
         @Override
         public Selector create() throws IOException

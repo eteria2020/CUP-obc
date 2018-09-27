@@ -47,12 +47,12 @@ public class FDriveMessage extends FBase {
 		
 		final View view = inflater.inflate(R.layout.f_lanes, container, false);
 		
-		((View)view.findViewById(R.id.btnNext)).setVisibility(View.INVISIBLE);
-		((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.VISIBLE);
+		view.findViewById(R.id.btnNext).setVisibility(View.INVISIBLE);
+		view.findViewById(R.id.tvCountdown).setVisibility(View.VISIBLE);
 
 		fchn_right_FL=(FrameLayout)view.findViewById(R.id.fchn_right_FL);
 		
-		((ImageButton)view.findViewById(R.id.btnNext)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.btnNext).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dlog.d("FDriveMessage btnNext click : " + login);
@@ -64,7 +64,7 @@ public class FDriveMessage extends FBase {
 			}
 		});
 		
-		((Button)view.findViewById(R.id.btnSOS)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.btnSOS).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(getActivity(), ASOS.class));
@@ -85,8 +85,8 @@ public class FDriveMessage extends FBase {
 
 				@Override
 				public void onFinish() {
-					((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.INVISIBLE);
-					((View)view.findViewById(R.id.btnNext)).setVisibility(View.VISIBLE);
+					view.findViewById(R.id.tvCountdown).setVisibility(View.INVISIBLE);
+					view.findViewById(R.id.btnNext).setVisibility(View.VISIBLE);
 				}
 
 		}.start();

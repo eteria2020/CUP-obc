@@ -101,8 +101,8 @@ public class FMaintenance extends FBase {
 							d.dismiss();
 						} else {
 							input.setText("");
-							Toast.makeText(FMaintenance.this.getActivity(), "PIN errato", Toast.LENGTH_SHORT).show();;
-							dlog.d("Wrong pin");
+							Toast.makeText(FMaintenance.this.getActivity(), "PIN errato", Toast.LENGTH_SHORT).show();
+                            dlog.d("Wrong pin");
 							eventRepository.Maintenance("Wrong pin");
 						}
 					}
@@ -129,12 +129,12 @@ public class FMaintenance extends FBase {
 		((AWelcome)getActivity()).sendMessage(MessageFactory.requestCarInfo());
 		view = inflater.inflate(R.layout.f_maintenance, container, false);
 
-		((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.GONE);
+		view.findViewById(R.id.tvCountdown).setVisibility(View.GONE);
 
 
 
 
-		((Button)view.findViewById(R.id.btnEndCharging)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.btnEndCharging).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dlog.d("Pushed EndCharging");
@@ -152,7 +152,7 @@ public class FMaintenance extends FBase {
 			}
 		});
 
-		((Button)view.findViewById(R.id.btnCarUpdate)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.btnCarUpdate).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dlog.d("Pushed CarUpdate");
@@ -166,7 +166,7 @@ public class FMaintenance extends FBase {
 		});
 
 
-		((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
+		view.findViewById(R.id.btnEndCharging).setEnabled(false);
 		((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_wait);
 
 		/*new CountDownTimer(4000,1000) {
@@ -204,10 +204,10 @@ public class FMaintenance extends FBase {
 		}
 		dlog.d("update App.Charging: "+ App.isCharging() +" chargingPlug: "+ carinfo.isChargingPlug());
 		if (App.isCharging() && !carinfo.isChargingPlug()) {
-			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(true);
+			view.findViewById(R.id.btnEndCharging).setEnabled(true);
 			((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_done);
 		} else {
-			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
+			view.findViewById(R.id.btnEndCharging).setEnabled(false);
 			if (carinfo.isChargingPlug())
 				((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_plug_insert);
 			else

@@ -144,14 +144,14 @@ public class FDriveMessage_new extends FBase {
 		final View view = inflater.inflate(R.layout.f_lanes_new, container, false);
 		dlog.d("OnCreareView FDriveMessage_new");
 
-		if(App.Instance.BannerName.getBundle("START")==null){
+		if(App.BannerName.getBundle("START")==null){
 			Intent i = new Intent(getActivity(), AMainOBC.class);
 			i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(i);
 			getActivity().finish();
 		}
 
-		if(App.Instance.BannerName.getBundle("START")==null&&!RequestBanner){
+		if(App.BannerName.getBundle("START")==null&&!RequestBanner){
 			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
 			RequestBanner=true;
 			new Thread(new Runnable() {
@@ -175,11 +175,11 @@ public class FDriveMessage_new extends FBase {
 			}).start();
 		}
 
-		((View)view.findViewById(R.id.btnNext)).setVisibility(View.INVISIBLE);
-		((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.VISIBLE);
+		view.findViewById(R.id.btnNext).setVisibility(View.INVISIBLE);
+		view.findViewById(R.id.tvCountdown).setVisibility(View.VISIBLE);
 
 		
-		((ImageButton)view.findViewById(R.id.btnNext)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.btnNext).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dlog.d("FDriveMessage btnNext click : " + login);
@@ -191,7 +191,7 @@ public class FDriveMessage_new extends FBase {
 			}
 		});
 		
-		((Button)view.findViewById(R.id.btnSOS)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.btnSOS).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(getActivity(), ASOS.class));
@@ -242,8 +242,8 @@ public class FDriveMessage_new extends FBase {
 			@Override
 			public void onClick(View v) {
 
-				if(App.Instance.BannerName.getBundle("START")!=null){
-					if(App.Instance.BannerName.getBundle("START").getString("CLICK").compareTo("null")!=0){
+				if(App.BannerName.getBundle("START")!=null){
+					if(App.BannerName.getBundle("START").getString("CLICK").compareTo("null")!=0){
 
 						if(!handleClick) {
 							adIV.setColorFilter(R.color.overlay_click);
@@ -291,8 +291,8 @@ public class FDriveMessage_new extends FBase {
 
 				@Override
 				public void onFinish() {
-					((View)view.findViewById(R.id.tvCountdown)).setVisibility(View.INVISIBLE);
-					((View)view.findViewById(R.id.btnNext)).setVisibility(View.VISIBLE);
+					view.findViewById(R.id.tvCountdown).setVisibility(View.INVISIBLE);
+					view.findViewById(R.id.btnNext).setVisibility(View.VISIBLE);
 
 					//localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,10000);
 
@@ -315,11 +315,11 @@ public class FDriveMessage_new extends FBase {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		if (App.Instance.BannerName.getBundle("START") != null) {
+		if (App.BannerName.getBundle("START") != null) {
 
-			dlog.i("STRINGID" + App.Instance.BannerName.getBundle("START").getString("ID"));
+			dlog.i("STRINGID" + App.BannerName.getBundle("START").getString("ID"));
 
-			if (App.Instance.BannerName.getBundle("START").getString("ID").compareTo("680") == 0) {
+			if (App.BannerName.getBundle("START").getString("ID").compareTo("680") == 0) {
 				dlog.i("video caricato");
 				View noDataView = getView().findViewById(R.id.imgfsIV);
 				noDataView.setVisibility(View.GONE);
@@ -669,7 +669,7 @@ public class FDriveMessage_new extends FBase {
 
 		if (!App.hasNetworkConnection()) {
 			dlog.e(" loadBanner: nessuna connessione");
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 
 			return;
 		}
@@ -691,10 +691,10 @@ public class FDriveMessage_new extends FBase {
 		}
 		try {
 			if (App.BannerName.getBundle(type) != null )
-				paramsList.add(new BasicNameValuePair("index", App.Instance.BannerName.getBundle(type).getString("INDEX",null)));
+				paramsList.add(new BasicNameValuePair("index", App.BannerName.getBundle(type).getString("INDEX",null)));
 
 			if (App.BannerName.getBundle(type) != null )
-				paramsList.add(new BasicNameValuePair("end", App.Instance.BannerName.getBundle(type).getString("END",null)));
+				paramsList.add(new BasicNameValuePair("end", App.BannerName.getBundle(type).getString("END",null)));
 
 
 
@@ -723,25 +723,25 @@ public class FDriveMessage_new extends FBase {
 			} else {
 
 				dlog.e(" loadBanner: Failed to connect "+String.valueOf(statusCode));
-				App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+				App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 				return;
 			}
 		}catch (Exception e){
 			dlog.e(" loadBanner: eccezione in connessione ",e);
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 		}
 		String jsonStr = builder.toString();
 		if(jsonStr.compareTo("")==0){
 			dlog.e(" loadBanner: nessuna connessione");
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 		}
 
 		DLog.I(" loadBanner: risposta "+jsonStr);
-		File file = new File(outDir, "placeholder.lol");;
+		File file = new File(outDir, "placeholder.lol");
 
-		try {
+        try {
 			JSONObject json = new JSONObject(jsonStr);
 
 			//Get the instance of JSONArray that contains JSONObjects
@@ -763,7 +763,7 @@ public class FDriveMessage_new extends FBase {
 			if (jsonObject.has("END"))
 				Image.putString(("END"), jsonObject.getString("END"));
 
-			App.Instance.BannerName.putBundle(type,Image);
+			App.BannerName.putBundle(type,Image);
 
 			//ricavo nome file
 			URL urlImg = new URL(Image.getString("URL"));
@@ -775,7 +775,7 @@ public class FDriveMessage_new extends FBase {
 
 			if(file.exists()){
 				Image.putString(("FILENAME"),filename);
-				App.Instance.BannerName.putBundle(type,Image);
+				App.BannerName.putBundle(type,Image);
 				dlog.i(" loadBanner: file già esistente: "+filename);
 				return;
 			}
@@ -804,13 +804,13 @@ public class FDriveMessage_new extends FBase {
 			inputStream.close();
 			urlConnection.disconnect();
 			Image.putString(("FILENAME"),filename);
-			App.Instance.BannerName.putBundle(type,Image);
+			App.BannerName.putBundle(type,Image);
 			dlog.i(" loadBanner: File scaricato e creato "+filename);
 
 
 		} catch (Exception e) {
 			if(file.exists()) file.delete();
-			App.Instance.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
+			App.BannerName.putBundle(type,null);//null per identificare nessuna connessione, caricare immagine offline
 			dlog.e(" loadBanner: eccezione in creazione e download file ",e);
 
 			e.printStackTrace();
@@ -823,7 +823,7 @@ public class FDriveMessage_new extends FBase {
 	private void updateBanner(String type){
 
 		File ImageV;
-		Bundle Banner = App.Instance.BannerName.getBundle(type);
+		Bundle Banner = App.BannerName.getBundle(type);
 		if(Banner!=null){
 			File outDir = new File(App.getBannerImagesFolder());
 			if (!outDir.isDirectory()) {

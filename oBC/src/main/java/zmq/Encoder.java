@@ -35,7 +35,7 @@ public class Encoder extends EncoderBase
         super(bufsize);
         tmpbuf = new byte[10];
         //  Write 0 bytes to the batch and go to messageReady state.
-        nextStep((byte[]) null, 0, MESSAGE_READY, true);
+        nextStep(null, 0, MESSAGE_READY, true);
     }
 
     @Override

@@ -19,7 +19,7 @@ import android.widget.EditText;
 public class CustomKeyboard {
 	
 	public interface CustomKeyboardDelegate {
-		public void onEnterPushed();
+		void onEnterPushed();
 	}
 	 
 	private KeyboardView mKeyboardView;

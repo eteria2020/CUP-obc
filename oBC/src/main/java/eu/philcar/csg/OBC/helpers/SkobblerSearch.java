@@ -159,12 +159,8 @@ public class SkobblerSearch implements SKSearchListener {
 		
 		if (categoryFilterList==null || categoryFilterList.isEmpty())
 			return true;
-		
-		if (categoryFilterList.contains(result.getCategory())) {
-			return true;
-		} else {
-			return false;
-		}
+
+        return categoryFilterList.contains(result.getCategory());
 		
 	}
 

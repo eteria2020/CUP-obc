@@ -369,7 +369,7 @@ public class ServiceTestActivity extends Activity {
 			findViewById(R.id.LogLL).setVisibility(View.VISIBLE);
 
 
-			((Button) findViewById(R.id.btnOpen)).setOnClickListener(new OnClickListener() {
+			findViewById(R.id.btnOpen).setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View arg0) {
@@ -380,7 +380,7 @@ public class ServiceTestActivity extends Activity {
 			});
 
 
-			((Button) findViewById(R.id.btnClose)).setOnClickListener(new OnClickListener() {
+			findViewById(R.id.btnClose).setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View arg0) {
@@ -392,7 +392,7 @@ public class ServiceTestActivity extends Activity {
 			});
 
 
-			((Button) findViewById(R.id.btnEngineOn)).setOnClickListener(new OnClickListener() {
+			findViewById(R.id.btnEngineOn).setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View arg0) {
@@ -403,7 +403,7 @@ public class ServiceTestActivity extends Activity {
 
 			});
 
-			((Button) findViewById(R.id.btnEngineOff)).setOnClickListener(new OnClickListener() {
+			findViewById(R.id.btnEngineOff).setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View arg0) {
@@ -413,7 +413,7 @@ public class ServiceTestActivity extends Activity {
 
 			});
 
-			((Button) findViewById(R.id.btnAltIP)).setOnClickListener(new OnClickListener() {
+			findViewById(R.id.btnAltIP).setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View arg0) {
@@ -423,7 +423,7 @@ public class ServiceTestActivity extends Activity {
 
 			});
 
-			((Button) findViewById(R.id.btnDefIP)).setOnClickListener(new OnClickListener() {
+			findViewById(R.id.btnDefIP).setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View arg0) {
@@ -433,7 +433,7 @@ public class ServiceTestActivity extends Activity {
 
 			});
 
-			((Button) findViewById(R.id.btnLogY)).setOnClickListener(new OnClickListener() {
+			findViewById(R.id.btnLogY).setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View arg0) {
@@ -442,7 +442,7 @@ public class ServiceTestActivity extends Activity {
 				}
 
 			});
-			((Button) findViewById(R.id.btnKeyY)).setOnClickListener(new OnClickListener() {
+			findViewById(R.id.btnKeyY).setOnClickListener(new OnClickListener() {
 
 
 				public void onClick(View arg0) {
@@ -453,7 +453,7 @@ public class ServiceTestActivity extends Activity {
 				}
 
 			});
-			((Button) findViewById(R.id.btnKeyN)).setOnClickListener(new OnClickListener() {
+			findViewById(R.id.btnKeyN).setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View arg0) {
@@ -464,7 +464,7 @@ public class ServiceTestActivity extends Activity {
 
 			});
 
-			((Button) findViewById(R.id.btnlogN)).setOnClickListener(new OnClickListener() {
+			findViewById(R.id.btnlogN).setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View arg0) {
@@ -478,7 +478,7 @@ public class ServiceTestActivity extends Activity {
 
 
 		} else {
-			((Button) findViewById(R.id.btnKeyY)).setOnClickListener(new OnClickListener() {
+			findViewById(R.id.btnKeyY).setOnClickListener(new OnClickListener() {
 
 
 				public void onClick(View arg0) {
@@ -489,7 +489,7 @@ public class ServiceTestActivity extends Activity {
 				}
 
 			});
-			((Button) findViewById(R.id.btnKeyN)).setOnClickListener(new OnClickListener() {
+			findViewById(R.id.btnKeyN).setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View arg0) {
@@ -542,7 +542,7 @@ public class ServiceTestActivity extends Activity {
     	
     	*/
 
-		((Button) findViewById(R.id.btnGPRS)).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.btnGPRS).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
@@ -555,7 +555,7 @@ public class ServiceTestActivity extends Activity {
 
 		});
 
-		((Button) findViewById(R.id.btnCells)).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.btnCells).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
@@ -575,7 +575,7 @@ public class ServiceTestActivity extends Activity {
 
 		});
 
-		((Button) findViewById(R.id.btnSet)).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.btnSet).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -591,13 +591,13 @@ public class ServiceTestActivity extends Activity {
 					Toast.makeText(ServiceTestActivity.this, "Set new plate id  to : '" + plate + "'", Toast.LENGTH_LONG).show();
 					etPlate.setEnabled(false);
 					etPlate.setFocusable(false);
-					((Button) findViewById(R.id.btnGo)).requestFocus();
+					findViewById(R.id.btnGo).requestFocus();
 				}
 			}
 		});
 
 
-		((Button) findViewById(R.id.btnSettings)).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.btnSettings).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -605,7 +605,7 @@ public class ServiceTestActivity extends Activity {
 			}
 		});
 
-		((Button) findViewById(R.id.btnGo)).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.btnGo).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
@@ -630,7 +630,7 @@ public class ServiceTestActivity extends Activity {
 		});
 
 
-		((Button) findViewById(R.id.btnLcd)).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.btnLcd).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -650,7 +650,7 @@ public class ServiceTestActivity extends Activity {
 			}
 		});
 
-		((Button) findViewById(R.id.btnRadio)).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.btnRadio).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -668,7 +668,7 @@ public class ServiceTestActivity extends Activity {
 			}
 		});
 
-		((Button) findViewById(R.id.btnTestLease)).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.btnTestLease).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
@@ -678,7 +678,7 @@ public class ServiceTestActivity extends Activity {
 		});
 
 
-		((Button) findViewById(R.id.btnGo)).requestFocus();
+		findViewById(R.id.btnGo).requestFocus();
 		etPlate.setFocusable(false);
 
 //	    if (Build.DEVICE.equalsIgnoreCase("tiny4412")) {

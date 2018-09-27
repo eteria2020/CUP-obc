@@ -50,13 +50,13 @@ public class FPark extends FBase implements OnClickListener {
 		startSelfClose(rootView);
 		//((View)rootView.findViewById(R.id.llCancel)).animate().alpha(0.25f);
 
-		((View)view.findViewById(R.id.finsSOSB)).setOnClickListener(this);
-		((View)view.findViewById(R.id.fmenBackIB)).setOnClickListener(this);
-		((View)view.findViewById(R.id.ivPark)).setOnClickListener(this);
+		view.findViewById(R.id.finsSOSB).setOnClickListener(this);
+		view.findViewById(R.id.fmenBackIB).setOnClickListener(this);
+		view.findViewById(R.id.ivPark).setOnClickListener(this);
 		fins_right_FL=(RelativeLayout)view.findViewById(R.id.fins_right_FL);
 
-		((View)rootView.findViewById(R.id.ivPark)).setClickable(true);
-		((View)rootView.findViewById(R.id.ivPark)).setBackgroundResource(R.drawable.sel_button_rent_resume);
+		rootView.findViewById(R.id.ivPark).setClickable(true);
+		rootView.findViewById(R.id.ivPark).setBackgroundResource(R.drawable.sel_button_rent_resume);
 
 		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
 			fins_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
@@ -103,17 +103,17 @@ public class FPark extends FBase implements OnClickListener {
 	}
 	
 	public void showBeginPark() {
-		((View)rootView.findViewById(R.id.fmenBackIB)).setVisibility(View.GONE);
+		rootView.findViewById(R.id.fmenBackIB).setVisibility(View.GONE);
 		((TextView)rootView.findViewById(R.id.tvRow1)).setText(R.string.menu_park_mode_resume);
 
-		((View)rootView.findViewById(R.id.ivPark)).setClickable(false);
-		((View)rootView.findViewById(R.id.ivPark)).setBackgroundResource(R.drawable.sel_button_rent_pause);
+		rootView.findViewById(R.id.ivPark).setClickable(false);
+		rootView.findViewById(R.id.ivPark).setBackgroundResource(R.drawable.sel_button_rent_pause);
 	}
 	
 	public void showEndPark() {
 
-		((View)rootView.findViewById(R.id.ivPark)).setClickable(true);
-		((View)rootView.findViewById(R.id.ivPark)).setBackgroundResource(R.drawable.sel_button_rent_resume);
+		rootView.findViewById(R.id.ivPark).setClickable(true);
+		rootView.findViewById(R.id.ivPark).setBackgroundResource(R.drawable.sel_button_rent_resume);
 		((TextView)rootView.findViewById(R.id.tvRow1)).setText(R.string.menu_park_mode_resume);
 	}
 	
@@ -128,7 +128,7 @@ public class FPark extends FBase implements OnClickListener {
 			return;
 		
 		((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(durata));
-		((LinearLayout)root.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
+		root.findViewById(R.id.llSelfClose).setVisibility(View.VISIBLE);
 		
 		timer = new CountDownTimer((durata+1)*1000,1000) {
 			@Override
@@ -139,7 +139,7 @@ public class FPark extends FBase implements OnClickListener {
 			@Override
 			public void onFinish() {
 				dlog.d("FMenu: finish countdown");
-				((LinearLayout)root.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
+				root.findViewById(R.id.llSelfClose).setVisibility(View.INVISIBLE);
 			}
 
 		};
@@ -150,7 +150,7 @@ public class FPark extends FBase implements OnClickListener {
 	
 	private void stopSelfClose(final View root) {
 		((AMainOBC)this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(0));
-		((LinearLayout)root.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
+		root.findViewById(R.id.llSelfClose).setVisibility(View.INVISIBLE);
 		
 		if (timer!=null)
 			timer.cancel();

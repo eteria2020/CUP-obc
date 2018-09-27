@@ -109,7 +109,7 @@ public class Hik_io implements LowLevelInterface {
 	private boolean getMinorGPSDisabled= false;
 	
 	public  Hik_io(ObcService service) {
-		context = (Context) service;		
+		context = service;
 
 		obcService = service;
 		obcParser = new ObcParser(obcService);
@@ -1148,7 +1148,7 @@ public class Hik_io implements LowLevelInterface {
 	            dlog.i("onVehileOdoMeterValueChange(vehileOdoMeter):" + vehileOdoMeter );
 	            
 	            Bundle b = new Bundle();
-	            b.putInt("Km", vehileOdoMeter);;
+	            b.putInt("Km", vehileOdoMeter);
 				obcService.notifyCarInfo(b);
 
 				if(vehileOdoMeter>0){

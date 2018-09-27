@@ -109,7 +109,7 @@ public class OptimizeDistanceCalc extends FBase implements View.OnClickListener 
         KMbygps2 = (TextView) view.findViewById(R.id.KMbyGPS2);
         KMbyODO = (TextView) view.findViewById(R.id.KMbyODO);
 
-        ((ImageButton) view.findViewById(R.id.Backb)).setOnClickListener(this);
+        view.findViewById(R.id.Backb).setOnClickListener(this);
 
         KMbygps.setText(String.format("%.02f", totalDistance));
         KMbyODO.setText(String.valueOf(DistancebyODO));

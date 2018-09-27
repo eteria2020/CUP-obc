@@ -106,7 +106,7 @@ public class FWelcome extends FBase {
 		dlog.d("OnCreareView FWelcome");
 
 		
-		((ImageButton)view.findViewById(R.id.fwelItalianIB)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.fwelItalianIB).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				((ABase)getActivity()).setItalianLanguage();
@@ -115,7 +115,7 @@ public class FWelcome extends FBase {
 			}
 		});
 
-		((ImageButton)view.findViewById(R.id.fwelFrenchIB)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.fwelFrenchIB).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				((ABase)getActivity()).setFrenchLanguage();
@@ -124,14 +124,14 @@ public class FWelcome extends FBase {
 			}
 		});
 		
-		((ImageButton)view.findViewById(R.id.fwelEnglishIB)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.fwelEnglishIB).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				((ABase)getActivity()).setEnglishLanguage();
 				nextPage();
 			}
 		});
-		((ImageButton)view.findViewById(R.id.fwelchineseIB)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.fwelchineseIB).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				((ABase)getActivity()).setChinseseLanguage();
@@ -141,7 +141,7 @@ public class FWelcome extends FBase {
 		});
 		
 		// Count  taps for service login dialog  
-		((ImageView)view.findViewById(R.id.fwelLogoIV)).setOnClickListener(new OnClickListener() {
+		view.findViewById(R.id.fwelLogoIV).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				logoTaps++;
@@ -149,7 +149,7 @@ public class FWelcome extends FBase {
 		});
 		
 		// Verify long press after min 5 taps for show service login dialog 
-		((ImageView)view.findViewById(R.id.fwelLogoIV)).setOnLongClickListener(new OnLongClickListener() {
+		view.findViewById(R.id.fwelLogoIV).setOnLongClickListener(new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
 				if (logoTaps>=5) {

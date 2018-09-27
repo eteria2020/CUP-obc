@@ -6,17 +6,17 @@ import org.apache.http.NameValuePair;
 
 public interface RemoteEntityInterface {
 
-	public enum eDirection  {UPLOAD, DOWNLOAD};
+	enum eDirection  {UPLOAD, DOWNLOAD}
+
+    int  MsgId();
+	String GetRemoteUrl();
 	
-	public int  MsgId();	
-	public String GetRemoteUrl();	
+	List<NameValuePair> GetParams();
 	
-	public List<NameValuePair> GetParams();
+	int DecodeJson(String response);
+	String  EncodeJson();
 	
-	public int DecodeJson(String response);
-	public String  EncodeJson();
-	
-	public eDirection getDirection();
+	eDirection getDirection();
 	
 
 	

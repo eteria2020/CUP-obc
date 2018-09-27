@@ -18,7 +18,7 @@ public class ALVPOI extends BaseAdapter {
 	public static final int ADDITIONAL_ITEMS_PER_LIST = 3;
 	
 	public interface ALVFuelStationsDelegate {
-		public void onRowSelected(int position);
+		void onRowSelected(int position);
 	}
 	
 	private Context context;

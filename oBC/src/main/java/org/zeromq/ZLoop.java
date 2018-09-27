@@ -37,7 +37,7 @@ public class ZLoop
 {
     public interface IZLoopHandler
     {
-        public int handle(ZLoop loop, PollItem item, Object arg);
+        int handle(ZLoop loop, PollItem item, Object arg);
     }
 
     private class SPoller
@@ -55,7 +55,7 @@ public class ZLoop
             errors = 0;
         }
 
-    };
+    }
 
     private class STimer
     {

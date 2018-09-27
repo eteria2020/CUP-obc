@@ -8,23 +8,23 @@ import android.os.Messenger;
 
 public interface LowLevelInterface {
 
-	public final static int ID_LED_GREEN = 0;
-	public final static int ID_LED_BLUE = 1;
-	public final static int ID_LED_YELLOW = 2;
-	public final static int ID_LED_RED = 3;
+	int ID_LED_GREEN = 0;
+	int ID_LED_BLUE = 1;
+	int ID_LED_YELLOW = 2;
+	int ID_LED_RED = 3;
 	
 	
-	public final static int ID_LED_OFF = 1;
-	public final static int ID_LED_ON = 0;
-	public final static int ID_LED_BLINK = 2;
+	int ID_LED_OFF = 1;
+	int ID_LED_ON = 0;
+	int ID_LED_BLINK = 2;
 	
-	public final static int AUDIO_NONE = 0;
-	public final static int AUDIO_RADIO = 1;
-	public final static int AUDIO_SYSTEM = 2;
-	public final static int AUDIO_AUX = 3;
+	int AUDIO_NONE = 0;
+	int AUDIO_RADIO = 1;
+	int AUDIO_SYSTEM = 2;
+	int AUDIO_AUX = 3;
 
-	public final static int AUDIO_LEVEL_ALERT = 25;
-	public final static int AUDIO_LEVEL_LAST = -1;
+	int AUDIO_LEVEL_ALERT = 25;
+	int AUDIO_LEVEL_LAST = -1;
 
 //  0 :  Green - Free
 //  1 :  Blue - in use

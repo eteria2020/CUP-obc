@@ -16,7 +16,7 @@ import android.widget.TextView;
 public class ALVGeocoding extends BaseAdapter {
 
 	public interface ALVGeocodingDelegate {
-		public void onRowSelected(GeocodedLocation location);
+		void onRowSelected(GeocodedLocation location);
 	}
 	
 	private Context context;

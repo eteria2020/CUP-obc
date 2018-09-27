@@ -1853,11 +1853,8 @@ public class ZMQ
                 return true;
             }
 
-            if (getRawSocket() != null && getRawSocket() == target.getRawSocket()) {
-                return true;
-            }
+            return getRawSocket() != null && getRawSocket() == target.getRawSocket();
 
-            return false;
         }
     }
 

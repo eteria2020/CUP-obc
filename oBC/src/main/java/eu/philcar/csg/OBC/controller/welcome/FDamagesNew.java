@@ -119,10 +119,10 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
         nextIB = (ImageButton)view.findViewById(R.id.fdamCloseIB);
 
         ((Button)view.findViewById(R.id.fdamYesB)).setTypeface(font);
-        ((Button)view.findViewById(R.id.fdamYesB)).setOnClickListener(this);
+        view.findViewById(R.id.fdamYesB).setOnClickListener(this);
 
         ((Button)view.findViewById(R.id.fdamNoB)).setTypeface(font);
-        ((Button)view.findViewById(R.id.fdamNoB)).setOnClickListener(this);
+        view.findViewById(R.id.fdamNoB).setOnClickListener(this);
 
         sosB = ((Button)view.findViewById(R.id.fdamSOSB));
         sosB.setOnClickListener(this);
@@ -148,7 +148,7 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
         changeNumberB = (Button)view.findViewById(R.id.fdamChangeNumberB);
 
         ((Button)view.findViewById(R.id.fdam_call_reserved_close_B)).setTypeface(font);
-        ((Button)view.findViewById(R.id.fdam_call_reserved_close_B)).setOnClickListener(this);
+        view.findViewById(R.id.fdam_call_reserved_close_B).setOnClickListener(this);
 
         dialCallB.setTypeface(font);
         changeNumberB.setTypeface(font);

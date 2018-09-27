@@ -22,7 +22,7 @@ import android.widget.TextView;
 public class ALVSearchResults extends BaseAdapter {
 
 	public interface ALVSearchResultsDelegate {
-		public void onRowSelected(SKSearchResult location);
+		void onRowSelected(SKSearchResult location);
 	}
 	
 	private Context context;

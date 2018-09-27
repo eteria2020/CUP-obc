@@ -81,7 +81,7 @@ public class ObcParser extends Handler {
 			String p[] = str.args.split(",");
 			String id = p[0];
 			String event = (p.length>=2?p[1]:"");
-			boolean handled = (p.length>=3?true:false);
+			boolean handled = (p.length >= 3);
 			dlog.d("OBC_IO read RFID :" + id +" event: " + event);
 			obcService.notifyCard(id,event,handled);
 			return;
@@ -129,7 +129,7 @@ public class ObcParser extends Handler {
 	}
 	
 	public interface OnObcReceivedListener {
-		public void newString(ObcCommand cmd, ObcString str) ;
+		void newString(ObcCommand cmd, ObcString str) ;
 	}
 	
 	

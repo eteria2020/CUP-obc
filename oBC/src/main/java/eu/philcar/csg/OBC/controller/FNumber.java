@@ -75,8 +75,8 @@ public class FNumber extends FBase implements OnClickListener {
 		
 		((TextView)view.findViewById(R.id.fchnMessageTV)).setTypeface(font);
 
-		((ImageButton)view.findViewById(R.id.fchnDeleteIB)).setOnClickListener(this);
-		((ImageButton)view.findViewById(R.id.fchnDeleteIB)).setOnLongClickListener(new View.OnLongClickListener() {
+		view.findViewById(R.id.fchnDeleteIB).setOnClickListener(this);
+		view.findViewById(R.id.fchnDeleteIB).setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
 				phoneNumber = "";
@@ -85,7 +85,7 @@ public class FNumber extends FBase implements OnClickListener {
 				return true;
 			}
 		});
-		((ImageButton)view.findViewById(R.id.fchnNextIB)).setOnClickListener(this);
+		view.findViewById(R.id.fchnNextIB).setOnClickListener(this);
 		
 		b1.setOnClickListener(this);
 		b2.setOnClickListener(this);

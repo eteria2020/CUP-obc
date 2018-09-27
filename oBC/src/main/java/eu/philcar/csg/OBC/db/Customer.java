@@ -272,12 +272,8 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 			if(id != ((Customer) o).id) {
 				return false;
 			}
-			if(update_timestamp != ((Customer) o).update_timestamp) {
-				return false;
-			}
-
-			return true;
-		}
+            return update_timestamp == ((Customer) o).update_timestamp;
+        }
 		return false;
 	}
 

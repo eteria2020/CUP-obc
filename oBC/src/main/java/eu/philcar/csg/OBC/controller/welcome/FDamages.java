@@ -82,16 +82,16 @@ public class FDamages extends FBase implements OnClickListener, OnSeekBarChangeL
 		nextIB = (ImageButton)view.findViewById(R.id.fdamCloseIB);
 		
 		((Button)view.findViewById(R.id.fdamYesB)).setTypeface(font);
-		((Button)view.findViewById(R.id.fdamYesB)).setOnClickListener(this);
+		view.findViewById(R.id.fdamYesB).setOnClickListener(this);
 		
 		((Button)view.findViewById(R.id.fdamNoB)).setTypeface(font);
-		((Button)view.findViewById(R.id.fdamNoB)).setOnClickListener(this);
+		view.findViewById(R.id.fdamNoB).setOnClickListener(this);
 		
 		((Button)view.findViewById(R.id.fdamAlternativeYesB)).setTypeface(font);
-		((Button)view.findViewById(R.id.fdamAlternativeYesB)).setOnClickListener(this);
+		view.findViewById(R.id.fdamAlternativeYesB).setOnClickListener(this);
 		
 		((Button)view.findViewById(R.id.fdamAlternativeNoB)).setTypeface(font);
-		((Button)view.findViewById(R.id.fdamAlternativeNoB)).setOnClickListener(this);
+		view.findViewById(R.id.fdamAlternativeNoB).setOnClickListener(this);
 		
 		sosB = ((Button)view.findViewById(R.id.fdamSOSB));
 		sosB.setOnClickListener(this);
@@ -113,7 +113,7 @@ public class FDamages extends FBase implements OnClickListener, OnSeekBarChangeL
 		changeNumberB = (Button)view.findViewById(R.id.fdamChangeNumberB);
 		
 		((Button)view.findViewById(R.id.fdam_call_reserved_close_B)).setTypeface(font);
-		((Button)view.findViewById(R.id.fdam_call_reserved_close_B)).setOnClickListener(this);
+		view.findViewById(R.id.fdam_call_reserved_close_B).setOnClickListener(this);
 		
 		dialCallB.setTypeface(font);
 		changeNumberB.setTypeface(font);

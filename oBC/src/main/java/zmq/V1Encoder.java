@@ -39,7 +39,7 @@ public class V1Encoder extends EncoderBase
         msgSource = session;
 
         //  Write 0 bytes to the batch and go to messageReady state.
-        nextStep((byte[]) null, 0, MESSAGE_READY, true);
+        nextStep(null, 0, MESSAGE_READY, true);
     }
 
     @Override

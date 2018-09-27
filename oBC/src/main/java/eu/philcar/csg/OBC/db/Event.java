@@ -75,11 +75,7 @@ public class Event extends DbRecord<EventResponse> {
 	@Override
 	public void handleResponse(EventResponse eventResponse, DataManager manager, int callOrder) {
 		sent = true;
-		if (eventResponse.getResult() > 0) {
-			sending_error=false;
-		} else {
-			sending_error=true;
-		}
+        sending_error = eventResponse.getResult() <= 0;
 		manager.updateEventSendingResponse(this);
 	}
 
