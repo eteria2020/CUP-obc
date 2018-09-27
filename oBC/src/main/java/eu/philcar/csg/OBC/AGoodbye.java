@@ -91,6 +91,7 @@ public class AGoodbye extends ABase {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        serviceConnector = null;
         serviceHandler = null;
         App.isClosing = false;
     }

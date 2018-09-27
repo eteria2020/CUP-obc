@@ -249,6 +249,7 @@
     <string name="call_error">Error while forwarding help request try calling %s</string>
     <string name="menu_cancel_action">Cancel</string>
     <string name="menu_rent_end_instruction">The engine will stop in the time indicated, if you want to cancel click below</string>
+    <string name="alert_area_box">Attention please, the vehicle is out of the operative area, it not possible close the trip</string>
 
 
 </resources>
