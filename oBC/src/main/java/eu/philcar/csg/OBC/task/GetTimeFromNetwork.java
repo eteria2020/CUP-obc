@@ -4,7 +4,6 @@ import android.app.AlarmManager;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.SystemClock;
-import android.util.Log;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
@@ -44,47 +43,44 @@ public class GetTimeFromNetwork extends AsyncTask<CarInfo, Void, Void> { // The 
             time = new Date(returnTime);
             dlog.i("getCurrentNetworkTime: Time: " + TIME_SERVER_IP + ": " + time);
 
-        }catch (Exception e){
-            dlog.e("Exception while retrieving NTP time",e);
-            if(carInfo!=null && carInfo.intGpsLocation.getTime()>1234567890) {
+        } catch (Exception e) {
+            dlog.e("Exception while retrieving NTP time", e);
+            if (carInfo != null && carInfo.intGpsLocation.getTime() > 1234567890) {
                 time = new Date(carInfo.intGpsLocation.getTime() + SystemClock.elapsedRealtime() - carInfo.intGpsLocation.getElapsedRealtimeNanos() / 1000000);
                 dlog.i("getCurrentNetworkTime: Time: GPS " + time);
             }
         }
 
         try {
-            if(time!=null) {
+            if (time != null) {
                 rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(time) + ";\n"}); //
                 rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time 0"});
-            }else
+            } else
                 rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time 1"});
 
             rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time_zone 0"}); //date -s 20120423.130000
             AlarmManager am = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
             am.setTimeZone(App.timeZone);
-        }catch (Exception e){
+        } catch (Exception e) {
 
             try {
                 rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time 1"});
             } catch (IOException e1) {
-                dlog.e("Deeper Exception while retrieving GPS time",e);
+                dlog.e("Deeper Exception while retrieving GPS time", e);
             }
-            dlog.e("Exception while retrieving GPS time",e);
+            dlog.e("Exception while retrieving GPS time", e);
         }
 
-
     }
-
 
     @Override
     protected Void doInBackground(CarInfo... carinfo) { // This will print the network time
         try {
             printTimes(carinfo[0]);
         } catch (Exception e) {
-            dlog.e("Exception in printTime",e);
+            dlog.e("Exception in printTime", e);
         }
         return null;
     }
-
 
 }

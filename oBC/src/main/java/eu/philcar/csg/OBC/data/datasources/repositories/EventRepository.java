@@ -11,16 +11,48 @@ import eu.philcar.csg.OBC.db.Event;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.service.ObcService;
 
-import static eu.philcar.csg.OBC.db.Events.*;
+import static eu.philcar.csg.OBC.db.Events.EVT_3G;
+import static eu.philcar.csg.OBC.db.Events.EVT_AREA;
+import static eu.philcar.csg.OBC.db.Events.EVT_BATTERY;
+import static eu.philcar.csg.OBC.db.Events.EVT_CAN_ANOMALIES;
+import static eu.philcar.csg.OBC.db.Events.EVT_CARPLATE;
+import static eu.philcar.csg.OBC.db.Events.EVT_CHARGE;
+import static eu.philcar.csg.OBC.db.Events.EVT_CLEANLINESS;
+import static eu.philcar.csg.OBC.db.Events.EVT_CMD;
+import static eu.philcar.csg.OBC.db.Events.EVT_DEVICEINFO;
+import static eu.philcar.csg.OBC.db.Events.EVT_DIAG;
+import static eu.philcar.csg.OBC.db.Events.EVT_ENGINE;
+import static eu.philcar.csg.OBC.db.Events.EVT_GEAR;
+import static eu.philcar.csg.OBC.db.Events.EVT_KEY;
+import static eu.philcar.csg.OBC.db.Events.EVT_LEASE;
+import static eu.philcar.csg.OBC.db.Events.EVT_MAINTENANCE;
+import static eu.philcar.csg.OBC.db.Events.EVT_MENU_CLICK;
+import static eu.philcar.csg.OBC.db.Events.EVT_OBCFAIL;
+import static eu.philcar.csg.OBC.db.Events.EVT_OBCOK;
+import static eu.philcar.csg.OBC.db.Events.EVT_OUTOFAREA;
+import static eu.philcar.csg.OBC.db.Events.EVT_OUTOFORDER;
+import static eu.philcar.csg.OBC.db.Events.EVT_PARK;
+import static eu.philcar.csg.OBC.db.Events.EVT_READY;
+import static eu.philcar.csg.OBC.db.Events.EVT_REBOOT;
+import static eu.philcar.csg.OBC.db.Events.EVT_REMOTE_CLOSE_TRIP;
+import static eu.philcar.csg.OBC.db.Events.EVT_RFID;
+import static eu.philcar.csg.OBC.db.Events.EVT_SELFCLOSE;
+import static eu.philcar.csg.OBC.db.Events.EVT_SHUTDOWN;
+import static eu.philcar.csg.OBC.db.Events.EVT_SOC;
+import static eu.philcar.csg.OBC.db.Events.EVT_SOS;
+import static eu.philcar.csg.OBC.db.Events.EVT_SPEED;
+import static eu.philcar.csg.OBC.db.Events.EVT_SWBOOT;
+import static eu.philcar.csg.OBC.db.Events.lastCanAnomalies;
 
 /**
  * Created by Fulvio on 26/02/2018.
  */
 @Singleton
 public class EventRepository {
-    @Inject SharengoApiRepository apiRepository;
-    @Inject SharengoPhpRepository phpRepository;
-
+    @Inject
+    SharengoApiRepository apiRepository;
+    @Inject
+    SharengoPhpRepository phpRepository;
 
     private SparseArray<String> labels = new SparseArray<>();
 
@@ -58,199 +90,198 @@ public class EventRepository {
         labels.put(EVT_CAN_ANOMALIES, "CAN_ANOMALIES");
         labels.put(EVT_REMOTE_CLOSE_TRIP, "EVT_REMOTE_CLOSE_TRIP");
     }
-    public  void eventEngine(int state) {
-        generateEvent(EVT_ENGINE,state,null);
+
+    public void eventEngine(int state) {
+        generateEvent(EVT_ENGINE, state, null);
     }
 
-    public  void eventSwBoot(String version) {
-        generateEvent(EVT_SWBOOT,0,version);
+    public void eventSwBoot(String version) {
+        generateEvent(EVT_SWBOOT, 0, version);
     }
 
-
-    public  void eventRfid(int result, String card) {
-        generateEvent(EVT_RFID,result,card);
+    public void eventRfid(int result, String card) {
+        generateEvent(EVT_RFID, result, card);
     }
 
-    public  void eventBattery(int value) {
-        generateEvent(EVT_BATTERY,value,null);
+    public void eventBattery(int value) {
+        generateEvent(EVT_BATTERY, value, null);
     }
 
-    public  void eventParkBegin() {
-        generateEvent(EVT_PARK,1,null);
+    public void eventParkBegin() {
+        generateEvent(EVT_PARK, 1, null);
     }
 
-    public  void eventParkEnd() {
-        generateEvent(EVT_PARK,2,null);
+    public void eventParkEnd() {
+        generateEvent(EVT_PARK, 2, null);
     }
 
-    public  void eventSos(String number) {
-        generateEvent(EVT_SOS,1,number);
+    public void eventSos(String number) {
+        generateEvent(EVT_SOS, 1, number);
     }
-    public  void eventSos(String number, ObcService service) {
+
+    public void eventSos(String number, ObcService service) {
         DLog.CR("Prenotata chiamata asistenza: " + number);
-        generateEvent(EVT_SOS,1,number, service);
+        generateEvent(EVT_SOS, 1, number, service);
     }
 
-    public  void eventDmg(String number) {
-        generateEvent(EVT_SOS,2,number);
+    public void eventDmg(String number) {
+        generateEvent(EVT_SOS, 2, number);
     }
 
-    public  void eventCmd(String cmd) {
-        generateEvent(EVT_CMD,0,cmd);
+    public void eventCmd(String cmd) {
+        generateEvent(EVT_CMD, 0, cmd);
     }
 
-    public  void eventCleanliness(int intVal, int extVal) {
-        generateEvent(EVT_CLEANLINESS,0,intVal+";"+extVal);
+    public void eventCleanliness(int intVal, int extVal) {
+        generateEvent(EVT_CLEANLINESS, 0, intVal + ";" + extVal);
     }
 
-    public  void eventCharge(int status) {
-        generateEvent(EVT_CHARGE,status,null);
+    public void eventCharge(int status) {
+        generateEvent(EVT_CHARGE, status, null);
     }
 
-    public  void eventKey(int status) {
-        generateEvent(EVT_KEY,status,null);
+    public void eventKey(int status) {
+        generateEvent(EVT_KEY, status, null);
     }
 
-    public  void eventReady(int status) {
-        generateEvent(EVT_READY,status,null);
+    public void eventReady(int status) {
+        generateEvent(EVT_READY, status, null);
     }
 
-    public  void outOfArea(Boolean status) {
-        if(App.getLastLocation().getLongitude()!=0.0 && App.getLastLocation().getLatitude()!=0.0)
-            generateEvent(EVT_OUTOFAREA,status?1:0,status?"Uscita Area Operativa":"Rientro Area Operativa");
+    public void outOfArea(Boolean status) {
+        if (App.getLastLocation().getLongitude() != 0.0 && App.getLastLocation().getLatitude() != 0.0)
+            generateEvent(EVT_OUTOFAREA, status ? 1 : 0, status ? "Uscita Area Operativa" : "Rientro Area Operativa");
     }
 
-    public  void menuclick(String clicked) {
-        generateEvent(EVT_MENU_CLICK,0,"Click on "+clicked);
+    public void menuclick(String clicked) {
+        generateEvent(EVT_MENU_CLICK, 0, "Click on " + clicked);
     }
 
-    public  void eventGear(String position) {
-        generateEvent(EVT_GEAR,0,position);
+    public void eventGear(String position) {
+        generateEvent(EVT_GEAR, 0, position);
     }
 
-    public  void eventObcFail(long delay) {
-        int idelay=0;
+    public void eventObcFail(long delay) {
+        int idelay = 0;
         if (delay > Integer.MAX_VALUE)
             idelay = Integer.MAX_VALUE;
         else
             idelay = (int) delay;
-        generateEvent(EVT_OBCFAIL,idelay,null);
+        generateEvent(EVT_OBCFAIL, idelay, null);
     }
 
-    public  void eventObcOk() {
-        generateEvent(EVT_OBCOK,0,null);
+    public void eventObcOk() {
+        generateEvent(EVT_OBCOK, 0, null);
     }
 
-    public  void DiagnosticPage(int pwd) {
-        generateEvent(EVT_DIAG,pwd,null);
+    public void DiagnosticPage(int pwd) {
+        generateEvent(EVT_DIAG, pwd, null);
     }
 
-    public  void DiagnosticPageFail(String pwd) {
-        generateEvent(EVT_DIAG,-1,pwd);
+    public void DiagnosticPageFail(String pwd) {
+        generateEvent(EVT_DIAG, -1, pwd);
     }
 
-    public  void CarPlateChange(String oldPlate, String newPlate) {
-        generateEvent(EVT_CARPLATE,0,oldPlate+"->"+newPlate);
+    public void CarPlateChange(String oldPlate, String newPlate) {
+        generateEvent(EVT_CARPLATE, 0, oldPlate + "->" + newPlate);
     }
 
-    public  void Restart3G(int count, String network) {
-        generateEvent(EVT_3G,count,network);
+    public void Restart3G(int count, String network) {
+        generateEvent(EVT_3G, count, network);
     }
 
-    public  void Maintenance(String action) {
-        generateEvent(EVT_MAINTENANCE,0,action);
+    public void Maintenance(String action) {
+        generateEvent(EVT_MAINTENANCE, 0, action);
     }
 
-
-    public  void BeginOutOfOrder(String reason) {
-        generateEvent(EVT_OUTOFORDER,1,reason);
+    public void BeginOutOfOrder(String reason) {
+        generateEvent(EVT_OUTOFORDER, 1, reason);
     }
 
-    public  void EndOutOfOrder() {
-        generateEvent(EVT_OUTOFORDER,2,null);
+    public void EndOutOfOrder() {
+        generateEvent(EVT_OUTOFORDER, 2, null);
     }
 
-    public  void TripOutOfOrder(String card) {
-        generateEvent(EVT_OUTOFORDER,3,card);
+    public void TripOutOfOrder(String card) {
+        generateEvent(EVT_OUTOFORDER, 3, card);
     }
 
-    public  void selfCloseTrip(int idTrip,int beforePin) {
-        generateEvent(EVT_SELFCLOSE,idTrip,(beforePin>0?"NOPAY":null));
+    public void selfCloseTrip(int idTrip, int beforePin) {
+        generateEvent(EVT_SELFCLOSE, idTrip, (beforePin > 0 ? "NOPAY" : null));
     }
 
-    public  void DeviceInfo(String versions) {
-        generateEvent(EVT_DEVICEINFO,App.id_Version,versions);
+    public void DeviceInfo(String versions) {
+        generateEvent(EVT_DEVICEINFO, App.id_Version, versions);
     }
 
-    public void remoteTripClose(String card_code){
-        generateEvent(EVT_REMOTE_CLOSE_TRIP,App.currentTripInfo.customer.id,card_code);
+    public void remoteTripClose(String card_code) {
+        generateEvent(EVT_REMOTE_CLOSE_TRIP, App.currentTripInfo.customer.id, card_code);
     }
 
-    public  void eventSoc(int level, String type) {
-        generateEvent(EVT_SOC,level,type);
+    public void eventSoc(int level, String type) {
+        generateEvent(EVT_SOC, level, type);
     }
 
-    public  void Shutdown() {
-        generateEvent(EVT_SHUTDOWN,0,"Shutting Down");
+    public void Shutdown() {
+        generateEvent(EVT_SHUTDOWN, 0, "Shutting Down");
     }
 
-    public  void StartShutdown() {
-        generateEvent(EVT_SHUTDOWN,0,"Start Shutdown timer");
+    public void StartShutdown() {
+        generateEvent(EVT_SHUTDOWN, 0, "Start Shutdown timer");
     }
 
-    public  void StopShutdown() {
-        generateEvent(EVT_SHUTDOWN,0,"Stop Shutdown timer");
-    }
-    public  void Reboot(String text) {
-        generateEvent(EVT_REBOOT,0,text+" " +App.sw_Version);
+    public void StopShutdown() {
+        generateEvent(EVT_SHUTDOWN, 0, "Stop Shutdown timer");
     }
 
+    public void Reboot(String text) {
+        generateEvent(EVT_REBOOT, 0, text + " " + App.sw_Version);
+    }
 
-    public  void CanAnomalies(String text) {
-        if(SystemClock.elapsedRealtime()-lastCanAnomalies>60*60*1000) {
-            lastCanAnomalies=SystemClock.elapsedRealtime();
+    public void CanAnomalies(String text) {
+        if (SystemClock.elapsedRealtime() - lastCanAnomalies > 60 * 60 * 1000) {
+            lastCanAnomalies = SystemClock.elapsedRealtime();
             generateEvent(EVT_CAN_ANOMALIES, 0, text);
         }
     }
 
-    public  void LeaseInfo(int status,int card) {
-        String Hex=Integer.toHexString(card);
-        generateEvent(EVT_LEASE,status,Hex);
+    public void LeaseInfo(int status, int card) {
+        String Hex = Integer.toHexString(card);
+        generateEvent(EVT_LEASE, status, Hex);
     }
 
-
-    public void generateEvent(int eventId, int intValue, String strValue){
+    public void generateEvent(int eventId, int intValue, String strValue) {
         generateEvent(eventId, intValue, strValue, null);
     }
 
     public void generateEvent(int eventId, int intValue, String strValue, ObcService service) {
-       Event event = new Event();
+        Event event = new Event();
         event.timestamp = System.currentTimeMillis();
 
         event.event = eventId;
 
-        if (labels.get(eventId)!=null)
+        if (labels.get(eventId) != null)
             event.label = labels.get(eventId);
 
         event.intval = intValue;
-        event.txtval = strValue==null?"":strValue;
+        event.txtval = strValue == null ? "" : strValue;
 
         event.km = App.km;
         event.battery = App.fuel_level;
 
-        if (App.currentTripInfo!=null  && App.currentTripInfo.trip!=null) {
+        if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
             event.level = App.currentTripInfo.trip.id;
             event.id_trip = App.currentTripInfo.trip.remote_id;
             event.id_customer = App.currentTripInfo.trip.id_customer;
         }
 
-        if (App.getLastLocation() !=null) {
+        if (App.getLastLocation() != null) {
             event.lon = App.getLastLocation().getLongitude();
             event.lat = App.getLastLocation().getLatitude();
         }
-        DLog.CR("Invio evento " +event.toStringOneLine());
-        if(App.fullNode)
-            apiRepository.sendEvent(event,service);
+        DLog.CR("Invio evento " + event.toStringOneLine());
+        if (App.fullNode)
+            apiRepository.sendEvent(event, service);
         else
             phpRepository.sendEvent(event);
 

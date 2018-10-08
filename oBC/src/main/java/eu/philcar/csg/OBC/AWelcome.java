@@ -253,8 +253,8 @@ public class AWelcome extends ABase {
                     default:
                         super.handleMessage(msg);
                 }
-            }catch (Exception e){
-                DLog.E("Excepton handling aWelcome Message",e);
+            } catch (Exception e) {
+                DLog.E("Excepton handling aWelcome Message", e);
             }
         }
     }

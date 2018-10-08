@@ -1,10 +1,7 @@
 package eu.philcar.csg.OBC;
 
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -20,6 +17,7 @@ import android.view.View;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.ref.WeakReference;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,7 +41,6 @@ import eu.philcar.csg.OBC.helpers.Clients;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
-import eu.philcar.csg.OBC.service.AdvertisementService;
 import eu.philcar.csg.OBC.service.CarInfo;
 import eu.philcar.csg.OBC.service.MessageFactory;
 import eu.philcar.csg.OBC.service.ObcService;
@@ -102,7 +99,6 @@ public class AMainOBC extends ABase implements LocationListener {
     private boolean lastIsInsideParkingArea = isInsideParkingArea;
     private long lastIsInsideParkingAreaTs = System.currentTimeMillis();
     private float rotationToParkingArea = 0.0f;
-    private AdvertisementReceiver advertisementReceiver;
     private int bearing = 0;
     private MainOBCServiceHandler serviceHandler = new MainOBCServiceHandler(new WeakReference<AMainOBC>(this));
 
@@ -166,24 +162,7 @@ public class AMainOBC extends ABase implements LocationListener {
             transaction.commit();
         }
 
-        registerAdsReceiver();
         computeAdsList();
-
-        // Location
-        /*
-		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-
-		Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		if (loc != null) {
-			currentPosition = loc;
-		} else {
-			loc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-			if (loc != null) {
-				currentPosition = loc;
-			} else {
-				currentPosition = null; //new LatLong(45.464189, 9.191181);	// Udine 46.089952, 13.230475 Milano 45.464189, 9.191181
-			}
-		}*/
 
         if (App.getLastLocation() != null)
             currentPosition = App.getLastLocation();
@@ -196,8 +175,6 @@ public class AMainOBC extends ABase implements LocationListener {
     protected void onResume() {
 
         super.onResume();
-
-        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
 
         App.setForegroundActivity(this);
 
@@ -240,22 +217,11 @@ public class AMainOBC extends ABase implements LocationListener {
             tts.shutdown();
             tts = null;
         }
-        unregisterReceiver(advertisementReceiver);
     }
 
     @Override
     public void sendMessage(Message msg) {
         serviceConnector.send(msg);
-    }
-
-    private void registerAdsReceiver() {
-
-        advertisementReceiver = new AdvertisementReceiver(this);
-
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(AdvertisementService.ACTION_UPDATE_ADVERTISEMENT);
-
-        registerReceiver(advertisementReceiver, intentFilter);
     }
 
     private void computeAdsList() {
@@ -385,14 +351,6 @@ public class AMainOBC extends ABase implements LocationListener {
         this.selectedPOI = poi;
     }
 
-    public Location getCurrentPosition() {
-        return null;
-    }
-
-    public void setCurrentPosition(Location currentPosition) {
-        //this.currentPosition = currentPosition;
-    }
-
     public void navigateTo(Location location) {
         FMap fMap = (FMap) getFragmentManager().findFragmentByTag(FMap.class.getName());
         if (fMap != null) {
@@ -416,31 +374,6 @@ public class AMainOBC extends ABase implements LocationListener {
         this.currentRouting = currentRouting;
     }
 
-    private void updateAd() {
-
-        if ((lastTimeAdChanged + AD_TIME < System.currentTimeMillis()) && theAds != null && theAds.length > 0) {
-
-            adPosition = (adPosition + 1) % theAds.length;
-
-            if (App.isNavigatorEnabled) {
-
-                FMap fMap = (FMap) getFragmentManager().findFragmentByTag(FMap.class.getName());
-                if (fMap != null) {
-                    fMap.updateAd(theAds[adPosition]);
-                }
-
-            } else {
-
-                FDriving fDriving = (FDriving) getFragmentManager().findFragmentByTag(FDriving.class.getName());
-                if (fDriving != null) {
-                    fDriving.updateAd(theAds[adPosition]);
-                }
-            }
-
-            lastTimeAdChanged = System.currentTimeMillis();
-        }
-    }
-
     @Override
     public void onLocationChanged(Location location) {
 
@@ -458,7 +391,7 @@ public class AMainOBC extends ABase implements LocationListener {
         //dlog.d("onLocationChanged: lastUpdate "+ (new Date().getTime() - lastUpdate.getTime()) );
 
         //Attenzione il codice commentato sotto per qualche motivo impedisce l'aggiornamento corretto della posizione!!!
-		/*if (previousPosition != null && GeoUtils.harvesineDistance(previousPosition, location) < MIN_MOVE_TOL) {
+        /*if (previousPosition != null && GeoUtils.harvesineDistance(previousPosition, location) < MIN_MOVE_TOL) {
 			currentPosition = location;
 			return;
 		}*/
@@ -482,13 +415,6 @@ public class AMainOBC extends ABase implements LocationListener {
                 //DLog.D(AMainOBC.class.toString() + " onLocationChanged: " + String.valueOf(isInsideParkingArea) + String.valueOf(currentPosition.getLatitude()) + " : " + String.valueOf(currentPosition.getLongitude()));
 
                 // Replace this three lines with the ones commented below
-
-			/*
-			double polygonAngle = GeoUtils.bearing(currentPosition.latitude, currentPosition.longitude, App.polygonCenter[0], App.polygonCenter[1]);
-			double bearingAngle = GeoUtils.bearing(previousPosition.latitude, previousPosition.longitude, currentPosition.latitude, currentPosition.longitude);
-
-			rotationToParkingArea = (float)((bearingAngle-polygonAngle)*-1);
-			*/
 
             }
 
@@ -885,34 +811,6 @@ public class AMainOBC extends ABase implements LocationListener {
 
                 default:
                     super.handleMessage(msg);
-            }
-        }
-    }
-
-    private class AdvertisementReceiver extends BroadcastReceiver {
-
-        private WeakReference<AMainOBC> activity;
-
-        public AdvertisementReceiver(AMainOBC activity) {
-            this.activity = new WeakReference<AMainOBC>(activity);
-        }
-
-        public void onReceive(Context context, Intent intent) {
-
-            AMainOBC strongActivity = activity.get();
-            if (strongActivity != null) {
-
-                String action = intent.getAction();
-                if (action != null && action.equals(AdvertisementService.ACTION_UPDATE_ADVERTISEMENT)) {
-                    strongActivity.computeAdsList();
-                    strongActivity.lastTimeAdChanged = strongActivity.lastTimeAdChanged - 2 * AMainOBC.AD_TIME;
-                    try {
-                        strongActivity.updateAd();
-                    } catch (NullPointerException npe) {
-                        // This could happen if method is called during activity deallocation, so we catch
-                        // the exception and let the activity be collected, user won't be affected
-                    }
-                }
             }
         }
     }

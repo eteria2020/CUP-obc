@@ -57,7 +57,6 @@ import eu.philcar.csg.OBC.service.MessageFactory;
 
 public class FGoodbye extends FBase {
 
-
     @Inject
     EventRepository eventRepository;
 
@@ -127,7 +126,7 @@ public class FGoodbye extends FBase {
         super.onCreate(savedInstanceState);
         closingTripid = App.currentTripInfo.trip.id;
         App.Instance.getComponent().inject(this);
-		/*if(App.first_UP_End && App.hasNetworkConnection){
+        /*if(App.first_UP_End && App.hasNetworkConnection){
 			App.first_UP_End=false;
 
 			new Thread(new Runnable() {
@@ -598,7 +597,7 @@ public class FGoodbye extends FBase {
                 adIV.setVisibility(View.VISIBLE);
                 return;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
 

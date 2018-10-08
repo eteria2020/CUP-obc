@@ -22,38 +22,30 @@ package zmq;
 import java.net.SocketException;
 import java.nio.channels.ClosedChannelException;
 
-public class ZError
-{
-    private ZError()
-    {
+public class ZError {
+    private ZError() {
     }
 
-    public static class CtxTerminatedException extends RuntimeException
-    {
+    public static class CtxTerminatedException extends RuntimeException {
         private static final long serialVersionUID = -4404921838608052956L;
 
-        public CtxTerminatedException()
-        {
+        public CtxTerminatedException() {
             super();
         }
     }
 
-    public static class InstantiationException extends RuntimeException
-    {
+    public static class InstantiationException extends RuntimeException {
         private static final long serialVersionUID = -4404921838608052955L;
 
-        public InstantiationException(Throwable cause)
-        {
+        public InstantiationException(Throwable cause) {
             super(cause);
         }
     }
 
-    public static class IOException extends RuntimeException
-    {
+    public static class IOException extends RuntimeException {
         private static final long serialVersionUID = 9202470691157986262L;
 
-        public IOException(java.io.IOException e)
-        {
+        public IOException(java.io.IOException e) {
             super(e);
         }
     }
@@ -86,32 +78,28 @@ public class ZError
     public static final int ESOCKET = ZMQ_HAUSNUMERO + 106;
     public static final int EMFILE = ZMQ_HAUSNUMERO + 107;
 
-    static int exccode(java.io.IOException e)
-    {
+    static int exccode(java.io.IOException e) {
         if (e instanceof SocketException) {
             return ESOCKET;
-        }
-        else if (e instanceof ClosedChannelException) {
+        } else if (e instanceof ClosedChannelException) {
             return ENOTCONN;
-        }
-        else {
+        } else {
             return EIOEXC;
         }
     }
 
-    public static String toString(int code)
-    {
+    public static String toString(int code) {
         switch (code) {
-        case EADDRINUSE:
-            return "Address already in use";
-        case EFSM:
-            return "Operation cannot be accomplished in current state";
-        case ENOCOMPATPROTO:
-            return "The protocol is not compatible with the socket type";
-        case ETERM:
-            return "Context was terminated";
-        case EMTHREAD:
-            return "No thread available";
+            case EADDRINUSE:
+                return "Address already in use";
+            case EFSM:
+                return "Operation cannot be accomplished in current state";
+            case ENOCOMPATPROTO:
+                return "The protocol is not compatible with the socket type";
+            case ETERM:
+                return "Context was terminated";
+            case EMTHREAD:
+                return "No thread available";
         }
         return "";
     }

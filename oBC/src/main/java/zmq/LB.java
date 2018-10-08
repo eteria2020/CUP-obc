@@ -22,8 +22,7 @@ package zmq;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LB
-{
+public class LB {
     //  List of outbound pipes.
     private final List<Pipe> pipes;
 
@@ -40,8 +39,7 @@ public class LB
     //  True if we are dropping current message.
     private boolean dropping;
 
-    public LB()
-    {
+    public LB() {
         active = 0;
         current = 0;
         more = false;
@@ -50,14 +48,12 @@ public class LB
         pipes = new ArrayList<Pipe>();
     }
 
-    public void attach(Pipe pipe)
-    {
+    public void attach(Pipe pipe) {
         pipes.add(pipe);
         activated(pipe);
     }
 
-    public void terminated(Pipe pipe)
-    {
+    public void terminated(Pipe pipe) {
         int index = pipes.indexOf(pipe);
 
         //  If we are in the middle of multipart message and current pipe
@@ -78,15 +74,13 @@ public class LB
         pipes.remove(pipe);
     }
 
-    public void activated(Pipe pipe)
-    {
+    public void activated(Pipe pipe) {
         //  Move the pipe to the list of active pipes.
         Utils.swap(pipes, pipes.indexOf(pipe), active);
         active++;
     }
 
-    public boolean send(Msg msg, ValueReference<Integer> errno)
-    {
+    public boolean send(Msg msg, ValueReference<Integer> errno) {
         //  Drop the message if required. If we are at the end of the message
         //  switch back to non-dropping mode.
         if (dropping) {
@@ -106,8 +100,7 @@ public class LB
             active--;
             if (current < active) {
                 Utils.swap(pipes, current, active);
-            }
-            else {
+            } else {
                 current = 0;
             }
         }
@@ -131,8 +124,7 @@ public class LB
         return true;
     }
 
-    public boolean hasOut()
-    {
+    public boolean hasOut() {
         //  If one part of the message was already written we can definitely
         //  write the rest of the message.
         if (more) {

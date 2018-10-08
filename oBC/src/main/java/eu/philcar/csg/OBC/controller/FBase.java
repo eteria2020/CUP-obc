@@ -10,30 +10,30 @@ import eu.philcar.csg.OBC.helpers.DLog;
 
 public abstract class FBase extends Fragment {
 
-	protected Unbinder unbinder;
+    protected Unbinder unbinder;
 
-	/**
-	 * When required, this method allows fragments to properly handle the back button navigation. 
-	 * 
-	 * @return	A boolean indicating to the main activity when the fragment has handled the back-action and there's no need for further action (true) 
-	 * 			or when the fragment doesn't need any special action and the main activity should handle the back-action (false)
-	 */
-	public boolean handleBackButton() {
-		return true;
-	}
+    /**
+     * When required, this method allows fragments to properly handle the back button navigation.
+     *
+     * @return A boolean indicating to the main activity when the fragment has handled the back-action and there's no need for further action (true)
+     * or when the fragment doesn't need any special action and the main activity should handle the back-action (false)
+     */
+    public boolean handleBackButton() {
+        return true;
+    }
 
-	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		DLog.CR("Lifecycle - onDestroyView " + this.getClass().getSimpleName());
-		if(unbinder!=null){
-			//unbinder.unbind();
-		}
-	}
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        DLog.CR("Lifecycle - onDestroyView " + this.getClass().getSimpleName());
+        if (unbinder != null) {
+            //unbinder.unbind();
+        }
+    }
 
-	@Override
-	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-		DLog.CR("Lifecycle - OnViewCreated " + this.getClass().getSimpleName());
-	}
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        DLog.CR("Lifecycle - OnViewCreated " + this.getClass().getSimpleName());
+    }
 }

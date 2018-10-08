@@ -10,7 +10,6 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import eu.philcar.csg.OBC.App;
-import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.model.SharengoResponse;
 import eu.philcar.csg.OBC.db.DbRecord;
@@ -28,14 +27,12 @@ public abstract class BaseRetrofitDataSource {
 
     private CompositeDisposable mSubscriptions;
 
-    private void addDisposable(Disposable d){
-        if(mSubscriptions == null || mSubscriptions.isDisposed()) {
+    private void addDisposable(Disposable d) {
+        if (mSubscriptions == null || mSubscriptions.isDisposed()) {
             mSubscriptions = new CompositeDisposable();
         }
         mSubscriptions.add(d);
     }
-
-
 
     protected <T> ObservableTransformer<Result<T>, T> handleRetrofitRequest() {
 
@@ -46,21 +43,20 @@ public abstract class BaseRetrofitDataSource {
 
                 if (throwable instanceof IOException) {
                     if (throwable instanceof ConnectException) {
-                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK,throwable));
+                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK, throwable));
                     } else if (throwable instanceof SocketTimeoutException) {
-                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.SERVER_TIMEOUT,throwable));
+                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.SERVER_TIMEOUT, throwable));
                     } else if (throwable instanceof UnknownHostException) {
-                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK,throwable));
+                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK, throwable));
                     } else if (throwable instanceof EOFException) {
-                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.EMPTY,throwable));
-                    }else{
-                            return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED,throwable));
+                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.EMPTY, throwable));
+                    } else {
+                        return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED, throwable));
                     }
                 } else {
-                    return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED,throwable));
+                    return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED, throwable));
                 }
-            }
-            else {
+            } else {
                 Response<T> retrofitResponse = r.response();
                 if (!retrofitResponse.isSuccessful()) {
                     int code = retrofitResponse.code();
@@ -79,9 +75,9 @@ public abstract class BaseRetrofitDataSource {
 
             return Observable.just(r.response().body());
         })
-            .doOnSubscribe(this::addDisposable)
-            .doOnError(this::handleErorResponse)
-            .doOnComplete(this::handleCompletion);
+                .doOnSubscribe(this::addDisposable)
+                .doOnError(this::handleErorResponse)
+                .doOnComplete(this::handleCompletion);
     }
 
     protected <T> ObservableTransformer<Result<SharengoResponse<T>>, T> handleSharengoRetrofitRequest() {
@@ -93,21 +89,20 @@ public abstract class BaseRetrofitDataSource {
 
                         if (throwable instanceof IOException) {
                             if (throwable instanceof ConnectException) {
-                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK,throwable));
+                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK, throwable));
                             } else if (throwable instanceof SocketTimeoutException) {
-                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.SERVER_TIMEOUT,throwable));
+                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.SERVER_TIMEOUT, throwable));
                             } else if (throwable instanceof UnknownHostException) {
-                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK,throwable));
+                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.NO_NETWORK, throwable));
                             } else if (throwable instanceof EOFException) {
-                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.EMPTY,throwable));
-                            }else{
-                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED,throwable));
+                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.EMPTY, throwable));
+                            } else {
+                                return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED, throwable));
                             }
                         } else {
-                            return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED,throwable));
+                            return Observable.error(new ErrorResponse(ErrorResponse.ErrorType.UNEXPECTED, throwable));
                         }
-                    }
-                    else {
+                    } else {
                         Response<SharengoResponse<T>> retrofitResponse = r.response();
                         if (!retrofitResponse.isSuccessful()) {
                             int code = retrofitResponse.code();
@@ -133,43 +128,41 @@ public abstract class BaseRetrofitDataSource {
                 .doOnComplete(this::handleCompletion);
     }
 
-    protected void handleResponsePersistance(DbRecord record,BaseResponse response, DataManager manager, int callOrder){
-
-
+    protected void handleResponsePersistance(DbRecord record, BaseResponse response, DataManager manager, int callOrder) {
 
         record.handleResponse(response, manager, callOrder);
 
     }
 
-    private void handleErorResponse(Throwable e){
-        if(e instanceof ErrorResponse){
+    private void handleErorResponse(Throwable e) {
+        if (e instanceof ErrorResponse) {
             App.onFailedApi((ErrorResponse) e);
             ErrorResponse er = (ErrorResponse) e;
-            switch (er.errorType){
+            switch (er.errorType) {
                 case HTTP:
-                    DLog.E("Retrofit Exception HTTP " + er.rawMessage,er.error);
+                    DLog.E("Retrofit Exception HTTP " + er.rawMessage, er.error);
                     break;
                 case EMPTY:
                     DLog.D("Retrofit Response EMPTY ");
                     break;
                 case CUSTOM:
-                    DLog.E("Retrofit Exception CUSTOM ",er.error);
+                    DLog.E("Retrofit Exception CUSTOM ", er.error);
                     break;
                 case CONVERSION:
-                    DLog.E("Retrofit Exception CONVERSION ",er.error);
+                    DLog.E("Retrofit Exception CONVERSION ", er.error);
                     break;
                 case NO_NETWORK:
                     DLog.E("Retrofit Exception NO_NETWORK ");
                     break;
                 case UNEXPECTED:
-                    DLog.E("Retrofit Exception UNEXPECTED ",er.error);
-                    if(er.error instanceof SocketException){ //controllare nel caso che sea tipo emfile (too many open file)
+                    DLog.E("Retrofit Exception UNEXPECTED ", er.error);
+                    if (er.error instanceof SocketException) { //controllare nel caso che sea tipo emfile (too many open file)
                         DLog.D("qui farei un EMFILE REBOOT ");
                         //SystemControl.emfileException(er.error);
                     }
                     break;
                 case SERVER_TIMEOUT:
-                    DLog.E("Retrofit Exception SERVER_TIMEOUT ",er.error);
+                    DLog.E("Retrofit Exception SERVER_TIMEOUT ", er.error);
                     break;
                 default:
                     break;
@@ -177,12 +170,12 @@ public abstract class BaseRetrofitDataSource {
         }
     }
 
-    private void handleCompletion(){
-     App.setNetworkStable(true);
+    private void handleCompletion() {
+        App.setNetworkStable(true);
     }
 
-    private <T> Observable<T> extractResponse(SharengoResponse<T> response){
-        if(response.timestamp!=0){
+    private <T> Observable<T> extractResponse(SharengoResponse<T> response) {
+        if (response.timestamp != 0) {
             App.sharengoTime = response.timestamp;
             App.sharengoTimeFix = SystemClock.elapsedRealtime();
         }

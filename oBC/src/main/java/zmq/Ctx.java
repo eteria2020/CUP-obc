@@ -36,24 +36,22 @@ import java.util.concurrent.locks.ReentrantLock;
 //Context object encapsulates all the global state associated with
 //  the library.
 
-public class Ctx
-{
+public class Ctx {
     //  Information associated with inproc endpoint. Note that endpoint options
     //  are registered as well so that the peer can access them without a need
     //  for synchronisation, handshaking or similar.
 
-    static class Endpoint
-    {
+    static class Endpoint {
         public final SocketBase socket;
         public final Options options;
 
-        public Endpoint(SocketBase socket, Options options)
-        {
+        public Endpoint(SocketBase socket, Options options) {
             this.socket = socket;
             this.options = options;
         }
 
     }
+
     //  Used to check whether the object is a context.
     private int tag;
 
@@ -115,8 +113,7 @@ public class Ctx
     public static final int TERM_TID = 0;
     public static final int REAPER_TID = 1;
 
-    public Ctx()
-    {
+    public Ctx() {
         tag = 0xabadcafe;
         terminating = false;
         reaper = null;
@@ -137,8 +134,7 @@ public class Ctx
         endpoints = new HashMap<String, Endpoint>();
     }
 
-    private void destroy() throws IOException
-    {
+    private void destroy() throws IOException {
         for (IOThread it : ioThreads) {
             it.stop();
         }
@@ -155,8 +151,7 @@ public class Ctx
     }
 
     //  Returns false if object is not a context.
-    public boolean checkTag()
-    {
+    public boolean checkTag() {
         return tag == 0xabadcafe;
     }
 
@@ -165,8 +160,7 @@ public class Ctx
     //  down. If there are open sockets still, the deallocation happens
     //  after the last one is closed.
 
-    public void terminate()
-    {
+    public void terminate() {
         tag = 0xdeadbeef;
 
         if (!starting.get()) {
@@ -189,8 +183,7 @@ public class Ctx
                         reaper.stop();
                     }
                 }
-            }
-            finally {
+            } finally {
                 slotSync.unlock();
             }
             //  Wait till reaper thread closes all the sockets.
@@ -202,8 +195,7 @@ public class Ctx
             slotSync.lock();
             try {
                 assert (sockets.isEmpty());
-            }
-            finally {
+            } finally {
                 slotSync.unlock();
             }
         }
@@ -211,69 +203,54 @@ public class Ctx
         //  Deallocate the resources.
         try {
             destroy();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public boolean set(int option, int optval)
-    {
+    public boolean set(int option, int optval) {
         if (option == ZMQ.ZMQ_MAX_SOCKETS && optval >= 1) {
             optSync.lock();
             try {
                 maxSockets = optval;
-            }
-            finally {
+            } finally {
                 optSync.unlock();
             }
-        }
-        else
-        if (option == ZMQ.ZMQ_IO_THREADS && optval >= 0) {
+        } else if (option == ZMQ.ZMQ_IO_THREADS && optval >= 0) {
             optSync.lock();
             try {
                 ioThreadCount = optval;
-            }
-            finally {
+            } finally {
                 optSync.unlock();
             }
-        }
-        else
-        if (option == ZMQ.ZMQ_BLOCKY && optval >= 0) {
+        } else if (option == ZMQ.ZMQ_BLOCKY && optval >= 0) {
             optSync.lock();
             try {
                 blocky = (optval != 0);
-            }
-            finally {
+            } finally {
                 optSync.unlock();
             }
-        }
-        else {
+        } else {
             return false;
         }
         return true;
     }
 
-    public int get(int option)
-    {
+    public int get(int option) {
         int rc = 0;
         if (option == ZMQ.ZMQ_MAX_SOCKETS) {
             rc = maxSockets;
-        }
-        else if (option == ZMQ.ZMQ_IO_THREADS) {
+        } else if (option == ZMQ.ZMQ_IO_THREADS) {
             rc = ioThreadCount;
-        }
-        else if (option == ZMQ.ZMQ_BLOCKY) {
+        } else if (option == ZMQ.ZMQ_BLOCKY) {
             rc = blocky ? 1 : 0;
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("option = " + option);
         }
         return rc;
     }
 
-    public SocketBase createSocket(int type)
-    {
+    public SocketBase createSocket(int type) {
         SocketBase s = null;
         slotSync.lock();
         try {
@@ -286,8 +263,7 @@ public class Ctx
                 try {
                     mazmq = maxSockets;
                     ios = ioThreadCount;
-                }
-                finally {
+                } finally {
                     optSync.unlock();
                 }
                 slotCount = mazmq + ios + 2;
@@ -344,16 +320,14 @@ public class Ctx
             }
             sockets.add(s);
             slots[slot] = s.getMailbox();
-        }
-        finally {
+        } finally {
             slotSync.unlock();
         }
 
         return s;
     }
 
-    public void destroySocket(SocketBase socket)
-    {
+    public void destroySocket(SocketBase socket) {
         slotSync.lock();
 
         //  Free the associated thread slot.
@@ -370,29 +344,25 @@ public class Ctx
             if (terminating && sockets.isEmpty()) {
                 reaper.stop();
             }
-        }
-        finally {
+        } finally {
             slotSync.unlock();
         }
     }
 
     //  Returns reaper thread object.
-    public ZObject getReaper()
-    {
+    public ZObject getReaper() {
         return reaper;
     }
 
     //  Send command to the destination thread.
-    void sendCommand(int tid, final Command command)
-    {
+    void sendCommand(int tid, final Command command) {
         slots[tid].send(command);
     }
 
     //  Returns the I/O thread that is the least busy at the moment.
     //  Affinity specifies which I/O threads are eligible (0 = all).
     //  Returns NULL if no I/O thread is available.
-    public IOThread chooseIoThread(long affinity)
-    {
+    public IOThread chooseIoThread(long affinity) {
         if (ioThreads.isEmpty()) {
             return null;
         }
@@ -414,22 +384,19 @@ public class Ctx
     }
 
     //  Management of inproc endpoints.
-    public boolean register_endpoint(String addr, Endpoint endpoint)
-    {
+    public boolean register_endpoint(String addr, Endpoint endpoint) {
         endpointsSync.lock();
 
         Endpoint inserted = null;
         try {
             inserted = endpoints.put(addr, endpoint);
-        }
-        finally {
+        } finally {
             endpointsSync.unlock();
         }
         return inserted == null;
     }
 
-    public void unregisterEndpoints(SocketBase socket)
-    {
+    public void unregisterEndpoints(SocketBase socket) {
         endpointsSync.lock();
 
         try {
@@ -440,14 +407,12 @@ public class Ctx
                     it.remove();
                 }
             }
-        }
-        finally {
+        } finally {
             endpointsSync.unlock();
         }
     }
 
-    public Endpoint findEndpoint(String addr)
-    {
+    public Endpoint findEndpoint(String addr) {
         Endpoint endpoint = null;
         endpointsSync.lock();
 
@@ -463,8 +428,7 @@ public class Ctx
             //  The subsequent 'bind' has to be called with inc_seqnum parameter
             //  set to false, so that the seqnum isn't incremented twice.
             endpoint.socket.incSeqnum();
-        }
-        finally {
+        } finally {
             endpointsSync.unlock();
         }
         return endpoint;

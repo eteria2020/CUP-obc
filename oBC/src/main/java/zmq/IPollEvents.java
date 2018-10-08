@@ -19,8 +19,7 @@
 
 package zmq;
 
-public interface IPollEvents
-{
+public interface IPollEvents {
     // Called by I/O thread when file descriptor is ready for reading.
     void inEvent();
 

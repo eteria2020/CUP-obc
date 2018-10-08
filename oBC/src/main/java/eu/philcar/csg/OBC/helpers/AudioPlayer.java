@@ -4,7 +4,6 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -14,32 +13,28 @@ import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 
-
-public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener{
-
+public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
 
     private final Context context;
     private DLog dlog = new DLog(this.getClass());
     private static MediaPlayer player;
 
-    private static int queue=0;
-    private static Uri playing=null;
-    private static boolean isBusy=false; //indicate if the player is busy
+    private static int queue = 0;
+    private static Uri playing = null;
+    private static boolean isBusy = false; //indicate if the player is busy
 
     public static int lastAudioState = 0;
     public static boolean isSystem = false;    //flag per il via libera alla riproduzione
-    public static boolean reqSystem=false;
-    public static boolean ignoreVolume=false;
-
-
-
+    public static boolean reqSystem = false;
+    public static boolean ignoreVolume = false;
 
     public AudioPlayer(Context context) {
-        this.context=context;
+        this.context = context;
         inizializePlayer(false);
     }
+
     private void inizializePlayer(boolean forced) {
-        if(player == null|| forced) {
+        if (player == null || forced) {
 
             player = new MediaPlayer();
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -51,29 +46,28 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        playing=null;
+        playing = null;
         queue--;
         reset();
         isBusy = false;
-        if(queue<=0&&ProTTS.getQueue()==0) {
-            queue=0;
+        if (queue <= 0 && ProTTS.getQueue() == 0) {
+            queue = 0;
             if (context instanceof AMainOBC)
                 ((AMainOBC) context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
             else if (context instanceof AGoodbye)
                 ((AGoodbye) context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
         }
 
-
     }
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
         queue--;
-        playing=null;
+        playing = null;
         reset();
         isBusy = false;
-        if(queue<=0&&ProTTS.getQueue()==0) {
-            queue=0;
+        if (queue <= 0 && ProTTS.getQueue() == 0) {
+            queue = 0;
             if (context instanceof AMainOBC)
                 ((AMainOBC) context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
             else if (context instanceof AGoodbye)
@@ -103,7 +97,6 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
                                 ((AMainOBC) context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
                             else if (context instanceof AGoodbye)
                                 ((AGoodbye) context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
-
 
                             dlog.d("waitToPlayFile: reset and abort");
                             return;
@@ -151,7 +144,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
 
     public void reset() {
 
-        playing=null;
+        playing = null;
 
         if (player != null) {
             try {
@@ -161,44 +154,36 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }
-        else{
+        } else {
             inizializePlayer(false);
         }
     }
 
-    public static void askForSystem(){
-        reqSystem=true;
-        ignoreVolume=true;
+    public static void askForSystem() {
+        reqSystem = true;
+        ignoreVolume = true;
     }
 
-    public static void pausePlayer(){
+    public static void pausePlayer() {
         try {
-            if(player.isPlaying())
+            if (player.isPlaying())
                 player.pause();
-        }catch(Exception e){
-            DLog.E("Exception while pausing player",e);
+        } catch (Exception e) {
+            DLog.E("Exception while pausing player", e);
         }
     }
 
-
-    public static boolean isBusy(){
+    public static boolean isBusy() {
         return isBusy;
     }
 
-
-    public static void resumePlayer(){
+    public static void resumePlayer() {
         try {
             player.start();
-        }catch(Exception e){
-            DLog.E("Exception while resuming player",e);
+        } catch (Exception e) {
+            DLog.E("Exception while resuming player", e);
         }
     }
-
-
-
-
-
 
     public void playFile(String filePath) {
 
@@ -221,26 +206,26 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener, MediaPlaye
             ioe.printStackTrace();
         }
     }
+
     public void playFile(Uri uri) {
 
         try {
             player.reset();
             try {
-                player.setDataSource(context,uri);
+                player.setDataSource(context, uri);
             } catch (IllegalStateException ile) {
                 player.reset();
-                player.setDataSource(context,uri);
+                player.setDataSource(context, uri);
             }
 
             player.prepare();
-            while(!isSystem)
-            {}
+            while (!isSystem) {
+            }
             player.start();
         } catch (Exception e) {
-            dlog.e("Eccezione in play file",e);
+            dlog.e("Eccezione in play file", e);
         }
     }
-
 
     public static int getQueue() {
         return queue;

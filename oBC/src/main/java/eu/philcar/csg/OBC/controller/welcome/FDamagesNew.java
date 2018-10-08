@@ -2,7 +2,6 @@ package eu.philcar.csg.OBC.controller.welcome;
 
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.NetworkOnMainThreadException;
 import android.util.Log;
@@ -14,7 +13,6 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -34,7 +32,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -71,16 +68,15 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
     private Button changeNumberB, sosB, dialCallB;
     private LinearLayout questionLL, newDamagesLL, callDealtLL, fnewDamageLL;
 
-
     private VerticalSeekBar damagesVSB, newdamagesVSB;
     private LADamages damagesA, newdamagesA;
     private ListView damagesLV, newdamagesLV;
 
-    private boolean  login;
+    private boolean login;
     private static boolean editMode;
     private String customerCenterNumber;
-    public String jsonStr= "";
-    private boolean JsonEND=false;
+    public String jsonStr = "";
+    private boolean JsonEND = false;
 
     private ArrayList<String> damages, newdamages;
 
@@ -105,38 +101,38 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
             }
         }).start();
 
-        firstLL = (LinearLayout)view.findViewById(R.id.fdam_first_LL);
+        firstLL = (LinearLayout) view.findViewById(R.id.fdam_first_LL);
 
         firstLL.setVisibility(View.VISIBLE);// ? View.VISIBLE : View.INVISIBLE);
 
-        callDealtLL = (LinearLayout)view.findViewById(R.id.fdam_call_reserved_LL);
-        newDamagesLL = (LinearLayout)view.findViewById(R.id.fdam_number_LL);
-        fnewDamageLL = (LinearLayout)view.findViewById(R.id.fnewdamDamagesLL);
-        questionLL = (LinearLayout)view.findViewById(R.id.fdam_question_LL);
+        callDealtLL = (LinearLayout) view.findViewById(R.id.fdam_call_reserved_LL);
+        newDamagesLL = (LinearLayout) view.findViewById(R.id.fdam_number_LL);
+        fnewDamageLL = (LinearLayout) view.findViewById(R.id.fnewdamDamagesLL);
+        questionLL = (LinearLayout) view.findViewById(R.id.fdam_question_LL);
 
         Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 
-        nextIB = (ImageButton)view.findViewById(R.id.fdamCloseIB);
+        nextIB = (ImageButton) view.findViewById(R.id.fdamCloseIB);
 
-        ((Button)view.findViewById(R.id.fdamYesB)).setTypeface(font);
+        ((Button) view.findViewById(R.id.fdamYesB)).setTypeface(font);
         view.findViewById(R.id.fdamYesB).setOnClickListener(this);
 
-        ((Button)view.findViewById(R.id.fdamNoB)).setTypeface(font);
+        ((Button) view.findViewById(R.id.fdamNoB)).setTypeface(font);
         view.findViewById(R.id.fdamNoB).setOnClickListener(this);
 
-        sosB = ((Button)view.findViewById(R.id.fdamSOSB));
+        sosB = ((Button) view.findViewById(R.id.fdamSOSB));
         sosB.setOnClickListener(this);
 
-        damagesObservedTV = (TextView)view.findViewById(R.id.fdamDamagesObservedTV);
-        newdamagesObservedTV = (TextView)view.findViewById(R.id.fnewDamagesObservedTV);
-        messageTV = (TextView)view.findViewById(R.id.fdamMessageTV);
-        newmessageTV = (TextView)view.findViewById(R.id.fnewDamMessageTV);
-        numberTV = (TextView)view.findViewById(R.id.fdamNumberTV);
+        damagesObservedTV = (TextView) view.findViewById(R.id.fdamDamagesObservedTV);
+        newdamagesObservedTV = (TextView) view.findViewById(R.id.fnewDamagesObservedTV);
+        messageTV = (TextView) view.findViewById(R.id.fdamMessageTV);
+        newmessageTV = (TextView) view.findViewById(R.id.fnewDamMessageTV);
+        numberTV = (TextView) view.findViewById(R.id.fdamNumberTV);
 
-        ((TextView)view.findViewById(R.id.fdam_question_TV)).setTypeface(font);
-        ((TextView)view.findViewById(R.id.fdam_call_message_TV)).setTypeface(font);
-        ((TextView)view.findViewById(R.id.fdamNumberCallTV)).setTypeface(font);
-        ((TextView)view.findViewById(R.id.fdam_call_reserved_message_TV)).setTypeface(font);
+        ((TextView) view.findViewById(R.id.fdam_question_TV)).setTypeface(font);
+        ((TextView) view.findViewById(R.id.fdam_call_message_TV)).setTypeface(font);
+        ((TextView) view.findViewById(R.id.fdamNumberCallTV)).setTypeface(font);
+        ((TextView) view.findViewById(R.id.fdam_call_reserved_message_TV)).setTypeface(font);
 
         damagesObservedTV.setTypeface(font);
         newdamagesObservedTV.setTypeface(font);
@@ -144,10 +140,10 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
         newmessageTV.setTypeface(font);
         numberTV.setTypeface(font);
 
-        dialCallB = (Button)view.findViewById(R.id.fdamCallB);
-        changeNumberB = (Button)view.findViewById(R.id.fdamChangeNumberB);
+        dialCallB = (Button) view.findViewById(R.id.fdamCallB);
+        changeNumberB = (Button) view.findViewById(R.id.fdamChangeNumberB);
 
-        ((Button)view.findViewById(R.id.fdam_call_reserved_close_B)).setTypeface(font);
+        ((Button) view.findViewById(R.id.fdam_call_reserved_close_B)).setTypeface(font);
         view.findViewById(R.id.fdam_call_reserved_close_B).setOnClickListener(this);
 
         dialCallB.setTypeface(font);
@@ -156,25 +152,25 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
         dialCallB.setOnClickListener(this);
         changeNumberB.setOnClickListener(this);
 
-         damages = App.Instance.getDamagesList();
+        damages = App.Instance.getDamagesList();
 
         int damagesSize = damages.size();
 
         damagesA = new LADamages(getActivity(), damages);
-        damagesLV = (ListView)view.findViewById(R.id.fdamDamagesLV);
+        damagesLV = (ListView) view.findViewById(R.id.fdamDamagesLV);
         damagesLV.setAdapter(damagesA);
 
-          newdamagesA = new LADamages(getActivity(), newdamages);
-          newdamagesLV = (ListView)view.findViewById(R.id.fnewdamDamagesLV);
-           newdamagesLV.setAdapter(newdamagesA);
+        newdamagesA = new LADamages(getActivity(), newdamages);
+        newdamagesLV = (ListView) view.findViewById(R.id.fnewdamDamagesLV);
+        newdamagesLV.setAdapter(newdamagesA);
 
-        damagesVSB = (VerticalSeekBar)view.findViewById(R.id.fdamDamageListSB);
-        newdamagesVSB = (VerticalSeekBar)view.findViewById(R.id.fnewDamageListSB);
+        damagesVSB = (VerticalSeekBar) view.findViewById(R.id.fdamDamageListSB);
+        newdamagesVSB = (VerticalSeekBar) view.findViewById(R.id.fnewDamageListSB);
 
-        damagesVSB.setMax(damagesSize-1 > 0 ? damagesSize-1 : 1);
-        damagesVSB.setProgress(damagesSize-1 > 0 ? damagesSize-1 : 1);
+        damagesVSB.setMax(damagesSize - 1 > 0 ? damagesSize - 1 : 1);
+        damagesVSB.setProgress(damagesSize - 1 > 0 ? damagesSize - 1 : 1);
 
-        if (damagesSize-1 > 0) {
+        if (damagesSize - 1 > 0) {
             damagesLV.setOnScrollListener(this);
             damagesVSB.setEnabled(true);
             damagesVSB.setOnSeekBarChangeListener(this);
@@ -194,18 +190,15 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
                 Object o = newdamagesLV.getItemAtPosition(position);
-                int i=0;
-                String str=(String)o;//As you are using Default String Adapter
+                int i = 0;
+                String str = (String) o;//As you are using Default String Adapter
                 switch (str) {
                     case "Parabrezza":
-                        i=99+22-i;
+                        i = 99 + 22 - i;
                         return;
                 }
             }
         });
-
-
-
 
         damagesObservedTV.setTypeface(font);
 
@@ -217,9 +210,6 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
 
         return view;
 
-
-
-
     }
 
     @Override
@@ -227,12 +217,11 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
 
         super.onResume();
 
-        if (App.currentTripInfo!=null && App.currentTripInfo.customer!=null) {
+        if (App.currentTripInfo != null && App.currentTripInfo.customer != null) {
             customerCenterNumber = App.currentTripInfo.customer.mobile;
         } else {
             customerCenterNumber = "";
         }
-
 
         updateUINew();
     }
@@ -247,15 +236,13 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
                 questionLL.setVisibility(View.GONE);
                 dlog.d("FDamagesNew fdamNoB click : " + login);
                 if (login) {
-                    ((ABase)getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
+                    ((ABase) getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
                 } else {
                     //((ABase)getActivity()).pushFragment(new FGoodbye(), FGoodbye.class.getName(), true);
                     getActivity().finish();
                 }
 
                 break;
-
-
 
             case R.id.fdamYesB:
                 editMode = true;
@@ -264,15 +251,15 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
 
             case R.id.fdamCloseIB:
                 if (editMode) {
-                    if (callDealtLL.getVisibility()==View.VISIBLE) {
+                    if (callDealtLL.getVisibility() == View.VISIBLE) {
                         questionLL.setVisibility(View.GONE);
                         newDamagesLL.setVisibility(View.GONE);
                         callDealtLL.setVisibility(View.GONE);
 
                         nextIB.setImageResource(R.drawable.ic_arrow_right);
-                    } else if (newDamagesLL.getVisibility()==View.GONE) {
+                    } else if (newDamagesLL.getVisibility() == View.GONE) {
                         if (login) {
-                            ((ABase)getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
+                            ((ABase) getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
                         } else {
                             getActivity().finish();
                             //((ABase)getActivity()).pushFragment(FInstructions.newInstance(false), FInstructions.class.getName(), true);
@@ -284,9 +271,9 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
                 } else {
                     dlog.d("FDamagesNew fdamCloseIB click : " + login);
                     if (login) {
-                        ((ABase)getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
+                        ((ABase) getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
                     } else {
-                        ((ABase)getActivity()).pushFragment(new FGoodbye(), FGoodbye.class.getName(), true);
+                        ((ABase) getActivity()).pushFragment(new FGoodbye(), FGoodbye.class.getName(), true);
                     }
                 }
                 break;
@@ -296,15 +283,15 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
                 break;
 
             case R.id.fdamChangeNumberB:
-                ((ABase)getActivity()).pushFragment(FNumber.newInstance(), FNumber.class.getName(), true);
+                ((ABase) getActivity()).pushFragment(FNumber.newInstance(), FNumber.class.getName(), true);
                 break;
 
             case R.id.fdamCallB:
 
                 if (login) {
-                    ((AWelcome)getActivity()).sendMessage(MessageFactory.requestCallCenterCallDMG(customerCenterNumber));
+                    ((AWelcome) getActivity()).sendMessage(MessageFactory.requestCallCenterCallDMG(customerCenterNumber));
                 } else {
-                    ((AGoodbye)getActivity()).sendMessage(MessageFactory.requestCallCenterCallDMG(customerCenterNumber));
+                    ((AGoodbye) getActivity()).sendMessage(MessageFactory.requestCallCenterCallDMG(customerCenterNumber));
                 }
 
                 questionLL.setVisibility(View.GONE);
@@ -339,12 +326,11 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
             nextIB.setOnClickListener(this);
             sosB.setVisibility(View.GONE);
 
-            if (App.currentTripInfo!=null && App.currentTripInfo.customer!=null) {
+            if (App.currentTripInfo != null && App.currentTripInfo.customer != null) {
                 customerCenterNumber = App.currentTripInfo.customer.mobile;
             } else {
                 customerCenterNumber = "";
             }
-
 
         } else {
 
@@ -371,8 +357,6 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
             messageTV.setVisibility(View.INVISIBLE);
             nextIB.setOnClickListener(this);
 
-
-
         } else {
 
             questionLL.setVisibility(View.VISIBLE);
@@ -396,60 +380,59 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-        if(seekBar.getId() == R.id.fnewDamageListSB){
+        if (seekBar.getId() == R.id.fnewDamageListSB) {
             int listPosition = newdamagesA.getCount() - LADamages.ADDITIONAL_ITEMS_PER_LIST - progress - 1;
             newdamagesLV.setSelection(listPosition);
-        }
-        else {
+        } else {
             int listPosition = damagesA.getCount() - LADamages.ADDITIONAL_ITEMS_PER_LIST - progress - 1;
             damagesLV.setSelection(listPosition);
         }
     }
 
     @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {}
+    public void onStartTrackingTouch(SeekBar seekBar) {
+    }
 
     @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {}
+    public void onStopTrackingTouch(SeekBar seekBar) {
+    }
 
     @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {}
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+    }
 
-   @Override
+    @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
-        switch (view.getId()){
+        switch (view.getId()) {
 
-        case  R.id.fnewdamDamagesLV:
-            if (oldFirstItemNew != firstVisibleItem) {
+            case R.id.fnewdamDamagesLV:
+                if (oldFirstItemNew != firstVisibleItem) {
 
-                newdamagesVSB.setProgress(newdamagesA.getCount() - LADamages.ADDITIONAL_ITEMS_PER_LIST - 1 - firstVisibleItem);
-                newdamagesVSB.updateThumb();
-                oldFirstItemNew = firstVisibleItem;
-            }
-             break;
+                    newdamagesVSB.setProgress(newdamagesA.getCount() - LADamages.ADDITIONAL_ITEMS_PER_LIST - 1 - firstVisibleItem);
+                    newdamagesVSB.updateThumb();
+                    oldFirstItemNew = firstVisibleItem;
+                }
+                break;
 
-        case R.id.fdamDamagesLV:
+            case R.id.fdamDamagesLV:
 
-            if (oldFirstItem != firstVisibleItem) {
+                if (oldFirstItem != firstVisibleItem) {
 
-                damagesVSB.setProgress(damagesA.getCount() - LADamages.ADDITIONAL_ITEMS_PER_LIST - 1 - firstVisibleItem);
-                damagesVSB.updateThumb();
-                oldFirstItem = firstVisibleItem;
-            }
-            break;
+                    damagesVSB.setProgress(damagesA.getCount() - LADamages.ADDITIONAL_ITEMS_PER_LIST - 1 - firstVisibleItem);
+                    damagesVSB.updateThumb();
+                    oldFirstItem = firstVisibleItem;
+                }
+                break;
         }
     }
 
-
-
-
     private void handleJson(String urls) {
 
-        if(newdamages.size()>1 || JsonEND)
+        if (newdamages.size() > 1 || JsonEND)
             return;
 
-        JsonEND=true;
+        JsonEND = true;
         StringBuilder builder = new StringBuilder();
         HttpClient client = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(urls);
@@ -469,7 +452,7 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
                 reader.close();
                 content.close();
             } else {
-                JsonEND=false;
+                JsonEND = false;
                 Log.e(FDamagesNew.class.toString(), "Failed to download file");
             }
         } catch (ClientProtocolException e) {
@@ -479,38 +462,32 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
         } catch (Exception e) {
             e.printStackTrace();
         }
-        jsonStr=builder.toString();
+        jsonStr = builder.toString();
         parseJson();
         (getActivity()).runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
                 // your stuff to update the UI
-                try{
-                    newdamagesA = new LADamages(getActivity(),newdamages);
+                try {
+                    newdamagesA = new LADamages(getActivity(), newdamages);
                     newdamagesLV.setAdapter(newdamagesA);
 
                     newdamagesVSB.setEnabled(true);
 
-
-                    newdamagesVSB.setMax(newdamages.size()-1 > 0 ? newdamages.size()-1 : 1);
-                    newdamagesVSB.setProgress(newdamages.size()-1 > 0 ? newdamages.size()-1 : 1);
+                    newdamagesVSB.setMax(newdamages.size() - 1 > 0 ? newdamages.size() - 1 : 1);
+                    newdamagesVSB.setProgress(newdamages.size() - 1 > 0 ? newdamages.size() - 1 : 1);
                     newdamagesLV.invalidate();
 
-                }
-                catch (Exception e){
+                } catch (Exception e) {
 
                 }
             }
         });
 
-
-
-        return ;
+        return;
 
     }
-
-
 
     private void parseJson() {
 
@@ -518,20 +495,19 @@ public class FDamagesNew extends FBase implements OnClickListener, OnSeekBarChan
             JSONObject json = new JSONObject(jsonStr);
             Log.i(FDamagesNew.class.getName(), "creazione oggetto Json");
             //Get the instance of JSONArray that contains JSONObjects
-           JSONArray jsonArray = json.optJSONArray("Danni");
+            JSONArray jsonArray = json.optJSONArray("Danni");
 
             //Iterate the jsonArray and print the info of JSONObjects
-            for(int k=0;k<jsonArray.length();k++) {
+            for (int k = 0; k < jsonArray.length(); k++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(k);
 
                 newdamages.add(jsonObject.getString("name"));
 
             }
         } catch (JSONException e) {
-            e.printStackTrace();}
+            e.printStackTrace();
+        }
 
     }
-
-
 
 }

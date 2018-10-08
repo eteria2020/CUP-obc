@@ -1,7 +1,5 @@
 package eu.philcar.csg.OBC.server;
 
-
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.philcar.csg.OBC.App;
-import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.helpers.DLog;
 
 public class SendEmail implements RemoteEntityInterface {
@@ -43,14 +40,13 @@ public class SendEmail implements RemoteEntityInterface {
         list.add(new BasicNameValuePair("PLATE", App.CarPlate));
         list.add(new BasicNameValuePair("EMAIL", this.email));
 
-
         return list;
 
     }
 
     @Override
     public int DecodeJson(String response) {
-        DLog.I("SendEmail: "+response);
+        DLog.I("SendEmail: " + response);
         Message m = Message.obtain(); //get null message
         Bundle b = new Bundle();
         b.putString("response", response);
@@ -70,11 +66,8 @@ public class SendEmail implements RemoteEntityInterface {
         return RemoteEntityInterface.eDirection.DOWNLOAD;
     }
 
-
     public void setEmail(String em) {
         email = em;
     }
-
-
 
 }

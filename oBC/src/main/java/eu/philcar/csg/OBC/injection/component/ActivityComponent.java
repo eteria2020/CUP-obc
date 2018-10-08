@@ -11,6 +11,4 @@ import eu.philcar.csg.OBC.injection.module.ActivityModule;
 @Subcomponent(modules = ActivityModule.class)
 public interface ActivityComponent {
 
-
-
 }

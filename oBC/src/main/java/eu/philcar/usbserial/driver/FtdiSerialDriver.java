@@ -43,7 +43,7 @@ import eu.philcar.usbserial.util.HexDump;
  * This driver is based on <a
  * href="http://www.intra2net.com/en/developer/libftdi">libftdi</a>, and is
  * copyright and subject to the following terms:
- *
+ * <p>
  * <pre>
  *   Copyright (C) 2003 by Intra2net AG
  *
@@ -54,7 +54,7 @@ import eu.philcar.usbserial.util.HexDump;
  *   opensource@intra2net.com
  *   http://www.intra2net.com/en/developer/libftdi
  * </pre>
- *
+ * <p>
  * </p>
  * <p>
  * Some FTDI devices have not been tested; see later listing of supported and
@@ -88,7 +88,7 @@ import eu.philcar.usbserial.util.HexDump;
  *
  * @author mike wakerly (opensource@hoho.com)
  * @see <a href="https://github.com/mik3y/usb-serial-for-android">USB Serial
- *      for Android project page</a>
+ * for Android project page</a>
  * @see <a href="http://www.ftdichip.com/">FTDI Homepage</a>
  * @see <a href="http://www.intra2net.com/en/developer/libftdi">libftdi</a>
  */
@@ -108,6 +108,7 @@ public class FtdiSerialDriver implements UsbSerialDriver {
         mDevice = device;
         mPort = new FtdiSerialPort(mDevice, 0);
     }
+
     @Override
     public UsbDevice getDevice() {
         return mDevice;
@@ -203,10 +204,11 @@ public class FtdiSerialDriver implements UsbSerialDriver {
 
         /**
          * Filter FTDI status bytes from buffer
-         * @param src The source buffer (which contains status bytes)
-         * @param dest The destination buffer to write the status bytes into (can be src)
+         *
+         * @param src            The source buffer (which contains status bytes)
+         * @param dest           The destination buffer to write the status bytes into (can be src)
          * @param totalBytesRead Number of bytes read to src
-         * @param maxPacketSize The USB endpoint max packet size
+         * @param maxPacketSize  The USB endpoint max packet size
          * @return The number of payload bytes
          */
         private final int filterStatusBytes(byte[] src, byte[] dest, int totalBytesRead, int maxPacketSize) {
@@ -224,7 +226,7 @@ public class FtdiSerialDriver implements UsbSerialDriver {
                 }
             }
 
-          return totalBytesRead - (packetsCount * 2);
+            return totalBytesRead - (packetsCount * 2);
         }
 
         public void reset() throws IOException {
@@ -504,7 +506,7 @@ public class FtdiSerialDriver implements UsbSerialDriver {
             }
 
             // Return the nearest baud rate
-            return new long[] {
+            return new long[]{
                     bestBaud, index, value
             };
         }
@@ -571,9 +573,9 @@ public class FtdiSerialDriver implements UsbSerialDriver {
     public static Map<Integer, int[]> getSupportedDevices() {
         final Map<Integer, int[]> supportedDevices = new LinkedHashMap<Integer, int[]>();
         supportedDevices.put(Integer.valueOf(UsbId.VENDOR_FTDI),
-                new int[] {
-                    UsbId.FTDI_FT232R,
-                    UsbId.FTDI_FT231X,
+                new int[]{
+                        UsbId.FTDI_FT232R,
+                        UsbId.FTDI_FT231X,
                 });
         return supportedDevices;
     }

@@ -33,7 +33,7 @@ public class VerticalSeekBar extends SeekBar {
 
     protected void onDraw(Canvas c) {
         c.rotate(-90);
-        c.translate(-getHeight(),0);
+        c.translate(-getHeight(), 0);
 
         super.onDraw(c);
     }
@@ -48,10 +48,10 @@ public class VerticalSeekBar extends SeekBar {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_UP:
-            	int i=0;
-            	i=getMax() - (int) (getMax() * event.getY() / getHeight());
+                int i = 0;
+                i = getMax() - (int) (getMax() * event.getY() / getHeight());
                 setProgress(i);
-                Log.i("Progress",getProgress()+"");
+                Log.i("Progress", getProgress() + "");
                 onSizeChanged(getWidth(), getHeight(), 0, 0);
                 break;
 
@@ -60,9 +60,9 @@ public class VerticalSeekBar extends SeekBar {
         }
         return true;
     }
-    
-    public void updateThumb(){
+
+    public void updateThumb() {
         onSizeChanged(getWidth(), getHeight(), 0, 0);
-   }
-    
+    }
+
 }

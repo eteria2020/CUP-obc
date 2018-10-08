@@ -30,92 +30,76 @@ import java.nio.channels.SocketChannel;
 import java.security.SecureRandom;
 import java.util.List;
 
-class Utils
-{
-    private Utils()
-    {
+class Utils {
+    private Utils() {
     }
 
     private static SecureRandom random = new SecureRandom();
 
-    public static int generateRandom()
-    {
+    public static int generateRandom() {
         return random.nextInt();
     }
 
-    public static void tuneTcpSocket(SocketChannel ch) throws SocketException
-    {
+    public static void tuneTcpSocket(SocketChannel ch) throws SocketException {
         tuneTcpSocket(ch.socket());
     }
 
-    public static void tuneTcpSocket(Socket fd) throws SocketException
-    {
+    public static void tuneTcpSocket(Socket fd) throws SocketException {
         //  Disable Nagle's algorithm. We are doing data batching on 0MQ level,
         //  so using Nagle wouldn't improve throughput in anyway, but it would
         //  hurt latency.
         try {
             fd.setTcpNoDelay(true);
-        }
-        catch (SocketException e) {
+        } catch (SocketException e) {
         }
     }
 
     public static void tuneTcpKeepalives(SocketChannel ch, int tcpKeepalive,
                                          int tcpKeepaliveCnt, int tcpKeepaliveIdle,
-                                         int tcpKeepaliveIntvl) throws SocketException
-    {
+                                         int tcpKeepaliveIntvl) throws SocketException {
         tune_tcp_keepalives(ch.socket(), tcpKeepalive, tcpKeepaliveCnt,
                 tcpKeepaliveIdle, tcpKeepaliveIntvl);
     }
 
     public static void tune_tcp_keepalives(Socket fd, int tcpKeepalive,
-            int tcpKeepaliveCnt, int tcpKeepaliveIdle,
-            int tcpKeepaliveIntvl) throws SocketException
-    {
+                                           int tcpKeepaliveCnt, int tcpKeepaliveIdle,
+                                           int tcpKeepaliveIntvl) throws SocketException {
         if (tcpKeepalive == 1) {
             fd.setKeepAlive(true);
-        }
-        else if (tcpKeepalive == 0) {
+        } else if (tcpKeepalive == 0) {
             fd.setKeepAlive(false);
         }
     }
 
-    public static void unblockSocket(SelectableChannel s) throws IOException
-    {
+    public static void unblockSocket(SelectableChannel s) throws IOException {
         s.configureBlocking(false);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T[] realloc(Class<T> klass, T[] src, int size, boolean ended)
-    {
+    public static <T> T[] realloc(Class<T> klass, T[] src, int size, boolean ended) {
         T[] dest;
 
         if (size > src.length) {
             dest = (T[]) Array.newInstance(klass, size);
             if (ended) {
                 System.arraycopy(src, 0, dest, 0, src.length);
-            }
-            else {
+            } else {
                 System.arraycopy(src, 0, dest, size - src.length, src.length);
             }
-        }
-        else if (size < src.length) {
+        } else if (size < src.length) {
             dest = (T[]) Array.newInstance(klass, size);
             if (ended) {
                 System.arraycopy(src, src.length - size, dest, 0, size);
-            }
-            else {
+            } else {
                 System.arraycopy(src, 0, dest, 0, size);
             }
-        }
-        else {
+        } else {
             dest = src;
         }
         return dest;
     }
 
-    public static <T> void swap(List<T> items, int index1, int index2)
-    {
+    public static <T> void swap(List<T> items, int index1, int index2) {
         if (index1 == index2) {
             return;
         }
@@ -130,15 +114,13 @@ class Utils
         }
     }
 
-    public static byte[] bytes(ByteBuffer buf)
-    {
+    public static byte[] bytes(ByteBuffer buf) {
         byte[] d = new byte[buf.limit()];
         buf.get(d);
         return d;
     }
 
-    public static byte[] realloc(byte[] src, int size)
-    {
+    public static byte[] realloc(byte[] src, int size) {
         byte[] dest = new byte[size];
         if (src != null) {
             System.arraycopy(src, 0, dest, 0, src.length);
@@ -147,8 +129,7 @@ class Utils
         return dest;
     }
 
-    public static boolean delete(File path)
-    {
+    public static boolean delete(File path) {
         if (!path.exists()) {
             return false;
         }

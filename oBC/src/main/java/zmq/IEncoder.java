@@ -21,8 +21,7 @@ package zmq;
 
 import java.nio.ByteBuffer;
 
-public interface IEncoder
-{
+public interface IEncoder {
     //  Set message producer.
     void setMsgSource(IMsgSource msgSource);
 

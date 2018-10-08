@@ -1,5 +1,7 @@
 package eu.philcar.csg.OBC.helpers;
 
+import android.util.Base64;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -7,27 +9,22 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-
-import android.os.Build;
-import android.util.Base64;
 
 public class Encryption {
     //XvSMJG6YGV
     private static String _charsetName = "UTF8";
     private static String _algorithm = "DES";
     private static int _base64Mode = Base64.DEFAULT;
-    
-    private static String _cachedKey ="ew3J8M4aGBZhIMMLkPJgUAdKPduqiYxezZhJymNgNkmS3NlXhzO1FYT0o6ONRL4";
-    
+
+    private static String _cachedKey = "ew3J8M4aGBZhIMMLkPJgUAdKPduqiYxezZhJymNgNkmS3NlXhzO1FYT0o6ONRL4";
 
     public static String getCharsetName() {
         return _charsetName;
     }
 
     public static void setCharsetName(String charsetName) {
-       _charsetName = charsetName;
+        _charsetName = charsetName;
     }
 
     public static String getAlgorithm() {
@@ -43,15 +40,15 @@ public class Encryption {
     }
 
     public static void setCachedKey(String key) {
-    	_cachedKey = key;
+        _cachedKey = key;
     }
-    
+
     public static void setBase64Mode(int base64Mode) {
         _base64Mode = base64Mode;
     }
 
-    public static String encrypt( String data) {
-    	String key = _cachedKey;
+    public static String encrypt(String data) {
+        String key = _cachedKey;
         if (key == null || data == null)
             return null;
         try {
@@ -71,7 +68,7 @@ public class Encryption {
     }
 
     public static String decrypt(String data) {
-    	String key = _cachedKey;
+        String key = _cachedKey;
         if (key == null || data == null)
             return null;
         try {
@@ -87,22 +84,21 @@ public class Encryption {
             return null;
         }
     }
-    
-    
+
     public static String decryptAes(String data) {
-    	try {
-	    	byte[] cipherText =  Base64.decode(data, _base64Mode);
-	        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS7Padding");
-	        MessageDigest md = MessageDigest.getInstance("MD5");
-	        byte[] thedigest = md.digest(_cachedKey.getBytes("UTF-8"));
-	        SecretKeySpec key = new SecretKeySpec(thedigest, "AES/ECB/PKCS5Padding");
-	        cipher.init(Cipher.DECRYPT_MODE, key);
-	        return new String(cipher.doFinal(cipherText),"UTF-8");
+        try {
+            byte[] cipherText = Base64.decode(data, _base64Mode);
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS7Padding");
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] thedigest = md.digest(_cachedKey.getBytes("UTF-8"));
+            SecretKeySpec key = new SecretKeySpec(thedigest, "AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            return new String(cipher.doFinal(cipherText), "UTF-8");
         } catch (Exception e) {
-              return null;
+            return null;
         }
-      }
-    
+    }
+
     public static final String md5(final String s) {
         final String MD5 = "MD5";
         try {

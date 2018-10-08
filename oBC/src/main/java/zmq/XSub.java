@@ -19,13 +19,10 @@
 
 package zmq;
 
-public class XSub extends SocketBase
-{
-    public static class XSubSession extends SessionBase
-    {
+public class XSub extends SocketBase {
+    public static class XSubSession extends SessionBase {
         public XSubSession(IOThread ioThread, boolean connect,
-                SocketBase socket, Options options, Address addr)
-        {
+                           SocketBase socket, Options options, Address addr) {
             super(ioThread, connect, socket, options, addr);
         }
     }
@@ -50,11 +47,9 @@ public class XSub extends SocketBase
     private static Trie.ITrieHandler sendSubscription;
 
     static {
-        sendSubscription = new Trie.ITrieHandler()
-        {
+        sendSubscription = new Trie.ITrieHandler() {
             @Override
-            public void added(byte[] data, int size, Object arg)
-            {
+            public void added(byte[] data, int size, Object arg) {
                 Pipe pipe = (Pipe) arg;
 
                 //  Create the subsctription message.
@@ -74,8 +69,7 @@ public class XSub extends SocketBase
         };
     }
 
-    public XSub(Ctx parent, int tid, int sid)
-    {
+    public XSub(Ctx parent, int tid, int sid) {
         super(parent, tid, sid);
 
         options.type = ZMQ.ZMQ_XSUB;
@@ -89,8 +83,7 @@ public class XSub extends SocketBase
     }
 
     @Override
-    protected void xattachPipe(Pipe pipe, boolean icanhasall)
-    {
+    protected void xattachPipe(Pipe pipe, boolean icanhasall) {
         assert (pipe != null);
         fq.attach(pipe);
         dist.attach(pipe);
@@ -101,35 +94,30 @@ public class XSub extends SocketBase
     }
 
     @Override
-    protected void xreadActivated(Pipe pipe)
-    {
+    protected void xreadActivated(Pipe pipe) {
         fq.activated(pipe);
     }
 
     @Override
-    protected void xwriteActivated(Pipe pipe)
-    {
+    protected void xwriteActivated(Pipe pipe) {
         dist.activated(pipe);
     }
 
     @Override
-    protected void xpipeTerminated(Pipe pipe)
-    {
+    protected void xpipeTerminated(Pipe pipe) {
         fq.terminated(pipe);
         dist.terminated(pipe);
     }
 
     @Override
-    protected void xhiccuped(Pipe pipe)
-    {
+    protected void xhiccuped(Pipe pipe) {
         //  Send all the cached subscriptions to the hiccuped pipe.
         subscriptions.apply(sendSubscription, pipe);
         pipe.flush();
     }
 
     @Override
-    protected boolean xsend(Msg msg)
-    {
+    protected boolean xsend(Msg msg) {
         byte[] data = msg.data();
         // Malformed subscriptions.
         if (data.length < 1 || (data[0] != 0 && data[0] != 1)) {
@@ -143,10 +131,9 @@ public class XSub extends SocketBase
             // doing it here as well breaks ZMQ_XPUB_VERBOSE
             // when there are forwarding devices involved
             //
-            subscriptions.add(data , 1);
+            subscriptions.add(data, 1);
             return dist.send_to_all(msg);
-        }
-        else {
+        } else {
             if (subscriptions.rm(data, 1)) {
                 return dist.send_to_all(msg);
             }
@@ -156,15 +143,13 @@ public class XSub extends SocketBase
     }
 
     @Override
-    protected boolean xhasOut()
-    {
+    protected boolean xhasOut() {
         //  Subscription can be added/removed anytime.
         return true;
     }
 
     @Override
-    protected Msg xrecv()
-    {
+    protected Msg xrecv() {
         Msg msg = null;
 
         //  If there's already a message prepared by a previous call to zmq_poll,
@@ -206,8 +191,7 @@ public class XSub extends SocketBase
     }
 
     @Override
-    protected boolean xhasIn()
-    {
+    protected boolean xhasIn() {
         //  There are subsequent parts of the partly-read message available.
         if (more) {
             return true;
@@ -246,8 +230,7 @@ public class XSub extends SocketBase
         }
     }
 
-    private boolean match(Msg msg)
-    {
+    private boolean match(Msg msg) {
         return subscriptions.check(msg.data());
     }
 }

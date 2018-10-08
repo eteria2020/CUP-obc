@@ -1,10 +1,5 @@
 package eu.philcar.csg.OBC.helpers;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -21,7 +16,6 @@ import android.view.View.OnClickListener;
 import android.view.View.OnSystemUiVisibilityChangeListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
@@ -30,6 +24,10 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.Hik.Mercury.SDK.Manager.CANManager;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -43,162 +41,153 @@ import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.ServiceConnector;
 import eu.philcar.csg.OBC.service.TripInfo;
 
-
 public class ServiceTestActivity extends Activity {
 
-	private DLog dlog = new DLog(this.getClass());
-	
-	//Riferimento alla classe helper che si occuper� di connettersi al servizio 	
-	private ServiceConnector serviceConnector =  null;
-	private EditText etPlate;
+    private DLog dlog = new DLog(this.getClass());
 
+    //Riferimento alla classe helper che si occuper� di connettersi al servizio
+    private ServiceConnector serviceConnector = null;
+    private EditText etPlate;
 
-	@Inject
-	EventRepository eventRepository;
+    @Inject
+    EventRepository eventRepository;
 
-	private UsbSerialConnection usc;
-	private CarInfo carInfo;
-	private CANManager CanManager;
-	
-	private boolean paused = false;
-	
-	WakeLock screenLock;
-	WakeLock screenLockTrip;
+    private UsbSerialConnection usc;
+    private CarInfo carInfo;
+    private CANManager CanManager;
 
-	private final int MSG_RELEASE_SCREEN = 10001;
+    private boolean paused = false;
 
-	int countRX=0;
-	//Handler locale che ricever� i messaggi inviati dal servizio 
-	
-	
-	
-	private Handler serviceHandler = new Handler() {
-		 @Override
-		 public void handleMessage(Message msg) {
-			Bundle b;
-			
+    WakeLock screenLock;
+    WakeLock screenLockTrip;
 
-			if (! App.isForegroundActivity(ServiceTestActivity.this))
-				return;
+    private final int MSG_RELEASE_SCREEN = 10001;
 
-			
-			switch (msg.what) {
-			
-			case ObcService.MSG_CLIENT_REGISTER:				
-			
-				Toast.makeText(ServiceTestActivity.this, "CONNECTED", Toast.LENGTH_SHORT).show();
-				break;
+    int countRX = 0;
+    //Handler locale che ricever� i messaggi inviati dal servizio
 
-			case ObcService.MSG_CAR_CAN_UPDATE:
-				/*b = msg.getData();
+    private Handler serviceHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            Bundle b;
+
+            if (!App.isForegroundActivity(ServiceTestActivity.this))
+                return;
+
+            switch (msg.what) {
+
+                case ObcService.MSG_CLIENT_REGISTER:
+
+                    Toast.makeText(ServiceTestActivity.this, "CONNECTED", Toast.LENGTH_SHORT).show();
+                    break;
+
+                case ObcService.MSG_CAR_CAN_UPDATE:
+                /*b = msg.getData();
 
 				if (msg.obj!=null &&  msg.obj instanceof CarInfo) {
 					updateCANData((CarInfo) msg.obj);
 				}*/
-				break;
+                    break;
 
-			case ObcService.MSG_CAR_START_CHARGING:
+                case ObcService.MSG_CAR_START_CHARGING:
 
 				/*
 
 				if (msg.obj!=null &&  msg.obj instanceof CarInfo) {
 					updateCANData((CarInfo) msg.obj);
 				}*/
-				break;
+                    break;
 				
 			/*case ObcService.MSG_CLIENT_UNREGISTER:
 				serviceConnector.unregister();
 				serviceConnector.disconnect();
 				ServiceTestActivity.this.finish();
 				break;*/
-				
-			case ObcService.MSG_CMD_TIMEOUT:
-				Toast.makeText(ServiceTestActivity.this, "TIMEOUT", Toast.LENGTH_SHORT).show();
-				break;
-			
-			case ObcService.MSG_PING:
-				Toast.makeText(ServiceTestActivity.this, "PING OK", Toast.LENGTH_SHORT).show();
-				break;
 
-				case ObcService.MSG_CAR_KEY_CHECK:
-					Toast.makeText(ServiceTestActivity.this, "CAR key Check", Toast.LENGTH_SHORT).show();
-					break;
-				
-			case ObcService.MSG_IO_RFID:
-				screenLock.acquire();
-				Message lmsg = this.obtainMessage(MSG_RELEASE_SCREEN);
-				this.sendMessageDelayed(lmsg, 2000);
-				
-				
-				b =  msg.getData();
-				String id=null;
-				String event=null;
-				
-				if (b!=null) {
-					id = b.getString("id");
-					event = b.getString("event");
-				}
-				
-				id = (id!=null)?id:"";
-				event = (event!=null)?event:"";
+                case ObcService.MSG_CMD_TIMEOUT:
+                    Toast.makeText(ServiceTestActivity.this, "TIMEOUT", Toast.LENGTH_SHORT).show();
+                    break;
 
-				Toast.makeText(ServiceTestActivity.this, "RFID : " + id +"\n" + event, Toast.LENGTH_SHORT).show();
-				handleCard(id,event);
-									
-				
-				break;
-				
-			case ObcService.MSG_CAR_UPDATE:
-				Message rmsg = MessageFactory.requestCarInfo();
-				serviceConnector.send(rmsg);
-				break;
-				
-			case ObcService.MSG_CAR_INFO:
-				b = msg.getData();				
-				countRX++;
-				((TextView)findViewById(R.id.tvNmsg)).setText(""+countRX);
-				
-				if (msg.obj!=null &&  msg.obj instanceof CarInfo) {					
-					handleCarInfo((CarInfo)msg.obj);
-				}
-				break;
-				
-			case ObcService.MSG_TRIP_BEGIN:
-				TripInfo ti = (TripInfo)msg.obj;
-				if (ti!=null && ti.customer !=  null) {
-					//((TextView)findViewById(R.id.tvStatus)).setText("Corsa aperta da " + ti.cliente.nome + " "+ ti.cliente.cognome);
-				}
-				BeginTimestamp = System.currentTimeMillis();
-				break;
-				
-			case ObcService.MSG_TRIP_END:
+                case ObcService.MSG_PING:
+                    Toast.makeText(ServiceTestActivity.this, "PING OK", Toast.LENGTH_SHORT).show();
+                    break;
 
-				//((TextView)findViewById(R.id.tvStatus)).setText("Corsa chiusa");
-				BeginTimestamp=0;
-				break;		
-				
-			case ObcService.MSG_CUSTOMER_CHECKPIN:
+                case ObcService.MSG_CAR_KEY_CHECK:
+                    Toast.makeText(ServiceTestActivity.this, "CAR key Check", Toast.LENGTH_SHORT).show();
+                    break;
 
-				Toast.makeText(ServiceTestActivity.this, "PIN : " + msg.arg1, Toast.LENGTH_SHORT).show();
+                case ObcService.MSG_IO_RFID:
+                    screenLock.acquire();
+                    Message lmsg = this.obtainMessage(MSG_RELEASE_SCREEN);
+                    this.sendMessageDelayed(lmsg, 2000);
 
-				break;	
-				
-			case MSG_RELEASE_SCREEN:
-				Toast.makeText(ServiceTestActivity.this, "Lock released", Toast.LENGTH_SHORT).show();
-				if (screenLock.isHeld())
-					screenLock.release();
-				break;
-				
-			default:
-				super.handleMessage(msg);
-			 }
-		 }
-	};
-	
-	
-	long  BeginTimestamp = 0;
-	
-	private void handleCard(String id, String event) {
+                    b = msg.getData();
+                    String id = null;
+                    String event = null;
+
+                    if (b != null) {
+                        id = b.getString("id");
+                        event = b.getString("event");
+                    }
+
+                    id = (id != null) ? id : "";
+                    event = (event != null) ? event : "";
+
+                    Toast.makeText(ServiceTestActivity.this, "RFID : " + id + "\n" + event, Toast.LENGTH_SHORT).show();
+                    handleCard(id, event);
+
+                    break;
+
+                case ObcService.MSG_CAR_UPDATE:
+                    Message rmsg = MessageFactory.requestCarInfo();
+                    serviceConnector.send(rmsg);
+                    break;
+
+                case ObcService.MSG_CAR_INFO:
+                    b = msg.getData();
+                    countRX++;
+                    ((TextView) findViewById(R.id.tvNmsg)).setText("" + countRX);
+
+                    if (msg.obj != null && msg.obj instanceof CarInfo) {
+                        handleCarInfo((CarInfo) msg.obj);
+                    }
+                    break;
+
+                case ObcService.MSG_TRIP_BEGIN:
+                    TripInfo ti = (TripInfo) msg.obj;
+                    if (ti != null && ti.customer != null) {
+                        //((TextView)findViewById(R.id.tvStatus)).setText("Corsa aperta da " + ti.cliente.nome + " "+ ti.cliente.cognome);
+                    }
+                    BeginTimestamp = System.currentTimeMillis();
+                    break;
+
+                case ObcService.MSG_TRIP_END:
+
+                    //((TextView)findViewById(R.id.tvStatus)).setText("Corsa chiusa");
+                    BeginTimestamp = 0;
+                    break;
+
+                case ObcService.MSG_CUSTOMER_CHECKPIN:
+
+                    Toast.makeText(ServiceTestActivity.this, "PIN : " + msg.arg1, Toast.LENGTH_SHORT).show();
+
+                    break;
+
+                case MSG_RELEASE_SCREEN:
+                    Toast.makeText(ServiceTestActivity.this, "Lock released", Toast.LENGTH_SHORT).show();
+                    if (screenLock.isHeld())
+                        screenLock.release();
+                    break;
+
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    };
+
+    long BeginTimestamp = 0;
+
+    private void handleCard(String id, String event) {
 //		Message  msg;
 //		if (event.equalsIgnoreCase("OPEN")) {
 //			msg = MessageFactory.setLed(MessageFactory.LED_GREEN, 0);
@@ -217,52 +206,49 @@ public class ServiceTestActivity extends Activity {
 //			//BeginTimestamp=0;
 //		}
 //		
-	}
-	
-	private void handleCarInfo(CarInfo carInfo) {
-		
-		((TextView)findViewById(R.id.tvCarInfo)).setText(carInfo.getJson_GPRS(true));
-		float currVolt=0;
-		String cellsVoltage="";
-		for(int i =0;i<carInfo.cellVoltageValue.length;i++){
-			cellsVoltage=cellsVoltage.concat(" " + carInfo.cellVoltageValue[i]);		//battery cell voltages
-			if ((i+1) % 8 == 0) {
+    }
 
-				cellsVoltage=cellsVoltage.concat("\n");
-			}
-		}
+    private void handleCarInfo(CarInfo carInfo) {
 
-		cellsVoltage=cellsVoltage.concat("Battery type: "+ carInfo.batteryType+"\n");
-		cellsVoltage=cellsVoltage.concat("Low voltage cells : "+ carInfo.isCellLowVoltage +" ("+ carInfo.lowCells +")\n");
-		cellsVoltage=cellsVoltage.concat("V100%: "+ App.getMax_voltage()+"V\n");
-		cellsVoltage=cellsVoltage.concat("VBATT: "+ carInfo.currVoltage+"V\n");
+        ((TextView) findViewById(R.id.tvCarInfo)).setText(carInfo.getJson_GPRS(true));
+        float currVolt = 0;
+        String cellsVoltage = "";
+        for (int i = 0; i < carInfo.cellVoltageValue.length; i++) {
+            cellsVoltage = cellsVoltage.concat(" " + carInfo.cellVoltageValue[i]);        //battery cell voltages
+            if ((i + 1) % 8 == 0) {
 
+                cellsVoltage = cellsVoltage.concat("\n");
+            }
+        }
 
+        cellsVoltage = cellsVoltage.concat("Battery type: " + carInfo.batteryType + "\n");
+        cellsVoltage = cellsVoltage.concat("Low voltage cells : " + carInfo.isCellLowVoltage + " (" + carInfo.lowCells + ")\n");
+        cellsVoltage = cellsVoltage.concat("V100%: " + App.getMax_voltage() + "V\n");
+        cellsVoltage = cellsVoltage.concat("VBATT: " + carInfo.currVoltage + "V\n");
 
-		cellsVoltage=cellsVoltage.concat("SOC: "+ carInfo.bmsSOC +"%\n");
-		cellsVoltage=cellsVoltage.concat("SOC_GPRS: "+ carInfo.bmsSOC_GPRS +"%\n");
-		cellsVoltage=cellsVoltage.concat("SOC2: "+ carInfo.virtualSOC +"%\n");
-		cellsVoltage=cellsVoltage.concat("SOCR : "+ carInfo.SOCR +"\n");
-		cellsVoltage=cellsVoltage.concat("SOCAdmin: "+ carInfo.batteryLevel +"%\n");
-		cellsVoltage=cellsVoltage.concat("outAmp: "+ carInfo.getOutAmp() +"A\n");
-		cellsVoltage=cellsVoltage.concat("Battery Safety: "+ carInfo.isBatterySafety() +"\n");
-		//cellsVoltage=cellsVoltage.concat("CurrentValue: "+ carInfo.current +"A\n");
+        cellsVoltage = cellsVoltage.concat("SOC: " + carInfo.bmsSOC + "%\n");
+        cellsVoltage = cellsVoltage.concat("SOC_GPRS: " + carInfo.bmsSOC_GPRS + "%\n");
+        cellsVoltage = cellsVoltage.concat("SOC2: " + carInfo.virtualSOC + "%\n");
+        cellsVoltage = cellsVoltage.concat("SOCR : " + carInfo.SOCR + "\n");
+        cellsVoltage = cellsVoltage.concat("SOCAdmin: " + carInfo.batteryLevel + "%\n");
+        cellsVoltage = cellsVoltage.concat("outAmp: " + carInfo.getOutAmp() + "A\n");
+        cellsVoltage = cellsVoltage.concat("Battery Safety: " + carInfo.isBatterySafety() + "\n");
+        //cellsVoltage=cellsVoltage.concat("CurrentValue: "+ carInfo.current +"A\n");
 
-		
-		//((TextView)findViewById(R.id.tvRpm)).setText(""+carInfo.rpm
+        //((TextView)findViewById(R.id.tvRpm)).setText(""+carInfo.rpm
 
-		//((TextView)findViewById(R.id.tvCellsInfo)).setText(cellsVoltage);
-		((TextView)findViewById(R.id.tvCellsInfo)).setText(cellsVoltage);
+        //((TextView)findViewById(R.id.tvCellsInfo)).setText(cellsVoltage);
+        ((TextView) findViewById(R.id.tvCellsInfo)).setText(cellsVoltage);
 
-		((TextView)findViewById(R.id.tvSpeed)).setText(""+ carInfo.getSpeed());
-		((TextView)findViewById(R.id.tvFuelLevel)).setText(""+carInfo.bmsSOC);
-		((TextView)findViewById(R.id.tvTarga)).setText(""+ carInfo.getId());
-		cellsVoltage=cellsVoltage.concat("outAmp: "+ carInfo.getOutAmp() +"A\n");
-		((TextView)findViewById(R.id.tvQuadro)).setText((carInfo.getIsKeyOn() >0)?"ON":"OFF");
-		((TextView)findViewById(R.id.tvFW)).setText(carInfo.getFw_version());
-		//((TextView)findViewById(R.id.tvAvolt)).setText(""+carInfo.analogVoltage);
-		((TextView)findViewById(R.id.tvMvolt)).setText(""+ carInfo.getVoltage());
-		((TextView)findViewById(R.id.tvKm)).setText(""+ carInfo.getKm());
+        ((TextView) findViewById(R.id.tvSpeed)).setText("" + carInfo.getSpeed());
+        ((TextView) findViewById(R.id.tvFuelLevel)).setText("" + carInfo.bmsSOC);
+        ((TextView) findViewById(R.id.tvTarga)).setText("" + carInfo.getId());
+        cellsVoltage = cellsVoltage.concat("outAmp: " + carInfo.getOutAmp() + "A\n");
+        ((TextView) findViewById(R.id.tvQuadro)).setText((carInfo.getIsKeyOn() > 0) ? "ON" : "OFF");
+        ((TextView) findViewById(R.id.tvFW)).setText(carInfo.getFw_version());
+        //((TextView)findViewById(R.id.tvAvolt)).setText(""+carInfo.analogVoltage);
+        ((TextView) findViewById(R.id.tvMvolt)).setText("" + carInfo.getVoltage());
+        ((TextView) findViewById(R.id.tvKm)).setText("" + carInfo.getKm());
 	
 		
 		
@@ -274,238 +260,219 @@ public class ServiceTestActivity extends Activity {
 			((TextView)findViewById(R.id.tvTime)).setText("");
 		}
 		*/
-		
-		
-	}
 
-	private void updateCANData(CarInfo carInfo) {
+    }
 
-		((TextView)findViewById(R.id.tvCarInfo)).setText(carInfo.getJson_GPRS(true));
-		float currVolt=0;
-		String cellsVoltage="";
-		for(int i =0;i<carInfo.cellVoltageValue.length;i++){
-			cellsVoltage=cellsVoltage.concat(" " + carInfo.cellVoltageValue[i]);		//battery cell voltages
-			if ((i+1) % 8 == 0) {
+    private void updateCANData(CarInfo carInfo) {
 
-				cellsVoltage=cellsVoltage.concat("\n");
-			}
-		}
+        ((TextView) findViewById(R.id.tvCarInfo)).setText(carInfo.getJson_GPRS(true));
+        float currVolt = 0;
+        String cellsVoltage = "";
+        for (int i = 0; i < carInfo.cellVoltageValue.length; i++) {
+            cellsVoltage = cellsVoltage.concat(" " + carInfo.cellVoltageValue[i]);        //battery cell voltages
+            if ((i + 1) % 8 == 0) {
 
-		cellsVoltage=cellsVoltage.concat("Battery type: "+ carInfo.batteryType+"\n");
-		cellsVoltage=cellsVoltage.concat("V100%: "+ App.getMax_voltage()+"V\n");
-		cellsVoltage=cellsVoltage.concat("VBATT: "+ carInfo.currVoltage+"V\n");
+                cellsVoltage = cellsVoltage.concat("\n");
+            }
+        }
 
+        cellsVoltage = cellsVoltage.concat("Battery type: " + carInfo.batteryType + "\n");
+        cellsVoltage = cellsVoltage.concat("V100%: " + App.getMax_voltage() + "V\n");
+        cellsVoltage = cellsVoltage.concat("VBATT: " + carInfo.currVoltage + "V\n");
 
+        //cellsVoltage=cellsVoltage.concat("SOC: "+ carInfo.bmsSOC +"%\n");
+        cellsVoltage = cellsVoltage.concat("SOC_GPRS: " + carInfo.bmsSOC_GPRS + "%\n");
+        cellsVoltage = cellsVoltage.concat("SOC2: " + carInfo.virtualSOC + "%\n");
+        cellsVoltage = cellsVoltage.concat("Low voltage cells : " + carInfo.isCellLowVoltage + " (" + carInfo.lowCells + ")\n");
+        cellsVoltage = cellsVoltage.concat("SOCR : " + carInfo.SOCR + "\n");
+        cellsVoltage = cellsVoltage.concat("SOCAdmin: " + carInfo.batteryLevel + "%\n");
+        cellsVoltage = cellsVoltage.concat("outAmp: " + carInfo.getOutAmp() + "A\n");
+        cellsVoltage = cellsVoltage.concat("CurrentAmp: " + carInfo.currentAmpere + "A\n");
+        cellsVoltage = cellsVoltage.concat("ChargingAmp: " + carInfo.chargingAmpere + "A\n");
+        cellsVoltage = cellsVoltage.concat("maxAmp: " + carInfo.maxAmpere + "A\n");
 
-		//cellsVoltage=cellsVoltage.concat("SOC: "+ carInfo.bmsSOC +"%\n");
-		cellsVoltage=cellsVoltage.concat("SOC_GPRS: "+ carInfo.bmsSOC_GPRS +"%\n");
-		cellsVoltage=cellsVoltage.concat("SOC2: "+ carInfo.virtualSOC +"%\n");
-		cellsVoltage=cellsVoltage.concat("Low voltage cells : "+ carInfo.isCellLowVoltage +" ("+ carInfo.lowCells +")\n");
-		cellsVoltage=cellsVoltage.concat("SOCR : "+ carInfo.SOCR +"\n");
-		cellsVoltage=cellsVoltage.concat("SOCAdmin: "+ carInfo.batteryLevel +"%\n");
-		cellsVoltage=cellsVoltage.concat("outAmp: "+ carInfo.getOutAmp() +"A\n");
-		cellsVoltage=cellsVoltage.concat("CurrentAmp: "+ carInfo.currentAmpere +"A\n");
-		cellsVoltage=cellsVoltage.concat("ChargingAmp: "+ carInfo.chargingAmpere +"A\n");
-		cellsVoltage=cellsVoltage.concat("maxAmp: "+ carInfo.maxAmpere +"A\n");
+        //((TextView)findViewById(R.id.tvRpm)).setText(""+carInfo.rpm
 
+        //((TextView)findViewById(R.id.tvCellsInfo)).setText(cellsVoltage);
+        ((TextView) findViewById(R.id.tvCellsInfo)).setText(cellsVoltage);
 
-		//((TextView)findViewById(R.id.tvRpm)).setText(""+carInfo.rpm
+    }
 
-		//((TextView)findViewById(R.id.tvCellsInfo)).setText(cellsVoltage);
-		((TextView)findViewById(R.id.tvCellsInfo)).setText(cellsVoltage);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
+        App.get(this).getComponent().inject(this);
 
+        CanManager = CANManager.get(this);
 
-	}
-	
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+        eventRepository.DiagnosticPage(0);
 
-		App.get(this).getComponent().inject(this);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-		CanManager = CANManager.get(this);
+        getWindow().addFlags(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
-		eventRepository.DiagnosticPage(0);
+        setContentView(R.layout.activity_service);
 
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-				WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        ((TextView) findViewById(R.id.tvVer)).setText(App.sw_Version);
 
-		getWindow().addFlags(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        screenLock = ((PowerManager) getSystemService(POWER_SERVICE)).newWakeLock(
+                PowerManager.ON_AFTER_RELEASE | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "TAG");
 
-		setContentView(R.layout.activity_service);
+        serviceConnector = new ServiceConnector(this, serviceHandler);
 
-		((TextView) findViewById(R.id.tvVer)).setText(App.sw_Version);
+        //serviceConnector.startService();
 
-		screenLock = ((PowerManager) getSystemService(POWER_SERVICE)).newWakeLock(
-				PowerManager.ON_AFTER_RELEASE | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "TAG");
+        serviceConnector.connect(Clients.ServiceTest);
 
+        etPlate = (EditText) findViewById(R.id.etPlate);
+        etPlate.setText(App.CarPlate);
+        etPlate.setFilters(new InputFilter[]{new InputFilter.AllCaps(), new InputFilter.LengthFilter(10)});
 
-		serviceConnector = new ServiceConnector(this, serviceHandler);
+        ((ToggleButton) findViewById(R.id.tbLed1)).setOnCheckedChangeListener(ledToggleListener);
+        ((ToggleButton) findViewById(R.id.tbLed2)).setOnCheckedChangeListener(ledToggleListener);
+        ((ToggleButton) findViewById(R.id.tbLed3)).setOnCheckedChangeListener(ledToggleListener);
+        ((ToggleButton) findViewById(R.id.tbLed4)).setOnCheckedChangeListener(ledToggleListener);
 
-		//serviceConnector.startService();
+        if (App.isAdmin == 1) {                    //MASSIMI PRIVILEGI ATTENZIONE!!!
 
-		serviceConnector.connect(Clients.ServiceTest);
+            findViewById(R.id.DoorsLL).setVisibility(View.VISIBLE);
+            findViewById(R.id.MotorLL).setVisibility(View.VISIBLE);
+            findViewById(R.id.ServerLL).setVisibility(View.VISIBLE);
+            findViewById(R.id.LogLL).setVisibility(View.VISIBLE);
 
+            findViewById(R.id.btnOpen).setOnClickListener(new OnClickListener() {
 
-		etPlate = (EditText) findViewById(R.id.etPlate);
-		etPlate.setText(App.CarPlate);
-		etPlate.setFilters(new InputFilter[]{new InputFilter.AllCaps(), new InputFilter.LengthFilter(10)});
+                @Override
+                public void onClick(View arg0) {
+                    Message msg = MessageFactory.openDoors();
+                    serviceConnector.send(msg);
+                }
 
+            });
 
-		((ToggleButton) findViewById(R.id.tbLed1)).setOnCheckedChangeListener(ledToggleListener);
-		((ToggleButton) findViewById(R.id.tbLed2)).setOnCheckedChangeListener(ledToggleListener);
-		((ToggleButton) findViewById(R.id.tbLed3)).setOnCheckedChangeListener(ledToggleListener);
-		((ToggleButton) findViewById(R.id.tbLed4)).setOnCheckedChangeListener(ledToggleListener);
+            findViewById(R.id.btnClose).setOnClickListener(new OnClickListener() {
 
+                @Override
+                public void onClick(View arg0) {
+                    Message msg = MessageFactory.closeDoors();
+                    serviceConnector.send(msg);
 
-		if (App.isAdmin == 1) {                    //MASSIMI PRIVILEGI ATTENZIONE!!!
+                }
 
+            });
 
-			findViewById(R.id.DoorsLL).setVisibility(View.VISIBLE);
-			findViewById(R.id.MotorLL).setVisibility(View.VISIBLE);
-			findViewById(R.id.ServerLL).setVisibility(View.VISIBLE);
-			findViewById(R.id.LogLL).setVisibility(View.VISIBLE);
+            findViewById(R.id.btnEngineOn).setOnClickListener(new OnClickListener() {
 
+                @Override
+                public void onClick(View arg0) {
+                    Message msg = MessageFactory.setEngine(true);
+                    serviceConnector.send(msg);
 
-			findViewById(R.id.btnOpen).setOnClickListener(new OnClickListener() {
+                }
 
-				@Override
-				public void onClick(View arg0) {
-					Message msg = MessageFactory.openDoors();
-					serviceConnector.send(msg);
-				}
+            });
 
-			});
+            findViewById(R.id.btnEngineOff).setOnClickListener(new OnClickListener() {
 
+                @Override
+                public void onClick(View arg0) {
+                    Message msg = MessageFactory.setEngine(false);
+                    serviceConnector.send(msg);
+                }
 
-			findViewById(R.id.btnClose).setOnClickListener(new OnClickListener() {
+            });
 
-				@Override
-				public void onClick(View arg0) {
-					Message msg = MessageFactory.closeDoors();
-					serviceConnector.send(msg);
+            findViewById(R.id.btnAltIP).setOnClickListener(new OnClickListener() {
 
-				}
+                @Override
+                public void onClick(View arg0) {
+                    Message msg = MessageFactory.useAlternativeIP();
+                    serviceConnector.send(msg);
+                }
 
-			});
+            });
 
+            findViewById(R.id.btnDefIP).setOnClickListener(new OnClickListener() {
 
-			findViewById(R.id.btnEngineOn).setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    Message msg = MessageFactory.useDefaultIP();
+                    serviceConnector.send(msg);
+                }
 
-				@Override
-				public void onClick(View arg0) {
-					Message msg = MessageFactory.setEngine(true);
-					serviceConnector.send(msg);
+            });
 
-				}
+            findViewById(R.id.btnLogY).setOnClickListener(new OnClickListener() {
 
-			});
+                @Override
+                public void onClick(View arg0) {
+                    Message msg = MessageFactory.enableLog();
+                    serviceConnector.send(msg);
+                }
 
-			findViewById(R.id.btnEngineOff).setOnClickListener(new OnClickListener() {
+            });
+            findViewById(R.id.btnKeyY).setOnClickListener(new OnClickListener() {
 
-				@Override
-				public void onClick(View arg0) {
-					Message msg = MessageFactory.setEngine(false);
-					serviceConnector.send(msg);
-				}
+                public void onClick(View arg0) {
+                    dlog.i("pulsante cliccato");
+                    Toast.makeText(ServiceTestActivity.this, "check key abilitato", Toast.LENGTH_SHORT).show();
+                    Message msg = MessageFactory.enableKeycheck();
+                    serviceConnector.send(msg);
+                }
 
-			});
+            });
+            findViewById(R.id.btnKeyN).setOnClickListener(new OnClickListener() {
 
-			findViewById(R.id.btnAltIP).setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    Toast.makeText(ServiceTestActivity.this, "check key disabilitato", Toast.LENGTH_SHORT).show();
+                    Message msg = MessageFactory.disableKeycheck();
+                    serviceConnector.send(msg);
+                }
 
-				@Override
-				public void onClick(View arg0) {
-					Message msg = MessageFactory.useAlternativeIP();
-					serviceConnector.send(msg);
-				}
+            });
 
-			});
+            findViewById(R.id.btnlogN).setOnClickListener(new OnClickListener() {
 
-			findViewById(R.id.btnDefIP).setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    Message msg = MessageFactory.disableLog();
+                    serviceConnector.send(msg);
+                }
 
-				@Override
-				public void onClick(View arg0) {
-					Message msg = MessageFactory.useDefaultIP();
-					serviceConnector.send(msg);
-				}
+            });
 
-			});
+        } else {
+            findViewById(R.id.btnKeyY).setOnClickListener(new OnClickListener() {
 
-			findViewById(R.id.btnLogY).setOnClickListener(new OnClickListener() {
+                public void onClick(View arg0) {
+                    dlog.i("pulsante cliccato");
+                    Toast.makeText(ServiceTestActivity.this, "check key abilitato", Toast.LENGTH_SHORT).show();
+                    Message msg = MessageFactory.enableKeycheck();
+                    serviceConnector.send(msg);
+                }
 
-				@Override
-				public void onClick(View arg0) {
-					Message msg = MessageFactory.enableLog();
-					serviceConnector.send(msg);
-				}
+            });
+            findViewById(R.id.btnKeyN).setOnClickListener(new OnClickListener() {
 
-			});
-			findViewById(R.id.btnKeyY).setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    Toast.makeText(ServiceTestActivity.this, "check key disabilitato", Toast.LENGTH_SHORT).show();
+                    Message msg = MessageFactory.disableKeycheck();
+                    serviceConnector.send(msg);
+                }
 
+            });
 
-				public void onClick(View arg0) {
-					dlog.i("pulsante cliccato");
-					Toast.makeText(ServiceTestActivity.this, "check key abilitato", Toast.LENGTH_SHORT).show();
-					Message msg = MessageFactory.enableKeycheck();
-					serviceConnector.send(msg);
-				}
-
-			});
-			findViewById(R.id.btnKeyN).setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View arg0) {
-					Toast.makeText(ServiceTestActivity.this, "check key disabilitato", Toast.LENGTH_SHORT).show();
-					Message msg = MessageFactory.disableKeycheck();
-					serviceConnector.send(msg);
-				}
-
-			});
-
-			findViewById(R.id.btnlogN).setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View arg0) {
-					Message msg = MessageFactory.disableLog();
-					serviceConnector.send(msg);
-				}
-
-			});
-
-
-
-
-		} else {
-			findViewById(R.id.btnKeyY).setOnClickListener(new OnClickListener() {
-
-
-				public void onClick(View arg0) {
-					dlog.i("pulsante cliccato");
-					Toast.makeText(ServiceTestActivity.this, "check key abilitato", Toast.LENGTH_SHORT).show();
-					Message msg = MessageFactory.enableKeycheck();
-					serviceConnector.send(msg);
-				}
-
-			});
-			findViewById(R.id.btnKeyN).setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View arg0) {
-					Toast.makeText(ServiceTestActivity.this, "check key disabilitato", Toast.LENGTH_SHORT).show();
-					Message msg = MessageFactory.disableKeycheck();
-					serviceConnector.send(msg);
-				}
-
-			});
-
-			findViewById(R.id.DoorsLL).setVisibility(View.GONE);
-			findViewById(R.id.MotorLL).setVisibility(View.GONE);
-			findViewById(R.id.ServerLL).setVisibility(View.GONE);
-			findViewById(R.id.LogLL).setVisibility(View.GONE);
-			findViewById(R.id.TestLeaseLL).setVisibility(View.VISIBLE);
-		}
+            findViewById(R.id.DoorsLL).setVisibility(View.GONE);
+            findViewById(R.id.MotorLL).setVisibility(View.GONE);
+            findViewById(R.id.ServerLL).setVisibility(View.GONE);
+            findViewById(R.id.LogLL).setVisibility(View.GONE);
+            findViewById(R.id.TestLeaseLL).setVisibility(View.VISIBLE);
+        }
 
     	
     	/*
@@ -542,26 +509,25 @@ public class ServiceTestActivity extends Activity {
     	
     	*/
 
-		findViewById(R.id.btnGPRS).setOnClickListener(new OnClickListener() {
+        findViewById(R.id.btnGPRS).setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View arg0) {
+            @Override
+            public void onClick(View arg0) {
 
-				findViewById(R.id.BodyLL).setVisibility(View.VISIBLE);
-				findViewById(R.id.CellsLL).setVisibility(View.GONE);
+                findViewById(R.id.BodyLL).setVisibility(View.VISIBLE);
+                findViewById(R.id.CellsLL).setVisibility(View.GONE);
 
+            }
 
-			}
+        });
 
-		});
+        findViewById(R.id.btnCells).setOnClickListener(new OnClickListener() {
 
-		findViewById(R.id.btnCells).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
 
-			@Override
-			public void onClick(View arg0) {
-
-				findViewById(R.id.BodyLL).setVisibility(View.GONE);
-				findViewById(R.id.CellsLL).setVisibility(View.VISIBLE);
+                findViewById(R.id.BodyLL).setVisibility(View.GONE);
+                findViewById(R.id.CellsLL).setVisibility(View.VISIBLE);
 
 
 					/*String cellsVoltage="";
@@ -570,48 +536,46 @@ public class ServiceTestActivity extends Activity {
 					}
 					((TextView)findViewById(R.id.tvCellsInfo)).setText(cellsVoltage);*/
 
+            }
 
-			}
+        });
 
-		});
+        findViewById(R.id.btnSet).setOnClickListener(new OnClickListener() {
 
-		findViewById(R.id.btnSet).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!etPlate.isEnabled()) {
+                    etPlate.setEnabled(true);
+                    etPlate.setFocusable(true);
+                    etPlate.setFocusableInTouchMode(true);
+                    etPlate.requestFocus();
+                } else {
+                    String plate = etPlate.getText().toString();
+                    Message msg = MessageFactory.setPlate(plate);
+                    serviceConnector.send(msg);
+                    Toast.makeText(ServiceTestActivity.this, "Set new plate id  to : '" + plate + "'", Toast.LENGTH_LONG).show();
+                    etPlate.setEnabled(false);
+                    etPlate.setFocusable(false);
+                    findViewById(R.id.btnGo).requestFocus();
+                }
+            }
+        });
 
-			@Override
-			public void onClick(View v) {
-				if (!etPlate.isEnabled()) {
-					etPlate.setEnabled(true);
-					etPlate.setFocusable(true);
-					etPlate.setFocusableInTouchMode(true);
-					etPlate.requestFocus();
-				} else {
-					String plate = etPlate.getText().toString();
-					Message msg = MessageFactory.setPlate(plate);
-					serviceConnector.send(msg);
-					Toast.makeText(ServiceTestActivity.this, "Set new plate id  to : '" + plate + "'", Toast.LENGTH_LONG).show();
-					etPlate.setEnabled(false);
-					etPlate.setFocusable(false);
-					findViewById(R.id.btnGo).requestFocus();
-				}
-			}
-		});
+        findViewById(R.id.btnSettings).setOnClickListener(new OnClickListener() {
 
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(android.provider.Settings.ACTION_SETTINGS), 0);
+            }
+        });
 
-		findViewById(R.id.btnSettings).setOnClickListener(new OnClickListener() {
+        findViewById(R.id.btnGo).setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				startActivityForResult(new Intent(android.provider.Settings.ACTION_SETTINGS), 0);
-			}
-		});
-
-		findViewById(R.id.btnGo).setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				serviceConnector.unregister();
-				ServiceTestActivity.this.finish();
-				//startActivity(new Intent(ServiceTestActivity.this, AWelcome.class));
+            @Override
+            public void onClick(View arg0) {
+                serviceConnector.unregister();
+                ServiceTestActivity.this.finish();
+                //startActivity(new Intent(ServiceTestActivity.this, AWelcome.class));
 
 
 			    /*
@@ -624,62 +588,59 @@ public class ServiceTestActivity extends Activity {
 				}
 			    */
 
+            }
 
-			}
+        });
 
-		});
+        findViewById(R.id.btnLcd).setOnClickListener(new OnClickListener() {
 
+            @Override
+            public void onClick(View v) {
+                Message msg = MessageFactory.setDisplayStatus(false);
+                serviceConnector.send(msg);
+                ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
 
-		findViewById(R.id.btnLcd).setOnClickListener(new OnClickListener() {
+                worker.schedule(new Runnable() {
 
-			@Override
-			public void onClick(View v) {
-				Message msg = MessageFactory.setDisplayStatus(false);
-				serviceConnector.send(msg);
-				ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
+                    @Override
+                    public void run() {
+                        Message msg = MessageFactory.setDisplayStatus(true);
+                        serviceConnector.send(msg);
+                    }
 
-				worker.schedule(new Runnable() {
+                }, 30, TimeUnit.SECONDS);
+            }
+        });
 
-					@Override
-					public void run() {
-						Message msg = MessageFactory.setDisplayStatus(true);
-						serviceConnector.send(msg);
-					}
+        findViewById(R.id.btnRadio).setOnClickListener(new OnClickListener() {
 
-				}, 30, TimeUnit.SECONDS);
-			}
-		});
-
-		findViewById(R.id.btnRadio).setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
 //				if (!SystemControl.hasNetworkConnection(getApplicationContext()))
 //					SystemControl.Reset3G(null);
 
-				//Message  msg = MessageFactory.zmqRestart();
-				//serviceConnector.send(msg);
+                //Message  msg = MessageFactory.zmqRestart();
+                //serviceConnector.send(msg);
 
-				Intent startMain = new Intent(Intent.ACTION_MAIN);
-				startMain.addCategory(Intent.CATEGORY_HOME);
-				startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(startMain);
+                Intent startMain = new Intent(Intent.ACTION_MAIN);
+                startMain.addCategory(Intent.CATEGORY_HOME);
+                startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(startMain);
 
-			}
-		});
+            }
+        });
 
-		findViewById(R.id.btnTestLease).setOnClickListener(new OnClickListener() {
+        findViewById(R.id.btnTestLease).setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View arg0) {
-				askLeaseCard();
-			}
+            @Override
+            public void onClick(View arg0) {
+                askLeaseCard();
+            }
 
-		});
+        });
 
-
-		findViewById(R.id.btnGo).requestFocus();
-		etPlate.setFocusable(false);
+        findViewById(R.id.btnGo).requestFocus();
+        etPlate.setFocusable(false);
 
 //	    if (Build.DEVICE.equalsIgnoreCase("tiny4412")) {
 //			  UsbSerialConnection usc = new UsbSerialConnection();
@@ -687,97 +648,91 @@ public class ServiceTestActivity extends Activity {
 //			  usc.startIntentFilter(ServiceTestActivity.this);
 //	    }	  
 
-	}
+    }
 
+    private void askLeaseCard() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-	private void askLeaseCard() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Inserire hex della Card");
 
+        // Add edit text for password input
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
 
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String hex = input.getText().toString();
 
-		builder.setTitle("Inserire hex della Card");
+                dlog.i("onLeaseReportCard : " + ", hex=" + hex);
+                serviceConnector.send(MessageFactory.sendDebugCard(hex));
 
-		// Add edit text for password input
-		final EditText input = new EditText(this);
-		input.setInputType(InputType.TYPE_CLASS_TEXT );
-		builder.setView(input);
+            }
+        });
+        builder.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
 
-		// Set up the buttons
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				String hex =  input.getText().toString();
+        builder.show();
+    }
 
-				dlog.i("onLeaseReportCard : " + ", hex="+hex);
-				serviceConnector.send(MessageFactory.sendDebugCard(hex));
+    private OnCheckedChangeListener ledToggleListener =
+            new OnCheckedChangeListener() {
 
-			}
-		});
-		builder.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
+                @Override
+                public void onCheckedChanged(CompoundButton tb, boolean value) {
+                    int led = 0;
+                    switch (tb.getId()) {
+                        case R.id.tbLed1:
+                            ((ToggleButton) findViewById(R.id.tbLed2)).setChecked(false);
+                            ((ToggleButton) findViewById(R.id.tbLed3)).setChecked(false);
+                            ((ToggleButton) findViewById(R.id.tbLed4)).setChecked(false);
+                            led = MessageFactory.LED_GREEN;
+                            break;
+                        case R.id.tbLed2:
+                            ((ToggleButton) findViewById(R.id.tbLed1)).setChecked(false);
+                            ((ToggleButton) findViewById(R.id.tbLed3)).setChecked(false);
+                            ((ToggleButton) findViewById(R.id.tbLed4)).setChecked(false);
 
-		builder.show();
-	}
+                            led = MessageFactory.LED_YELLOW;
+                            break;
+                        case R.id.tbLed3:
+                            ((ToggleButton) findViewById(R.id.tbLed1)).setChecked(false);
+                            ((ToggleButton) findViewById(R.id.tbLed2)).setChecked(false);
+                            ((ToggleButton) findViewById(R.id.tbLed4)).setChecked(false);
+                            led = MessageFactory.LED_BLUE;
+                            break;
+                        case R.id.tbLed4:
+                            ((ToggleButton) findViewById(R.id.tbLed1)).setChecked(false);
+                            ((ToggleButton) findViewById(R.id.tbLed2)).setChecked(false);
+                            ((ToggleButton) findViewById(R.id.tbLed3)).setChecked(false);
+                            led = MessageFactory.LED_RED;
+                            break;
 
+                    }
 
-	private OnCheckedChangeListener  ledToggleListener =	
-			new OnCheckedChangeListener() {
-		
-				@Override
-				public void onCheckedChanged(CompoundButton tb , boolean value) {				
-					int led=0;
-					switch (tb.getId()) {
-					case R.id.tbLed1 :
-						((ToggleButton)findViewById(R.id.tbLed2)).setChecked(false);
-						((ToggleButton)findViewById(R.id.tbLed3)).setChecked(false);
-						((ToggleButton)findViewById(R.id.tbLed4)).setChecked(false);
-						led=MessageFactory.LED_GREEN;
-						break;
-					case R.id.tbLed2 :
-						((ToggleButton)findViewById(R.id.tbLed1)).setChecked(false);
-						((ToggleButton)findViewById(R.id.tbLed3)).setChecked(false);
-						((ToggleButton)findViewById(R.id.tbLed4)).setChecked(false);
-						
-						led=MessageFactory.LED_YELLOW;
-						break;
-					case R.id.tbLed3 :
-						((ToggleButton)findViewById(R.id.tbLed1)).setChecked(false);
-						((ToggleButton)findViewById(R.id.tbLed2)).setChecked(false);
-						((ToggleButton)findViewById(R.id.tbLed4)).setChecked(false);						
-						led=MessageFactory.LED_BLUE;
-						break;
-					case R.id.tbLed4 :
-						((ToggleButton)findViewById(R.id.tbLed1)).setChecked(false);
-						((ToggleButton)findViewById(R.id.tbLed2)).setChecked(false);
-						((ToggleButton)findViewById(R.id.tbLed3)).setChecked(false);						
-						led=MessageFactory.LED_RED;
-						break;
-						
-						
-					}
-					
-					Message  msg = MessageFactory.setLed(led, value?MessageFactory.LED_ON:MessageFactory.LED_OFF);
-					serviceConnector.send(msg);		
-				}
-				
-			};
-	
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		screenLock.acquire();
-		
-		serviceConnector.send(MessageFactory.setDisplayStatus(true));
-		
-		App.setForegroundActivity(this);
-		
+                    Message msg = MessageFactory.setLed(led, value ? MessageFactory.LED_ON : MessageFactory.LED_OFF);
+                    serviceConnector.send(msg);
+                }
+
+            };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        screenLock.acquire();
+
+        serviceConnector.send(MessageFactory.setDisplayStatus(true));
+
+        App.setForegroundActivity(this);
+
         getWindow().addFlags(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        
+
         getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(
                 new OnSystemUiVisibilityChangeListener() {
                     @Override
@@ -797,36 +752,27 @@ public class ServiceTestActivity extends Activity {
                         }
                     }
                 });
-	}
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
 
-	@Override
-	protected void onPause() {
-		super.onPause();
+        App.setForegroundActivity(this.getClass().toString() + "Pause");
 
-		App.setForegroundActivity(this.getClass().toString() +"Pause");
+        if (screenLock.isHeld())
+            screenLock.release();
 
-		if(screenLock.isHeld())
-				screenLock.release();
-		
-		serviceConnector.send(MessageFactory.setDisplayStatus(false));
-	}
-	
-	
-	@Override 
-	public void onDestroy() {
-		super.onDestroy();
-		App.isAdmin=0;
-		serviceConnector.unregister();
-		serviceConnector.disconnect();
+        serviceConnector.send(MessageFactory.setDisplayStatus(false));
+    }
 
-		
-		
-	}
-	
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        App.isAdmin = 0;
+        serviceConnector.unregister();
+        serviceConnector.disconnect();
 
+    }
 
-	
-
-	
 }

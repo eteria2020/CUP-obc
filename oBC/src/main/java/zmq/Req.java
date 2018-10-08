@@ -19,8 +19,7 @@
 
 package zmq;
 
-public class Req extends Dealer
-{
+public class Req extends Dealer {
     //  If true, request was already sent and reply wasn't received yet or
     //  was raceived partially.
     private boolean receivingReply;
@@ -29,8 +28,7 @@ public class Req extends Dealer
     //  of the message must be empty message part (backtrace stack bottom).
     private boolean messageBegins;
 
-    public Req(Ctx parent, int tid, int sid)
-    {
+    public Req(Ctx parent, int tid, int sid) {
         super(parent, tid, sid);
 
         receivingReply = false;
@@ -39,8 +37,7 @@ public class Req extends Dealer
     }
 
     @Override
-    public boolean xsend(Msg msg)
-    {
+    public boolean xsend(Msg msg) {
         //  If we've sent a request and we still haven't got the reply,
         //  we can't send another request.
         if (receivingReply) {
@@ -76,8 +73,7 @@ public class Req extends Dealer
     }
 
     @Override
-    protected Msg xrecv()
-    {
+    protected Msg xrecv() {
         //  If request wasn't send, we can't wait for reply.
         if (!receivingReply) {
             errno.set(ZError.EFSM);
@@ -122,21 +118,18 @@ public class Req extends Dealer
     }
 
     @Override
-    public boolean xhasIn()
-    {
+    public boolean xhasIn() {
         //  TODO: Duplicates should be removed here.
 
         return receivingReply && super.xhasIn();
     }
 
     @Override
-    public boolean xhasOut()
-    {
+    public boolean xhasOut() {
         return !receivingReply && super.xhasOut();
     }
 
-    public static class ReqSession extends Dealer.DealerSession
-    {
+    public static class ReqSession extends Dealer.DealerSession {
         enum State {
             IDENTITY,
             BOTTOM,
@@ -146,46 +139,43 @@ public class Req extends Dealer
         private State state;
 
         public ReqSession(IOThread ioThread, boolean connect,
-            SocketBase socket, final Options options,
-            final Address addr)
-        {
+                          SocketBase socket, final Options options,
+                          final Address addr) {
             super(ioThread, connect, socket, options, addr);
 
             state = State.IDENTITY;
         }
 
         @Override
-        public int pushMsg(Msg msg)
-        {
+        public int pushMsg(Msg msg) {
             switch (state) {
-            case BOTTOM:
-                if (msg.hasMore() && msg.size() == 0) {
-                    state = State.BODY;
-                    return super.pushMsg(msg);
-                }
-                break;
-            case BODY:
-                if (msg.hasMore()) {
-                    return super.pushMsg(msg);
-                }
-                if (msg.flags() == 0) {
-                    state = State.BOTTOM;
-                    return super.pushMsg(msg);
-                }
-                break;
-            case IDENTITY:
-                if (msg.flags() == 0) {
-                    state = State.BOTTOM;
-                    return super.pushMsg(msg);
-                }
-                break;
+                case BOTTOM:
+                    if (msg.hasMore() && msg.size() == 0) {
+                        state = State.BODY;
+                        return super.pushMsg(msg);
+                    }
+                    break;
+                case BODY:
+                    if (msg.hasMore()) {
+                        return super.pushMsg(msg);
+                    }
+                    if (msg.flags() == 0) {
+                        state = State.BOTTOM;
+                        return super.pushMsg(msg);
+                    }
+                    break;
+                case IDENTITY:
+                    if (msg.flags() == 0) {
+                        state = State.BOTTOM;
+                        return super.pushMsg(msg);
+                    }
+                    break;
             }
             socket.errno.set(ZError.EFAULT);
             return -1;
         }
 
-        public void reset()
-        {
+        public void reset() {
             super.reset();
             state = State.IDENTITY;
         }

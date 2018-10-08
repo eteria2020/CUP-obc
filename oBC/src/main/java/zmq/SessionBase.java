@@ -23,9 +23,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 class SessionBase extends Own implements
-                        Pipe.IPipeEvents, IPollEvents,
-                        IMsgSink, IMsgSource
-{
+        Pipe.IPipeEvents, IPollEvents,
+        IMsgSink, IMsgSource {
     //  If true, this session (re)connects to the peer. Otherwise, it's
     //  a transient session created by the listener.
     private boolean connect;
@@ -70,63 +69,61 @@ class SessionBase extends Own implements
     private IOObject ioObject;
 
     public static SessionBase create(IOThread ioThread, boolean connect,
-            SocketBase socket, Options options, Address addr)
-    {
+                                     SocketBase socket, Options options, Address addr) {
         SessionBase s = null;
         switch (options.type) {
-        case ZMQ.ZMQ_REQ:
-            s = new  Req.ReqSession(ioThread, connect,
-                socket, options, addr);
-            break;
-        case ZMQ.ZMQ_DEALER:
-            s = new Dealer.DealerSession(ioThread, connect,
-                socket, options, addr);
-            break;
-        case ZMQ.ZMQ_REP:
-            s = new Rep.RepSession(ioThread, connect,
-                socket, options, addr);
-            break;
-        case ZMQ.ZMQ_ROUTER:
-            s = new Router.RouterSession(ioThread, connect,
-                socket, options, addr);
-            break;
-        case ZMQ.ZMQ_PUB:
-            s = new Pub.PubSession(ioThread, connect,
-                socket, options, addr);
-            break;
-        case ZMQ.ZMQ_XPUB:
-            s = new XPub.XPubSession(ioThread, connect,
-                socket, options, addr);
-            break;
-        case ZMQ.ZMQ_SUB:
-            s = new  Sub.SubSession(ioThread, connect,
-                socket, options, addr);
-            break;
-        case ZMQ.ZMQ_XSUB:
-            s = new XSub.XSubSession(ioThread, connect,
-                socket, options, addr);
-            break;
-        case ZMQ.ZMQ_PUSH:
-            s = new Push.PushSession(ioThread, connect,
-                socket, options, addr);
-            break;
-        case ZMQ.ZMQ_PULL:
-            s = new Pull.PullSession(ioThread, connect,
-                socket, options, addr);
-            break;
-        case ZMQ.ZMQ_PAIR:
-            s = new Pair.PairSession(ioThread, connect,
-                socket, options, addr);
-            break;
-        default:
-            throw new IllegalArgumentException("type=" + options.type);
+            case ZMQ.ZMQ_REQ:
+                s = new Req.ReqSession(ioThread, connect,
+                        socket, options, addr);
+                break;
+            case ZMQ.ZMQ_DEALER:
+                s = new Dealer.DealerSession(ioThread, connect,
+                        socket, options, addr);
+                break;
+            case ZMQ.ZMQ_REP:
+                s = new Rep.RepSession(ioThread, connect,
+                        socket, options, addr);
+                break;
+            case ZMQ.ZMQ_ROUTER:
+                s = new Router.RouterSession(ioThread, connect,
+                        socket, options, addr);
+                break;
+            case ZMQ.ZMQ_PUB:
+                s = new Pub.PubSession(ioThread, connect,
+                        socket, options, addr);
+                break;
+            case ZMQ.ZMQ_XPUB:
+                s = new XPub.XPubSession(ioThread, connect,
+                        socket, options, addr);
+                break;
+            case ZMQ.ZMQ_SUB:
+                s = new Sub.SubSession(ioThread, connect,
+                        socket, options, addr);
+                break;
+            case ZMQ.ZMQ_XSUB:
+                s = new XSub.XSubSession(ioThread, connect,
+                        socket, options, addr);
+                break;
+            case ZMQ.ZMQ_PUSH:
+                s = new Push.PushSession(ioThread, connect,
+                        socket, options, addr);
+                break;
+            case ZMQ.ZMQ_PULL:
+                s = new Pull.PullSession(ioThread, connect,
+                        socket, options, addr);
+                break;
+            case ZMQ.ZMQ_PAIR:
+                s = new Pair.PairSession(ioThread, connect,
+                        socket, options, addr);
+                break;
+            default:
+                throw new IllegalArgumentException("type=" + options.type);
         }
         return s;
     }
 
     public SessionBase(IOThread ioThread, boolean connect,
-            SocketBase socket, Options options, Address addr)
-    {
+                       SocketBase socket, Options options, Address addr) {
         super(ioThread, options);
         ioObject = new IOObject(ioThread);
 
@@ -146,8 +143,7 @@ class SessionBase extends Own implements
     }
 
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         assert (pipe == null);
 
         //  If there's still a pending linger timer, remove it.
@@ -163,8 +159,7 @@ class SessionBase extends Own implements
     }
 
     //  To be used once only, when creating the session.
-    public void attachPipe(Pipe pipe)
-    {
+    public void attachPipe(Pipe pipe) {
         assert (!isTerminating());
         assert (this.pipe == null);
         assert (pipe != null);
@@ -172,8 +167,7 @@ class SessionBase extends Own implements
         this.pipe.setEventSink(this);
     }
 
-    public Msg pullMsg()
-    {
+    public Msg pullMsg() {
         //  First message to send is identity
         if (!identitySent) {
             Msg msg = new Msg(options.identitySize);
@@ -199,8 +193,7 @@ class SessionBase extends Own implements
     }
 
     @Override
-    public int pushMsg(Msg msg)
-    {
+    public int pushMsg(Msg msg) {
         //  First message to receive is identity (if required).
         if (!identityReceived) {
             msg.setFlags(Msg.IDENTITY);
@@ -218,15 +211,13 @@ class SessionBase extends Own implements
         return ZError.EAGAIN;
     }
 
-    protected void reset()
-    {
+    protected void reset() {
         //  Restore identity flags.
         identitySent = false;
         identityReceived = false;
     }
 
-    public void flush()
-    {
+    public void flush() {
         if (pipe != null) {
             pipe.flush();
         }
@@ -234,8 +225,7 @@ class SessionBase extends Own implements
 
     //  Remove any half processed messages. Flush unflushed messages.
     //  Call this function when engine disconnect to get rid of leftovers.
-    private void cleanPipes()
-    {
+    private void cleanPipes() {
         if (pipe != null) {
             //  Get rid of half-processed messages in the out pipe. Flush any
             //  unflushed messages upstream.
@@ -255,8 +245,7 @@ class SessionBase extends Own implements
     }
 
     @Override
-    public void pipeTerminated(Pipe pipe)
-    {
+    public void pipeTerminated(Pipe pipe) {
         //  Drop the reference to the deallocated pipe.
         assert (this.pipe == pipe || terminatingPipes.contains(pipe));
 
@@ -267,8 +256,7 @@ class SessionBase extends Own implements
                 ioObject.cancelTimer(LINGER_TIMER_ID);
                 hasLingerTimer = false;
             }
-        }
-        else {
+        } else {
             // Remove the pipe from the detached pipes set
             terminatingPipes.remove(pipe);
         }
@@ -283,8 +271,7 @@ class SessionBase extends Own implements
     }
 
     @Override
-    public void readActivated(Pipe pipe)
-    {
+    public void readActivated(Pipe pipe) {
         // Skip activating if we're detaching this pipe
         if (this.pipe != pipe) {
             assert (terminatingPipes.contains(pipe));
@@ -293,15 +280,13 @@ class SessionBase extends Own implements
 
         if (engine != null) {
             engine.activateOut();
-        }
-        else {
+        } else {
             this.pipe.checkRead();
         }
     }
 
     @Override
-    public void writeActivated(Pipe pipe)
-    {
+    public void writeActivated(Pipe pipe) {
         // Skip activating if we're detaching this pipe
         if (this.pipe != pipe) {
             assert (terminatingPipes.contains(pipe));
@@ -314,22 +299,19 @@ class SessionBase extends Own implements
     }
 
     @Override
-    public void hiccuped(Pipe pipe)
-    {
+    public void hiccuped(Pipe pipe) {
         //  Hiccups are always sent from session to socket, not the other
         //  way round.
         throw new UnsupportedOperationException("Must Override");
 
     }
 
-    public SocketBase getSocket()
-    {
+    public SocketBase getSocket() {
         return socket;
     }
 
     @Override
-    protected void processPlug()
-    {
+    protected void processPlug() {
         ioObject.setHandler(this);
         if (connect) {
             startConnecting(false);
@@ -337,8 +319,7 @@ class SessionBase extends Own implements
     }
 
     @Override
-    protected void processAttach(IEngine engine)
-    {
+    protected void processAttach(IEngine engine) {
         assert (engine != null);
 
         //  Create the pipe if it does not exist yet.
@@ -366,8 +347,7 @@ class SessionBase extends Own implements
         this.engine.plug(ioThread, this);
     }
 
-    public void detach()
-    {
+    public void detach() {
         //  Engine is dead. Let's forget about it.
         engine = null;
 
@@ -383,8 +363,7 @@ class SessionBase extends Own implements
         }
     }
 
-    protected void processTerm(int linger)
-    {
+    protected void processTerm(int linger) {
         assert (!pending);
 
         //  If the termination of the pipe happens before the term command is
@@ -419,8 +398,7 @@ class SessionBase extends Own implements
     }
 
     @Override
-    public void timerEvent(int id)
-    {
+    public void timerEvent(int id) {
         //  Linger period expired. We can proceed with termination even though
         //  there are still pending messages to be sent.
         assert (id == LINGER_TIMER_ID);
@@ -431,8 +409,7 @@ class SessionBase extends Own implements
         pipe.terminate(false);
     }
 
-    private void detached()
-    {
+    private void detached() {
         //  Transient session self-destructs after peer disconnects.
         if (!connect) {
             terminate();
@@ -442,7 +419,7 @@ class SessionBase extends Own implements
         //  For delayed connect situations, terminate the pipe
         //  and reestablish later on
         if (pipe != null && options.delayAttachOnConnect == 1
-            && !addr.protocol().equals("pgm") && !addr.protocol().equals("epgm")) {
+                && !addr.protocol().equals("pgm") && !addr.protocol().equals("epgm")) {
             pipe.hiccup();
             pipe.terminate(false);
             terminatingPipes.add(pipe);
@@ -463,8 +440,7 @@ class SessionBase extends Own implements
         }
     }
 
-    private void startConnecting(boolean wait)
-    {
+    private void startConnecting(boolean wait) {
         assert (connect);
 
         //  Choose I/O thread to run connecter in. Given that we are already
@@ -476,14 +452,14 @@ class SessionBase extends Own implements
 
         if (addr.protocol().equals("tcp")) {
             TcpConnecter connecter = new TcpConnecter(
-                ioThread, this, options, addr, wait);
+                    ioThread, this, options, addr, wait);
             launchChild(connecter);
             return;
         }
 
         if (addr.protocol().equals("ipc")) {
             IpcConnecter connecter = new IpcConnecter(
-                ioThread, this, options, addr, wait);
+                    ioThread, this, options, addr, wait);
             launchChild(connecter);
             return;
         }
@@ -492,32 +468,27 @@ class SessionBase extends Own implements
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return super.toString() + "[" + options.socketId + "]";
     }
 
     @Override
-    public void inEvent()
-    {
+    public void inEvent() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void outEvent()
-    {
+    public void outEvent() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void connectEvent()
-    {
+    public void connectEvent() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void acceptEvent()
-    {
+    public void acceptEvent() {
         throw new UnsupportedOperationException();
     }
 }

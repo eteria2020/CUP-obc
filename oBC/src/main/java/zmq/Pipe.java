@@ -22,13 +22,14 @@ package zmq;
 //  Note that pipe can be stored in three different arrays.
 //  The array of inbound pipes (1), the array of outbound pipes (2) and
 //  the generic array of pipes to deallocate (3).
-class Pipe extends ZObject
-{
-    interface IPipeEvents
-    {
+class Pipe extends ZObject {
+    interface IPipeEvents {
         void readActivated(Pipe pipe);
+
         void writeActivated(Pipe pipe);
+
         void hiccuped(Pipe pipe);
+
         void pipeTerminated(Pipe pipe);
     }
 
@@ -77,6 +78,7 @@ class Pipe extends ZObject
         TERMINATED,
         DOUBLE_TERMINATED
     }
+
     private State state;
 
     //  If true, we receive all the pending inbound messages before
@@ -93,8 +95,7 @@ class Pipe extends ZObject
     //  Constructor is private. Pipe can only be created using
     //  pipepair function.
     private Pipe(ZObject parent, YPipe<Msg> inpipe, YPipe<Msg> outpipe,
-              int inhwm, int outhwm, boolean delay)
-    {
+                 int inhwm, int outhwm, boolean delay) {
         super(parent);
         this.inpipe = inpipe;
         this.outpipe = outpipe;
@@ -120,8 +121,7 @@ class Pipe extends ZObject
     //  pipe receives all the pending messages before terminating, otherwise it
     //  terminates straight away.
     public static void pipepair(ZObject[] parents, Pipe[] pipes, int[] hwms,
-            boolean[] delays)
-    {
+                                boolean[] delays) {
         //   Creates two pipe objects. These objects are connected by two ypipes,
         //   each to pass messages in one direction.
 
@@ -129,9 +129,9 @@ class Pipe extends ZObject
         YPipe<Msg> upipe2 = new YPipe<Msg>(Config.MESSAGE_PIPE_GRANULARITY.getValue());
 
         pipes[0] = new Pipe(parents[0], upipe1, upipe2,
-            hwms[1], hwms[0], delays[0]);
+                hwms[1], hwms[0], delays[0]);
         pipes[1] = new Pipe(parents[1], upipe2, upipe1,
-            hwms[0], hwms[1], delays[1]);
+                hwms[0], hwms[1], delays[1]);
 
         pipes[0].setPeer(pipes[1]);
         pipes[1].setPeer(pipes[0]);
@@ -140,34 +140,29 @@ class Pipe extends ZObject
 
     //  Pipepair uses this function to let us know about
     //  the peer pipe object.
-    private void setPeer(Pipe peer)
-    {
+    private void setPeer(Pipe peer) {
         //  Peer can be set once only.
         assert (peer != null);
         this.peer = peer;
     }
 
     //  Specifies the object to send events to.
-    public void setEventSink(IPipeEvents sink)
-    {
+    public void setEventSink(IPipeEvents sink) {
         assert (this.sink == null);
         this.sink = sink;
     }
 
     //  Pipe endpoint can store an opaque ID to be used by its clients.
-    public void setIdentity(Blob identity)
-    {
+    public void setIdentity(Blob identity) {
         this.identity = identity;
     }
 
-    public Blob getIdentity()
-    {
+    public Blob getIdentity() {
         return identity;
     }
 
     //  Returns true if there is at least one message to read in the pipe.
-    public boolean checkRead()
-    {
+    public boolean checkRead() {
         if (!inActive || (state != State.ACTIVE && state != State.PENDING)) {
             return false;
         }
@@ -191,8 +186,7 @@ class Pipe extends ZObject
     }
 
     //  Reads a message to the underlying pipe.
-    public Msg read()
-    {
+    public Msg read() {
         if (!inActive || (state != State.ACTIVE && state != State.PENDING)) {
             return null;
         }
@@ -223,8 +217,7 @@ class Pipe extends ZObject
 
     //  Checks whether messages can be written to the pipe. If writing
     //  the message would cause high watermark the function returns false.
-    public boolean checkWrite()
-    {
+    public boolean checkWrite() {
         if (!outActive || state != State.ACTIVE) {
             return false;
         }
@@ -241,8 +234,7 @@ class Pipe extends ZObject
 
     //  Writes a message to the underlying pipe. Returns false if the
     //  message cannot be written because high watermark was reached.
-    public boolean write(Msg msg)
-    {
+    public boolean write(Msg msg) {
         if (!checkWrite()) {
             return false;
         }
@@ -258,8 +250,7 @@ class Pipe extends ZObject
     }
 
     //  Remove unfinished parts of the outbound message from the pipe.
-    public void rollback()
-    {
+    public void rollback() {
         //  Remove incomplete message from the outbound pipe.
         Msg msg;
         if (outpipe != null) {
@@ -270,8 +261,7 @@ class Pipe extends ZObject
     }
 
     //  Flush the messages downsteam.
-    public void flush()
-    {
+    public void flush() {
         //  The peer does not exist anymore at this point.
         if (state == State.TERMINATING) {
             return;
@@ -283,8 +273,7 @@ class Pipe extends ZObject
     }
 
     @Override
-    protected void processActivateRead()
-    {
+    protected void processActivateRead() {
         if (!inActive && (state == State.ACTIVE || state == State.PENDING)) {
             inActive = true;
             sink.readActivated(this);
@@ -292,8 +281,7 @@ class Pipe extends ZObject
     }
 
     @Override
-    protected void processActivateWrite(long msgsRead)
-    {
+    protected void processActivateWrite(long msgsRead) {
         //  Remember the peers's message sequence number.
         peersMsgsRead = msgsRead;
 
@@ -305,8 +293,7 @@ class Pipe extends ZObject
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void processHiccup(Object pipe)
-    {
+    protected void processHiccup(Object pipe) {
         //  Destroy old outpipe. Note that the read end of the pipe was already
         //  migrated to this thread.
         assert (outpipe != null);
@@ -327,8 +314,7 @@ class Pipe extends ZObject
     }
 
     @Override
-    protected void processPipeTerm()
-    {
+    protected void processPipeTerm() {
         //  This is the simple case of peer-induced termination. If there are no
         //  more pending messages to read, or if the pipe was configured to drop
         //  pending messages, we can move directly to the terminating state.
@@ -339,8 +325,7 @@ class Pipe extends ZObject
                 state = State.TERMINATING;
                 outpipe = null;
                 sendPipeTermAck(peer);
-            }
-            else {
+            } else {
                 state = State.PENDING;
             }
             return;
@@ -370,8 +355,7 @@ class Pipe extends ZObject
     }
 
     @Override
-    protected void processPipeTermAck()
-    {
+    protected void processPipeTermAck() {
         //  Notify the user that all the references to the pipe should be dropped.
         assert (sink != null);
         sink.pipeTerminated(this);
@@ -383,8 +367,7 @@ class Pipe extends ZObject
         if (state == State.TERMINATED) {
             outpipe = null;
             sendPipeTermAck(peer);
-        }
-        else {
+        } else {
             assert (state == State.TERMINATING || state == State.DOUBLE_TERMINATED);
         }
 
@@ -406,8 +389,7 @@ class Pipe extends ZObject
     //  and user will be notified about actual deallocation by 'terminated'
     //  event. If delay is true, the pending messages will be processed
     //  before actual shutdown.
-    public void terminate(boolean delay)
-    {
+    public void terminate(boolean delay) {
         //  Overload the value specified at pipe creation.
         this.delay = delay;
 
@@ -467,14 +449,12 @@ class Pipe extends ZObject
     }
 
     //  Returns true if the message is delimiter; false otherwise.
-    private static boolean isDelimiter(Msg msg)
-    {
+    private static boolean isDelimiter(Msg msg) {
         return msg.isDelimiter();
     }
 
     //  Computes appropriate low watermark from the given high watermark.
-    private static int computeLwm(int hwm)
-    {
+    private static int computeLwm(int hwm) {
         //  Compute the low water mark. Following point should be taken
         //  into consideration:
         //
@@ -497,12 +477,11 @@ class Pipe extends ZObject
         //  Let's make LWM 1/2 of HWM in such cases.
 
         return (hwm > Config.MAX_WM_DELTA.getValue() * 2) ?
-            hwm - Config.MAX_WM_DELTA.getValue() : (hwm + 1) / 2;
+                hwm - Config.MAX_WM_DELTA.getValue() : (hwm + 1) / 2;
     }
 
     //  Handler for delimiter read from the pipe.
-    private void delimit()
-    {
+    private void delimit() {
         if (state == State.ACTIVE) {
             state = State.DELIMITED;
             return;
@@ -522,8 +501,7 @@ class Pipe extends ZObject
     //  Temporaraily disconnects the inbound message stream and drops
     //  all the messages on the fly. Causes 'hiccuped' event to be generated
     //  in the peer.
-    public void hiccup()
-    {
+    public void hiccup() {
         //  If termination is already under way do nothing.
         if (state != State.ACTIVE) {
             return;
@@ -542,8 +520,7 @@ class Pipe extends ZObject
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return super.toString() + "[" + parent + "]";
     }
 }

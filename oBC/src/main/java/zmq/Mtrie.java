@@ -23,8 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 //Multi-trie. Each node in the trie is a set of pointers to pipes.
-public class Mtrie
-{
+public class Mtrie {
     private Set<Pipe> pipes;
 
     private int min;
@@ -32,13 +31,11 @@ public class Mtrie
     private int liveNodes;
     private Mtrie[] next;
 
-    public interface IMtrieHandler
-    {
+    public interface IMtrieHandler {
         void invoke(Pipe pipe, byte[] data, int size, Object arg);
     }
 
-    public Mtrie()
-    {
+    public Mtrie() {
         min = 0;
         count = 0;
         liveNodes = 0;
@@ -47,20 +44,17 @@ public class Mtrie
         next = null;
     }
 
-    public boolean add(byte[] prefix, Pipe pipe)
-    {
+    public boolean add(byte[] prefix, Pipe pipe) {
         return addHelper(prefix, 0, pipe);
     }
 
     //  Add key to the trie. Returns true if it's a new subscription
     //  rather than a duplicate.
-    public boolean add(byte[] prefix, int start, Pipe pipe)
-    {
+    public boolean add(byte[] prefix, int start, Pipe pipe) {
         return addHelper(prefix, start, pipe);
     }
 
-    private boolean addHelper(byte[] prefix, int start, Pipe pipe)
-    {
+    private boolean addHelper(byte[] prefix, int start, Pipe pipe) {
         //  We are at the node corresponding to the prefix. We are isSystem.
         if (prefix == null || prefix.length == start) {
             boolean result = pipes == null;
@@ -79,21 +73,18 @@ public class Mtrie
                 min = c;
                 count = 1;
                 next = null;
-            }
-            else if (count == 1) {
+            } else if (count == 1) {
                 int oldc = min;
                 Mtrie oldp = next[0];
                 count = (min < c ? c - min : min - c) + 1;
                 next = new Mtrie[count];
                 min = Math.min(min, c);
                 next[oldc - min] = oldp;
-            }
-            else if (min < c) {
+            } else if (min < c) {
                 //  The new character is above the current character range.
                 count = c - min + 1;
                 next = realloc(next, count, true);
-            }
-            else {
+            } else {
                 //  The new character is below the current character range.
                 count = (min + count) - c;
                 next = realloc(next, count, false);
@@ -110,8 +101,7 @@ public class Mtrie
                 //alloc_assert (next.node);
             }
             return next[0].addHelper(prefix, start + 1, pipe);
-        }
-        else {
+        } else {
             if (next[c - min] == null) {
                 next[c - min] = new Mtrie();
                 ++liveNodes;
@@ -121,22 +111,19 @@ public class Mtrie
         }
     }
 
-    private Mtrie[] realloc(Mtrie[] table, int size, boolean ended)
-    {
+    private Mtrie[] realloc(Mtrie[] table, int size, boolean ended) {
         return Utils.realloc(Mtrie.class, table, size, ended);
     }
 
     //  Remove all subscriptions for a specific peer from the trie.
     //  If there are no subscriptions left on some topics, invoke the
     //  supplied callback function.
-    public boolean rm(Pipe pipe, IMtrieHandler func, Object arg)
-    {
+    public boolean rm(Pipe pipe, IMtrieHandler func, Object arg) {
         return rmHelper(pipe, new byte[0], 0, 0, func, arg);
     }
 
     private boolean rmHelper(Pipe pipe, byte[] buff, int buffsize, int maxBuffSize,
-                             IMtrieHandler func, Object arg)
-    {
+                             IMtrieHandler func, Object arg) {
         //  Remove the subscription from this node.
         if (pipes != null && pipes.remove(pipe) && pipes.isEmpty()) {
             func.invoke(null, buff, buffsize, arg);
@@ -189,8 +176,7 @@ public class Mtrie
 
                     assert (liveNodes > 0);
                     --liveNodes;
-                }
-                else {
+                } else {
                     //  The node is not redundant, so it's a candidate for being
                     //  the new min/max node.
                     //
@@ -222,14 +208,13 @@ public class Mtrie
             //  representation
             assert (newMin == newMax);
             assert (newMin >= min && newMin < min + count);
-            Mtrie node = next [newMin - min];
+            Mtrie node = next[newMin - min];
             assert (node != null);
             next = null;
             next = new Mtrie[]{node};
             count = 1;
             min = newMin;
-        }
-        else if (newMin > min || newMax < min + count - 1) {
+        } else if (newMin > min || newMax < min + count - 1) {
             assert (newMax - newMin + 1 > 1);
 
             Mtrie[] oldTable = next;
@@ -249,13 +234,11 @@ public class Mtrie
 
     //  Remove specific subscription from the trie. Return true is it was
     //  actually removed rather than de-duplicated.
-    public boolean rm(byte[] prefix, int start, Pipe pipe)
-    {
+    public boolean rm(byte[] prefix, int start, Pipe pipe) {
         return rmHelper(prefix, start, pipe);
     }
 
-    private boolean rmHelper(byte[] prefix, int start, Pipe pipe)
-    {
+    private boolean rmHelper(byte[] prefix, int start, Pipe pipe) {
         if (prefix == null || prefix.length == start) {
             if (pipes != null) {
                 boolean erased = pipes.remove(pipe);
@@ -273,7 +256,7 @@ public class Mtrie
         }
 
         Mtrie nextNode =
-            count == 1 ? next[0] : next[c - min];
+                count == 1 ? next[0] : next[c - min];
 
         if (nextNode == null) {
             return false;
@@ -288,8 +271,7 @@ public class Mtrie
                 count = 0;
                 --liveNodes;
                 assert (liveNodes == 0);
-            }
-            else {
+            } else {
                 next[c - min] = null;
                 assert (liveNodes > 1);
                 --liveNodes;
@@ -309,10 +291,9 @@ public class Mtrie
                     assert (i < count);
                     min += i;
                     count = 1;
-                    Mtrie old = next [i];
-                    next = new Mtrie [] { old };
-                }
-                else if (c == min) {
+                    Mtrie old = next[i];
+                    next = new Mtrie[]{old};
+                } else if (c == min) {
                     //  We can compact the table "from the left"
                     int i;
                     for (i = 1; i < count; ++i) {
@@ -325,8 +306,7 @@ public class Mtrie
                     min += i;
                     count -= i;
                     next = realloc(next, count, true);
-                }
-                else if (c == min + count - 1) {
+                } else if (c == min + count - 1) {
                     //  We can compact the table "from the right"
                     int i;
                     for (i = 1; i < count; ++i) {
@@ -345,8 +325,7 @@ public class Mtrie
     }
 
     //  Signal all the matching pipes.
-    public void match(byte[] data, int size, IMtrieHandler func, Object arg)
-    {
+    public void match(byte[] data, int size, IMtrieHandler func, Object arg) {
         Mtrie current = this;
         int idx = 0;
 
@@ -382,7 +361,7 @@ public class Mtrie
 
             //  If there are multiple subnodes.
             if (c < current.min || c >=
-                  current.min + current.count) {
+                    current.min + current.count) {
                 break;
             }
             if (current.next[c - current.min] == null) {
@@ -394,8 +373,7 @@ public class Mtrie
         }
     }
 
-    private boolean isRedundant()
-    {
+    private boolean isRedundant() {
         return pipes == null && liveNodes == 0;
     }
 }

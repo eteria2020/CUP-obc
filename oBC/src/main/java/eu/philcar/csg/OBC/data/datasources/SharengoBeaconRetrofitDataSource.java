@@ -6,6 +6,7 @@ import eu.philcar.csg.OBC.data.datasources.api.SharengoBeaconApi;
 import eu.philcar.csg.OBC.data.datasources.base.BaseRetrofitDataSource;
 import eu.philcar.csg.OBC.data.model.BeaconResponse;
 import io.reactivex.Observable;
+import io.reactivex.observers.DisposableSingleObserver;
 
 /**
  * Created by Fulvio on 01/03/2018.
@@ -22,13 +23,13 @@ public class SharengoBeaconRetrofitDataSource extends BaseRetrofitDataSource imp
     @Override
     public Observable<BeaconResponse> sendBeacon(String plate, String beacon) {
 
-        try{
-            beacon= URLEncoder.encode(beacon,"UTF-8");
-        }catch (Exception e){
+        try {
+            beacon = URLEncoder.encode(beacon, "UTF-8");
+        } catch (Exception e) {
 
         }
 
-        return  mSharengoBeaconApi.sendBeacon(plate,beacon)
+        return mSharengoBeaconApi.sendBeacon(plate, beacon)
                 .compose(this.handleRetrofitRequest());
     }
 }

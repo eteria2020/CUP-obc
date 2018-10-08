@@ -29,7 +29,6 @@ import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.controller.map.FHome;
 import eu.philcar.csg.OBC.helpers.DLog;
 
-
 /**
  * Created by Momo on 2/14/2018.
  */
@@ -61,7 +60,6 @@ public class OptimizeDistanceCalc extends FBase implements View.OnClickListener 
     public static double tripDistanceValue = -1;
     public static float totalDistance2 = 0;
     public static boolean Odo_firstInit = true;
-
 
     /* for debug */
     private static TextView KMbygps, KMbyODO, KMbygps2;
@@ -133,7 +131,6 @@ public class OptimizeDistanceCalc extends FBase implements View.OnClickListener 
 
                 break;
 
-
         }
 
     }
@@ -178,7 +175,6 @@ public class OptimizeDistanceCalc extends FBase implements View.OnClickListener 
             case OdoController.DESTROY:
                 ODC.destroy();
                 break;
-
 
         }
     }
@@ -257,13 +253,11 @@ public class OptimizeDistanceCalc extends FBase implements View.OnClickListener 
         if (prevLoc == null) {
             prevLoc = new Location(changedGPS);
 
-
         } else {
             double mdistance = meterDistanceBetweenPoints((float) changedGPS.getLatitude(), (float) changedGPS.getLongitude(), (float) prevLoc.getLatitude(), (float) prevLoc.getLongitude());
             float distance2 = prevLoc2.distanceTo(changedGPS);
             currentTime = new Date();
             long diffSec = (currentTime.getTime() - prevTime.getTime()) / 1000;
-
 
             ODC.putDouble(totalDistance);
             if (mdistance > 30 && mdistance / diffSec < 25) { //&& mdistance/diffSec < 25
@@ -286,7 +280,6 @@ public class OptimizeDistanceCalc extends FBase implements View.OnClickListener 
         }
 
     }
-
 
     public void setStartOdoValue(int odo) {
         if (odo <= 0)
@@ -373,7 +366,7 @@ public class OptimizeDistanceCalc extends FBase implements View.OnClickListener 
             } catch (Exception e) {
             }
 
-        if (KMbygps2 != null && tripDistanceValue >0) {
+        if (KMbygps2 != null && tripDistanceValue > 0) {
             float b = (float) (tripDistanceValue / 1000);
             KMbygps2.setText(String.valueOf(b));
         }
@@ -385,7 +378,6 @@ public class OptimizeDistanceCalc extends FBase implements View.OnClickListener 
         if(loc.distanceTo(prevLoc) < 50)
     }
 */
-
 
 }
 

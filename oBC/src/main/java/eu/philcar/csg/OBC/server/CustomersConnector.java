@@ -1,6 +1,10 @@
 package eu.philcar.csg.OBC.server;
 
-
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -8,213 +12,194 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.db.Customer;
 import eu.philcar.csg.OBC.db.Customers;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.helpers.DLog;
+
 @Deprecated
 public class CustomersConnector implements RemoteEntityInterface {
 
-	private DLog dlog = new DLog(this.getClass());
-	
-	public static  CustomersConnector GetDownloadConnector() {
-		return new CustomersConnector();
-	}
-	
-		
-		
-		private String cardCode = null;
-		private long lastUpdate;
-		private int  receivedRecords;
+    private DLog dlog = new DLog(this.getClass());
 
-		private static boolean busy=false;
-		
-		public void setLastUpdate(long v) {
-			this.lastUpdate = v;
-		}
-		
-		public void setCardCodeQuery(String cardCode) {
-			this.cardCode = cardCode;	
-		}
-		
-		public int getReceivedRecords() {
-			return receivedRecords;
-		}
-		
-		public int MsgId() {
-			return Connectors.MSG_DN_CLIENTI;
-		}
-		
-		public String GetRemoteUrl() {
-			if (!App.hasNetworkConnection()) {
-				dlog.w("Customers : No network");
-				return null;
-			}
+    public static CustomersConnector GetDownloadConnector() {
+        return new CustomersConnector();
+    }
 
-			if (!busy) {
-				busy=true;
-				return App.URL_Clienti;
-			} else {
-				dlog.w("Customers : busy");
-				return null;
-			}
-		}
-	
-	public int DecodeJson(String responseBody) {
+    private String cardCode = null;
+    private long lastUpdate;
+    private int receivedRecords;
 
+    private static boolean busy = false;
 
-		if (responseBody == null || responseBody.isEmpty()) {
-			dlog.e("Empty response");
-			return MsgId();
-		}
-			
-		
-		DbManager dbm = App.Instance.getDbManager();
+    public void setLastUpdate(long v) {
+        this.lastUpdate = v;
+    }
 
-		final Customers customers = dbm.getClientiDao();
+    public void setCardCodeQuery(String cardCode) {
+        this.cardCode = cardCode;
+    }
 
+    public int getReceivedRecords() {
+        return receivedRecords;
+    }
 
-		
-		final JSONArray  jArray;
-		try {
-			jArray = new JSONArray(responseBody);
-		} catch (JSONException e) {
-			dlog.e("Errore estraendo array json", e);
-			return MsgId();
-		}
-		
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    public int MsgId() {
+        return Connectors.MSG_DN_CLIENTI;
+    }
 
-		
-		
-		dlog.d("Downloaded " +jArray.length() + " records");
-		long ts_begin = System.currentTimeMillis();
-		try {
-			customers.callBatchTasks(new Callable<Void>() {
+    public String GetRemoteUrl() {
+        if (!App.hasNetworkConnection()) {
+            dlog.w("Customers : No network");
+            return null;
+        }
 
-				@Override
-				public Void call() throws Exception {
-					String abilitato;
-					int n = jArray.length();
-					for (int i = 0; i < n; i++) {
+        if (!busy) {
+            busy = true;
+            return App.URL_Clienti;
+        } else {
+            dlog.w("Customers : busy");
+            return null;
+        }
+    }
 
-						try {
-							JSONObject jobj = jArray.getJSONObject(i);
+    public int DecodeJson(String responseBody) {
 
-							int id = jobj.getInt("i");
-							long tms = jobj.getLong("tm");
-							JSONArray ojarray = new JSONArray();
+        if (responseBody == null || responseBody.isEmpty()) {
+            dlog.e("Empty response");
+            return MsgId();
+        }
 
-							// if (!clienti.isPresent(id, tms)) {
-							Customer c = new Customer(true);
-							c.id = id;
-							c.name = jobj.getString("n");
-							c.surname = jobj.getString("c");
-						//	c.language = jobj.getString("lingua");
-							c.mobile = jobj.getString("t");
-							
-							abilitato = jobj.getString("a");
-							if (abilitato!=null)
-								c.enabled = abilitato.equalsIgnoreCase("TRUE");
-							else
-								c.enabled = false;
-							
-							c.info_display = jobj.getString("id");
-							
-							c.card_code = jobj.getString("cc");
-							
-							ojarray.put(jobj.getString("p"));
-							if (jobj.has("pin2")) {
-							    String pin2 = jobj.getString("pin2");
-							    if (pin2!=null && !pin2.isEmpty()) {
-							    	ojarray.put(pin2);
-							    }
-							}
+        DbManager dbm = App.Instance.getDbManager();
 
-							c.pin = ojarray.toString();
-							
-							if (jobj.has("ps")) {
-							    String pins = jobj.getString("ps");
-							    if (pins!=null && !pins.isEmpty()) {
-							    	c.pin = pins;
-							    }
-							}
-							
-							c.update_timestamp = tms;
+        final Customers customers = dbm.getClientiDao();
 
-							c.encrypt();
-							
-							try {
-								customers.createOrUpdate(c);
-							} catch (SQLException e) {
-								dlog.e("Insert or update:", e);
+        final JSONArray jArray;
+        try {
+            jArray = new JSONArray(responseBody);
+        } catch (JSONException e) {
+            dlog.e("Errore estraendo array json", e);
+            return MsgId();
+        }
 
-							}
-							// }
-						} catch (JSONException e) {
-							dlog.e("Errore estraendo array json", e);
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-						}
+        dlog.d("Downloaded " + jArray.length() + " records");
+        long ts_begin = System.currentTimeMillis();
+        try {
+            customers.callBatchTasks(new Callable<Void>() {
 
-						
-					}
-					return null;
-				}
-				
-			});
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+                @Override
+                public Void call() throws Exception {
+                    String abilitato;
+                    int n = jArray.length();
+                    for (int i = 0; i < n; i++) {
 
-	
-		long time = System.currentTimeMillis() - ts_begin; 
-		receivedRecords = jArray.length();
-		dlog.d("WHITELIST PARSE: " + time +"ms for " + receivedRecords );
+                        try {
+                            JSONObject jobj = jArray.getJSONObject(i);
 
-		App.whiteListSize = customers.getSize();
+                            int id = jobj.getInt("i");
+                            long tms = jobj.getLong("tm");
+                            JSONArray ojarray = new JSONArray();
 
-		busy = false;
+                            // if (!clienti.isPresent(id, tms)) {
+                            Customer c = new Customer(true);
+                            c.id = id;
+                            c.name = jobj.getString("n");
+                            c.surname = jobj.getString("c");
+                            //	c.language = jobj.getString("lingua");
+                            c.mobile = jobj.getString("t");
 
-		return MsgId();
-	}
+                            abilitato = jobj.getString("a");
+                            if (abilitato != null)
+                                c.enabled = abilitato.equalsIgnoreCase("TRUE");
+                            else
+                                c.enabled = false;
 
-		public eDirection getDirection() {
-			return eDirection.DOWNLOAD;
-		}
+                            c.info_display = jobj.getString("id");
 
-		public String EncodeJson() {
-			
-			return null;
-		}
+                            c.card_code = jobj.getString("cc");
 
+                            ojarray.put(jobj.getString("p"));
+                            if (jobj.has("pin2")) {
+                                String pin2 = jobj.getString("pin2");
+                                if (pin2 != null && !pin2.isEmpty()) {
+                                    ojarray.put(pin2);
+                                }
+                            }
 
-		@Override
-		public List<NameValuePair> GetParams() {
-			
-			ArrayList<NameValuePair> list = null;
-			
-			if (cardCode!=null) {
-				list = new ArrayList<NameValuePair>();
-				list.add(new BasicNameValuePair("cardcode", cardCode));
-			} 
-			
-			if (lastUpdate > 0) {
-				list = new ArrayList<NameValuePair>();
-				list.add(new BasicNameValuePair("lastupdate", "" + lastUpdate));
-			}
-			
-			return list;
-		}
-	
+                            c.pin = ojarray.toString();
 
-	
-	
+                            if (jobj.has("ps")) {
+                                String pins = jobj.getString("ps");
+                                if (pins != null && !pins.isEmpty()) {
+                                    c.pin = pins;
+                                }
+                            }
+
+                            c.update_timestamp = tms;
+
+                            c.encrypt();
+
+                            try {
+                                customers.createOrUpdate(c);
+                            } catch (SQLException e) {
+                                dlog.e("Insert or update:", e);
+
+                            }
+                            // }
+                        } catch (JSONException e) {
+                            dlog.e("Errore estraendo array json", e);
+
+                        }
+
+                    }
+                    return null;
+                }
+
+            });
+        } catch (SQLException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+
+        long time = System.currentTimeMillis() - ts_begin;
+        receivedRecords = jArray.length();
+        dlog.d("WHITELIST PARSE: " + time + "ms for " + receivedRecords);
+
+        App.whiteListSize = customers.getSize();
+
+        busy = false;
+
+        return MsgId();
+    }
+
+    public eDirection getDirection() {
+        return eDirection.DOWNLOAD;
+    }
+
+    public String EncodeJson() {
+
+        return null;
+    }
+
+    @Override
+    public List<NameValuePair> GetParams() {
+
+        ArrayList<NameValuePair> list = null;
+
+        if (cardCode != null) {
+            list = new ArrayList<NameValuePair>();
+            list.add(new BasicNameValuePair("cardcode", cardCode));
+        }
+
+        if (lastUpdate > 0) {
+            list = new ArrayList<NameValuePair>();
+            list.add(new BasicNameValuePair("lastupdate", "" + lastUpdate));
+        }
+
+        return list;
+    }
+
 }

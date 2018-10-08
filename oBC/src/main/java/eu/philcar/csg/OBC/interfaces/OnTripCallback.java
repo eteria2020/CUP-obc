@@ -7,5 +7,5 @@ import eu.philcar.csg.OBC.service.TripInfo;
  */
 public interface OnTripCallback {
 
-     void onTripResult(TripInfo response);
+    void onTripResult(TripInfo response);
 }

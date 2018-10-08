@@ -1,104 +1,100 @@
 package eu.philcar.csg.OBC.devices;
 
-import java.util.List;
-
-import eu.philcar.csg.OBC.service.Reservation;
 import android.os.Message;
 import android.os.Messenger;
 
+import java.util.List;
+
+import eu.philcar.csg.OBC.service.Reservation;
+
 public interface LowLevelInterface {
 
-	int ID_LED_GREEN = 0;
-	int ID_LED_BLUE = 1;
-	int ID_LED_YELLOW = 2;
-	int ID_LED_RED = 3;
-	
-	
-	int ID_LED_OFF = 1;
-	int ID_LED_ON = 0;
-	int ID_LED_BLINK = 2;
-	
-	int AUDIO_NONE = 0;
-	int AUDIO_RADIO = 1;
-	int AUDIO_SYSTEM = 2;
-	int AUDIO_AUX = 3;
+    int ID_LED_GREEN = 0;
+    int ID_LED_BLUE = 1;
+    int ID_LED_YELLOW = 2;
+    int ID_LED_RED = 3;
 
-	int AUDIO_LEVEL_ALERT = 25;
-	int AUDIO_LEVEL_LAST = -1;
+    int ID_LED_OFF = 1;
+    int ID_LED_ON = 0;
+    int ID_LED_BLINK = 2;
+
+    int AUDIO_NONE = 0;
+    int AUDIO_RADIO = 1;
+    int AUDIO_SYSTEM = 2;
+    int AUDIO_AUX = 3;
+
+    int AUDIO_LEVEL_ALERT = 25;
+    int AUDIO_LEVEL_LAST = -1;
 
 //  0 :  Green - Free
 //  1 :  Blue - in use
 //  2 :  orange - booked
 //  3 :  red - broken
 
+    void init();
 
-	
-void init();
+    void init(boolean bond);
 
-void init(boolean bond);
+    void close();
 
-void close();
+    void btSend(byte data[]);
 
+    void btSend(ObcCommand cmd);
 
-void btSend(byte data[]);
+    void btSend(String cmd);
 
-void btSend(ObcCommand cmd) ;
+    void Ping(Messenger replyTo, Message timeout);
 
-void btSend(String cmd) ;
+    void setCarPlate(Messenger replyTo, String plate);
 
-void Ping(Messenger replyTo, Message timeout);
+    void setDisplayStatus(Messenger replyTo, boolean on);
 
-void setCarPlate(Messenger replyTo, String plate);
+    void setLed(Messenger replyTo, int led, int state);
 
-void setDisplayStatus(Messenger replyTo, boolean on);
+    void setDoors(Messenger replyTo, int state, String message);
 
-void setLed(Messenger replyTo, int led, int state);
+    void setEngine(Messenger replyTo, int state);
 
+    void setLcd(Messenger replyTo, String txt);
 
-void setDoors(Messenger replyTo, int state, String message);
+    void setTag(Messenger replyTo, String code);
 
-void setEngine(Messenger replyTo, int state) ;
+    void setCharger(Messenger replyTo, int state);
 
+    void setReservation(Reservation r);
 
-void setLcd(Messenger replyTo, String txt) ;
+    void RequestWhitelistUpload();
 
+    void setSecondaryGPS(long period);
 
-void setTag(Messenger replyTo, String code) ;
+    long lastContactDelay();
 
+    float getCellVoltageValue(int index);
 
-void setCharger(Messenger replyTo, int state);
+    int getSOCValue();
 
-void setReservation(Reservation r) ;
+    int getPackCurrentValue();
 
-void RequestWhitelistUpload() ;
+    void addAdminCard(List<String> cards);
 
-void setSecondaryGPS(long period);
+    void addAdminCard(String card);
 
-long lastContactDelay() ;
+    void delAdminCard(String card);
 
-float getCellVoltageValue(int index);
+    void resetAdminCards();
 
-int getSOCValue();
+    void setForcedLedBlink(boolean status);
 
-int getPackCurrentValue();
+    void setAudioChannel(int channel, int volume);
 
-void addAdminCard(List<String> cards);
-void addAdminCard(String card);
-void delAdminCard(String card);
-void resetAdminCards();
+    void SetRadioChannel(String Band, int freq);
 
-void setForcedLedBlink(boolean status);
+    void SetRadioVolume(int vol);
 
-void setAudioChannel(int channel, int volume);
-void SetRadioChannel(String Band, int freq);
-void SetRadioVolume(int vol);
+    void SetSeek(int direction, boolean auto);
 
-void SetSeek(int direction, boolean auto);
+    void enableWatchdog(int secs);
 
-void enableWatchdog(int secs);
-void disableWatchdog();
+    void disableWatchdog();
 
-	
-	
-	
 }

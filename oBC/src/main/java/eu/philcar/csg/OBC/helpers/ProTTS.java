@@ -1,16 +1,9 @@
 package eu.philcar.csg.OBC.helpers;
 
 import android.content.Context;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -20,62 +13,52 @@ import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 
-
-public class ProTTS implements TextToSpeech.OnInitListener{
-
+public class ProTTS implements TextToSpeech.OnInitListener {
 
     private TextToSpeech player;
     private UtteranceProgressListener utteranceListener;
-    private static ArrayList<String> playing =new ArrayList<>();
+    private static ArrayList<String> playing = new ArrayList<>();
 
     public static int lastAudioState = 0;
-    public static boolean reqSystem=false;
-    public static boolean ignoreVolume=false;
+    public static boolean reqSystem = false;
+    public static boolean ignoreVolume = false;
 
-
-
-    private boolean ready=false;
+    private boolean ready = false;
 
     private int queue = 0;
-
 
     private Context context;
     private DLog dlog = new DLog(this.getClass());
 
-
-
     public ProTTS(Context context) {
-        this.context=context;
-        player=new TextToSpeech(context,this);
+        this.context = context;
+        player = new TextToSpeech(context, this);
 
     }
+
     private void reinizializePlayer() {
         player.stop();
         player.shutdown();
-        player=null;
-        utteranceListener=null;
+        player = null;
+        utteranceListener = null;
 
         player = new TextToSpeech(context, this);
 
-
     }
 
-
-
-    public void shutdown(){
+    public void shutdown() {
         try {
             player.stop();
             player.shutdown();
-            player=null;
-            utteranceListener=null;
+            player = null;
+            utteranceListener = null;
             context = null;
-        }catch(Exception e){
-            dlog.e("Exception while pausing player",e);
+        } catch (Exception e) {
+            dlog.e("Exception while pausing player", e);
         }
     }
 
-
-    public boolean isBusy(){
+    public boolean isBusy() {
         return player.isSpeaking();
     }
 
@@ -92,11 +75,10 @@ public class ProTTS implements TextToSpeech.OnInitListener{
         return ready;
     }
 
-    public static void askForSystem(){
-        reqSystem=true;
-        ignoreVolume=true;
+    public static void askForSystem() {
+        reqSystem = true;
+        ignoreVolume = true;
     }
-
 
     public void speak(final String text) {
 
@@ -132,13 +114,14 @@ public class ProTTS implements TextToSpeech.OnInitListener{
         }).start();
 
     }
-    public void speak(final String text,final int queueMode) {
+
+    public void speak(final String text, final int queueMode) {
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 Thread.currentThread().setName("ProTTS");
-                try{
+                try {
                    /* if(playing.size()>0){
                         for(String s : playing){
                             if(s.compareTo(text)==0){
@@ -152,16 +135,17 @@ public class ProTTS implements TextToSpeech.OnInitListener{
                     map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, text);
                     Thread.sleep(300);
                     //player.setDataSource(context,uri);
-                    player.speak(text,queueMode,map);
+                    player.speak(text, queueMode, map);
                     map.clear();
-                    dlog.d("speak: riproduco "+text);
+                    dlog.d("speak: riproduco " + text);
                 } catch (Exception e) {
-                    dlog.e("speak: Eccezione in play tts",e);
+                    dlog.e("speak: Eccezione in play tts", e);
                 }
-    }
-}).start();
+            }
+        }).start();
 
     }
+
     public void reset() {
 
         if (player != null) {
@@ -174,37 +158,36 @@ public class ProTTS implements TextToSpeech.OnInitListener{
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }
-        else
+        } else
             reinizializePlayer();
     }
 
     @Override
     public void onInit(int status) {
-        if(status != TextToSpeech.ERROR) {
-            if (((ABase)context).getActivityLocale().equalsIgnoreCase("it")) {
+        if (status != TextToSpeech.ERROR) {
+            if (((ABase) context).getActivityLocale().equalsIgnoreCase("it")) {
                 player.setPitch(0.85f);
                 player.setSpeechRate(1.15f);
                 player.setLanguage(Locale.ITALIAN);
-            } else if (((ABase)context).getActivityLocale().equalsIgnoreCase("en")) {
+            } else if (((ABase) context).getActivityLocale().equalsIgnoreCase("en")) {
                 player.setPitch(0.7f);
                 player.setSpeechRate(0.9f);
                 player.setLanguage(Locale.ENGLISH);
-            }
-            else {
+            } else {
                 player.setLanguage(Locale.FRENCH);
                 player.setPitch(0.9f);
                 player.setSpeechRate(0.4f);
             }
 
             utteranceListener = new UtteranceProgressListener() {
-                private final Context Context =context;
+                private final Context Context = context;
+
                 @Override
                 public void onStart(String utteranceId) {
-                        dlog.d("Player is Busy pausing advice");
+                    dlog.d("Player is Busy pausing advice");
 
-                    if(AudioPlayer.isBusy())
-                       AudioPlayer.pausePlayer();
+                    if (AudioPlayer.isBusy())
+                        AudioPlayer.pausePlayer();
 
                 }
 
@@ -213,13 +196,13 @@ public class ProTTS implements TextToSpeech.OnInitListener{
                     // Toast.makeText(context,"done",Toast.LENGTH_SHORT).show();
                     try {
                         playing.remove(utteranceId);
-                        if(playing.size()==0 && AudioPlayer.getQueue()==0)
-                            if(Context instanceof AMainOBC)
+                        if (playing.size() == 0 && AudioPlayer.getQueue() == 0)
+                            if (Context instanceof AMainOBC)
                                 ((AMainOBC) Context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
                             else if (Context instanceof AGoodbye)
-                                ((AGoodbye) Context).setAudioSystem(lastAudioState,LowLevelInterface.AUDIO_LEVEL_LAST);
-                    }catch (Exception e){
-                        dlog.e("ProTTS: Exception while executing onDone operation ",e);
+                                ((AGoodbye) Context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
+                    } catch (Exception e) {
+                        dlog.e("ProTTS: Exception while executing onDone operation ", e);
                     }
                 }
 
@@ -227,31 +210,31 @@ public class ProTTS implements TextToSpeech.OnInitListener{
                 public void onError(String utteranceId) {
                     try {
                         playing.remove(utteranceId);
-                        if(getQueue()==0 && AudioPlayer.getQueue()==0)
-                            if(Context instanceof AMainOBC)
-                                ((AMainOBC) Context).setAudioSystem(lastAudioState,LowLevelInterface.AUDIO_LEVEL_LAST);
+                        if (getQueue() == 0 && AudioPlayer.getQueue() == 0)
+                            if (Context instanceof AMainOBC)
+                                ((AMainOBC) Context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
                             else if (Context instanceof AGoodbye)
-                                ((AGoodbye) Context).setAudioSystem(lastAudioState,LowLevelInterface.AUDIO_LEVEL_LAST);
-                    }catch (Exception e){
-                        dlog.e("ProTTS: Exception while executing onDone operation ",e);
+                                ((AGoodbye) Context).setAudioSystem(lastAudioState, LowLevelInterface.AUDIO_LEVEL_LAST);
+                    } catch (Exception e) {
+                        dlog.e("ProTTS: Exception while executing onDone operation ", e);
                     }
                 }
             };
 
             player.setOnUtteranceProgressListener(utteranceListener);
-            ready=true;
-        }else
-            ready=false;
+            ready = true;
+        } else
+            ready = false;
 
     }
 
-    public void postpone(){
-        if(!player.isSpeaking())
+    public void postpone() {
+        if (!player.isSpeaking())
             return;
         player.stop();
     }
 
-    public static int getQueue(){
+    public static int getQueue() {
         return playing.size();
     }
 }

@@ -122,7 +122,7 @@ public class Area extends BaseResponse implements Comparable<Area> {
     public Boolean insideItaly() {
         return !(max.getLongitude() >= 18.53 ||
                 min.getLongitude() <= 6.63 ||
-                ((max.getLatitude()>44 && max.getLongitude() >13.7484) || max.getLatitude() >= 47.10 )|| //check for upper right area corner
+                ((max.getLatitude() > 44 && max.getLongitude() > 13.7484) || max.getLatitude() >= 47.10) || //check for upper right area corner
                 min.getLatitude() <= 36.64);
     }
 
@@ -140,7 +140,7 @@ public class Area extends BaseResponse implements Comparable<Area> {
     public long getArea() {
         long distance = 0;
         Location l1 = new Location(""), l2 = new Location("");
-        for (int i = 0; i < points.size()-1; i++) {
+        for (int i = 0; i < points.size() - 1; i++) {
             SKCoordinate c1 = points.get(i), c2 = points.get(i + 1);
             l1.setLatitude(c1.getLatitude());
             l1.setLongitude(c1.getLongitude());
@@ -148,7 +148,6 @@ public class Area extends BaseResponse implements Comparable<Area> {
             l2.setLongitude(c2.getLongitude());
             distance += GeoUtils.harvesineDistance(l1, l2);
         }
-
 
         return distance;
     }

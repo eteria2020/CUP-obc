@@ -24,28 +24,25 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
-abstract class PollerBase
-{
+abstract class PollerBase {
     //  Load of the poller. Currently the number of file descriptors
     //  registered.
     private final AtomicInteger load;
 
-    private final class TimerInfo
-    {
+    private final class TimerInfo {
         IPollEvents sink;
         int id;
 
-        public TimerInfo(IPollEvents sink, int id)
-        {
+        public TimerInfo(IPollEvents sink, int id) {
             this.sink = sink;
             this.id = id;
         }
     }
+
     private final Map<Long, TimerInfo> timers;
     private final Map<Long, TimerInfo> addingTimers;
 
-    protected PollerBase()
-    {
+    protected PollerBase() {
         load = new AtomicInteger(0);
         timers = new MultiMap<Long, TimerInfo>();
         addingTimers = new MultiMap<Long, TimerInfo>();
@@ -53,22 +50,19 @@ abstract class PollerBase
 
     //  Returns load of the poller. Note that this function can be
     //  invoked from a different thread!
-    public final int getLoad()
-    {
+    public final int getLoad() {
         return load.get();
     }
 
     //  Called by individual poller implementations to manage the load.
-    protected void adjustLoad(int amount)
-    {
+    protected void adjustLoad(int amount) {
         load.addAndGet(amount);
     }
 
     //  Add a timeout to expire in timeout_ milliseconds. After the
     //  expiration timerEvent on sink_ object will be called with
     //  argument set to id_.
-    public void addTimer(long timeout, IPollEvents sink, int id)
-    {
+    public void addTimer(long timeout, IPollEvents sink, int id) {
         long expiration = Clock.nowMS() + timeout;
         TimerInfo info = new TimerInfo(sink, id);
         addingTimers.put(expiration, info);
@@ -76,8 +70,7 @@ abstract class PollerBase
     }
 
     //  Cancel the timer created by sink_ object with ID equal to id_.
-    public void cancelTimer(IPollEvents sink, int id)
-    {
+    public void cancelTimer(IPollEvents sink, int id) {
         //  Complexity of this operation is O(n). We assume it is rarely used.
 
         if (!addingTimers.isEmpty()) {
@@ -100,8 +93,7 @@ abstract class PollerBase
 
     //  Executes any timers that are due. Returns number of milliseconds
     //  to wait to match the next timer or 0 meaning "no timers".
-    protected long executeTimers()
-    {
+    protected long executeTimers() {
         if (!addingTimers.isEmpty()) {
             timers.putAll(addingTimers);
             addingTimers.clear();

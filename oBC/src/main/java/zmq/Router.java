@@ -26,14 +26,11 @@ import java.util.Map;
 import java.util.Set;
 
 //TODO: This class uses O(n) scheduling. Rewrite it to use O(1) algorithm.
-public class Router extends SocketBase
-{
-    public static class RouterSession extends SessionBase
-    {
+public class Router extends SocketBase {
+    public static class RouterSession extends SessionBase {
         public RouterSession(IOThread ioThread, boolean connect,
-            SocketBase socket, final Options options,
-            final Address addr)
-        {
+                             SocketBase socket, final Options options,
+                             final Address addr) {
             super(ioThread, connect, socket, options, addr);
         }
     }
@@ -57,13 +54,11 @@ public class Router extends SocketBase
     //  If true, more incoming message parts are expected.
     private boolean moreIn;
 
-    class Outpipe
-    {
+    class Outpipe {
         private Pipe pipe;
         private boolean active;
 
-        public Outpipe(Pipe pipe, boolean active)
-        {
+        public Outpipe(Pipe pipe, boolean active) {
             this.pipe = pipe;
             this.active = active;
         }
@@ -91,8 +86,7 @@ public class Router extends SocketBase
 
     private boolean handover;
 
-    public Router(Ctx parent, int tid, int sid)
-    {
+    public Router(Ctx parent, int tid, int sid) {
         super(parent, tid, sid);
         prefetched = false;
         identitySent = false;
@@ -122,22 +116,19 @@ public class Router extends SocketBase
     }
 
     @Override
-    public void xattachPipe(Pipe pipe, boolean icanhasall)
-    {
+    public void xattachPipe(Pipe pipe, boolean icanhasall) {
         assert (pipe != null);
 
         boolean identityOk = identifyPeer(pipe);
         if (identityOk) {
             fq.attach(pipe);
-        }
-        else {
+        } else {
             anonymousPipes.add(pipe);
         }
     }
 
     @Override
-    public boolean xsetsockopt(int option, Object optval)
-    {
+    public boolean xsetsockopt(int option, Object optval) {
         if (option == ZMQ.ZMQ_ROUTER_MANDATORY) {
             mandatory = (Integer) optval == 1;
             return true;
@@ -150,8 +141,7 @@ public class Router extends SocketBase
     }
 
     @Override
-    public void xpipeTerminated(Pipe pipe)
-    {
+    public void xpipeTerminated(Pipe pipe) {
         if (!anonymousPipes.remove(pipe)) {
             Outpipe old = outpipes.remove(pipe.getIdentity());
             assert (old != null);
@@ -164,12 +154,10 @@ public class Router extends SocketBase
     }
 
     @Override
-    public void xreadActivated(Pipe pipe)
-    {
+    public void xreadActivated(Pipe pipe) {
         if (!anonymousPipes.contains(pipe)) {
             fq.activated(pipe);
-        }
-        else {
+        } else {
             boolean identityOk = identifyPeer(pipe);
             if (identityOk) {
                 anonymousPipes.remove(pipe);
@@ -179,8 +167,7 @@ public class Router extends SocketBase
     }
 
     @Override
-    public void xwriteActivated(Pipe pipe)
-    {
+    public void xwriteActivated(Pipe pipe) {
         for (Map.Entry<Blob, Outpipe> it : outpipes.entrySet()) {
             if (it.getValue().pipe == pipe) {
                 assert (!it.getValue().active);
@@ -192,8 +179,7 @@ public class Router extends SocketBase
     }
 
     @Override
-    protected boolean xsend(Msg msg)
-    {
+    protected boolean xsend(Msg msg) {
         //  If this is the first part of the message it's the ID of the
         //  peer to send the message to.
         if (!moreOut) {
@@ -222,8 +208,7 @@ public class Router extends SocketBase
                             return false;
                         }
                     }
-                }
-                else if (mandatory) {
+                } else if (mandatory) {
                     moreOut = false;
                     errno.set(ZError.EHOSTUNREACH);
                     return false;
@@ -241,8 +226,7 @@ public class Router extends SocketBase
             boolean ok = currentOut.write(msg);
             if (!ok) {
                 currentOut = null;
-            }
-            else if (!moreOut) {
+            } else if (!moreOut) {
                 currentOut.flush();
                 currentOut = null;
             }
@@ -252,16 +236,14 @@ public class Router extends SocketBase
     }
 
     @Override
-    protected Msg xrecv()
-    {
+    protected Msg xrecv() {
         Msg msg = null;
         if (prefetched) {
             if (!identitySent) {
                 msg = prefetchedId;
                 prefetchedId = null;
                 identitySent = true;
-            }
-            else {
+            } else {
                 msg = prefetchedMsg;
                 prefetchedMsg = null;
                 prefetched = false;
@@ -290,8 +272,7 @@ public class Router extends SocketBase
         //  If we are in the middle of reading a message, just return the next part.
         if (moreIn) {
             moreIn = msg.hasMore();
-        }
-        else {
+        } else {
             //  We are at the beginning of a message.
             //  Keep the message part we have in the prefetch buffer
             //  and return the ID of the peer instead.
@@ -308,8 +289,7 @@ public class Router extends SocketBase
     }
 
     //  Rollback any message parts that were sent but not yet flushed.
-    protected void rollback()
-    {
+    protected void rollback() {
         if (currentOut != null) {
             currentOut.rollback();
             currentOut = null;
@@ -318,8 +298,7 @@ public class Router extends SocketBase
     }
 
     @Override
-    protected boolean xhasIn()
-    {
+    protected boolean xhasIn() {
         //  If we are in the middle of reading the messages, there are
         //  definitely more parts available.
         if (moreIn) {
@@ -361,16 +340,14 @@ public class Router extends SocketBase
     }
 
     @Override
-    protected boolean xhasOut()
-    {
+    protected boolean xhasOut() {
         //  In theory, ROUTER socket is always ready for writing. Whether actual
         //  attempt to write succeeds depends on whitch pipe the message is going
         //  to be routed to.
         return true;
     }
 
-    private boolean identifyPeer(Pipe pipe)
-    {
+    private boolean identifyPeer(Pipe pipe) {
         Blob identity;
 
         Msg msg = pipe.read();
@@ -384,8 +361,7 @@ public class Router extends SocketBase
             buf.put((byte) 0);
             buf.putInt(nextPeerId++);
             identity = Blob.createBlob(buf.array(), false);
-        }
-        else {
+        } else {
             identity = Blob.createBlob(msg.data(), true);
 
             if (outpipes.containsKey(identity)) {

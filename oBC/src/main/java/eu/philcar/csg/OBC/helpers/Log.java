@@ -7,11 +7,11 @@ import java.util.Date;
  * Created by Fulvio on 19/09/2017.
  */
 
-public class Log implements Comparable<Log>{
+public class Log implements Comparable<Log> {
     File file = null;
     Date date = null;
     int index;
-    boolean deletingError=false;
+    boolean deletingError = false;
 
     public Log() {
 
@@ -51,7 +51,7 @@ public class Log implements Comparable<Log>{
 
     @Override
     public int compareTo(Log another) {
-        if(getDate()==null || another.getDate()==null)
+        if (getDate() == null || another.getDate() == null)
             return 0;
         return getDate().compareTo(another.getDate());
     }

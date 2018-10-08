@@ -29,33 +29,31 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
 
     private final SharengoApi mSharengoApi;
 
-
     public SharengoRetrofitDataSource(SharengoApi mSharengoApi) {
         this.mSharengoApi = mSharengoApi;
     }
 
     @Override
     public Observable<List<Customer>> getCustomer(long lastupdate) {
-        return  mSharengoApi.getCustomer(lastupdate)
+        return mSharengoApi.getCustomer(lastupdate)
                 .compose(this.handleRetrofitRequest());
     }
 
     @Override
     public Observable<List<BusinessEmployee>> getBusinessEmployees() {
-        return  mSharengoApi.getBusinessEmployees()
+        return mSharengoApi.getBusinessEmployees()
                 .compose(this.handleRetrofitRequest());
     }
 
     @Override
     public Observable<Config> getConfig(String car_plate) {
-        return  mSharengoApi.getConfigs(car_plate)
+        return mSharengoApi.getConfigs(car_plate)
                 .compose(this.handleRetrofitRequest());
     }
 
-
     @Override
     public Observable<List<Reservation>> getReservation(String car_plate) {
-        return  mSharengoApi.getReservation(car_plate)
+        return mSharengoApi.getReservation(car_plate)
                 .compose(this.handleSharengoRetrofitRequest());
     }
 
@@ -67,19 +65,19 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
 
     @Override
     public Observable<List<Area>> getArea(String md5) {
-        return  mSharengoApi.getArea(md5)
+        return mSharengoApi.getArea(md5)
                 .compose(this.handleSharengoRetrofitRequest());
     }
 
     @Override
     public Observable<List<ServerCommand>> getCommands(String plate) {
-        return  mSharengoApi.getCommands(plate)
+        return mSharengoApi.getCommands(plate)
                 .compose(this.handleSharengoRetrofitRequest());
     }
 
-        @Override
+    @Override
     public Observable<List<ModelResponse>> getModel(String plate) {
-        return  mSharengoApi.getModel(plate)
+        return mSharengoApi.getModel(plate)
                 .compose(this.handleRetrofitRequest());
     }
 
@@ -92,14 +90,16 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
     @Override
     public Observable<EventResponse> sendEvent(Event event, DataManager dataManager) {
         //DLog.D("HttpLogger: sending Event " + event.toString());
-        return mSharengoApi.sendEvent(event.event,event.label, App.CarPlate, event.id_customer, event.id_trip, event.timestamp, event.intval, event.txtval!=null?event.txtval:"", event.lon, event.lat, event.km, event.battery, App.IMEI, event.json_data)
+        return mSharengoApi.sendEvent(event.event, event.label, App.CarPlate, event.id_customer, event.id_trip, event.timestamp, event.intval, event.txtval != null ? event.txtval : "", event.lon, event.lat, event.km, event.battery, App.IMEI, event.json_data)
                 .compose(this.handleSharengoRetrofitRequest())
-                .concatMap(n ->{this.handleResponsePersistance(event,n,dataManager,0);
-                    return Observable.just(n);})
-                .doOnError(e ->{
-                    event.sending_error=true;
-                    event.sent=false;
-                    if(event.id == Events.EVT_SOS){
+                .concatMap(n -> {
+                    this.handleResponsePersistance(event, n, dataManager, 0);
+                    return Observable.just(n);
+                })
+                .doOnError(e -> {
+                    event.sending_error = true;
+                    event.sent = false;
+                    if (event.id == Events.EVT_SOS) {
                         event.intval = 3;
                     }
                     dataManager.updateEventSendingResponse(event);
@@ -109,6 +109,7 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
 
     /**
      * open trip and handle all the database operation to save the result of the opening
+     *
      * @param trip
      * @param dataManager
      * @return
@@ -117,7 +118,7 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
     public Observable<TripResponse> openTrip(final Trip trip, final DataManager dataManager) {
 
         return mSharengoApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat,
-                trip.warning==null?"":trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress==null?"":App.MacAddress, App.IMEI, trip.n_pin, trip.getId_parent() ==0?null:String.valueOf(trip.getId_parent()))
+                trip.warning == null ? "" : trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress == null ? "" : App.MacAddress, App.IMEI, trip.n_pin, trip.getId_parent() == 0 ? null : String.valueOf(trip.getId_parent()))
                 .compose(this.handleSharengoRetrofitRequest())
                 .doOnError(e -> {
                     trip.recharge = 0; //server result
@@ -132,31 +133,33 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
 
     /**
      * open trip wothout blocking the chain, it return the Trip not the TripResponse
+     *
      * @param trip
      * @param dataManager
      * @return
      */
     @Override
     public Observable<Trip> openTripPassive(final Trip trip, final DataManager dataManager) {
-        return openTrip(trip,dataManager)
+        return openTrip(trip, dataManager)
                 .concatMap(tripResponse -> Observable.just(trip));
     }
 
-
     /**
      * open trip wothout blocking the chain, it return the Trip not the TripResponse
+     *
      * @param trip
      * @param dataManager
      * @return
      */
     @Override
     public Observable<Trip> closeTripPassive(final Trip trip, final DataManager dataManager) {
-        return closeTrip(trip,dataManager)
+        return closeTrip(trip, dataManager)
                 .concatMap(tripResponse -> Observable.just(trip));
     }
 
     /**
      * update Trip for Pin Result
+     *
      * @param trip
      * @return
      */
@@ -164,22 +167,22 @@ public class SharengoRetrofitDataSource extends BaseRetrofitDataSource implement
     public Observable<TripResponse> updateTrip(final Trip trip) {
 
         return mSharengoApi.openTrip(1, trip.plate, trip.id_customer, trip.begin_timestamp, trip.begin_km, trip.begin_battery, trip.begin_lon, trip.begin_lat,
-                trip.warning==null?"":trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin, trip.getId_parent() ==0?null:String.valueOf(trip.getId_parent()))
+                trip.warning == null ? "" : trip.warning, trip.int_cleanliness, trip.ext_cleanliness, App.MacAddress, App.IMEI, trip.n_pin, trip.getId_parent() == 0 ? null : String.valueOf(trip.getId_parent()))
                 .compose(this.handleSharengoRetrofitRequest());
 
     }
 
     @Override
-    public Observable<TripResponse> closeTrip(final Trip trip,final DataManager dataManager) {
-        return mSharengoApi.closeTrip(2,trip.remote_id, trip.plate, trip.id_customer, trip.end_timestamp, trip.end_km, trip.end_battery, trip.end_lon, trip.end_lat,
-                trip.warning==null?"":trip.warning, trip.int_cleanliness, trip.ext_cleanliness, trip.park_seconds, trip.n_pin, trip.getId_parent() ==0?null:String.valueOf(trip.getId_parent()))
+    public Observable<TripResponse> closeTrip(final Trip trip, final DataManager dataManager) {
+        return mSharengoApi.closeTrip(2, trip.remote_id, trip.plate, trip.id_customer, trip.end_timestamp, trip.end_km, trip.end_battery, trip.end_lon, trip.end_lat,
+                trip.warning == null ? "" : trip.warning, trip.int_cleanliness, trip.ext_cleanliness, trip.park_seconds, trip.n_pin, trip.getId_parent() == 0 ? null : String.valueOf(trip.getId_parent()))
                 .compose(this.handleSharengoRetrofitRequest())
-                .doOnError(e ->{
-                    trip.offline=true;
+                .doOnError(e -> {
+                    trip.offline = true;
                     dataManager.updateTripSetOffline(trip);
                 })
                 .concatMap(tripResponse -> {
-                    trip.handleResponse(tripResponse,dataManager,Trip.CLOSE_TRIP);
+                    trip.handleResponse(tripResponse, dataManager, Trip.CLOSE_TRIP);
                     return Observable.just(tripResponse);
                 });
     }

@@ -1,138 +1,124 @@
 package eu.philcar.csg.OBC.db;
 
-
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import android.content.Context;
 import android.os.Handler;
-import android.os.SystemClock;
 
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.helpers.DLog;
-import eu.philcar.csg.OBC.server.Connectors;
-import eu.philcar.csg.OBC.server.HttpConnector;
-import eu.philcar.csg.OBC.service.TripInfo;
-import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class Events extends DbTable<Event,Integer> {
+public class Events extends DbTable<Event, Integer> {
 
-	public static final int EVT_SWBOOT =1;
-	public static final int EVT_RFID   =3;
-	public static final int EVT_BATTERY=4;
-	public static final int EVT_SPEED  =5;
-	public static final int EVT_AREA   =6;
-	public static final int EVT_CHARGE   =7;
-	public static final int EVT_ENGINE =8;
-	public static final int EVT_SOS    =9;
-	public static final int EVT_PARK   =10;
-	public static final int EVT_CMD    =11;
-	public static final int EVT_CLEANLINESS =12;
-	public static final int EVT_OBCFAIL = 13;
-	public static final int EVT_OBCOK = 14;	
-	public static final int EVT_KEY = 15;
-	public static final int EVT_READY = 16;
-	public static final int EVT_GEAR = 17;
-	public static final int EVT_DIAG = 18;
-	public static final int EVT_CARPLATE = 19;
-	public static final int EVT_3G = 20;
-	public static final int EVT_MAINTENANCE = 21;
-	public static final int EVT_OUTOFORDER=22;
-	public static final int EVT_SELFCLOSE = 23;
-	public static final int EVT_DEVICEINFO= 24;
-	public static final int EVT_SHUTDOWN= 25;
-	public static final int EVT_LEASE= 26;
-	public static final int EVT_REBOOT= 27;
-	public static final int EVT_SOC   	 =28;
-	public static final int EVT_OUTOFAREA	=29;
-	public static final int EVT_MENU_CLICK	=30;
-	public static final int EVT_CAN_ANOMALIES	=31;
-	public static final int EVT_REMOTE_CLOSE_TRIP	=32;
-	
-	
-	
-	private Map<Integer,String> labels = new HashMap<Integer,String>();
+    public static final int EVT_SWBOOT = 1;
+    public static final int EVT_RFID = 3;
+    public static final int EVT_BATTERY = 4;
+    public static final int EVT_SPEED = 5;
+    public static final int EVT_AREA = 6;
+    public static final int EVT_CHARGE = 7;
+    public static final int EVT_ENGINE = 8;
+    public static final int EVT_SOS = 9;
+    public static final int EVT_PARK = 10;
+    public static final int EVT_CMD = 11;
+    public static final int EVT_CLEANLINESS = 12;
+    public static final int EVT_OBCFAIL = 13;
+    public static final int EVT_OBCOK = 14;
+    public static final int EVT_KEY = 15;
+    public static final int EVT_READY = 16;
+    public static final int EVT_GEAR = 17;
+    public static final int EVT_DIAG = 18;
+    public static final int EVT_CARPLATE = 19;
+    public static final int EVT_3G = 20;
+    public static final int EVT_MAINTENANCE = 21;
+    public static final int EVT_OUTOFORDER = 22;
+    public static final int EVT_SELFCLOSE = 23;
+    public static final int EVT_DEVICEINFO = 24;
+    public static final int EVT_SHUTDOWN = 25;
+    public static final int EVT_LEASE = 26;
+    public static final int EVT_REBOOT = 27;
+    public static final int EVT_SOC = 28;
+    public static final int EVT_OUTOFAREA = 29;
+    public static final int EVT_MENU_CLICK = 30;
+    public static final int EVT_CAN_ANOMALIES = 31;
+    public static final int EVT_REMOTE_CLOSE_TRIP = 32;
 
-	public static long lastCanAnomalies=0;
-	
-	private DLog dlog = new DLog(this.getClass());
-	
-	 
-	public  Events(ConnectionSource connectionSource, Class dataClass)
-			throws SQLException {
-		super(connectionSource, dataClass);
-		
-		labels.put(EVT_SWBOOT, "SW_BOOT");
-		labels.put(EVT_RFID, "RFID");
-		labels.put(EVT_BATTERY, "BATTERY");
-		labels.put(EVT_SPEED, "SPEED");
-		labels.put(EVT_AREA, "AREA");
-		labels.put(EVT_CHARGE, "CHARGE");
-		labels.put(EVT_KEY, "KEY");
-		labels.put(EVT_READY, "READY");		
-		labels.put(EVT_SOS, "SOS");
-		labels.put(EVT_PARK, "PARK");
-		labels.put(EVT_CMD, "CMD");
-		labels.put(EVT_GEAR, "GEAR");
-		labels.put(EVT_CLEANLINESS, "CLEANLINESS");
-		labels.put(EVT_OBCFAIL, "OBC_FAIL");
-		labels.put(EVT_OBCOK, "OBC_OK");		
-		labels.put(EVT_DIAG, "DIAG");
-		labels.put(EVT_CARPLATE, "CARPLATE");
-		labels.put(EVT_3G, "3G");
-		labels.put(EVT_MAINTENANCE, "MAINTENANCE");
-		labels.put(EVT_OUTOFORDER, "OUT_OF_ORDER");
-		labels.put(EVT_SELFCLOSE, "SELFCLOSE");
-		labels.put(EVT_DEVICEINFO, "DEVICEINFO");
-		labels.put(EVT_SHUTDOWN, "SHUTDOWN");
-		labels.put(EVT_LEASE, "LEASE");
-		labels.put(EVT_REBOOT, "REBOOT");
-		labels.put(EVT_SOC, "SOC");
-		labels.put(EVT_OUTOFAREA, "AREA");
-		labels.put(EVT_MENU_CLICK, "MENU_CLICK");
-		labels.put(EVT_CAN_ANOMALIES, "CAN_ANOMALIES");
-		labels.put(EVT_REMOTE_CLOSE_TRIP, "EVT_REMOTE_CLOSE_TRIP");
+    private Map<Integer, String> labels = new HashMap<Integer, String>();
 
-		
-		
-	}
-	
-	
-	public  static Class GetRecordClass() {
-		return Event.class;
-	}
+    public static long lastCanAnomalies = 0;
 
+    private DLog dlog = new DLog(this.getClass());
 
+    public Events(ConnectionSource connectionSource, Class dataClass)
+            throws SQLException {
+        super(connectionSource, dataClass);
 
-	public void ResetFailed() {
-		try {
-			UpdateBuilder<Event, Integer> updateBuilder = updateBuilder();
+        labels.put(EVT_SWBOOT, "SW_BOOT");
+        labels.put(EVT_RFID, "RFID");
+        labels.put(EVT_BATTERY, "BATTERY");
+        labels.put(EVT_SPEED, "SPEED");
+        labels.put(EVT_AREA, "AREA");
+        labels.put(EVT_CHARGE, "CHARGE");
+        labels.put(EVT_KEY, "KEY");
+        labels.put(EVT_READY, "READY");
+        labels.put(EVT_SOS, "SOS");
+        labels.put(EVT_PARK, "PARK");
+        labels.put(EVT_CMD, "CMD");
+        labels.put(EVT_GEAR, "GEAR");
+        labels.put(EVT_CLEANLINESS, "CLEANLINESS");
+        labels.put(EVT_OBCFAIL, "OBC_FAIL");
+        labels.put(EVT_OBCOK, "OBC_OK");
+        labels.put(EVT_DIAG, "DIAG");
+        labels.put(EVT_CARPLATE, "CARPLATE");
+        labels.put(EVT_3G, "3G");
+        labels.put(EVT_MAINTENANCE, "MAINTENANCE");
+        labels.put(EVT_OUTOFORDER, "OUT_OF_ORDER");
+        labels.put(EVT_SELFCLOSE, "SELFCLOSE");
+        labels.put(EVT_DEVICEINFO, "DEVICEINFO");
+        labels.put(EVT_SHUTDOWN, "SHUTDOWN");
+        labels.put(EVT_LEASE, "LEASE");
+        labels.put(EVT_REBOOT, "REBOOT");
+        labels.put(EVT_SOC, "SOC");
+        labels.put(EVT_OUTOFAREA, "AREA");
+        labels.put(EVT_MENU_CLICK, "MENU_CLICK");
+        labels.put(EVT_CAN_ANOMALIES, "CAN_ANOMALIES");
+        labels.put(EVT_REMOTE_CLOSE_TRIP, "EVT_REMOTE_CLOSE_TRIP");
 
-			updateBuilder.updateColumnValue("sent", false);
-			updateBuilder.where().ne("event",9);//escludo gli eventi SOS per evitare falsi positivi
-			updateBuilder.update();
-			updateBuilder.reset();
-		} catch (SQLException e) {
-			dlog.e("ResetFailed error:",e);
-		}
-	}
+    }
+
+    public static Class GetRecordClass() {
+        return Event.class;
+    }
+
+    public void ResetFailed() {
+        try {
+            UpdateBuilder<Event, Integer> updateBuilder = updateBuilder();
+
+            updateBuilder.updateColumnValue("sent", false);
+            updateBuilder.where().ne("event", 9);//escludo gli eventi SOS per evitare falsi positivi
+            updateBuilder.update();
+            updateBuilder.reset();
+        } catch (SQLException e) {
+            dlog.e("ResetFailed error:", e);
+        }
+    }
 
 
 	/*public static void eventEngine(int state) {
-		generateEvent(EVT_ENGINE,state,null);
+        generateEvent(EVT_ENGINE,state,null);
 	}
 
 	public static void eventSwBoot(String version) {
@@ -341,71 +327,65 @@ public class Events extends DbTable<Event,Integer> {
 
 	}*/
 
-	@SuppressWarnings("unchecked")
-	public List<Event> getEventsToSend() {
-		
-		try {
-			Where<Event,Integer> where  = queryBuilder().orderBy("timestamp", true).where();
+    @SuppressWarnings("unchecked")
+    public List<Event> getEventsToSend() {
 
-			where.and(
-				where.eq("sent",false),
-				//where.eq("sending_error", false)
-				where.ge("timestamp",((System.currentTimeMillis()/1000)-60*60*24*7)) //7 giorni sempre
-			);
+        try {
+            Where<Event, Integer> where = queryBuilder().orderBy("timestamp", true).where();
 
+            where.and(
+                    where.eq("sent", false),
+                    //where.eq("sending_error", false)
+                    where.ge("timestamp", ((System.currentTimeMillis() / 1000) - 60 * 60 * 24 * 7)) //7 giorni sempre
+            );
 
+            PreparedQuery<Event> query = where.prepare();
 
+            dlog.d("Query : " + query.toString());
 
-			PreparedQuery<Event> query =  where.prepare();
+            return this.query(query);
 
-			dlog.d("Query : " + query.toString());
+        } catch (SQLException e) {
+            dlog.e("getEventsToSend fail:", e);
+            return null;
 
-			return this.query(query);
+        }
+    }
 
-		} catch (SQLException e) {
-			dlog.e("getEventsToSend fail:",e);
-			return null;
+    public boolean spedisciOffline(Context context, Handler handler, SharengoApiRepository apiRepository, SharengoPhpRepository phpRepository) {
+        //HttpConnector http;
+        if (!SharengoApiRepository.sendingEvents)
+            Observable.just(0)
+                    .concatMap(i -> Observable.just(getEventsToSend()))
+                    .doOnNext(list -> {
+                        if (App.fullNode)
+                            apiRepository.sendEvents(list);
+                        else
+                            phpRepository.sendEvents(list);
+                    })
+                    .subscribeOn(Schedulers.computation())
+                    .subscribe(new Observer<List<Event>>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
 
-		}
-	}
+                        }
 
+                        @Override
+                        public void onNext(List<Event> events) {
 
-	
-	
-	public boolean spedisciOffline(Context context, Handler handler, SharengoApiRepository apiRepository, SharengoPhpRepository phpRepository) {
-		//HttpConnector http;
-		if(!SharengoApiRepository.sendingEvents)
-		Observable.just(0)
-				.concatMap(i->Observable.just(getEventsToSend()))
-				.doOnNext(list->{
-					if(App.fullNode)
-						apiRepository.sendEvents(list);
-					else
-						phpRepository.sendEvents(list);
-				})
-				.subscribeOn(Schedulers.computation())
-				.subscribe(new Observer<List<Event>>() {
-					@Override
-					public void onSubscribe(Disposable d) {
+                            dlog.d("Eventi to send : " + events.size());
+                        }
 
-					}
+                        @Override
+                        public void onError(Throwable e) {
+                            dlog.e("Esception sending offline Events", e);
+                        }
 
-					@Override
-					public void onNext(List<Event> events) {
+                        @Override
+                        public void onComplete() {
 
-						dlog.d("Eventi to send : " + events.size());
-					}
-
-					@Override
-					public void onError(Throwable e) {
-					dlog.e("Esception sending offline Events",e);
-					}
-
-					@Override
-					public void onComplete() {
-
-					}
-				});
+                        }
+                    });
 		/*List<Event> list = getEventsToSend();
 		
 		if (list==null) 
@@ -423,7 +403,7 @@ public class Events extends DbTable<Event,Integer> {
 		else
 			phpRepository.sendEvents(list);*/
 
-		//Dato che l'invio � asincrono viene richiesto l'invio solo della prima corsa non spedito, quando arriva il messaggio di risposto di invio eseguito(o fallito) passa alla successiva 
+        //Dato che l'invio � asincrono viene richiesto l'invio solo della prima corsa non spedito, quando arriva il messaggio di risposto di invio eseguito(o fallito) passa alla successiva
 		/*for(Event e : list) {
 			
 			dlog.d("Selected  evento to send:" + e.toString());
@@ -443,12 +423,8 @@ public class Events extends DbTable<Event,Integer> {
 						
 			return true;
 		}*/
-		
-		return false;
-	}
 
+        return false;
+    }
 
-
-	
-	
 }

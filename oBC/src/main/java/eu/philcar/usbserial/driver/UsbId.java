@@ -23,7 +23,7 @@ package eu.philcar.usbserial.driver;
 
 /**
  * Registry of USB vendor/product ID constants.
- *
+ * <p>
  * Culled from various sources; see
  * <a href="http://www.linux-usb.org/usb.ids">usb.ids</a> for one listing.
  *

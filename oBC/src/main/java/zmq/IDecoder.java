@@ -21,8 +21,7 @@ package zmq;
 
 import java.nio.ByteBuffer;
 
-public interface IDecoder
-{
+public interface IDecoder {
     void setMsgSink(IMsgSink msgSink);
 
     ByteBuffer getBuffer();

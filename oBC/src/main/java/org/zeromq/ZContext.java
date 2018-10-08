@@ -19,26 +19,24 @@
 
 package org.zeromq;
 
+import org.zeromq.ZMQ.Context;
+import org.zeromq.ZMQ.Socket;
+
 import java.io.Closeable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.zeromq.ZMQ.Context;
-import org.zeromq.ZMQ.Socket;
 
 import zmq.ZError;
 
 /**
  * ZContext provides a high-level ZeroMQ context management class
- *
+ * <p>
  * It manages open sockets in the context and automatically closes these before terminating the context.
  * It provides a simple way to set the linger timeout on sockets, and configure contexts for number of I/O threads.
  * Sets-up signal (interrupt) handling for the process.
- *
  */
 
-public class ZContext implements Closeable
-{
+public class ZContext implements Closeable {
     /**
      * Reference to underlying Context object
      */
@@ -73,13 +71,11 @@ public class ZContext implements Closeable
     /**
      * Class Constructor
      */
-    public ZContext()
-    {
+    public ZContext() {
         this(1);
     }
 
-    public ZContext(int ioThreads)
-    {
+    public ZContext(int ioThreads) {
         sockets = new CopyOnWriteArrayList<Socket>();
         this.ioThreads = ioThreads;
         linger = 0;
@@ -89,13 +85,11 @@ public class ZContext implements Closeable
     /**
      * Destructor.  Call this to gracefully terminate context and close any managed 0MQ sockets
      */
-    public void destroy()
-    {
+    public void destroy() {
         for (Socket socket : sockets) {
             try {
                 socket.setLinger(linger);
-            }
-            catch (ZError.CtxTerminatedException e) {
+            } catch (ZError.CtxTerminatedException e) {
             }
             socket.close();
         }
@@ -112,13 +106,11 @@ public class ZContext implements Closeable
     /**
      * Creates a new managed socket within this ZContext instance.
      * Use this to get automatic management of the socket at shutdown
-     * @param type
-     *          socket type (see ZMQ static class members)
-     * @return
-     *          Newly created Socket object
+     *
+     * @param type socket type (see ZMQ static class members)
+     * @return Newly created Socket object
      */
-    public Socket createSocket(int type)
-    {
+    public Socket createSocket(int type) {
         // Create and register socket
         Socket socket = getContext().socket(type);
         sockets.add(socket);
@@ -128,11 +120,10 @@ public class ZContext implements Closeable
     /**
      * Destroys managed socket within this context
      * and remove from sockets list
-     * @param s
-     *          org.zeromq.Socket object to destroy
+     *
+     * @param s org.zeromq.Socket object to destroy
      */
-    public void destroySocket(Socket s)
-    {
+    public void destroySocket(Socket s) {
         if (s == null) {
             return;
         }
@@ -140,8 +131,7 @@ public class ZContext implements Closeable
         if (sockets.contains(s)) {
             try {
                 s.setLinger(linger);
-            }
-            catch (ZError.CtxTerminatedException e) {
+            } catch (ZError.CtxTerminatedException e) {
             }
             s.close();
             sockets.remove(s);
@@ -152,11 +142,11 @@ public class ZContext implements Closeable
      * Creates new shadow context.
      * Shares same underlying org.zeromq.Context instance but has own list
      * of managed sockets, io thread count etc.
-     * @param ctx   Original ZContext to create shadow of
-     * @return  New ZContext
+     *
+     * @param ctx Original ZContext to create shadow of
+     * @return New ZContext
      */
-    public static ZContext shadow(ZContext ctx)
-    {
+    public static ZContext shadow(ZContext ctx) {
         ZContext shadow = new ZContext();
         shadow.setContext(ctx.getContext());
         shadow.setMain(false);
@@ -167,72 +157,63 @@ public class ZContext implements Closeable
     /**
      * @return the ioThreads
      */
-    public int getIoThreads()
-    {
+    public int getIoThreads() {
         return ioThreads;
     }
 
     /**
      * @param ioThreads the ioThreads to set
      */
-    public void setIoThreads(int ioThreads)
-    {
+    public void setIoThreads(int ioThreads) {
         this.ioThreads = ioThreads;
     }
 
     /**
      * @return the linger
      */
-    public int getLinger()
-    {
+    public int getLinger() {
         return linger;
     }
 
     /**
      * @param linger the linger to set
      */
-    public void setLinger(int linger)
-    {
+    public void setLinger(int linger) {
         this.linger = linger;
     }
 
     /**
      * @return the HWM
      */
-    public int getHWM()
-    {
+    public int getHWM() {
         return hwm;
     }
 
     /**
      * @param hwm the HWM to set
      */
-    public void setHWM(int hwm)
-    {
+    public void setHWM(int hwm) {
         this.hwm = hwm;
     }
 
     /**
      * @return the main
      */
-    public boolean isMain()
-    {
+    public boolean isMain() {
         return main;
     }
 
     /**
      * @param main the main to set
      */
-    public void setMain(boolean main)
-    {
+    public void setMain(boolean main) {
         this.main = main;
     }
 
     /**
      * @return the context
      */
-    public Context getContext()
-    {
+    public Context getContext() {
         Context result = context;
         if (result == null) {
             synchronized (this) {
@@ -247,24 +228,21 @@ public class ZContext implements Closeable
     }
 
     /**
-     * @param ctx   sets the underlying org.zeromq.Context associated with this ZContext wrapper object
+     * @param ctx sets the underlying org.zeromq.Context associated with this ZContext wrapper object
      */
-    public void setContext(Context ctx)
-    {
+    public void setContext(Context ctx) {
         this.context = ctx;
     }
 
     /**
      * @return the sockets
      */
-    public List<Socket> getSockets()
-    {
+    public List<Socket> getSockets() {
         return sockets;
     }
 
     @Override
-    public void close()
-    {
+    public void close() {
         destroy();
     }
 }

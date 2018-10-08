@@ -26,8 +26,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Mailbox
-        implements Closeable
-{
+        implements Closeable {
     //  The pipe to store actual commands.
     private final YPipe<Command> cpipe;
 
@@ -47,8 +46,7 @@ public class Mailbox
     // mailbox name, for better debugging
     private final String name;
 
-    public Mailbox(String name)
-    {
+    public Mailbox(String name) {
         cpipe = new YPipe<Command>(Config.COMMAND_PIPE_GRANULARITY.getValue());
         sync = new ReentrantLock();
         signaler = new Signaler();
@@ -64,20 +62,17 @@ public class Mailbox
         this.name = name;
     }
 
-    public SelectableChannel getFd()
-    {
+    public SelectableChannel getFd() {
         return signaler.getFd();
     }
 
-    public void send(final Command cmd)
-    {
+    public void send(final Command cmd) {
         boolean ok = false;
         sync.lock();
         try {
             cpipe.write(cmd, false);
             ok = cpipe.flush();
-        }
-        finally {
+        } finally {
             sync.unlock();
         }
 
@@ -86,8 +81,7 @@ public class Mailbox
         }
     }
 
-    public Command recv(long timeout)
-    {
+    public Command recv(long timeout) {
         Command cmd = null;
         //  Try to get the command straight away.
         if (active) {
@@ -118,8 +112,7 @@ public class Mailbox
     }
 
     @Override
-    public void close() throws IOException
-    {
+    public void close() throws IOException {
         //  TODO: Retrieve and deallocate commands inside the cpipe.
 
         // Work around problem that other threads might still be in our
@@ -131,8 +124,7 @@ public class Mailbox
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return super.toString() + "[" + name + "]";
     }
 }

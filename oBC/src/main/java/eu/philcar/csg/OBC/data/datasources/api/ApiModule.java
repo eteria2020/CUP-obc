@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.skobbler.ngx.SKCoordinate;
 
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -25,14 +24,12 @@ import javax.net.ssl.X509TrustManager;
 
 import dagger.Module;
 import dagger.Provides;
-import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.data.common.SerializationExclusionStrategy;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.injection.ApplicationContext;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -48,11 +45,9 @@ public class ApiModule {
     @Singleton
     SharengoApi provideSharengoApi(@ApplicationContext Context context) {
 
-
         Gson gson = new GsonBuilder()
                 .addSerializationExclusionStrategy(new SerializationExclusionStrategy())
                 .create();
-
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(context.getString(R.string.endpointSharengo))
@@ -83,7 +78,6 @@ public class ApiModule {
                 .addSerializationExclusionStrategy(new SerializationExclusionStrategy())
                 .create();
 
-
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(context.getString(R.string.endpointSharengoPhp))
                 //.baseUrl("http:gr3dcomunication.com/sharengo/")
@@ -103,7 +97,6 @@ public class ApiModule {
                 .addSerializationExclusionStrategy(new SerializationExclusionStrategy())
                 .create();
 
-
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(context.getString(R.string.endpointSharengoBeacon))
                 //.baseUrl("http:gr3dcomunication.com/sharengo/")
@@ -117,7 +110,7 @@ public class ApiModule {
 
     @Provides
     @Singleton
-    OkHttpClient provideOkHttpClientTrusted(Context context){
+    OkHttpClient provideOkHttpClientTrusted(Context context) {
         /*HttpLogger logger = new HttpLogger();
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(logger){
 
@@ -131,12 +124,13 @@ public class ApiModule {
 
         try {
 
-            final TrustManager[] trustAllCerts = new TrustManager[] {
+            final TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
                         @Override
                         public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
 
                         }
+
                         @Override
                         public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
 
@@ -148,9 +142,6 @@ public class ApiModule {
                         }
                     }
             };
-
-
-
 
             CertificateFactory cf = CertificateFactory.getInstance("X509");
             Certificate caServer;
@@ -178,8 +169,8 @@ public class ApiModule {
 
                 httpClient.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
             }
-        }catch (Exception e){
-            DLog.E("Exception while providing OKHTTPCLIENTTrusted",e);
+        } catch (Exception e) {
+            DLog.E("Exception while providing OKHTTPCLIENTTrusted", e);
         }
 
         /*httpClient.addInterceptor(new Interceptor() {
@@ -209,16 +200,17 @@ public class ApiModule {
                                         }
                                     }
         );
-        httpClient.readTimeout(20, TimeUnit.SECONDS);
-        httpClient.connectTimeout(20, TimeUnit.SECONDS);
-        httpClient.retryOnConnectionFailure(false);
+        httpClient.readTimeout(40, TimeUnit.SECONDS);
+        httpClient.connectTimeout(40, TimeUnit.SECONDS);
+        httpClient.writeTimeout(40,TimeUnit.SECONDS);
+        httpClient.retryOnConnectionFailure(true);
 
         return httpClient.build();
     }
 
     @Provides
     @Singleton
-    OkHttpClient provideOkHttpClient(){
+    OkHttpClient provideOkHttpClient() {
 /*        HttpLogger logger = new HttpLogger();
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(logger);
             logging.setLevel(HttpLoggingInterceptor.Level.BASIC);*/

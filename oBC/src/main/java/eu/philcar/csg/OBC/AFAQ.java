@@ -1,19 +1,17 @@
 package eu.philcar.csg.OBC;
 
-import eu.philcar.csg.OBC.R;
-import eu.philcar.csg.OBC.controller.sos.FSOS;
-import eu.philcar.csg.OBC.controller.sos.FFAQ;
-import eu.philcar.csg.OBC.helpers.Clients;
-import eu.philcar.csg.OBC.service.ObcService;
-import eu.philcar.csg.OBC.service.ServiceConnector;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.widget.Toast;
 
-public class AFAQ  extends ABase {
+import eu.philcar.csg.OBC.controller.sos.FFAQ;
+import eu.philcar.csg.OBC.helpers.Clients;
+import eu.philcar.csg.OBC.service.ObcService;
+import eu.philcar.csg.OBC.service.ServiceConnector;
+
+public class AFAQ extends ABase {
 
     private ServiceConnector serviceConnector;
 
@@ -22,7 +20,6 @@ public class AFAQ  extends ABase {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.a_base);
-
 
         serviceConnector = new ServiceConnector(this, serviceHandler);
 
@@ -68,12 +65,11 @@ public class AFAQ  extends ABase {
         serviceConnector.disconnect();
     }
 
-    private  Handler serviceHandler = new Handler() {
+    private Handler serviceHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
 
             switch (msg.what) {
-
 
                 case ObcService.MSG_TRIP_END:
                     Intent i = new Intent(AFAQ.this, AWelcome.class);

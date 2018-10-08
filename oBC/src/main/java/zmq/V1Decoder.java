@@ -21,8 +21,7 @@ package zmq;
 
 import java.nio.ByteBuffer;
 
-public class V1Decoder extends DecoderBase
-{
+public class V1Decoder extends DecoderBase {
     private static final int ONE_BYTE_SIZE_READY = 0;
     private static final int EIGHT_BYTE_SIZE_READY = 1;
     private static final int FLAGS_READY = 2;
@@ -34,8 +33,7 @@ public class V1Decoder extends DecoderBase
     private final long maxmsgsize;
     private int msgFlags;
 
-    public V1Decoder(int bufsize, long maxmsgsize, IMsgSink session)
-    {
+    public V1Decoder(int bufsize, long maxmsgsize, IMsgSink session) {
         super(bufsize);
 
         this.maxmsgsize = maxmsgsize;
@@ -49,30 +47,27 @@ public class V1Decoder extends DecoderBase
 
     //  Set the receiver of decoded messages.
     @Override
-    public void setMsgSink(IMsgSink msgSink)
-    {
+    public void setMsgSink(IMsgSink msgSink) {
         this.msgSink = msgSink;
     }
 
     @Override
-    protected boolean next()
-    {
-        switch(state()) {
-        case ONE_BYTE_SIZE_READY:
-            return oneByteSizeReady();
-        case EIGHT_BYTE_SIZE_READY:
-            return eightByteSizeReady();
-        case FLAGS_READY:
-            return flagsReady();
-        case MESSAGE_READY:
-            return messageReady();
-        default:
-            return false;
+    protected boolean next() {
+        switch (state()) {
+            case ONE_BYTE_SIZE_READY:
+                return oneByteSizeReady();
+            case EIGHT_BYTE_SIZE_READY:
+                return eightByteSizeReady();
+            case FLAGS_READY:
+                return flagsReady();
+            case MESSAGE_READY:
+                return messageReady();
+            default:
+                return false;
         }
     }
 
-    private boolean oneByteSizeReady()
-    {
+    private boolean oneByteSizeReady() {
         int size = tmpbuf[0];
         if (size < 0) {
             size = (0xff) & size;
@@ -98,8 +93,7 @@ public class V1Decoder extends DecoderBase
         return true;
     }
 
-    private boolean eightByteSizeReady()
-    {
+    private boolean eightByteSizeReady() {
         //  The payload size is encoded as 64-bit unsigned integer.
         //  The most significant byte comes first.
         final long msgSize = ByteBuffer.wrap(tmpbuf).getLong();
@@ -130,8 +124,7 @@ public class V1Decoder extends DecoderBase
         return true;
     }
 
-    private boolean flagsReady()
-    {
+    private boolean flagsReady() {
         //  Store the flags from the wire into the message structure.
         msgFlags = 0;
         int first = tmpbuf[0];
@@ -143,16 +136,14 @@ public class V1Decoder extends DecoderBase
         //  depending on whether the 'large' bit is set.
         if ((first & V1Protocol.LARGE_FLAG) > 0) {
             nextStep(tmpbuf, 8, EIGHT_BYTE_SIZE_READY);
-        }
-        else {
+        } else {
             nextStep(tmpbuf, 1, ONE_BYTE_SIZE_READY);
         }
 
         return true;
     }
 
-    private boolean messageReady()
-    {
+    private boolean messageReady() {
         //  Message is completely read. Push it further and start reading
         //  new message. (inProgress is a 0-byte message after this point.)
 

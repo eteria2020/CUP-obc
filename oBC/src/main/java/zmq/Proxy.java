@@ -22,15 +22,12 @@ package zmq;
 import java.io.IOException;
 import java.nio.channels.Selector;
 
-public class Proxy
-{
-    private Proxy()
-    {
+public class Proxy {
+    private Proxy() {
     }
 
     public static boolean proxy(SocketBase frontend,
-            SocketBase backend, SocketBase capture)
-    {
+                                SocketBase backend, SocketBase capture) {
         //  The algorithm below assumes ratio of requests and replies processed
         //  under full load to be 1:1.
 
@@ -49,8 +46,7 @@ public class Proxy
         Selector selector;
         try {
             selector = Selector.open();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ZError.IOException(e);
         }
 
@@ -127,12 +123,10 @@ public class Proxy
                     }
                 }
             }
-        }
-        finally {
+        } finally {
             try {
                 selector.close();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
             }
         }
 

@@ -1,6 +1,5 @@
 package eu.philcar.csg.OBC.server;
 
-
 import org.apache.http.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,98 +15,97 @@ import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.BusinessEmployees;
 import eu.philcar.csg.OBC.db.DbManager;
 import eu.philcar.csg.OBC.helpers.DLog;
+
 @Deprecated
 public class BusinessEmployeeConnector implements RemoteEntityInterface {
 
-	private DLog dlog = new DLog(this.getClass());
+    private DLog dlog = new DLog(this.getClass());
 
-	public static BusinessEmployeeConnector GetDownloadConnector() {
-		return new BusinessEmployeeConnector();
-	}
-	
+    public static BusinessEmployeeConnector GetDownloadConnector() {
+        return new BusinessEmployeeConnector();
+    }
 
-	public int MsgId() {
-		return Connectors.MSG_DN_AZIENDE;
-	}
-	
-	public String GetRemoteUrl() {
-		return App.URL_Dipendenti;
-	}
-	
-	public int DecodeJson(String responseBody) {
-		if (responseBody == null || responseBody.isEmpty()) {
-			dlog.e("Empty response");
-			return MsgId();
-		}
+    public int MsgId() {
+        return Connectors.MSG_DN_AZIENDE;
+    }
 
-		DbManager dbm = App.Instance.getDbManager();
+    public String GetRemoteUrl() {
+        return App.URL_Dipendenti;
+    }
 
-		final BusinessEmployees dipendentiDao = dbm.getDipendentiDao();
+    public int DecodeJson(String responseBody) {
+        if (responseBody == null || responseBody.isEmpty()) {
+            dlog.e("Empty response");
+            return MsgId();
+        }
 
-		final JSONArray jArray;
-		try {
-			jArray = new JSONArray(responseBody);
-		} catch (JSONException e) {
-			dlog.e("Errore estraendo array json", e);
-			return MsgId();
-		}
+        DbManager dbm = App.Instance.getDbManager();
 
-		dlog.d("Downloaded " + jArray.length() + " records");
-		long ts_begin = System.currentTimeMillis();
-		try {
-			dipendentiDao.callBatchTasks(new Callable<Void>() {
+        final BusinessEmployees dipendentiDao = dbm.getDipendentiDao();
 
-				@Override
-				public Void call() throws Exception {
+        final JSONArray jArray;
+        try {
+            jArray = new JSONArray(responseBody);
+        } catch (JSONException e) {
+            dlog.e("Errore estraendo array json", e);
+            return MsgId();
+        }
 
-					dipendentiDao.deleteAll(); //delete everything since I just received the new list of employees
+        dlog.d("Downloaded " + jArray.length() + " records");
+        long ts_begin = System.currentTimeMillis();
+        try {
+            dipendentiDao.callBatchTasks(new Callable<Void>() {
 
-					int n = jArray.length();
-					for (int i = 0; i < n; i++) {
-						try {
-							JSONObject jobj = jArray.getJSONObject(i);
-							BusinessEmployee b = new BusinessEmployee();
-							b.id = jobj.getInt("id");
-							b.businessCode = jobj.getString("codice_azienda");
-							b.isBusinessEnabled = jobj.getBoolean("azienda_abilitata");
-							b.timeLimits = jobj.getString("limite_orari");
+                @Override
+                public Void call() throws Exception {
 
-							try {
-								dipendentiDao.createOrUpdate(b);
-							} catch (SQLException e) {
-								dlog.e("Insert or update:", e);
-							}
-						} catch (JSONException e) {
-							dlog.e("Errore estraendo array json", e);
+                    dipendentiDao.deleteAll(); //delete everything since I just received the new list of employees
 
-						}
-					}
-					return null;
-				}
+                    int n = jArray.length();
+                    for (int i = 0; i < n; i++) {
+                        try {
+                            JSONObject jobj = jArray.getJSONObject(i);
+                            BusinessEmployee b = new BusinessEmployee();
+                            b.id = jobj.getInt("id");
+                            b.businessCode = jobj.getString("codice_azienda");
+                            b.isBusinessEnabled = jobj.getBoolean("azienda_abilitata");
+                            b.timeLimits = jobj.getString("limite_orari");
 
-			});
-		} catch (SQLException e1) {
-			dlog.e("SQLException",e1);
-		}
+                            try {
+                                dipendentiDao.createOrUpdate(b);
+                            } catch (SQLException e) {
+                                dlog.e("Insert or update:", e);
+                            }
+                        } catch (JSONException e) {
+                            dlog.e("Errore estraendo array json", e);
 
+                        }
+                    }
+                    return null;
+                }
 
-		long time = System.currentTimeMillis() - ts_begin;
-		int receivedRecords = jArray.length();
-		dlog.d("BusinessEmployee list parse: " + time +"ms for " + receivedRecords );
+            });
+        } catch (SQLException e1) {
+            dlog.e("SQLException", e1);
+        }
 
-		return MsgId();
-	}
+        long time = System.currentTimeMillis() - ts_begin;
+        int receivedRecords = jArray.length();
+        dlog.d("BusinessEmployee list parse: " + time + "ms for " + receivedRecords);
 
-	public eDirection getDirection() {
-		return eDirection.DOWNLOAD;
-	}
+        return MsgId();
+    }
 
-	public String EncodeJson() {
-		return null;
-	}
+    public eDirection getDirection() {
+        return eDirection.DOWNLOAD;
+    }
 
-	@Override
-	public List<NameValuePair> GetParams() {
-		return new ArrayList<>();
-	}
+    public String EncodeJson() {
+        return null;
+    }
+
+    @Override
+    public List<NameValuePair> GetParams() {
+        return new ArrayList<>();
+    }
 }

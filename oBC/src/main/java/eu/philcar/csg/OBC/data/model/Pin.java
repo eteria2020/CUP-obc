@@ -1,14 +1,12 @@
 package eu.philcar.csg.OBC.data.model;
 
-import com.google.gson.Gson;
-
 import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
 
 /**
  * Created by Fulvio on 15/02/2018.
  */
 
-public class Pin extends BaseResponse{
+public class Pin extends BaseResponse {
     private String primary;
     private String secondary;
     private String company;
@@ -42,6 +40,5 @@ public class Pin extends BaseResponse{
     public void setCompany(String company) {
         this.company = company;
     }
-
 
 }

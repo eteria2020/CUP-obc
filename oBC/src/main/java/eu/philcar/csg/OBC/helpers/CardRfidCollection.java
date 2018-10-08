@@ -13,57 +13,55 @@ import eu.philcar.csg.OBC.interfaces.BasicJsonCollection;
  * Created by Fulvio on 06/10/2017.
  */
 
-public class CardRfidCollection implements BasicJsonCollection{
-    private DLog dlog =new DLog(this.getClass());
+public class CardRfidCollection implements BasicJsonCollection {
+    private DLog dlog = new DLog(this.getClass());
 
     private ArrayList<CardRfid> cards;
 
     public CardRfidCollection() {
-        cards=new ArrayList<>();
+        cards = new ArrayList<>();
     }
 
     public static CardRfidCollection decodeFromJson(String json) {
-        CardRfidCollection result= new CardRfidCollection();
+        CardRfidCollection result = new CardRfidCollection();
 
         JSONArray ja;
         try {
-            if(!json.equalsIgnoreCase("") && !json.equalsIgnoreCase("{}")) {
+            if (!json.equalsIgnoreCase("") && !json.equalsIgnoreCase("{}")) {
                 ja = new JSONArray(json);
 
                 if (ja.length() > 0) {
                     for (int i = 0; i < ja.length(); i++) {
                         JSONObject jo = ja.optJSONObject(i);
                         if (jo != null) {
-                           result.add(CardRfid.decodeFromJson(jo.toString()));
+                            result.add(CardRfid.decodeFromJson(jo.toString()));
                         }
                     }
                 }
             }
         } catch (JSONException e) {
-            DLog.E("Parsing OpenDoorsCardsSetup JSON",e);
+            DLog.E("Parsing OpenDoorsCardsSetup JSON", e);
         }
         return result;
 
     }
 
     @Override
-    public String  toJson(){
+    public String toJson() {
 
         JSONArray ja = new JSONArray();
-        for(CardRfid card : cards) {
+        for (CardRfid card : cards) {
             ja.put(card.toJsonObject());
         }
         return ja.toString();
     }
 
-
-
     @Override
-    public boolean add(BasicJson card){
-        if(card instanceof CardRfid && card.isValid()){
-            cards.add((CardRfid)card);
+    public boolean add(BasicJson card) {
+        if (card instanceof CardRfid && card.isValid()) {
+            cards.add((CardRfid) card);
             return true;
-        }else {
+        } else {
             return false;
         }
     }
@@ -80,13 +78,14 @@ public class CardRfidCollection implements BasicJsonCollection{
 
     @Override
     public boolean contains(BasicJson unit) {
-        if(unit instanceof CardRfid){
+        if (unit instanceof CardRfid) {
 
             return cards.contains(unit);
-        }else{
+        } else {
             return false;
         }
     }
+
     @Override
     public BasicJson find(BasicJson unit) {
         try {
@@ -98,7 +97,7 @@ public class CardRfidCollection implements BasicJsonCollection{
                 return null;
             }
         } catch (Exception e) {
-            dlog.e("exception while finding card",e);
+            dlog.e("exception while finding card", e);
             return null;
         }
     }

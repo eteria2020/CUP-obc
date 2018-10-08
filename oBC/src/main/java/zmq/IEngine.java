@@ -20,8 +20,7 @@
 package zmq;
 
 //  Abstract interface to be implemented by various engines.
-public interface IEngine
-{
+public interface IEngine {
     //  Plug the engine to the session.
     void plug(IOThread ioThread, SessionBase session);
 

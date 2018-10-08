@@ -1,12 +1,10 @@
 package eu.philcar.csg.OBC.data.datasources.api;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import eu.philcar.csg.OBC.helpers.DLog;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -20,6 +18,7 @@ import okio.Buffer;
 
 public class LoggerInterceptor implements Interceptor {
     HttpLogger logger = new HttpLogger();
+
     @SuppressLint("DefaultLocale")
     @Override
     public Response intercept(Chain chain) throws IOException {
@@ -32,40 +31,30 @@ public class LoggerInterceptor implements Interceptor {
 
             if (request.method().equalsIgnoreCase("POST") && request.body() != null) {
                 request.body().writeTo(requestBuffer);
-                params ="body";
-            }else if(request.method().equalsIgnoreCase("GET")){
+                params = "body";
+            } else if (request.method().equalsIgnoreCase("GET")) {
                 String query = request.url().query();
-                requestBuffer.writeString(query==null?"":query, Charset.defaultCharset());
+                requestBuffer.writeString(query == null ? "" : query, Charset.defaultCharset());
                 params = "params";
-                if(url.contains("?"))
-                    url = url.substring(0,request.url().toString().lastIndexOf('?'));
+                if (url.contains("?"))
+                    url = url.substring(0, request.url().toString().lastIndexOf('?'));
             }
 
-
-            logger.log(String.format("--> %s request %s %s: %s", request.method(), url,params, requestBuffer.readUtf8()));
+            logger.log(String.format("--> %s request %s %s: %s", request.method(), url, params, requestBuffer.readUtf8()));
         } catch (Exception e) {
             logger.e("Exception writing log " + request.url(), e);
         }
-
-
-
-
 
         Response response = chain.proceed(request);
 
         long t2 = System.nanoTime();
         try {
-            logger.log( String.format("<-- %s response %s for %s in %.1fms",
-                    response.request().method(),response.code(), response.request().url(), (t2 - t1) / 1e6d ));
-        }catch (Exception e){
-            logger.e("Exception writing log "+request.url(),e);
-        }
+            logger.log(String.format("<-- %s response %s for %s in %.1fms Body ",
+                    response.request().method(), response.code(), response.request().url(), (t2 - t1) / 1e6d));
 
-        MediaType contentType = response.body().contentType();
-        String content = response.body().string();
-        //Log.d("OkHttp", content);
-
-        ResponseBody wrappedBody = ResponseBody.create(contentType, content);
-        return response.newBuilder().body(wrappedBody).build();
+        } catch (Exception e) {
+        logger.e("Exception writing log " + request.url(), e);
+    }
+        return response;
     }
 }

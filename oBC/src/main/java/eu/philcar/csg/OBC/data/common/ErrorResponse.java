@@ -5,7 +5,7 @@ package eu.philcar.csg.OBC.data.common;
 
 public class ErrorResponse extends Throwable {
 
-    public enum ErrorType{
+    public enum ErrorType {
         CUSTOM,
         NO_NETWORK,
         EMPTY,
@@ -20,14 +20,16 @@ public class ErrorResponse extends Throwable {
     public Integer httpStatus;
     public Throwable error;
 
-    public ErrorResponse(){}
+    public ErrorResponse() {
+    }
 
-    public ErrorResponse(ErrorType errorType){
+    public ErrorResponse(ErrorType errorType) {
         this.errorType = errorType;
     }
-    public ErrorResponse(ErrorType errorType, Throwable error){
+
+    public ErrorResponse(ErrorType errorType, Throwable error) {
         this.errorType = errorType;
-        this.error =error;
+        this.error = error;
     }
 
     /*@Override
@@ -61,7 +63,7 @@ public class ErrorResponse extends Throwable {
     @Override
     public void printStackTrace() {
 
-        if(error!=null)
+        if (error != null)
             error.printStackTrace();
         else
             super.printStackTrace();

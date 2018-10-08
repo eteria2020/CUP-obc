@@ -3,21 +3,17 @@ package eu.philcar.csg.OBC.helpers;
 /**
  * Created by Fulvio on 18/10/2016.
  */
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.Toast;
-
-import java.io.IOException;
-
-import eu.philcar.csg.OBC.App;
 
 public class RunOnStartup extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-            DLog.D(this.getClass().toString()+" Ricevuto boot del dispositivo, non è un crash");
+            DLog.D(this.getClass().toString() + " Ricevuto boot del dispositivo, non è un crash");
             DLog.CR("Avvio in seguito ad un boot di Android");
 
            /* Runtime rt = Runtime.getRuntime();

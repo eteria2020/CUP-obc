@@ -1,6 +1,5 @@
 package eu.philcar.csg.OBC.controller.map;
 
-import eu.philcar.csg.OBC.R;
 import android.app.Activity;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
@@ -16,135 +15,138 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import eu.philcar.csg.OBC.R;
+
 public class CustomKeyboard {
-	
-	public interface CustomKeyboardDelegate {
-		void onEnterPushed();
-	}
-	 
-	private KeyboardView mKeyboardView;
-    private Activity     mHostActivity;
+
+    public interface CustomKeyboardDelegate {
+        void onEnterPushed();
+    }
+
+    private KeyboardView mKeyboardView;
+    private Activity mHostActivity;
     private CustomKeyboardDelegate delegate;
-	private static boolean caps = false;
-	private static boolean num = false;
+    private static boolean caps = false;
+    private static boolean num = false;
 
     public CustomKeyboard(Activity host, View view, int viewId, int layoutId, CustomKeyboardDelegate delegate) {
-    	
-    	this.delegate = delegate;
-    	
-    	mHostActivity = host;
-    	
-    	Keyboard mKeyboard= new Keyboard(host, layoutId);
 
-    	// Lookup the KeyboardView
-    	mKeyboardView = (KeyboardView)view.findViewById(viewId);
-    	
-    	// Attach the keyboard to the view
-    	mKeyboardView.setKeyboard(mKeyboard);
+        this.delegate = delegate;
 
-    	// Install the key handler
-    	mKeyboardView.setOnKeyboardActionListener(mOnKeyboardActionListener);
-    	
-    	// Hide the standard keyboard initially
-    	host.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        mHostActivity = host;
+
+        Keyboard mKeyboard = new Keyboard(host, layoutId);
+
+        // Lookup the KeyboardView
+        mKeyboardView = (KeyboardView) view.findViewById(viewId);
+
+        // Attach the keyboard to the view
+        mKeyboardView.setKeyboard(mKeyboard);
+
+        // Install the key handler
+        mKeyboardView.setOnKeyboardActionListener(mOnKeyboardActionListener);
+
+        // Hide the standard keyboard initially
+        host.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     public boolean isCustomKeyboardVisible() {
-	    return mKeyboardView.getVisibility() == View.VISIBLE;
+        return mKeyboardView.getVisibility() == View.VISIBLE;
     }
 
     public void showCustomKeyboard(View view) {
-	    mKeyboardView.setVisibility(View.VISIBLE);
-	    mKeyboardView.setEnabled(true);
-	    if( view!=null ) ((InputMethodManager)mHostActivity.getSystemService(Activity.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(view.getWindowToken(), 0);
+        mKeyboardView.setVisibility(View.VISIBLE);
+        mKeyboardView.setEnabled(true);
+        if (view != null)
+            ((InputMethodManager) mHostActivity.getSystemService(Activity.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     public void hideCustomKeyboard() {
-    	mKeyboardView.setVisibility(View.GONE);
-	    mKeyboardView.setEnabled(false);
+        mKeyboardView.setVisibility(View.GONE);
+        mKeyboardView.setEnabled(false);
     }
 
     public void registerEditText(EditText editText) {
-	    
-	    // Make the custom keyboard appear
-		editText.setOnFocusChangeListener(new OnFocusChangeListener() {
-	        @Override 
-	        public void onFocusChange(View v, boolean hasFocus) {
-	            if( hasFocus ) showCustomKeyboard(v); else hideCustomKeyboard();
-	        }
-	    });
-		editText.setOnClickListener(new OnClickListener() {
-	        @Override 
-	        public void onClick(View v) {
-	            showCustomKeyboard(v);
-	        }
-	    });
-	    // Disable standard keyboard hard way
-		editText.setOnTouchListener(new OnTouchListener() {
-	        @Override 
-	        public boolean onTouch(View v, MotionEvent event) {
-	            EditText edittext = (EditText) v;
-	            int inType = edittext.getInputType();       // Backup the input type
-	            edittext.setInputType(InputType.TYPE_NULL); // Disable standard keyboard
-	            edittext.onTouchEvent(event);               // Call native handler
-	            edittext.setInputType(inType);              // Restore input type
-	            return true; // Consume touch event
-	        }
-	    });
-	    // Disable spell check (hex strings look like words to Android)
-		editText.setInputType( editText.getInputType() | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS );
-	}
+
+        // Make the custom keyboard appear
+        editText.setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) showCustomKeyboard(v);
+                else hideCustomKeyboard();
+            }
+        });
+        editText.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCustomKeyboard(v);
+            }
+        });
+        // Disable standard keyboard hard way
+        editText.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                EditText edittext = (EditText) v;
+                int inType = edittext.getInputType();       // Backup the input type
+                edittext.setInputType(InputType.TYPE_NULL); // Disable standard keyboard
+                edittext.onTouchEvent(event);               // Call native handler
+                edittext.setInputType(inType);              // Restore input type
+                return true; // Consume touch event
+            }
+        });
+        // Disable spell check (hex strings look like words to Android)
+        editText.setInputType(editText.getInputType() | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+    }
 
     private OnKeyboardActionListener mOnKeyboardActionListener = new OnKeyboardActionListener() {
-    	
+
         @Override
         public void onKey(int primaryCode, int[] keyCodes) {
-        	
-        	View focusCurrent = mHostActivity.getWindow().getCurrentFocus();
-        	
-		    if( focusCurrent==null || focusCurrent.getClass()!=EditText.class ) return;
-		    
-		    EditText edittext = (EditText) focusCurrent;
-		    Editable editable = edittext.getText();
-		    
-		    int start = edittext.getSelectionStart();
-			switch(primaryCode){
-				case Keyboard.KEYCODE_DELETE :
-					if( editable!=null && start>0 ) editable.delete(start - 1, start);
-					break;
-				case Keyboard.KEYCODE_MODE_CHANGE :
-					num=!num;
-					if(num) {
-						Keyboard mKeyboard = new Keyboard(mHostActivity, R.xml.hexkbd_num);
-						mKeyboardView.setKeyboard(mKeyboard);
-						mKeyboardView.invalidateAllKeys();
-					}
-					else{
-						Keyboard mKeyboard = new Keyboard(mHostActivity, R.xml.hexkbd);
-						mKeyboardView.setKeyboard(mKeyboard);
-						mKeyboardView.invalidateAllKeys();
-					}
 
-					break;
-				case Keyboard.KEYCODE_SHIFT:
-					caps=!caps;
-					mKeyboardView.getKeyboard().setShifted(caps);
-					mKeyboardView.invalidateAllKeys();
-					break;
-				case Keyboard.KEYCODE_DONE:
-					hideCustomKeyboard();
-					if (delegate != null) {
-						delegate.onEnterPushed();
-					}
-					break;
-				default:
-					char code = (char)primaryCode;
-					if(Character.isLetter(code) && caps){
-						code = Character.toUpperCase(code);
-					}
-					editable.insert(start,String.valueOf(code));
-			}/*
-		    if (primaryCode == mHostActivity.getResources().getInteger(R.integer.key_enter)) {
+            View focusCurrent = mHostActivity.getWindow().getCurrentFocus();
+
+            if (focusCurrent == null || focusCurrent.getClass() != EditText.class) return;
+
+            EditText edittext = (EditText) focusCurrent;
+            Editable editable = edittext.getText();
+
+            int start = edittext.getSelectionStart();
+            switch (primaryCode) {
+                case Keyboard.KEYCODE_DELETE:
+                    if (editable != null && start > 0) editable.delete(start - 1, start);
+                    break;
+                case Keyboard.KEYCODE_MODE_CHANGE:
+                    num = !num;
+                    if (num) {
+                        Keyboard mKeyboard = new Keyboard(mHostActivity, R.xml.hexkbd_num);
+                        mKeyboardView.setKeyboard(mKeyboard);
+                        mKeyboardView.invalidateAllKeys();
+                    } else {
+                        Keyboard mKeyboard = new Keyboard(mHostActivity, R.xml.hexkbd);
+                        mKeyboardView.setKeyboard(mKeyboard);
+                        mKeyboardView.invalidateAllKeys();
+                    }
+
+                    break;
+                case Keyboard.KEYCODE_SHIFT:
+                    caps = !caps;
+                    mKeyboardView.getKeyboard().setShifted(caps);
+                    mKeyboardView.invalidateAllKeys();
+                    break;
+                case Keyboard.KEYCODE_DONE:
+                    hideCustomKeyboard();
+                    if (delegate != null) {
+                        delegate.onEnterPushed();
+                    }
+                    break;
+                default:
+                    char code = (char) primaryCode;
+                    if (Character.isLetter(code) && caps) {
+                        code = Character.toUpperCase(code);
+                    }
+                    editable.insert(start, String.valueOf(code));
+            }/*
+            if (primaryCode == mHostActivity.getResources().getInteger(R.integer.key_enter)) {
 		    	hideCustomKeyboard();
 		    	if (delegate != null) {
 		    		delegate.onEnterPushed();
@@ -262,21 +264,33 @@ public class CustomKeyboard {
 		    } */
         }
 
-		@Override
-		public void onPress(int primaryCode) {}
-		@Override
-		public void onRelease(int primaryCode) {}
-		@Override
-		public void onText(CharSequence text) {}
-		@Override
-		public void swipeLeft() {}
-		@Override
-		public void swipeRight() {}
-		@Override
-		public void swipeDown() {}
-		@Override
-		public void swipeUp() {}
-    };
+        @Override
+        public void onPress(int primaryCode) {
+        }
 
+        @Override
+        public void onRelease(int primaryCode) {
+        }
+
+        @Override
+        public void onText(CharSequence text) {
+        }
+
+        @Override
+        public void swipeLeft() {
+        }
+
+        @Override
+        public void swipeRight() {
+        }
+
+        @Override
+        public void swipeDown() {
+        }
+
+        @Override
+        public void swipeUp() {
+        }
+    };
 
 }

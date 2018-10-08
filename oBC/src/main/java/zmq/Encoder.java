@@ -21,8 +21,7 @@ package zmq;
 
 import java.nio.ByteBuffer;
 
-public class Encoder extends EncoderBase
-{
+public class Encoder extends EncoderBase {
     private static final int SIZE_READY = 0;
     private static final int MESSAGE_READY = 1;
 
@@ -30,8 +29,7 @@ public class Encoder extends EncoderBase
     private final byte[] tmpbuf;
     private IMsgSource msgSource;
 
-    public Encoder(int bufsize)
-    {
+    public Encoder(int bufsize) {
         super(bufsize);
         tmpbuf = new byte[10];
         //  Write 0 bytes to the batch and go to messageReady state.
@@ -39,34 +37,30 @@ public class Encoder extends EncoderBase
     }
 
     @Override
-    public void setMsgSource(IMsgSource msgSource)
-    {
+    public void setMsgSource(IMsgSource msgSource) {
         this.msgSource = msgSource;
     }
 
     @Override
-    protected boolean next()
-    {
-        switch(state()) {
-        case SIZE_READY:
-            return sizeReady();
-        case MESSAGE_READY:
-            return messageReady();
-        default:
-            return false;
+    protected boolean next() {
+        switch (state()) {
+            case SIZE_READY:
+                return sizeReady();
+            case MESSAGE_READY:
+                return messageReady();
+            default:
+                return false;
         }
     }
 
-    private boolean sizeReady()
-    {
+    private boolean sizeReady() {
         //  Write message body into the buffer.
         nextStep(inProgress.data(), inProgress.size(),
                 MESSAGE_READY, !inProgress.hasMore());
         return true;
     }
 
-    private boolean messageReady()
-    {
+    private boolean messageReady() {
         //  Destroy content of the old message.
         //inProgress.close ();
 
@@ -98,8 +92,7 @@ public class Encoder extends EncoderBase
             tmpbuf[0] = (byte) size;
             tmpbuf[1] = (byte) (inProgress.flags() & Msg.MORE);
             nextStep(tmpbuf, 2, SIZE_READY, false);
-        }
-        else {
+        } else {
             ByteBuffer b = ByteBuffer.wrap(tmpbuf);
             b.put((byte) 0xff);
             b.putLong(size);

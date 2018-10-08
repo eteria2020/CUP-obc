@@ -36,53 +36,50 @@ public class DataManager { //TODO change to interface-type system like api does 
 
     private final DbManager mDbManager; //TODO use interface DbHelper
 
-
     @Inject
     public DataManager(DbManager DbManager) {
         mDbManager = DbManager;
     }
 
-
-
     public Observable<Customer> saveCustomer(List<Customer> customer) {
 
-        return  mDbManager.getClientiDao().createOrUpdateMany(customer);
+        return mDbManager.getClientiDao().createOrUpdateMany(customer);
 
     }
 
     public Observable<BusinessEmployee> saveEmployee(List<BusinessEmployee> customer) {
 
-        return  mDbManager.getDipendentiDao().createOrUpdateMany(customer);
+        return mDbManager.getDipendentiDao().createOrUpdateMany(customer);
 
     }
 
     public Observable<Trip> saveTrip(Trip trip) {
 
-        return  mDbManager.getTripDao().createOrUpdateOne(trip);
+        return mDbManager.getTripDao().createOrUpdateOne(trip);
 
     }
 
     public Observable<Trip> saveTrips(Collection<Trip> trip) {
 
-        return  mDbManager.getTripDao().createOrUpdateMany(trip);
+        return mDbManager.getTripDao().createOrUpdateMany(trip);
 
     }
 
     public Observable<Event> saveEvent(Event event) {
 
-        return  mDbManager.getEventiDao().createOrUpdateOne(event);
+        return mDbManager.getEventiDao().createOrUpdateOne(event);
 
     }
 
     public Observable<Event> saveEvents(Collection<Event> event) {
 
-        return  mDbManager.getEventiDao().createOrUpdateMany(event);
+        return mDbManager.getEventiDao().createOrUpdateMany(event);
 
     }
 
     public void saveConfig(Config customer) {
 
-        App.Instance.setConfig(customer.getJson(),null);
+        App.Instance.setConfig(customer.getJson(), null);
 
     }
 
@@ -92,19 +89,19 @@ public class DataManager { //TODO change to interface-type system like api does 
 
     }
 
-    public Observable<List<Area>> saveArea(List<Area> area){
+    public Observable<List<Area>> saveArea(List<Area> area) {
 
         return persistArea(area);
     }
 
     public Observable<Poi> savePoi(List<Poi> pois) {
 
-        return  mDbManager.getPoisDao().createOrUpdateMany(pois);
+        return mDbManager.getPoisDao().createOrUpdateMany(pois);
 
     }
 
-    public void updateBeginSentDone(Trip trip){
-        UpdateBuilder<Trip,Integer> builder = mDbManager.getTripDao().updateBuilder();
+    public void updateBeginSentDone(Trip trip) {
+        UpdateBuilder<Trip, Integer> builder = mDbManager.getTripDao().updateBuilder();
         try {
             builder.updateColumnValue("warning", trip.warning);
             builder.updateColumnValue("recharge", trip.recharge);
@@ -114,17 +111,16 @@ public class DataManager { //TODO change to interface-type system like api does 
             builder.update();
             builder.reset();
         } catch (SQLException e) {
-            DLog.E("setTxApertura : ",e);
+            DLog.E("setTxApertura : ", e);
         }
     }
 
     public void updateTripSetOffline(Trip trip) {
 
-        if (trip==null)
+        if (trip == null)
             return;
 
-
-        UpdateBuilder<Trip,Integer> builder =  mDbManager.getTripDao().updateBuilder();
+        UpdateBuilder<Trip, Integer> builder = mDbManager.getTripDao().updateBuilder();
         try {
             builder.updateColumnValue("recharge", trip.recharge);
             builder.updateColumnValue("offline", trip.offline);
@@ -132,17 +128,16 @@ public class DataManager { //TODO change to interface-type system like api does 
             builder.update();
             builder.reset();
         } catch (SQLException e) {
-            DLog.E("setTxOffline : ",e);
+            DLog.E("setTxOffline : ", e);
         }
     }
 
     public void updateEventSendingResponse(Event event) {
 
-        if (event==null)
+        if (event == null)
             return;
 
-
-        UpdateBuilder<Event,Integer> builder =  mDbManager.getEventiDao().updateBuilder();
+        UpdateBuilder<Event, Integer> builder = mDbManager.getEventiDao().updateBuilder();
         try {
             builder.updateColumnValue("sending_error", event.sending_error);
             builder.updateColumnValue("sent", event.sent);
@@ -151,29 +146,27 @@ public class DataManager { //TODO change to interface-type system like api does 
             builder.update();
             builder.reset();
         } catch (SQLException e) {
-            DLog.E("setTxOffline : ",e);
+            DLog.E("setTxOffline : ", e);
         }
     }
 
     public void updateTripEndSentDone(Trip trip) {
 
-        if (trip==null)
+        if (trip == null)
             return;
 
-
-        UpdateBuilder<Trip,Integer> builder =  mDbManager.getTripDao().updateBuilder();
+        UpdateBuilder<Trip, Integer> builder = mDbManager.getTripDao().updateBuilder();
         try {
             builder.updateColumnValue("end_sent", true);
             builder.where().idEq(trip.id);
             builder.update();
             builder.reset();
         } catch (SQLException e) {
-            DLog.E("setTxChiusura : ",e);
+            DLog.E("setTxChiusura : ", e);
         }
     }
 
-
-    public Observable<ServerCommand> handleCommands(List<ServerCommand> commands){
+    public Observable<ServerCommand> handleCommands(List<ServerCommand> commands) {
 
         return Observable.create(emitter -> {
             if (emitter.isDisposed())
@@ -183,8 +176,8 @@ public class DataManager { //TODO change to interface-type system like api does 
                     emitter.onNext(row);
                 }
                 emitter.onComplete();
-            } catch(Exception e) {
-                DLog.E("Exception handling commands",e);
+            } catch (Exception e) {
+                DLog.E("Exception handling commands", e);
                 emitter.onError(e);
             }
         });
@@ -192,38 +185,38 @@ public class DataManager { //TODO change to interface-type system like api does 
 
     /**
      * emit the firs active reservation and then sent the completion signal
+     *
      * @param reservations
      * @return
      */
-    public Observable<Reservation> handleReservations(List<Reservation> reservations){
+    public Observable<Reservation> handleReservations(List<Reservation> reservations) {
 
         return Observable.create(emitter -> {
             if (emitter.isDisposed())
                 return;
             try {
-                Reservation first=null;
+                Reservation first = null;
                 for (Reservation reservation : reservations) {
-                    if(first==null) {
-                        if(reservation.active)
-                            first=reservation;
+                    if (first == null) {
+                        if (reservation.active)
+                            first = reservation;
                     }
-                    if(reservation.isMaintenance() && reservation.active){
-                        first=reservation;
+                    if (reservation.isMaintenance() && reservation.active) {
+                        first = reservation;
                         break;
                     }
                 }
                 emitter.onNext(first);
                 emitter.onComplete();
-            } catch(Exception e) {
-                DLog.E("Exception handling reservation",e);
+            } catch (Exception e) {
+                DLog.E("Exception handling reservation", e);
                 emitter.onError(e);
             }
         });
     }
 
-
-    private Observable<List<Area>> persistArea(List<Area> area){
-        File file = new File(App.getAppDataPath(),"area.json");
+    private Observable<List<Area>> persistArea(List<Area> area) {
+        File file = new File(App.getAppDataPath(), "area.json");
 
         String result;
 
@@ -231,42 +224,40 @@ public class DataManager { //TODO change to interface-type system like api does 
                 .registerTypeAdapter(Area.class, new AreaAdapter())
                 .serializeNulls();
 
-            Gson gson =builder.create();
-            result = gson.toJson(area);
+        Gson gson = builder.create();
+        result = gson.toJson(area);
 
         try {
             OutputStream os = new FileOutputStream(file);
             os.write(result.getBytes());
             os.close();
         } catch (IOException e) {
-            DLog.E("File output error area.json",e);
+            DLog.E("File output error area.json", e);
         }
         return Observable.just(area);
     }
 
-
-    public long getMaxCustomerLastupdate(){
+    public long getMaxCustomerLastupdate() {
         return mDbManager.getClientiDao().mostRecentTimestamp();
     }
 
-    public Observable<Integer> findTripParent(Trip trip){
+    public Observable<Integer> findTripParent(Trip trip) {
         return mDbManager.getTripDao().findTripParentfromTrip(trip)
                 .concatMap(trip1 -> Observable.just(trip1.remote_id));
     }
 
-    public int getTripIdFromEvent(Event event){
-        if(event.id != Events.EVT_SOS) {
+    public int getTripIdFromEvent(Event event) {
+        if (event.id != Events.EVT_SOS) {
             List<Trip> trips = mDbManager.getTripDao().getTripfromTime(event.timestamp);
             if (trips.size() > 0)
                 return trips.get(0).remote_id;
             else
                 return 0;
-        }
-        else
+        } else
             return 0;
     }
 
-    public long getMaxPoiLastupdate(){
+    public long getMaxPoiLastupdate() {
         return mDbManager.getPoisDao().mostRecent();
     }
 
@@ -277,8 +268,5 @@ public class DataManager { //TODO change to interface-type system like api does 
 //                        return table.setCustomers(customer);
 //                    }
 //                });
-
-
-
 
 }

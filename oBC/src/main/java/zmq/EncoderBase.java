@@ -22,8 +22,7 @@ package zmq;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-public abstract class EncoderBase implements IEncoder
-{
+public abstract class EncoderBase implements IEncoder {
     //  Where to get the data to write from.
     private byte[] writeBuf;
     private FileChannel writeChannel;
@@ -47,8 +46,7 @@ public abstract class EncoderBase implements IEncoder
 
     private boolean error;
 
-    protected EncoderBase(int bufferSize)
-    {
+    protected EncoderBase(int bufferSize) {
         this.bufferSize = bufferSize;
         buffer = ByteBuffer.allocateDirect(bufferSize);
         error = false;
@@ -59,8 +57,7 @@ public abstract class EncoderBase implements IEncoder
     //  points to NULL) decoder object will provide buffer of its own.
 
     @Override
-    public Transfer getData(ByteBuffer buffer)
-    {
+    public Transfer getData(ByteBuffer buffer) {
         if (buffer == null) {
             buffer = this.buffer;
         }
@@ -86,7 +83,7 @@ public abstract class EncoderBase implements IEncoder
             if (writeChannel != null) {
                 buffer.flip();
                 Transfer t = new Transfer.FileChannelTransfer(buffer, writeChannel,
-                                                    (long) writePos, (long) toWrite);
+                        (long) writePos, (long) toWrite);
                 writePos = 0;
                 toWrite = 0;
 
@@ -127,46 +124,38 @@ public abstract class EncoderBase implements IEncoder
     }
 
     @Override
-    public boolean hasData()
-    {
+    public boolean hasData() {
         return toWrite > 0;
     }
 
-    protected int state()
-    {
+    protected int state() {
         return next;
     }
 
-    protected void state(int state)
-    {
+    protected void state(int state) {
         next = state;
     }
 
-    protected void encodingError()
-    {
+    protected void encodingError() {
         error = true;
     }
 
-    public final boolean isError()
-    {
+    public final boolean isError() {
         return error;
     }
 
     protected abstract boolean next();
 
-    protected void nextStep(Msg msg, int state, boolean beginning)
-    {
+    protected void nextStep(Msg msg, int state, boolean beginning) {
         if (msg == null) {
             nextStep(null, 0, state, beginning);
-        }
-        else {
+        } else {
             nextStep(msg.data(), msg.size(), state, beginning);
         }
     }
 
     protected void nextStep(byte[] buf, int toWrite,
-                            int next, boolean beginning)
-    {
+                            int next, boolean beginning) {
         writeBuf = buf;
         writeChannel = null;
         writePos = 0;
@@ -176,8 +165,7 @@ public abstract class EncoderBase implements IEncoder
     }
 
     protected void nextStep(FileChannel ch, long pos, long toWrite,
-                            int next, boolean beginning)
-    {
+                            int next, boolean beginning) {
         writeBuf = null;
         writeChannel = ch;
         writePos = (int) pos;

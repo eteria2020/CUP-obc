@@ -7,8 +7,6 @@ import dagger.Provides;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoApi;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoBeaconApi;
 import eu.philcar.csg.OBC.data.datasources.api.SharengoPhpApi;
-import eu.philcar.csg.OBC.data.datasources.repositories.SharengoBeaconRepository;
-import eu.philcar.csg.OBC.service.DataManager;
 
 /**
  * Created by Fulvio on 15/02/2018.
@@ -33,7 +31,5 @@ public class DataSourceModule {
     SharengoBeaconDataSource provideSharengoBeaconRemoteDataSource(SharengoBeaconApi api) {
         return new SharengoBeaconRetrofitDataSource(api);
     }
-
-
 
 }
