@@ -125,7 +125,8 @@ public class FMaintenance extends FBase {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //App.Charging = true;
         eventRepository.Maintenance("Show");
-        askPin();
+        if(App.currentTripInfo.customer.isMaintainer())
+            askPin();
         ((AWelcome) getActivity()).sendMessage(MessageFactory.requestCarInfo());
         view = inflater.inflate(R.layout.f_maintenance, container, false);
 
@@ -230,7 +231,11 @@ public class FMaintenance extends FBase {
     @Override
     public void onDestroy() {
         Instance = null;
-        //dialog.dismiss();
+        try {
+            dialog.dismiss();
+        }catch (Exception e) {
+            dlog.e("exception in onDestroy dismissing dialog",e);
+        }
         super.onDestroy();
     }
 }

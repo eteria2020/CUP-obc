@@ -370,11 +370,12 @@ public class SharengoApiRepository {
     public void consumeReservation(final int reservation_id) {
 
         mRemoteDataSource.consumeReservation(reservation_id)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<Reservation>() {
+                    Disposable disposable;
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        disposable = d;
                     }
 
                     @Override
@@ -386,11 +387,13 @@ public class SharengoApiRepository {
 
                     @Override
                     public void onError(Throwable e) {
+                        RxUtil.dispose(disposable);
 
                     }
 
                     @Override
                     public void onComplete() {
+                        RxUtil.dispose(disposable);
 
                     }
                 });
@@ -408,9 +411,10 @@ public class SharengoApiRepository {
                 .concatMap(n -> mDataManager.savePoi(n))
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<Poi>() {
+                    Disposable disposable;
                     @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
+                    public void onSubscribe(Disposable d) {
+                        disposable = d;
                     }
 
                     @Override
@@ -419,11 +423,13 @@ public class SharengoApiRepository {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
+                        RxUtil.dispose(disposable);
                     }
 
                     @Override
                     public void onComplete() {
                         DLog.I("Synced successfully!");
+                        RxUtil.dispose(disposable);
                     }
                 });
     }
@@ -453,11 +459,12 @@ public class SharengoApiRepository {
                         return Observable.just(event1);
                 })*/
                 .concatMap(e -> mRemoteDataSource.sendEvent(e, mDataManager))
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<EventResponse>() {
+                    Disposable disposable;
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        disposable = d;
                     }
 
                     @Override
@@ -470,10 +477,12 @@ public class SharengoApiRepository {
                         if (service != null) {
                             service.sendMessage(MessageFactory.failedSOS());
                         }
+                        RxUtil.dispose(disposable);
                     }
 
                     @Override
                     public void onComplete() {
+                        RxUtil.dispose(disposable);
 
                     }
                 });
@@ -522,14 +531,17 @@ public class SharengoApiRepository {
                     .concatMap(e -> mRemoteDataSource.sendEvent(e, mDataManager))
                     .subscribeOn(Schedulers.io())
                     .subscribe(new Observer<EventResponse>() {
+                        Disposable disposable;
                         @Override
                         public void onSubscribe(Disposable d) {
+                            disposable = d;
                             sendingEvents = true;
                         }
 
                         @Override
                         public void onNext(EventResponse eventResponse) {
                             DLog.D("Receiver Event response");
+                            RxUtil.dispose(disposable);
                         }
 
                         @Override
@@ -540,6 +552,7 @@ public class SharengoApiRepository {
                         @Override
                         public void onComplete() {
                             sendingEvents = false;
+                            RxUtil.dispose(disposable);
 
                         }
                     });

@@ -54,6 +54,7 @@ import eu.philcar.csg.OBC.db.Trips;
 import eu.philcar.csg.OBC.devices.LowLevelInterface;
 import eu.philcar.csg.OBC.helpers.CardRfid;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.helpers.RxUtil;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.task.OdoController;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
@@ -390,7 +391,7 @@ public class TripInfo {
                         service.removeSelfCloseTrip();
 
                         service.setDisplayStatus(false, 15);
-                        service.sendBeacon();
+//                        service.sendBeacon();
 
                         OptimizeDistanceCalc.Controller(OdoController.PAUSE); // momo metti in pausa il calcolo, la macchina e' ferma
                         return MessageFactory.notifyTripParkModeCardBegin();
@@ -421,7 +422,7 @@ public class TripInfo {
 
                             SuspendRfid(obc_io, " Auto in uso");
                         }
-                        service.sendBeacon();
+//                        service.sendBeacon();
                         return MessageFactory.notifyTripParkModeCardEnd();
                     }
                 } else {  // l'auto viene rilasciata
@@ -455,7 +456,7 @@ public class TripInfo {
                         App.pinChecked = false;
                         App.Instance.persistPinChecked();
 
-                        service.sendBeacon();
+//                        service.sendBeacon();
                         return (MessageFactory.notifyTripEnd(this));
                     } else {
                         dlog.d("Unable to close trip, out of operative area");
@@ -703,7 +704,7 @@ public class TripInfo {
                     App.pinChecked = false;
                     App.Instance.persistPinChecked();
 
-                    service.sendBeacon();
+//                    service.sendBeacon();
                     return n;
                 })
                 .concatMap(f -> {
@@ -713,11 +714,12 @@ public class TripInfo {
                         return phpRepository.openTrip(trip, this);
                 })
 //                .subscribeOn(Schedulers.newThread())
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<TripResponse>() {
+                    Disposable disposable;
                     @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
+                    public void onSubscribe(Disposable d) {
+                        disposable = d;
                     }
 
                     @Override
@@ -731,10 +733,12 @@ public class TripInfo {
 
                             dlog.e("Error inside Trip Opening " + ((ErrorResponse) e).errorType, e);
                         }
+                        RxUtil.dispose(disposable);
                     }
 
                     @Override
                     public void onComplete() {
+                        RxUtil.dispose(disposable);
                     }
                 });
 
@@ -823,9 +827,10 @@ public class TripInfo {
 
 //                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<TripResponse>() {
+                    Disposable disposable;
                     @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
+                    public void onSubscribe(Disposable d) {
+                        disposable = d;
                     }
 
                     @Override
@@ -835,10 +840,12 @@ public class TripInfo {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
+                        RxUtil.dispose(disposable);
                     }
 
                     @Override
                     public void onComplete() {
+                        RxUtil.dispose(disposable);
                     }
                 });
     }
@@ -888,7 +895,7 @@ public class TripInfo {
                     service.getHandler().sendMessage(MessageFactory.stopRemoteUpdateCycle());
                     App.pinChecked = false;
                     App.Instance.persistPinChecked();
-                    service.sendBeacon();
+//                    service.sendBeacon();
                     return n;
                 })
                 .concatMap(n -> {
@@ -899,9 +906,10 @@ public class TripInfo {
                 })
 //                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<TripResponse>() {
+                    Disposable disposable;
                     @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
+                    public void onSubscribe(Disposable d) {
+                        disposable = d;
                     }
 
                     @Override
@@ -911,10 +919,12 @@ public class TripInfo {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
+                        RxUtil.dispose(disposable);
                     }
 
                     @Override
                     public void onComplete() {
+                        RxUtil.dispose(disposable);
                     }
                 });
     }
@@ -1070,9 +1080,10 @@ public class TripInfo {
                 })
 //                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<TripResponse>() {
+                    Disposable disposable;
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        disposable = d;
                     }
 
                     @Override
@@ -1082,11 +1093,13 @@ public class TripInfo {
 
                     @Override
                     public void onError(Throwable e) {
+                        RxUtil.dispose(disposable);
 
                     }
 
                     @Override
                     public void onComplete() {
+                        RxUtil.dispose(disposable);
 
                     }
                 });
@@ -1206,11 +1219,12 @@ public class TripInfo {
                                 return phpRepository.openTrip(trip, this);
                         })
 //                        .+(Schedulers.newThread())
-                        .subscribeOn(Schedulers.io())
+                        .subscribeOn(Schedulers.newThread())
                         .subscribe(new Observer<TripResponse>() {
+                            Disposable disposable;
                             @Override
-                            public void onSubscribe(@NonNull Disposable d) {
-
+                            public void onSubscribe(Disposable d) {
+                                disposable = d;
                             }
 
                             @Override
@@ -1220,10 +1234,12 @@ public class TripInfo {
 
                             @Override
                             public void onError(@NonNull Throwable e) {
+                                RxUtil.dispose(disposable);
                             }
 
                             @Override
                             public void onComplete() {
+                                RxUtil.dispose(disposable);
                             }
                         });
                 //trip = trips.Begin(App.CarPlate,customer, carInfo.location, App.fuel_level, App.km);

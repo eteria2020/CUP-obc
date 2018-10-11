@@ -17,6 +17,7 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoApiRepository;
 import eu.philcar.csg.OBC.data.datasources.repositories.SharengoPhpRepository;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.helpers.RxUtil;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -363,11 +364,11 @@ public class Events extends DbTable<Event, Integer> {
                         else
                             phpRepository.sendEvents(list);
                     })
-                    .subscribeOn(Schedulers.computation())
-                    .subscribe(new Observer<List<Event>>() {
+                    .subscribeOn(Schedulers.newThread())
+                    .subscribe(new Observer<List<Event>>() {Disposable disposable;
                         @Override
                         public void onSubscribe(Disposable d) {
-
+                            disposable = d;
                         }
 
                         @Override
@@ -379,10 +380,12 @@ public class Events extends DbTable<Event, Integer> {
                         @Override
                         public void onError(Throwable e) {
                             dlog.e("Esception sending offline Events", e);
+                            RxUtil.dispose(disposable);
                         }
 
                         @Override
                         public void onComplete() {
+                            RxUtil.dispose(disposable);
 
                         }
                     });

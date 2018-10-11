@@ -247,7 +247,7 @@ public class SharengoPhpRepository {
     public void sendEvent(final Event event) {
         mDataManager.saveEvent(event)
                 .concatMap(e -> mRemoteDataSource.sendEvent(e, mDataManager))
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<EventResponse>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -283,7 +283,7 @@ public class SharengoPhpRepository {
             /*mDataManager.saveEvents(event)
                     .delay(10, TimeUnit.SECONDS)*/
                     .concatMap(e -> mRemoteDataSource.sendEvent(e, mDataManager))
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .subscribe(new Observer<EventResponse>() {
                         @Override
                         public void onSubscribe(Disposable d) {

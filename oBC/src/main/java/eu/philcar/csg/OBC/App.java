@@ -115,6 +115,7 @@ import eu.philcar.csg.OBC.helpers.CardRfidCollection;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.Encryption;
+import eu.philcar.csg.OBC.helpers.RxUtil;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.injection.component.ApplicationComponent;
 import eu.philcar.csg.OBC.injection.component.DaggerApplicationComponent;
@@ -2166,9 +2167,10 @@ public class App extends MultiDexApplication {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(Schedulers.computation())
                 .subscribe(new Observer<Area>() {
+                    Disposable disposable;
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        disposable = d;
                     }
 
                     @Override
@@ -2178,11 +2180,12 @@ public class App extends MultiDexApplication {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        RxUtil.dispose(disposable);
                     }
 
                     @Override
                     public void onComplete() {
+                        RxUtil.dispose(disposable);
 
                     }
                 });

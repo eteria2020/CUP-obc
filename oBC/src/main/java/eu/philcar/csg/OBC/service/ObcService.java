@@ -85,6 +85,7 @@ import eu.philcar.csg.OBC.helpers.Clients;
 import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Debug;
 import eu.philcar.csg.OBC.helpers.ProTTS;
+import eu.philcar.csg.OBC.helpers.RxUtil;
 import eu.philcar.csg.OBC.helpers.ServiceTestActivity;
 import eu.philcar.csg.OBC.interfaces.OnTripCallback;
 import eu.philcar.csg.OBC.scheduler.SuperSocScheduler;
@@ -1166,10 +1167,10 @@ public class ObcService extends Service implements OnTripCallback {
                             beaconRepository.sendBeacon(carinfo.getJson(true)))
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.computation())
-                    .subscribe(new Observer<BeaconResponse>() {
+                    .subscribe(new Observer<BeaconResponse>() {Disposable disposable;
                         @Override
-                        public void onSubscribe(@NonNull Disposable d) {
-
+                        public void onSubscribe(Disposable d) {
+                            disposable = d;
                         }
 
                         @Override
@@ -1181,11 +1182,13 @@ public class ObcService extends Service implements OnTripCallback {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
+                            RxUtil.dispose(disposable);
                         }
 
                         @Override
                         public void onComplete() {
                             DLog.I("Beacon sent successfully!");
+                            RxUtil.dispose(disposable);
                         }
                     });
 
@@ -1940,9 +1943,10 @@ public class ObcService extends Service implements OnTripCallback {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Reservation>() {
+                    Disposable disposable;
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        disposable = d;
                     }
 
                     @Override
@@ -1959,10 +1963,12 @@ public class ObcService extends Service implements OnTripCallback {
                             }
                         } else if (e instanceof NullPointerException)
                             setReservation(null);
+                        RxUtil.dispose(disposable);
                     }
 
                     @Override
                     public void onComplete() {
+                        RxUtil.dispose(disposable);
 
                     }
                 });
@@ -1986,9 +1992,10 @@ public class ObcService extends Service implements OnTripCallback {
                 })
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<ServerCommand>() {
+                    Disposable disposable;
                     @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
+                    public void onSubscribe(Disposable d) {
+                        disposable = d;
                     }
 
                     @Override
@@ -1998,11 +2005,13 @@ public class ObcService extends Service implements OnTripCallback {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
+                        RxUtil.dispose(disposable);
                     }
 
                     @Override
                     public void onComplete() {
                         DLog.I("Synced successfully!");
+                        RxUtil.dispose(disposable);
                     }
                 });
 //            HttpConnector http = new HttpConnector(this);
