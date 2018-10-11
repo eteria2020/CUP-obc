@@ -547,13 +547,29 @@ public class FMenu extends FBase implements OnClickListener{
 				cancelLL.setVisibility(View.GONE);
 		}
 
-		cancelIB.setOnClickListener(fuelListener);
 		cancelIB.setImageResource(fuelImage);
-		cancelTV.setOnClickListener(fuelListener);
+		if(fuelListener!=null) {
+			cancelIB.setEnabled(true);
+			cancelIB.setOnClickListener(fuelListener);
+			cancelTV.setOnClickListener(fuelListener);
+		}
+		else {
+			cancelIB.setEnabled(false);
+			cancelIB.setOnClickListener(fuelListener);
+			cancelTV.setOnClickListener(fuelListener);
+		}
 		cancelTV.setText(fuelText);
 
-		
-		backIB.setOnClickListener(backListener);
+		if(backListener!=null) {
+			backIB.setEnabled(true);
+			backIB.setOnClickListener(backListener);
+			backIB.animate().alpha(1f);
+		}else {
+
+			backIB.setEnabled(true);
+			backIB.setOnClickListener(backListener);
+			backIB.animate().alpha(0.33f);
+		}
 		backIB.setImageResource(backImage);
 	}
 	

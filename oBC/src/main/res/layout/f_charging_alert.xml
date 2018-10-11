@@ -26,7 +26,7 @@
         android:background="#3ea447" >
         
         <Button
-            android:id="@+id/btnSOS"
+            android:id="@+id/fChargingAlertBtnSOS"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|top"
@@ -34,7 +34,7 @@
             android:background="@drawable/sel_button_sos" />
         
         <ImageButton
-            android:id="@+id/btnNext"
+            android:id="@+id/fChargingAlertBtnNext"
             android:layout_width="@dimen/side_square_big_icon"
             android:layout_height="@dimen/side_square_big_icon"
             android:layout_gravity="bottom|center_horizontal"
@@ -62,54 +62,35 @@
         android:layout_toStartOf="@+id/fchn_right_FL"
         android:layout_below="@+id/fchn_top_V" >
 
-        <TextView
-            android:id="@+id/tvPageTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+
+
+        <ImageView
+
+            android:id="@+id/ivPicture"
+            android:layout_width="436dp"
+            android:layout_height="300dp"
+            android:background="@drawable/white_border"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="12dp"
-            android:text="@string/priority_lanes_title"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="#fdee66"
-            android:textSize="36sp" />
-        
+            android:layout_marginTop="60dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/img_charging_alert" />
         <TextView
             android:id="@+id/tvMessageTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/ivPicture"
-            android:layout_marginLeft="40dp"
-            android:layout_marginStart="40dp"
+            android:layout_below="@id/ivPicture"
+            android:layout_centerHorizontal="true"
             android:layout_marginTop="25dp"
-            android:layout_toRightOf="@+id/ivPicture"
-            android:text="@string/attention"
-            android:textColor="#F00"
-            android:textSize="34sp"
-            android:textStyle="bold" />
+            android:maxWidth="600dp"
+            android:text="@string/charging_alert_text"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:textColor="@color/text_primary"
+            android:textSize="34sp"/>
 
-        <ImageView
-            android:id="@+id/ivPicture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/fchnMessageTV"
-            android:layout_below="@+id/tvPageTitle"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="16dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/priority_lanes" />
 
-        <TextView
-            android:id="@+id/tvMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/tvMessageTitle"
-            android:layout_below="@+id/tvMessageTitle"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/priority_lanes"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="34sp" />
+
                 
     </RelativeLayout>
 

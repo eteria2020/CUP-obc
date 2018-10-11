@@ -133,17 +133,19 @@
             android:text="-"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="36sp" />
-        <Button
+
+        <ImageButton
             android:id="@+id/btnEndCharging"
-            android:layout_width="142dp"
-            android:layout_height="105dp"
-            android:background="@drawable/sel_button_fuel_station"
-            android:text="End charge"
-            android:textColor="@color/text_green"
+            android:layout_width="@dimen/side_square_big_icon"
+            android:layout_height="@dimen/side_square_big_icon"
             android:layout_gravity="center_horizontal|bottom"
-            android:layout_marginBottom="70dp"
+            android:layout_marginBottom="50dp"
+            android:src="@drawable/ic_arrow_right"
+            android:background="@drawable/sel_button_white"
+            android:text="AVANTI"
+            android:textColor="@color/text_green"
             android:textSize="22sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
     </FrameLayout>
 

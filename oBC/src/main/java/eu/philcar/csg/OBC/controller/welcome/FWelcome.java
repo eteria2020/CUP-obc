@@ -351,7 +351,8 @@ public class FWelcome extends FBase {
         public void handleMessage(Message msg) {
         	switch (msg.what) {
         		case 0:
-        			tvDateTime.setText(sdf.format(new Date()));
+        			if(tvDateTime!=null)
+        				tvDateTime.setText(sdf.format(new Date()));
         			this.sendEmptyMessageDelayed(0, 1000);
         			break;
 

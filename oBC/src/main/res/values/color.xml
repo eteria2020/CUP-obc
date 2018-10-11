@@ -14,6 +14,7 @@
 	<color name="background_green">#3ea447</color>
 
 	<color name="text_green">#3ea447</color>
+	<color name="text_yellow">#fdee66</color>
 	<color name="overlay_click">#61616161</color>
 	<color name="alert_yellow">#fbc02d</color>
 

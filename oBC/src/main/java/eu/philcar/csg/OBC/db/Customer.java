@@ -202,7 +202,7 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 	}
 
 
-	public Boolean checkAdmin(){
+	public Boolean isMaintainer(){
 		return info_display.compareTo("sharengo")==0;
 	}
 
