@@ -1888,6 +1888,8 @@ public class App extends MultiDexApplication {
 //		if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
 //			return false;
         if (latitude == 0 || longitude == 0 || AreaPolygons == null) {
+
+            DLog.I("checkParkArea: lat, lon " + latitude + ", " + longitude + " " + true);
             return true;
         }
 
@@ -1901,6 +1903,7 @@ public class App extends MultiDexApplication {
 
                 if (GeoUtils.contains(latitude, longitude, aPolygon)) {
 
+                    DLog.I("checkParkArea: lat, lon " + latitude + ", " + longitude + " " + true);
                     return true;
                 }
             }
@@ -1908,9 +1911,11 @@ public class App extends MultiDexApplication {
 
         if (App.AreaPolygons.size() == 0) {
             App.Instance.initAreaPolygon();
+            DLog.I("checkParkArea: empty area lat, lon " + latitude + ", " + longitude + " " + true);
             return true;
         }
 
+        DLog.I("checkParkArea: lat, lon " + latitude + ", " + longitude + " " + false);
         return false;
     }
 

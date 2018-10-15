@@ -739,10 +739,10 @@ public class FDriveMessage_new extends FBase {
 
             App.BannerName.putBundle(type, Image);
 
-            //ricavo nome file
-            URL urlImg = new URL(Image.getString("URL"));
-            String extension = urlImg.getFile().substring(urlImg.getFile().lastIndexOf('.') + 1);
-            String filename = Image.getString("ID").concat(".").concat(extension);
+			//ricavo nome file
+			URL urlImg = new URL(Image.getString("URL").replace(" ", "%20"));
+			String extension = urlImg.getFile().substring(urlImg.getFile().lastIndexOf('.') + 1);
+			String filename = Image.getString("ID").concat(".").concat(extension);
 
             //download imagine se non esiste
             file = new File(outDir, filename);
