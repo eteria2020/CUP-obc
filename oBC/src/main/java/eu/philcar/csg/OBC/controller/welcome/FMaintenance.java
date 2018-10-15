@@ -125,7 +125,8 @@ public class FMaintenance extends FBase {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		//App.Charging = true;
 		eventRepository.Maintenance("Show");
-		askPin();
+		if(App.currentTripInfo.customer.isMaintainer())
+			askPin();
 		((AWelcome)getActivity()).sendMessage(MessageFactory.requestCarInfo());
 		view = inflater.inflate(R.layout.f_maintenance, container, false);
 
@@ -134,7 +135,7 @@ public class FMaintenance extends FBase {
 
 
 
-		((Button)view.findViewById(R.id.btnEndCharging)).setOnClickListener(new OnClickListener() {
+		(view.findViewById(R.id.btnEndCharging)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dlog.d("Pushed EndCharging");
@@ -166,7 +167,7 @@ public class FMaintenance extends FBase {
 		});
 
 
-		((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
+		(view.findViewById(R.id.btnEndCharging)).setEnabled(false);
 		((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_wait);
 
 		/*new CountDownTimer(4000,1000) {
@@ -204,14 +205,17 @@ public class FMaintenance extends FBase {
 		}
 		dlog.d("update App.Charging: "+ App.isCharging() +" chargingPlug: "+ carinfo.isChargingPlug());
 		if (App.isCharging() && !carinfo.isChargingPlug()) {
-			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(true);
+			(view.findViewById(R.id.btnEndCharging)).setEnabled(true);
 			((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_done);
 		} else {
-			((Button)view.findViewById(R.id.btnEndCharging)).setEnabled(false);
+			(view.findViewById(R.id.btnEndCharging)).setEnabled(false);
 			if (carinfo.isChargingPlug())
 				((TextView)view.findViewById(R.id.tvChargingStatus)).setText(R.string.maintenance_status_plug_insert);
 			else
-				((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
+				if(App.currentTripInfo.customer.isMaintainer())
+					((ABase)getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
+			    else
+					((ABase)getActivity()).pushFragment(FChargingAlert.newInstance(), FChargingAlert.class.getName(), true);
 		}
 	}
 
@@ -231,13 +235,23 @@ public class FMaintenance extends FBase {
 	public void onPause() {
 		super.onPause();
 		Instance=null;
-		//dialog.dismiss();
+		try{
+			if(dialog !=null)
+				dialog.dismiss();
+		}catch (Exception e) {
+		    dlog.e( "onPause: Exception", e);
+		}
 	}
 
 	@Override
 	public void onDestroy() {
 		Instance=null;
-		//dialog.dismiss();
+		try{
+			if(dialog !=null)
+				dialog.dismiss();
+		}catch (Exception e) {
+			dlog.e( "onPause: Exception", e);
+		}
 		super.onDestroy();
 	}
 }

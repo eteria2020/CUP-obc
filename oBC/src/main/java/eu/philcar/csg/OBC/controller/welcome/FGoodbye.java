@@ -251,7 +251,7 @@ public class FGoodbye extends FBase {
                             if (!handleClick) {
                                 adIV.setColorFilter(R.color.overlay_click);
                                 handleClick = true;
-                                dlog.i(FDriveMessage.class.toString() + " Click su banner ");
+                                dlog.i( " Click su banner ");
                                 Thread onBannerClick = new Thread(new Runnable() {
                                     @Override
                                     public void run() {

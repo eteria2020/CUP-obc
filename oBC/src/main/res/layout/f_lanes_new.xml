@@ -98,8 +98,7 @@
             android:layout_below="@+id/tvPageTitle"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="16dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/priority_lanes" />
+            android:scaleType="fitXY" />
 
         <TextView
             android:id="@+id/tvMessage"

@@ -10,7 +10,7 @@ import eu.philcar.csg.OBC.helpers.DLog;
 
 public abstract class FBase extends Fragment {
 
-	protected Unbinder unbinder;
+	protected Unbinder unbinder = null;
 
 	/**
 	 * When required, this method allows fragments to properly handle the back button navigation. 

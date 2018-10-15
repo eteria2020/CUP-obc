@@ -231,7 +231,7 @@ public class AWelcome extends ABase {
                             welcomeWeakReference.get().localCarInfo = (CarInfo) msg.obj;
                         }
                         FWelcome fWelcome = (FWelcome) welcomeWeakReference.get().getFragmentManager().findFragmentByTag(FWelcome.class.getName());
-                        if (fWelcome != null) {
+                        if (fWelcome != null && fWelcome.isVisible()) {
                             fWelcome.setCarPlate(App.CarPlate);
                         }
 
