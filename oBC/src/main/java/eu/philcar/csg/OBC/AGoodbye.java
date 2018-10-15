@@ -21,211 +21,211 @@ import eu.philcar.csg.OBC.service.ServiceConnector;
 
 public class AGoodbye extends ABase {
 
-    public static final String JUMP_TO_END = "JUMP_TO_END";
-    public static final String EUTHANASIA = "I_WANT_TO_DIE";
-    public final boolean SKIP_DAMAGES = true;
-    private DLog dlog = new DLog(this.getClass());
-    private ServiceConnector serviceConnector;
-    private GoodbyServiceHandler serviceHandler = new GoodbyServiceHandler(new WeakReference<AGoodbye>(this));
+	public static final String JUMP_TO_END = "JUMP_TO_END";
+	public static final String EUTHANASIA = "I_WANT_TO_DIE";
+	public final boolean SKIP_DAMAGES = true;
+	private DLog dlog = new DLog(this.getClass());
+	private ServiceConnector serviceConnector;
+	private GoodbyServiceHandler serviceHandler = new GoodbyServiceHandler(new WeakReference<AGoodbye>(this));
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
 
-        super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);
 
-        if (getIntent().getBooleanExtra(EUTHANASIA, true)) {
-            Intent i = new Intent(this, StubActivity.class);
-            startActivity(i);
-            finish();
-        }
+		if (getIntent().getBooleanExtra(EUTHANASIA, true)) {
+			Intent i = new Intent(this, StubActivity.class);
+			startActivity(i);
+			finish();
+		}
 
-        //System.gc();
-        dlog.d("AGoodbye: onCreate extra: " + getIntent().getBooleanExtra(EUTHANASIA, true));
+		//System.gc();
+		dlog.d("AGoodbye: onCreate extra: " + getIntent().getBooleanExtra(EUTHANASIA, true));
 
-        setContentView(R.layout.a_base);
+		setContentView(R.layout.a_base);
 
-        serviceConnector = new ServiceConnector(this, serviceHandler);
+		serviceConnector = new ServiceConnector(this, serviceHandler);
 
 
 		/*if (savedInstanceState == null) {
 
 
 		}*/
-    }
+	}
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        App.setForegroundActivity(this);
-        if (!serviceConnector.isConnected())
-            serviceConnector.connect(Clients.Goodbye);
+	@Override
+	protected void onResume() {
+		super.onResume();
+		App.setForegroundActivity(this);
+		if (!serviceConnector.isConnected())
+			serviceConnector.connect(Clients.Goodbye);
 
-    }
+	}
 
-    @Override
-    protected void onPause() {
+	@Override
+	protected void onPause() {
 
-        super.onPause();
+		super.onPause();
 
-        App.setForegroundActivity("Pause");
-        if (serviceConnector.isConnected()) {
-            serviceConnector.unregister();
-            serviceConnector.disconnect();
-        }
-    }
+		App.setForegroundActivity("Pause");
+		if (serviceConnector.isConnected()) {
+			serviceConnector.unregister();
+			serviceConnector.disconnect();
+		}
+	}
 
-    @Override
-    protected int getPlaceholderResource() {
-        return R.id.awelPlaceholderFL;
-    }
+	@Override
+	protected int getPlaceholderResource() {
+		return R.id.awelPlaceholderFL;
+	}
 
-    @Override
-    public void sendMessage(Message msg) {
-        serviceConnector.send(msg);
-    }
+	@Override
+	public void sendMessage(Message msg) {
+		serviceConnector.send(msg);
+	}
 
-    public void setAudioSystem(int mode, int volume) {
-        this.sendMessage(MessageFactory.AudioChannel(mode, volume));
-    }
+	public void setAudioSystem(int mode, int volume) {
+		this.sendMessage(MessageFactory.AudioChannel(mode, volume));
+	}
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        serviceConnector = null;
-        serviceHandler = null;
-        App.isClosing = false;
-    }
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		serviceConnector = null;
+		serviceHandler = null;
+		App.isClosing = false;
+	}
 
-    @Override
-    public int getActivityUID() {
-        return App.AGOODBYE_UID;
-    }
+	@Override
+	public int getActivityUID() {
+		return App.AGOODBYE_UID;
+	}
 
-    static class GoodbyServiceHandler extends Handler {
+	static class GoodbyServiceHandler extends Handler {
 
-        final WeakReference<AGoodbye> goodbyeWeakReference;
+		final WeakReference<AGoodbye> goodbyeWeakReference;
 
-        public GoodbyServiceHandler(WeakReference<AGoodbye> goodbyeWeakReference) {
-            this.goodbyeWeakReference = goodbyeWeakReference;
-        }
+		public GoodbyServiceHandler(WeakReference<AGoodbye> goodbyeWeakReference) {
+			this.goodbyeWeakReference = goodbyeWeakReference;
+		}
 
-        @Override
-        public void handleMessage(Message msg) {
-            try {
-                FPark fPark;
-                if (msg.what != ObcService.MSG_TRIP_END) {
+		@Override
+		public void handleMessage(Message msg) {
+			try {
+				FPark fPark;
+				if (msg.what != ObcService.MSG_TRIP_END) {
 
-                    if (!App.isForegroundActivity(goodbyeWeakReference.get())) {
-                        DLog.W(AGoodbye.class.getName() + " MSG to non foreground activity. ignoring");
-                        if (App.currentTripInfo == null) {
-                            DLog.W(AGoodbye.class.getName() + " no trip found wrong foreground activity restarting AWelcome");
-                            if (!App.isForegroundActivity(AWelcome.class.getName())) {
-                                Intent i = new Intent(goodbyeWeakReference.get(), AWelcome.class);
-                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                goodbyeWeakReference.get().startActivity(i);
-                            }
+					if (!App.isForegroundActivity(goodbyeWeakReference.get())) {
+						DLog.W(AGoodbye.class.getName() + " MSG to non foreground activity. ignoring");
+						if (App.currentTripInfo == null) {
+							DLog.W(AGoodbye.class.getName() + " no trip found wrong foreground activity restarting AWelcome");
+							if (!App.isForegroundActivity(AWelcome.class.getName())) {
+								Intent i = new Intent(goodbyeWeakReference.get(), AWelcome.class);
+								i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+								goodbyeWeakReference.get().startActivity(i);
+							}
 
-                            goodbyeWeakReference.get().finish();
-                        }
-                        return;
-                    }
-                    if (App.currentTripInfo == null) {
+							goodbyeWeakReference.get().finish();
+						}
+						return;
+					}
+					if (App.currentTripInfo == null) {
 
-                        DLog.W(AGoodbye.class.getName() + " no trip found restarting AWelcome");
-                        Intent i = new Intent(goodbyeWeakReference.get(), AWelcome.class);
-                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        goodbyeWeakReference.get().startActivity(i);
-                        goodbyeWeakReference.get().finish();
-                        return;
-                    }
-                }
-                switch (msg.what) {
+						DLog.W(AGoodbye.class.getName() + " no trip found restarting AWelcome");
+						Intent i = new Intent(goodbyeWeakReference.get(), AWelcome.class);
+						i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						goodbyeWeakReference.get().startActivity(i);
+						goodbyeWeakReference.get().finish();
+						return;
+					}
+				}
+				switch (msg.what) {
 
-                    case ObcService.MSG_CLIENT_REGISTER:
-                        DLog.I(": MSG_CLIENT_REGISTER");
+					case ObcService.MSG_CLIENT_REGISTER:
+						DLog.I(": MSG_CLIENT_REGISTER");
 
-                        // Since this is the first fragment, we need to use the "add" method to show it to the user, and not the "replace"
-                        FragmentTransaction transaction = goodbyeWeakReference.get().getFragmentManager().beginTransaction();
-                        String fragmentName = goodbyeWeakReference.get().getIntent().getStringExtra("fragment");
+						// Since this is the first fragment, we need to use the "add" method to show it to the user, and not the "replace"
+						FragmentTransaction transaction = goodbyeWeakReference.get().getFragmentManager().beginTransaction();
+						String fragmentName = goodbyeWeakReference.get().getIntent().getStringExtra("fragment");
 
-                        if (fragmentName != null && fragmentName.equals("damages")) {
-                            transaction.add(R.id.awelPlaceholderFL, FDamages.newInstance(false), FDamages.class.getName());
-                            transaction.addToBackStack(FDamages.class.getName());
-                        } else if (goodbyeWeakReference.get().SKIP_DAMAGES || (goodbyeWeakReference.get().getIntent() != null && goodbyeWeakReference.get().getIntent().getBooleanExtra(AGoodbye.JUMP_TO_END, false))) {
-                            DLog.D("Agoodbye JUMP_TO_END");//Create fragment and add bundle to indicate the explicit request to close trip
+						if (fragmentName != null && fragmentName.equals("damages")) {
+							transaction.add(R.id.awelPlaceholderFL, FDamages.newInstance(false), FDamages.class.getName());
+							transaction.addToBackStack(FDamages.class.getName());
+						} else if (goodbyeWeakReference.get().SKIP_DAMAGES || (goodbyeWeakReference.get().getIntent() != null && goodbyeWeakReference.get().getIntent().getBooleanExtra(AGoodbye.JUMP_TO_END, false))) {
+							DLog.D("Agoodbye JUMP_TO_END");//Create fragment and add bundle to indicate the explicit request to close trip
 
-                            Fragment f = FGoodbye.newInstance();
-                            Bundle b = new Bundle();
-                            b.putBoolean("CLOSE", true);
-                            f.setArguments(b);
+							Fragment f = FGoodbye.newInstance();
+							Bundle b = new Bundle();
+							b.putBoolean("CLOSE", true);
+							f.setArguments(b);
 
-                            transaction.add(R.id.awelPlaceholderFL, f, FGoodbye.class.getName());
-                            transaction.addToBackStack(FGoodbye.class.getName());
-                        } else {
-                            transaction.add(R.id.awelPlaceholderFL, FDamages.newInstance(true), FDamages.class.getName());
-                            transaction.addToBackStack(FDamages.class.getName());
-                        }
+							transaction.add(R.id.awelPlaceholderFL, f, FGoodbye.class.getName());
+							transaction.addToBackStack(FGoodbye.class.getName());
+						} else {
+							transaction.add(R.id.awelPlaceholderFL, FDamages.newInstance(true), FDamages.class.getName());
+							transaction.addToBackStack(FDamages.class.getName());
+						}
 
-                        transaction.commit();
-                        break;
+						transaction.commit();
+						break;
 
-                    case ObcService.MSG_CMD_TIMEOUT:
-                        DLog.D(": MSG_CMD_TIMEOUT");
-                        break;
+					case ObcService.MSG_CMD_TIMEOUT:
+						DLog.D(": MSG_CMD_TIMEOUT");
+						break;
 
-                    case ObcService.MSG_PING:
-                        DLog.D(": MSG_PING");
-                        break;
+					case ObcService.MSG_PING:
+						DLog.D(": MSG_PING");
+						break;
 
-                    case ObcService.MSG_IO_RFID:
+					case ObcService.MSG_IO_RFID:
 
-                        DLog.D(": MSG_IO_RFID");
-                        break;
+						DLog.D(": MSG_IO_RFID");
+						break;
 
-                    case ObcService.MSG_TRIP_END:
+					case ObcService.MSG_TRIP_END:
 
-                        App.userDrunk = false;
-                        App.Instance.persistUserDrunk();
+						App.userDrunk = false;
+						App.Instance.persistUserDrunk();
 
-                        Intent i = new Intent(goodbyeWeakReference.get(), AWelcome.class);
-                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        goodbyeWeakReference.get().startActivity(i);
-                        goodbyeWeakReference.get().finish();
+						Intent i = new Intent(goodbyeWeakReference.get(), AWelcome.class);
+						i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						goodbyeWeakReference.get().startActivity(i);
+						goodbyeWeakReference.get().finish();
 
-                        break;
+						break;
 
-                    case ObcService.MSG_TRIP_BEGIN:
+					case ObcService.MSG_TRIP_BEGIN:
 
-                        //NON PRENDERE COME VALIDOP QUESTO EVENTO VIENE GENERATO ANCHE A CORSA GIà APERTA
+						//NON PRENDERE COME VALIDOP QUESTO EVENTO VIENE GENERATO ANCHE A CORSA GIà APERTA
 
-                        break;
+						break;
 
-                    case ObcService.MSG_CUSTOMER_INFO:
+					case ObcService.MSG_CUSTOMER_INFO:
 
-                        break;
+						break;
 
-                    case ObcService.MSG_TRIP_PARK_CARD_BEGIN:
-                        fPark = (FPark) goodbyeWeakReference.get().getFragmentManager().findFragmentByTag(FPark.class.getName());
+					case ObcService.MSG_TRIP_PARK_CARD_BEGIN:
+						fPark = (FPark) goodbyeWeakReference.get().getFragmentManager().findFragmentByTag(FPark.class.getName());
 
-                        if (fPark != null) {
-                            fPark.showBeginPark();
-                        }
-                        break;
+						if (fPark != null) {
+							fPark.showBeginPark();
+						}
+						break;
 
-                    case ObcService.MSG_TRIP_PARK_CARD_END:
-                        fPark = (FPark) goodbyeWeakReference.get().getFragmentManager().findFragmentByTag(FPark.class.getName());
+					case ObcService.MSG_TRIP_PARK_CARD_END:
+						fPark = (FPark) goodbyeWeakReference.get().getFragmentManager().findFragmentByTag(FPark.class.getName());
 
-                        if (fPark != null) {
-                            fPark.showEndPark();
-                        }
-                        break;
+						if (fPark != null) {
+							fPark.showEndPark();
+						}
+						break;
 
-                    default:
-                        super.handleMessage(msg);
-                }
-            } catch (Exception e) {
-                DLog.E("Exception while handling message", e);
-            }
-        }
-    }
+					default:
+						super.handleMessage(msg);
+				}
+			} catch (Exception e) {
+				DLog.E("Exception while handling message", e);
+			}
+		}
+	}
 }

@@ -13,19 +13,19 @@ import eu.philcar.csg.OBC.App;
  */
 public class StubActivity extends Activity {
 
-    @Override
-    public void onCreate(Bundle b) {
-        super.onCreate(b);
-        DLog.D("StubActivity onCreate");
+	@Override
+	public void onCreate(Bundle b) {
+		super.onCreate(b);
+		DLog.D("StubActivity onCreate");
 
-        if (Debug.ON || App.Instance.isConfigMode()) {
-            startActivity(new Intent(this, ServiceTestActivity.class));
-        } else {
-            DLog.D("AWelcome onCreate Stub");
-            //startActivity(new Intent(this,  AWelcome.class));
-        }
+		if (Debug.ON || App.Instance.isConfigMode()) {
+			startActivity(new Intent(this, ServiceTestActivity.class));
+		} else {
+			DLog.D("AWelcome onCreate Stub");
+			//startActivity(new Intent(this,  AWelcome.class));
+		}
 
-        finish();
-    }
+		finish();
+	}
 
 }

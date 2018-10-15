@@ -22,11 +22,11 @@ package zmq;
 import java.nio.ByteBuffer;
 
 public interface IDecoder {
-    void setMsgSink(IMsgSink msgSink);
+	void setMsgSink(IMsgSink msgSink);
 
-    ByteBuffer getBuffer();
+	ByteBuffer getBuffer();
 
-    int processBuffer(ByteBuffer buffer, int size);
+	int processBuffer(ByteBuffer buffer, int size);
 
-    boolean stalled();
+	boolean stalled();
 }

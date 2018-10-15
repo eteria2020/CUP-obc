@@ -25,194 +25,194 @@ import eu.philcar.csg.OBC.helpers.Debug;
 
 public class FPinCode extends FBase implements OnClickListener {
 
-    public static FPinCode newInstance(String code) {
+	public static FPinCode newInstance(String code) {
 
-        FPinCode fpc = new FPinCode();
+		FPinCode fpc = new FPinCode();
 
-        if (Debug.IGNORE_HARDWARE) {
-            fpc.code = "1234";
-        } else {
-            fpc.code = code;
-        }
+		if (Debug.IGNORE_HARDWARE) {
+			fpc.code = "1234";
+		} else {
+			fpc.code = code;
+		}
 
-        return fpc;
-    }
+		return fpc;
+	}
 
-    private TextView oneTV, twoTV, threeTV, fourTV, messageTV, savedMinutesTV, minutesTV;
-    private ImageButton nextIB, backIB;
-    private Button sosB;
-    private LinearLayout cardLL, savedMinutesLL;
-    private RelativeLayout fpca_right_RL;
-    private ImageView fuelStatusIV;
-    private DLog dlog = new DLog(this.getClass());
+	private TextView oneTV, twoTV, threeTV, fourTV, messageTV, savedMinutesTV, minutesTV;
+	private ImageButton nextIB, backIB;
+	private Button sosB;
+	private LinearLayout cardLL, savedMinutesLL;
+	private RelativeLayout fpca_right_RL;
+	private ImageView fuelStatusIV;
+	private DLog dlog = new DLog(this.getClass());
 
-    private String code;
-    private byte uiStatus;
+	private String code;
+	private byte uiStatus;
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.f_pin_code, container, false);
-        dlog.d("OnCreareView FPinCode");
+		View view = inflater.inflate(R.layout.f_pin_code, container, false);
+		dlog.d("OnCreareView FPinCode");
 
-        Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
+		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 
-        oneTV = (TextView) view.findViewById(R.id.fpcaPinCodeOneTV);
-        twoTV = (TextView) view.findViewById(R.id.fpcaPinCodeTwoTV);
-        threeTV = (TextView) view.findViewById(R.id.fpcaPinCodeThreeTV);
-        fourTV = (TextView) view.findViewById(R.id.fpcaPinCodeFourTV);
-        fpca_right_RL = (RelativeLayout) view.findViewById(R.id.fpca_right_RL);
+		oneTV = (TextView) view.findViewById(R.id.fpcaPinCodeOneTV);
+		twoTV = (TextView) view.findViewById(R.id.fpcaPinCodeTwoTV);
+		threeTV = (TextView) view.findViewById(R.id.fpcaPinCodeThreeTV);
+		fourTV = (TextView) view.findViewById(R.id.fpcaPinCodeFourTV);
+		fpca_right_RL = (RelativeLayout) view.findViewById(R.id.fpca_right_RL);
 
-        cardLL = (LinearLayout) view.findViewById(R.id.fpcaCardLL);
-        fuelStatusIV = (ImageView) view.findViewById(R.id.fpcaFuelFullIV);
-        savedMinutesLL = (LinearLayout) view.findViewById(R.id.fpcaSavedMinutesLL);
-        minutesTV = (TextView) view.findViewById(R.id.fpcaMinutesTV);
+		cardLL = (LinearLayout) view.findViewById(R.id.fpcaCardLL);
+		fuelStatusIV = (ImageView) view.findViewById(R.id.fpcaFuelFullIV);
+		savedMinutesLL = (LinearLayout) view.findViewById(R.id.fpcaSavedMinutesLL);
+		minutesTV = (TextView) view.findViewById(R.id.fpcaMinutesTV);
 
-        messageTV = (TextView) view.findViewById(R.id.fpcaMessageTV);
+		messageTV = (TextView) view.findViewById(R.id.fpcaMessageTV);
 
-        savedMinutesTV = (TextView) view.findViewById(R.id.fpcaSavedMinutesTV);
+		savedMinutesTV = (TextView) view.findViewById(R.id.fpcaSavedMinutesTV);
 
-        backIB = (ImageButton) view.findViewById(R.id.fpcaBackIB);
-        sosB = (Button) view.findViewById(R.id.fpcaSOSB);
-        nextIB = (ImageButton) view.findViewById(R.id.fpcaNextIB);
+		backIB = (ImageButton) view.findViewById(R.id.fpcaBackIB);
+		sosB = (Button) view.findViewById(R.id.fpcaSOSB);
+		nextIB = (ImageButton) view.findViewById(R.id.fpcaNextIB);
 
-        ((TextView) view.findViewById(R.id.fpcaPinTV)).setTypeface(font);
-        oneTV.setTypeface(font);
-        twoTV.setTypeface(font);
-        threeTV.setTypeface(font);
-        fourTV.setTypeface(font);
-        sosB.setTypeface(font);
+		((TextView) view.findViewById(R.id.fpcaPinTV)).setTypeface(font);
+		oneTV.setTypeface(font);
+		twoTV.setTypeface(font);
+		threeTV.setTypeface(font);
+		fourTV.setTypeface(font);
+		sosB.setTypeface(font);
 
-        messageTV.setTypeface(font);
-        savedMinutesTV.setTypeface(font);
-        minutesTV.setTypeface(font);
+		messageTV.setTypeface(font);
+		savedMinutesTV.setTypeface(font);
+		minutesTV.setTypeface(font);
 
-        updateUI();
+		updateUI();
 
-        backIB.setOnClickListener(this);
-        sosB.setOnClickListener(this);
-        nextIB.setOnClickListener(this);
+		backIB.setOnClickListener(this);
+		sosB.setOnClickListener(this);
+		nextIB.setOnClickListener(this);
 
-        if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
-            fpca_right_RL.setBackgroundColor(getResources().getColor(R.color.background_red));
+		if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
+			fpca_right_RL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
-        } else {
-            fpca_right_RL.setBackgroundColor(getResources().getColor(R.color.background_green));
-        }
+		} else {
+			fpca_right_RL.setBackgroundColor(getResources().getColor(R.color.background_green));
+		}
 
-        return view;
-    }
+		return view;
+	}
 
-    private void updateUI() {
+	private void updateUI() {
 
-        switch (uiStatus) {
+		switch (uiStatus) {
 
-            case 0:
+			case 0:
 
-                cardLL.setVisibility(View.VISIBLE);
-                fuelStatusIV.setVisibility(View.INVISIBLE);
-                savedMinutesLL.setVisibility(View.INVISIBLE);
+				cardLL.setVisibility(View.VISIBLE);
+				fuelStatusIV.setVisibility(View.INVISIBLE);
+				savedMinutesLL.setVisibility(View.INVISIBLE);
 
-                oneTV.setText(code.substring(0, 1));
-                twoTV.setText(code.substring(1, 2));
-                threeTV.setText(code.substring(2, 3));
-                fourTV.setText(code.substring(3, 4));
+				oneTV.setText(code.substring(0, 1));
+				twoTV.setText(code.substring(1, 2));
+				threeTV.setText(code.substring(2, 3));
+				fourTV.setText(code.substring(3, 4));
 
-                messageTV.setText(R.string.fuel_status_pin_card);
+				messageTV.setText(R.string.fuel_status_pin_card);
 
-                break;
+				break;
 
-            case 1:
+			case 1:
 
-                backIB.setVisibility(View.GONE);
+				backIB.setVisibility(View.GONE);
 
-                cardLL.setVisibility(View.INVISIBLE);
-                fuelStatusIV.setVisibility(View.VISIBLE);
-                savedMinutesLL.setVisibility(View.INVISIBLE);
+				cardLL.setVisibility(View.INVISIBLE);
+				fuelStatusIV.setVisibility(View.VISIBLE);
+				savedMinutesLL.setVisibility(View.INVISIBLE);
 
-                messageTV.setText(R.string.refueling_done);
+				messageTV.setText(R.string.refueling_done);
 
-                break;
+				break;
 
-            case 2:
+			case 2:
 
-                cardLL.setVisibility(View.INVISIBLE);
-                fuelStatusIV.setVisibility(View.INVISIBLE);
-                savedMinutesLL.setVisibility(View.VISIBLE);
+				cardLL.setVisibility(View.INVISIBLE);
+				fuelStatusIV.setVisibility(View.INVISIBLE);
+				savedMinutesLL.setVisibility(View.VISIBLE);
 
-                messageTV.setText(R.string.back_to_navigation);
+				messageTV.setText(R.string.back_to_navigation);
 
-                // TODO: replace with real data
-                String minutes = "20";
-                if (minutes.length() < 2) {
-                    minutes = "0" + minutes;
-                }
-                // END
+				// TODO: replace with real data
+				String minutes = "20";
+				if (minutes.length() < 2) {
+					minutes = "0" + minutes;
+				}
+				// END
 
-                minutesTV.setText(minutes);
+				minutesTV.setText(minutes);
 
-                break;
+				break;
 
-        }
-    }
+		}
+	}
 
-    @Override
-    public void onClick(View v) {
+	@Override
+	public void onClick(View v) {
 
-        switch (v.getId()) {
+		switch (v.getId()) {
 
-            case R.id.fpcaBackIB:
-                ((AMainOBC) getActivity()).popFragment();
-                break;
+			case R.id.fpcaBackIB:
+				((AMainOBC) getActivity()).popFragment();
+				break;
 
-            case R.id.fpcaSOSB:
-                startActivity(new Intent(getActivity(), ASOS.class));
-                break;
+			case R.id.fpcaSOSB:
+				startActivity(new Intent(getActivity(), ASOS.class));
+				break;
 
-            case R.id.fpcaNextIB:
+			case R.id.fpcaNextIB:
 
-                if (uiStatus < 2) {
+				if (uiStatus < 2) {
 
-                    uiStatus++;
-                    updateUI();
+					uiStatus++;
+					updateUI();
 
-                } else {
+				} else {
 
-                    ((AMainOBC) getActivity()).setFuelStation(null);
-                    ((AMainOBC) getActivity()).setEndingPosition(null);
-                    ((AMainOBC) getActivity()).setCurrentRouting(null);
+					((AMainOBC) getActivity()).setFuelStation(null);
+					((AMainOBC) getActivity()).setEndingPosition(null);
+					((AMainOBC) getActivity()).setCurrentRouting(null);
 
-                    if (App.isNavigatorEnabled) {
-                        try {
-                            ((ABase) getActivity()).popTillFragment(FMap.class.getName());
-                        } catch (Exception e) {
-                            dlog.d("Exception while popping fragment");
-                        }
-                    } else {
-                        try {
-                            ((ABase) getActivity()).popTillFragment(FDriving.class.getName());
-                        } catch (Exception e) {
-                            dlog.d("Exception while popping fragment");
-                        }
-                        return;
-                    }
-                }
+					if (App.isNavigatorEnabled) {
+						try {
+							((ABase) getActivity()).popTillFragment(FMap.class.getName());
+						} catch (Exception e) {
+							dlog.d("Exception while popping fragment");
+						}
+					} else {
+						try {
+							((ABase) getActivity()).popTillFragment(FDriving.class.getName());
+						} catch (Exception e) {
+							dlog.d("Exception while popping fragment");
+						}
+						return;
+					}
+				}
 
-                break;
+				break;
 
-        }
-    }
+		}
+	}
 
-    // TODO: remove this method
-    @Override
-    public boolean handleBackButton() {
+	// TODO: remove this method
+	@Override
+	public boolean handleBackButton() {
 
-        if (0 < uiStatus && uiStatus <= 2) {
-            uiStatus--;
-            updateUI();
-            return true;
-        }
+		if (0 < uiStatus && uiStatus <= 2) {
+			uiStatus--;
+			updateUI();
+			return true;
+		}
 
-        return super.handleBackButton();
-    }
+		return super.handleBackButton();
+	}
 }

@@ -22,89 +22,89 @@ package org.zeromq;
 import org.zeromq.ZMQ.Socket;
 
 public class ZThread {
-    private ZThread() {
-    }
+	private ZThread() {
+	}
 
-    public interface IAttachedRunnable {
-        void run(Object[] args, ZContext ctx, Socket pipe);
-    }
+	public interface IAttachedRunnable {
+		void run(Object[] args, ZContext ctx, Socket pipe);
+	}
 
-    public interface IDetachedRunnable {
-        void run(Object[] args);
-    }
+	public interface IDetachedRunnable {
+		void run(Object[] args);
+	}
 
-    private static class ShimThread extends Thread {
-        private ZContext ctx;
-        private IAttachedRunnable attachedRunnable;
-        private IDetachedRunnable detachedRunnable;
-        private Object[] args;
-        private Socket pipe;
+	private static class ShimThread extends Thread {
+		private ZContext ctx;
+		private IAttachedRunnable attachedRunnable;
+		private IDetachedRunnable detachedRunnable;
+		private Object[] args;
+		private Socket pipe;
 
-        protected ShimThread(ZContext ctx, IAttachedRunnable runnable, Object[] args, Socket pipe) {
-            assert (ctx != null);
-            assert (pipe != null);
-            assert (runnable != null);
+		protected ShimThread(ZContext ctx, IAttachedRunnable runnable, Object[] args, Socket pipe) {
+			assert (ctx != null);
+			assert (pipe != null);
+			assert (runnable != null);
 
-            this.ctx = ctx;
-            this.attachedRunnable = runnable;
-            this.args = args;
-            this.pipe = pipe;
-        }
+			this.ctx = ctx;
+			this.attachedRunnable = runnable;
+			this.args = args;
+			this.pipe = pipe;
+		}
 
-        public ShimThread(IDetachedRunnable runnable, Object[] args) {
-            assert (runnable != null);
-            this.detachedRunnable = runnable;
-            this.args = args;
-        }
+		public ShimThread(IDetachedRunnable runnable, Object[] args) {
+			assert (runnable != null);
+			this.detachedRunnable = runnable;
+			this.args = args;
+		}
 
-        @Override
-        public void run() {
-            if (attachedRunnable != null) {
-                attachedRunnable.run(args, ctx, pipe);
-                ctx.destroy();
-            } else {
-                detachedRunnable.run(args);
-            }
-        }
-    }
+		@Override
+		public void run() {
+			if (attachedRunnable != null) {
+				attachedRunnable.run(args, ctx, pipe);
+				ctx.destroy();
+			} else {
+				detachedRunnable.run(args);
+			}
+		}
+	}
 
-    //  --------------------------------------------------------------------------
-    //  Create a detached thread. A detached thread operates autonomously
-    //  and is used to simulate a separate process. It gets no ctx, and no
-    //  pipe.
+	//  --------------------------------------------------------------------------
+	//  Create a detached thread. A detached thread operates autonomously
+	//  and is used to simulate a separate process. It gets no ctx, and no
+	//  pipe.
 
-    public static void start(IDetachedRunnable runnable, Object... args) {
-        //  Prepare child thread
-        Thread shim = new ShimThread(runnable, args);
-        shim.start();
-    }
+	public static void start(IDetachedRunnable runnable, Object... args) {
+		//  Prepare child thread
+		Thread shim = new ShimThread(runnable, args);
+		shim.start();
+	}
 
-    //  --------------------------------------------------------------------------
-    //  Create an attached thread. An attached thread gets a ctx and a PAIR
-    //  pipe back to its parent. It must monitor its pipe, and exit if the
-    //  pipe becomes unreadable. Returns pipe, or null if there was an error.
+	//  --------------------------------------------------------------------------
+	//  Create an attached thread. An attached thread gets a ctx and a PAIR
+	//  pipe back to its parent. It must monitor its pipe, and exit if the
+	//  pipe becomes unreadable. Returns pipe, or null if there was an error.
 
-    public static Socket fork(ZContext ctx, IAttachedRunnable runnable, Object... args) {
-        Socket pipe = ctx.createSocket(ZMQ.PAIR);
+	public static Socket fork(ZContext ctx, IAttachedRunnable runnable, Object... args) {
+		Socket pipe = ctx.createSocket(ZMQ.PAIR);
 
-        if (pipe != null) {
-            pipe.bind(String.format("inproc://zctx-pipe-%d", pipe.hashCode()));
-        } else {
-            return null;
-        }
+		if (pipe != null) {
+			pipe.bind(String.format("inproc://zctx-pipe-%d", pipe.hashCode()));
+		} else {
+			return null;
+		}
 
-        //  Connect child pipe to our pipe
-        ZContext ccontext = ZContext.shadow(ctx);
-        Socket cpipe = ccontext.createSocket(ZMQ.PAIR);
-        if (cpipe == null) {
-            return null;
-        }
-        cpipe.connect(String.format("inproc://zctx-pipe-%d", pipe.hashCode()));
+		//  Connect child pipe to our pipe
+		ZContext ccontext = ZContext.shadow(ctx);
+		Socket cpipe = ccontext.createSocket(ZMQ.PAIR);
+		if (cpipe == null) {
+			return null;
+		}
+		cpipe.connect(String.format("inproc://zctx-pipe-%d", pipe.hashCode()));
 
-        //  Prepare child thread
-        Thread shim = new ShimThread(ccontext, runnable, args, cpipe);
-        shim.start();
+		//  Prepare child thread
+		Thread shim = new ShimThread(ccontext, runnable, args, cpipe);
+		shim.start();
 
-        return pipe;
-    }
+		return pipe;
+	}
 }

@@ -12,39 +12,39 @@ import java.security.cert.X509Certificate;
 
 public class Security {
 
-    public static String getSignature(PackageInfo p, PackageManager pm) {
+	public static String getSignature(PackageInfo p, PackageManager pm) {
 
-        StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 
-        final String strName = p.applicationInfo.loadLabel(pm).toString();
-        final String strVendor = p.packageName;
+		final String strName = p.applicationInfo.loadLabel(pm).toString();
+		final String strVendor = p.packageName;
 
-        sb.append("" + strName + " / " + strVendor + ": \n");
+		sb.append("" + strName + " / " + strVendor + ": \n");
 
-        final Signature[] arrSignatures = p.signatures;
-        for (final Signature sig : arrSignatures) {
-            /*
+		final Signature[] arrSignatures = p.signatures;
+		for (final Signature sig : arrSignatures) {
+			/*
 	        * Get the X.509 certificate.
 	        */
-            final byte[] rawCert = sig.toByteArray();
-            InputStream certStream = new ByteArrayInputStream(rawCert);
+			final byte[] rawCert = sig.toByteArray();
+			InputStream certStream = new ByteArrayInputStream(rawCert);
 
-            final CertificateFactory certFactory;
-            final X509Certificate x509Cert;
-            try {
-                certFactory = CertificateFactory.getInstance("X509");
-                x509Cert = (X509Certificate) certFactory.generateCertificate(certStream);
+			final CertificateFactory certFactory;
+			final X509Certificate x509Cert;
+			try {
+				certFactory = CertificateFactory.getInstance("X509");
+				x509Cert = (X509Certificate) certFactory.generateCertificate(certStream);
 
-                sb.append("Certificate subject: " + x509Cert.getSubjectDN() + "\n");
-                sb.append("Certificate issuer: " + x509Cert.getIssuerDN() + "\n");
-                sb.append("Certificate serial number: " + x509Cert.getSerialNumber() + "\n");
-                sb.append("\n");
-            } catch (CertificateException e) {
-                // e.printStackTrace();
-            }
-        }
+				sb.append("Certificate subject: " + x509Cert.getSubjectDN() + "\n");
+				sb.append("Certificate issuer: " + x509Cert.getIssuerDN() + "\n");
+				sb.append("Certificate serial number: " + x509Cert.getSerialNumber() + "\n");
+				sb.append("\n");
+			} catch (CertificateException e) {
+				// e.printStackTrace();
+			}
+		}
 
-        return sb.toString();
-    }
+		return sb.toString();
+	}
 
 }

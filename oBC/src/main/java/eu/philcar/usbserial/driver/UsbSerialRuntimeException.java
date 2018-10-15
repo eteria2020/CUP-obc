@@ -27,20 +27,20 @@ package eu.philcar.usbserial.driver;
 @SuppressWarnings("serial")
 public class UsbSerialRuntimeException extends RuntimeException {
 
-    public UsbSerialRuntimeException() {
-        super();
-    }
+	public UsbSerialRuntimeException() {
+		super();
+	}
 
-    public UsbSerialRuntimeException(String detailMessage, Throwable throwable) {
-        super(detailMessage, throwable);
-    }
+	public UsbSerialRuntimeException(String detailMessage, Throwable throwable) {
+		super(detailMessage, throwable);
+	}
 
-    public UsbSerialRuntimeException(String detailMessage) {
-        super(detailMessage);
-    }
+	public UsbSerialRuntimeException(String detailMessage) {
+		super(detailMessage);
+	}
 
-    public UsbSerialRuntimeException(Throwable throwable) {
-        super(throwable);
-    }
+	public UsbSerialRuntimeException(Throwable throwable) {
+		super(throwable);
+	}
 
 }

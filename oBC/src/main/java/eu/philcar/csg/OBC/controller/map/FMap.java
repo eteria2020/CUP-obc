@@ -134,411 +134,411 @@ import eu.philcar.csg.OBC.service.MessageFactory;
 @SuppressLint("SimpleDateFormat")
 public class FMap extends FBase implements OnClickListener {
 
-    public static FMap newInstance() {
-        FMap fm = new FMap();
-        return fm;
-    }
-
-    @Inject
-    EventRepository eventRepository;
-    private DLog dlog = new DLog(this.getClass());
-
-    public final static int BASE_TOLLERANCE = 50;                    // Circle radius in meters (for fuel station on-map-tap)
-    public final static byte BASE_ZOOM_LEVEL = 17;                // Maps-forge level
-    public final static byte BASE_TOLLERANCE_INCREMENT = 50;    // meters
-
-    private final static int MSG_SHOW_REAL_REACH = 1;
-    private final static int MSG_ZOOM_REAL_REACH = 2;
-    private final static int MSG_HIDE_REAL_REACH = 3;
-    private final static int MSG_START_NAVIGATION = 4;
-    private final static int MSG_STOP_NAVIGATION = 5;
-    private final static int MSG_CENTER_MAP = 6;
-    private final static int MSG_CLOSE_CALLOUT = 7;
-    private final static int MSG_CLOSE_SOC_ALERT = 8;
-    private final static int MSG_OPEN_SOC_ALERT = 9;
-
-    private static View rootView;
-    public static SKMapViewHolder mapHolder;
-    private static SKMapSurfaceView mapView;
-
-    private FrameLayout navigationFL, fmapAlarm, fmapRange;
-    private Button endB, navigationB, findDestinationB, fuelStationsB, homeB, sosB;
-    private ImageView parkingStatusIV, parkingDirectionIV, adIV, no3gIV;
-    private TextView dayTV, timeTV, tvRange, fmapAlertTV;
-    private boolean seen = false, drawCharging = true, firstUpReceived = false;
-    private static int statusAlertSOC = 0, lastInside = 0; //0 none played | 1 played 20km | 2 player 5km
-
-    //anim
-    private Animation alertAnimation;
-    private static boolean animToggle = true, animFull = false;
-    private int playing = 0;//0:no anim 1:anim3g 2:animArea 3:alertAnimation
-    private List<String> animQueue = new ArrayList<String>();
-    private long updateArea = 0;
-    private CarInfo localCarInfo;
-
-    private static SKCoordinate calloutCoordinate = null;
-
-    private static View panelRealReach, panelNavigation, panelNavMenu, no3gwarning;
-
-    private TextView no3gtxt, txtCurrentStreet;
-    private TextView txtNextStreet, titleAnnotation, descriptionAnnotation;
-    private ArrayList<SKAnnotation> annotationList = new ArrayList<SKAnnotation>();
-
-    public static CountDownTimer timer_2min, timer_5sec;
-
-    private static List<View> panels = new ArrayList<View>();
-
-    private RelativeLayout customView;
-    private static ArrayList<Bundle> Icons = new ArrayList<Bundle>();
-    private static ArrayList<Bundle> Pois = new ArrayList<Bundle>();
-
-    private SKCurrentPositionProvider currentPositionProvider;
-    private static SKPosition currentPosition = new SKPosition();
-    private int range = 0;
-    private static boolean navigationActive = false;
-    private static boolean firstLaunch = true;
-    private static String jsonmd5 = "";
-    private static Boolean handleClick = false;
-    public static Boolean started = false; //flag per non ripetere CDtimr
-
-    private ProTTS tts;
-    private AudioPlayer player;
-    private UtteranceProgressListener utteranceListener;
-
-    private boolean navigatorAT;
-
-    private Uri uri;
-    public FMap Instance;
-
-    private boolean mapLoaded = false;
-    private boolean showingFuelStations = false;
-    private RelativeLayout fmap_top_LL;
-    private static Boolean RequestBanner = false;
-    public static Boolean firstRun = true;
-    public static Context context;
-
-    private static Boolean isSecondCallout = false;
-
-    private static Bundle calloutPoi = null;
-
-    public static Boolean getIsSecondCallout() {
-        return isSecondCallout;
-    }
-
-    public static void setIsSecondCallout(Boolean isSecondCallout) {
-        FMap.isSecondCallout = isSecondCallout;
-    }
-
-    private static View calloutView = null;
-
-    public static View getCalloutView() {
-        return calloutView;
-    }
-
-    public static Bundle getCalloutPoi() {
-        return calloutPoi;
-    }
-
-    public FMap() {
-        Instance = this;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-        context = getActivity();
-        player = new AudioPlayer(getActivity());
-        App.setIsCloseable(false);
-        App.get(getActivity()).getComponent().inject(this);
-
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.f_map, container, false);
-
-        dlog.d("OnCreareView FMap");
-        rootView = view;
-        if (App.BannerName.getBundle("CAR") == null && !RequestBanner) {          //App.Instance.BannerName.getBundle("CAR")==null&&
-            //controllo se ho il banner e se non ho già iniziato a scaricarlo.
-            RequestBanner = true;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-
-                    loadBanner(App.URL_AdsBuilderCar, "CAR", false);        //scarico banner
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                FMap fMap = (FMap) getFragmentManager().findFragmentByTag(FMap.class.getName());
-                                if (fMap != null) {
-
-                                    updateBanner("CAR");                            //Modifico l'IV
-                                    //RequestBanner = false;
-                                }
-                            } catch (Exception e) {
-                                dlog.e("updateBanner: eccezione in chiamata", e);
-                            }
-                        }
-                    });
-                }
-            }).start();
-        }
-
-        if (App.BannerName.getBundle("END") == null) {          //App.Instance.BannerName.getBundle("CAR")==null&&
-            //controllo se ho il banner e se non ho già iniziato a scaricarlo.
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-
-                    loadBanner(App.URL_AdsBuilderEnd, "END", false);        //scarico banner
-
-                }
-            }).start();
-        }
-
-        //uri = Uri.parse("android.resource://eu.philcar.csg.OBC/"+ R.raw.out_operative_area_tts_it);//avviso sonoro
-
-        FrameLayout frame = (FrameLayout) rootView.findViewById(R.id.fmapMapMV);
-
-        if (new File("/sdcard/SKMaps/Maps/v1/20150413/meta/").exists()) {
-            if (mapHolder == null) {
-                mapHolder = new SKMapViewHolder(this.getActivity());
-                mapHolder.setMapSurfaceListener(mapSurfaceListener);
-                frame.addView(mapHolder);
-            } else {
-                frame.addView(mapHolder);
-            }
-        }
-
-        tts = new ProTTS(getActivity());
-
-        //seen=false;
-
-        adIV = (ImageView) view.findViewById(R.id.fmapLeftBorderIV);
-
-        navigationFL = (FrameLayout) view.findViewById(R.id.fmapNavitagionFL);
-        navigationB = (Button) view.findViewById(R.id.fmapNavigationB);
-        tvRange = (TextView) view.findViewById(R.id.tvRange);
-        fmap_top_LL = (RelativeLayout) view.findViewById(R.id.fmap_top_LL);
-
-        titleAnnotation = (TextView) view.findViewById(R.id.titleAnnotationTV);
-        descriptionAnnotation = (TextView) view.findViewById(R.id.descriptionAnnotationTV);
-
-        no3gIV = (ImageView) view.findViewById(R.id.no3gIV_MAP);
-        no3gwarning = view.findViewById(R.id.ll3G_MAP);
-        no3gtxt = (TextView) view.findViewById(R.id.no3gtxt_MAP);
-
-        //endB = (Button)view.findViewById(R.id.fmapENDB);
-        findDestinationB = (Button) view.findViewById(R.id.fmapSearchB);
-        //fuelStationsB = (Button)view.findViewById(R.id.fmapFuelStationsB);
-        homeB = (Button) view.findViewById(R.id.fmapHomeB);
-        sosB = (Button) view.findViewById(R.id.fmapSOSB);
-
-        Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
-
-        parkingStatusIV = (ImageView) view.findViewById(R.id.fmapParkingStatusIV);
-        parkingDirectionIV = (ImageView) view.findViewById(R.id.fmapParkingDirectionIV);
-        fmapAlarm = (FrameLayout) view.findViewById(R.id.fmapAlarm);
-        fmapRange = (FrameLayout) view.findViewById(R.id.fmapRange);
-
-        fmapAlarm.setVisibility(View.INVISIBLE);
-        fmapRange.setVisibility(View.INVISIBLE);
-
-        txtCurrentStreet = (TextView) rootView.findViewById(R.id.txtCurrentStreet);
-        txtCurrentStreet.setVisibility(View.INVISIBLE);
-        txtNextStreet = (TextView) rootView.findViewById(R.id.txtNextStreet);
-        txtNextStreet.setVisibility(View.INVISIBLE);
-
-        fmapAlertTV = (TextView) rootView.findViewById(R.id.fmapAlertTV);
-        navigationB.setTypeface(font);
-        homeB.setTypeface(font);
-
-        dayTV = (TextView) view.findViewById(R.id.fmap_date_TV);
-        timeTV = (TextView) view.findViewById(R.id.fmap_hour_TV);
-
-        ((AMainOBC) getActivity()).setFragmentHandler(localActivityHandler);
-
-        findDestinationB.setOnClickListener(this);
-        //endB.setOnClickListener(this);
-        homeB.setOnClickListener(this);
-        sosB.setOnClickListener(this);
-        navigationB.setOnClickListener(this);
-        Button btnCloseNav = (Button) view.findViewById(R.id.btnCloseNav);
-        btnCloseNav.setOnClickListener(this);
-        adIV.setOnClickListener(this);
-        view.findViewById(R.id.fmapAlertCloseBTN).setOnClickListener(this);
-
-        buildLeftPanels();
-
-        //webViewBanner = (WebView) view.findViewById(R.id.WebViewBanner);
-
-        //animation for the blink of the alert in the top right corner
-        alertAnimation = new AlphaAnimation(0.0f, 1.0f);
-        alertAnimation.setDuration(500); //You can manage the time of the blink with this parameter
-        alertAnimation.setStartOffset(200);
-        alertAnimation.setRepeatMode(Animation.REVERSE);
-        alertAnimation.setRepeatCount(Animation.INFINITE);
-        alertAnimation.setAnimationListener(new Animation.AnimationListener() {
-
-            int index = 0;
-            String playing = "";
-
-            @Override
-            public void onAnimationStart(Animation animator) {
-                dlog.d(FMap.class.toString() + "StartAnimation: alertAnimation");
-                index = 0;
-
-                playing = animQueue.get(0);
-
-                switch (playing) {
-
-                    case "none"://no anim
-                        no3gwarning.setVisibility(View.INVISIBLE);
-                        break;
-                    case "area"://out of area
-                        no3gIV.setVisibility(View.GONE); //icona no3G
-                        // no3gIV.setImageResource(R.drawable.img_parking_p_green);
-                        no3gtxt.setText(R.string.outside_area);
-                        animToggle = !animToggle;
-                        no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedredbox);
-                        break;
-                    case "3g"://3G
-                        no3gIV.setVisibility(View.GONE);
-                        no3gIV.setImageResource(R.drawable.no_connection);
-                        no3gtxt.setText("NO 3G");
-                        animToggle = !animToggle;
-                        no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedredbox);
-                        break;
-                    case "bonus"://Bonus
-                        no3gIV.setVisibility(View.GONE);
-                        no3gtxt.setText("BONUS");
-                        no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedorangebox);
-                        animToggle = !animToggle;
-                        break;
-
-                }
-                animToggle = true;
-                animFull = false;
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                dlog.d(FMap.class.toString() + "EndAnimation: alertAnimation");
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-                if (animQueue.size() == 0) {
-                    no3gwarning.clearAnimation();
-                    return;
-                }
-
-                if (animFull) {
-                    index++;
-
-                    if (index >= animQueue.size())
-                        index = 0;
-
-                    playing = animQueue.get(index);
-
-                    switch (playing) {
-
-                        case "none"://no anim
-                            no3gwarning.setVisibility(View.INVISIBLE);
-                            break;
-                        case "area"://out of area
-                            no3gIV.setVisibility(View.GONE); //icona no3G
-                            // no3gIV.setImageResource(R.drawable.img_parking_p_green);
-                            no3gtxt.setText(R.string.outside_area);
-                            animToggle = !animToggle;
-                            no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedredbox);
-                            break;
-                        case "3g"://3G
-                            no3gIV.setVisibility(View.VISIBLE);
-                            no3gIV.setImageResource(R.drawable.no_connection);
-                            no3gtxt.setText("NO 3G");
-                            animToggle = !animToggle;
-                            no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedredbox);
-                            break;
-                        case "bonus"://Bonus
-                            no3gIV.setVisibility(View.GONE);
-                            no3gtxt.setText("BONUS");
-                            no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedorangebox);
-                            animToggle = !animToggle;
-                            break;
-
-                    }
-
-                    animFull = !animFull;
-                } else
-                    animFull = !animFull;
-            }
-
-        });
-
-        String jsonFile = "";
-
-        File outDir = new File(App.getPoiPositionFolder());
-        if (!outDir.isDirectory()) {
-            outDir.mkdir();
-        }
-        try {
-            File outputFile = new File(outDir, "POIS_POS.json");
-            if (outputFile.exists()) {
-                jsonFile = getStringFromFile(outputFile.getPath());
-                jsonmd5 = md5(jsonFile);
-                parseJsonPos(jsonFile);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        AMainOBC activity = (AMainOBC) getActivity();
-        if (activity != null) {
-            updateParkAreaStatus(activity.isInsideParkArea(), activity.getRotationToParkAngle());
-        }
-
-        if (App.first_UP_poi && App.hasNetworkConnection()) {
-            new Thread(new Runnable() {
-                public void run() {
-                    dlog.d(FMap.class.toString() + " onCreateView: Primo aggiornamento Poi");
-                    updatePoiIcon(App.URL_PoisIcons);
-                    updatePoiPos(App.URL_PoisBanner);
-                }
-            }).start();
-
-        }
-
-        if ((new Date().getTime() - App.update_Poi.getTime()) > 3 * 60 * 60 * 1000 && App.hasNetworkConnection() && !App.first_UP_poi) {    //3600000 = 1 ora
-
-            new Thread(new Runnable() {
-                public void run() {
-                    updatePoiIcon(App.URL_PoisIcons);
-                    updatePoiPos(App.URL_PoisBanner);
-                }
-            }).start();
-        }
-
-        App.first_UP_poi = false;
-
-        if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
-            fmap_top_LL.setBackgroundColor(getResources().getColor(R.color.background_red));
-
-        } else {
-            fmap_top_LL.setBackgroundColor(getResources().getColor(R.color.background_green));
-        }
-
-        initNoTouchArea();
-
-        //timer for advertisment update
+	public static FMap newInstance() {
+		FMap fm = new FMap();
+		return fm;
+	}
+
+	@Inject
+	EventRepository eventRepository;
+	private DLog dlog = new DLog(this.getClass());
+
+	public final static int BASE_TOLLERANCE = 50;                    // Circle radius in meters (for fuel station on-map-tap)
+	public final static byte BASE_ZOOM_LEVEL = 17;                // Maps-forge level
+	public final static byte BASE_TOLLERANCE_INCREMENT = 50;    // meters
+
+	private final static int MSG_SHOW_REAL_REACH = 1;
+	private final static int MSG_ZOOM_REAL_REACH = 2;
+	private final static int MSG_HIDE_REAL_REACH = 3;
+	private final static int MSG_START_NAVIGATION = 4;
+	private final static int MSG_STOP_NAVIGATION = 5;
+	private final static int MSG_CENTER_MAP = 6;
+	private final static int MSG_CLOSE_CALLOUT = 7;
+	private final static int MSG_CLOSE_SOC_ALERT = 8;
+	private final static int MSG_OPEN_SOC_ALERT = 9;
+
+	private static View rootView;
+	public static SKMapViewHolder mapHolder;
+	private static SKMapSurfaceView mapView;
+
+	private FrameLayout navigationFL, fmapAlarm, fmapRange;
+	private Button endB, navigationB, findDestinationB, fuelStationsB, homeB, sosB;
+	private ImageView parkingStatusIV, parkingDirectionIV, adIV, no3gIV;
+	private TextView dayTV, timeTV, tvRange, fmapAlertTV;
+	private boolean seen = false, drawCharging = true, firstUpReceived = false;
+	private static int statusAlertSOC = 0, lastInside = 0; //0 none played | 1 played 20km | 2 player 5km
+
+	//anim
+	private Animation alertAnimation;
+	private static boolean animToggle = true, animFull = false;
+	private int playing = 0;//0:no anim 1:anim3g 2:animArea 3:alertAnimation
+	private List<String> animQueue = new ArrayList<String>();
+	private long updateArea = 0;
+	private CarInfo localCarInfo;
+
+	private static SKCoordinate calloutCoordinate = null;
+
+	private static View panelRealReach, panelNavigation, panelNavMenu, no3gwarning;
+
+	private TextView no3gtxt, txtCurrentStreet;
+	private TextView txtNextStreet, titleAnnotation, descriptionAnnotation;
+	private ArrayList<SKAnnotation> annotationList = new ArrayList<SKAnnotation>();
+
+	public static CountDownTimer timer_2min, timer_5sec;
+
+	private static List<View> panels = new ArrayList<View>();
+
+	private RelativeLayout customView;
+	private static ArrayList<Bundle> Icons = new ArrayList<Bundle>();
+	private static ArrayList<Bundle> Pois = new ArrayList<Bundle>();
+
+	private SKCurrentPositionProvider currentPositionProvider;
+	private static SKPosition currentPosition = new SKPosition();
+	private int range = 0;
+	private static boolean navigationActive = false;
+	private static boolean firstLaunch = true;
+	private static String jsonmd5 = "";
+	private static Boolean handleClick = false;
+	public static Boolean started = false; //flag per non ripetere CDtimr
+
+	private ProTTS tts;
+	private AudioPlayer player;
+	private UtteranceProgressListener utteranceListener;
+
+	private boolean navigatorAT;
+
+	private Uri uri;
+	public FMap Instance;
+
+	private boolean mapLoaded = false;
+	private boolean showingFuelStations = false;
+	private RelativeLayout fmap_top_LL;
+	private static Boolean RequestBanner = false;
+	public static Boolean firstRun = true;
+	public static Context context;
+
+	private static Boolean isSecondCallout = false;
+
+	private static Bundle calloutPoi = null;
+
+	public static Boolean getIsSecondCallout() {
+		return isSecondCallout;
+	}
+
+	public static void setIsSecondCallout(Boolean isSecondCallout) {
+		FMap.isSecondCallout = isSecondCallout;
+	}
+
+	private static View calloutView = null;
+
+	public static View getCalloutView() {
+		return calloutView;
+	}
+
+	public static Bundle getCalloutPoi() {
+		return calloutPoi;
+	}
+
+	public FMap() {
+		Instance = this;
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+
+		super.onCreate(savedInstanceState);
+		context = getActivity();
+		player = new AudioPlayer(getActivity());
+		App.setIsCloseable(false);
+		App.get(getActivity()).getComponent().inject(this);
+
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+		View view = inflater.inflate(R.layout.f_map, container, false);
+
+		dlog.d("OnCreareView FMap");
+		rootView = view;
+		if (App.BannerName.getBundle("CAR") == null && !RequestBanner) {          //App.Instance.BannerName.getBundle("CAR")==null&&
+			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
+			RequestBanner = true;
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+
+					loadBanner(App.URL_AdsBuilderCar, "CAR", false);        //scarico banner
+					getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								FMap fMap = (FMap) getFragmentManager().findFragmentByTag(FMap.class.getName());
+								if (fMap != null) {
+
+									updateBanner("CAR");                            //Modifico l'IV
+									//RequestBanner = false;
+								}
+							} catch (Exception e) {
+								dlog.e("updateBanner: eccezione in chiamata", e);
+							}
+						}
+					});
+				}
+			}).start();
+		}
+
+		if (App.BannerName.getBundle("END") == null) {          //App.Instance.BannerName.getBundle("CAR")==null&&
+			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
+
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+
+					loadBanner(App.URL_AdsBuilderEnd, "END", false);        //scarico banner
+
+				}
+			}).start();
+		}
+
+		//uri = Uri.parse("android.resource://eu.philcar.csg.OBC/"+ R.raw.out_operative_area_tts_it);//avviso sonoro
+
+		FrameLayout frame = (FrameLayout) rootView.findViewById(R.id.fmapMapMV);
+
+		if (new File("/sdcard/SKMaps/Maps/v1/20150413/meta/").exists()) {
+			if (mapHolder == null) {
+				mapHolder = new SKMapViewHolder(this.getActivity());
+				mapHolder.setMapSurfaceListener(mapSurfaceListener);
+				frame.addView(mapHolder);
+			} else {
+				frame.addView(mapHolder);
+			}
+		}
+
+		tts = new ProTTS(getActivity());
+
+		//seen=false;
+
+		adIV = (ImageView) view.findViewById(R.id.fmapLeftBorderIV);
+
+		navigationFL = (FrameLayout) view.findViewById(R.id.fmapNavitagionFL);
+		navigationB = (Button) view.findViewById(R.id.fmapNavigationB);
+		tvRange = (TextView) view.findViewById(R.id.tvRange);
+		fmap_top_LL = (RelativeLayout) view.findViewById(R.id.fmap_top_LL);
+
+		titleAnnotation = (TextView) view.findViewById(R.id.titleAnnotationTV);
+		descriptionAnnotation = (TextView) view.findViewById(R.id.descriptionAnnotationTV);
+
+		no3gIV = (ImageView) view.findViewById(R.id.no3gIV_MAP);
+		no3gwarning = view.findViewById(R.id.ll3G_MAP);
+		no3gtxt = (TextView) view.findViewById(R.id.no3gtxt_MAP);
+
+		//endB = (Button)view.findViewById(R.id.fmapENDB);
+		findDestinationB = (Button) view.findViewById(R.id.fmapSearchB);
+		//fuelStationsB = (Button)view.findViewById(R.id.fmapFuelStationsB);
+		homeB = (Button) view.findViewById(R.id.fmapHomeB);
+		sosB = (Button) view.findViewById(R.id.fmapSOSB);
+
+		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
+
+		parkingStatusIV = (ImageView) view.findViewById(R.id.fmapParkingStatusIV);
+		parkingDirectionIV = (ImageView) view.findViewById(R.id.fmapParkingDirectionIV);
+		fmapAlarm = (FrameLayout) view.findViewById(R.id.fmapAlarm);
+		fmapRange = (FrameLayout) view.findViewById(R.id.fmapRange);
+
+		fmapAlarm.setVisibility(View.INVISIBLE);
+		fmapRange.setVisibility(View.INVISIBLE);
+
+		txtCurrentStreet = (TextView) rootView.findViewById(R.id.txtCurrentStreet);
+		txtCurrentStreet.setVisibility(View.INVISIBLE);
+		txtNextStreet = (TextView) rootView.findViewById(R.id.txtNextStreet);
+		txtNextStreet.setVisibility(View.INVISIBLE);
+
+		fmapAlertTV = (TextView) rootView.findViewById(R.id.fmapAlertTV);
+		navigationB.setTypeface(font);
+		homeB.setTypeface(font);
+
+		dayTV = (TextView) view.findViewById(R.id.fmap_date_TV);
+		timeTV = (TextView) view.findViewById(R.id.fmap_hour_TV);
+
+		((AMainOBC) getActivity()).setFragmentHandler(localActivityHandler);
+
+		findDestinationB.setOnClickListener(this);
+		//endB.setOnClickListener(this);
+		homeB.setOnClickListener(this);
+		sosB.setOnClickListener(this);
+		navigationB.setOnClickListener(this);
+		Button btnCloseNav = (Button) view.findViewById(R.id.btnCloseNav);
+		btnCloseNav.setOnClickListener(this);
+		adIV.setOnClickListener(this);
+		view.findViewById(R.id.fmapAlertCloseBTN).setOnClickListener(this);
+
+		buildLeftPanels();
+
+		//webViewBanner = (WebView) view.findViewById(R.id.WebViewBanner);
+
+		//animation for the blink of the alert in the top right corner
+		alertAnimation = new AlphaAnimation(0.0f, 1.0f);
+		alertAnimation.setDuration(500); //You can manage the time of the blink with this parameter
+		alertAnimation.setStartOffset(200);
+		alertAnimation.setRepeatMode(Animation.REVERSE);
+		alertAnimation.setRepeatCount(Animation.INFINITE);
+		alertAnimation.setAnimationListener(new Animation.AnimationListener() {
+
+			int index = 0;
+			String playing = "";
+
+			@Override
+			public void onAnimationStart(Animation animator) {
+				dlog.d(FMap.class.toString() + "StartAnimation: alertAnimation");
+				index = 0;
+
+				playing = animQueue.get(0);
+
+				switch (playing) {
+
+					case "none"://no anim
+						no3gwarning.setVisibility(View.INVISIBLE);
+						break;
+					case "area"://out of area
+						no3gIV.setVisibility(View.GONE); //icona no3G
+						// no3gIV.setImageResource(R.drawable.img_parking_p_green);
+						no3gtxt.setText(R.string.outside_area);
+						animToggle = !animToggle;
+						no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedredbox);
+						break;
+					case "3g"://3G
+						no3gIV.setVisibility(View.GONE);
+						no3gIV.setImageResource(R.drawable.no_connection);
+						no3gtxt.setText("NO 3G");
+						animToggle = !animToggle;
+						no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedredbox);
+						break;
+					case "bonus"://Bonus
+						no3gIV.setVisibility(View.GONE);
+						no3gtxt.setText("BONUS");
+						no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedorangebox);
+						animToggle = !animToggle;
+						break;
+
+				}
+				animToggle = true;
+				animFull = false;
+
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				dlog.d(FMap.class.toString() + "EndAnimation: alertAnimation");
+
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				if (animQueue.size() == 0) {
+					no3gwarning.clearAnimation();
+					return;
+				}
+
+				if (animFull) {
+					index++;
+
+					if (index >= animQueue.size())
+						index = 0;
+
+					playing = animQueue.get(index);
+
+					switch (playing) {
+
+						case "none"://no anim
+							no3gwarning.setVisibility(View.INVISIBLE);
+							break;
+						case "area"://out of area
+							no3gIV.setVisibility(View.GONE); //icona no3G
+							// no3gIV.setImageResource(R.drawable.img_parking_p_green);
+							no3gtxt.setText(R.string.outside_area);
+							animToggle = !animToggle;
+							no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedredbox);
+							break;
+						case "3g"://3G
+							no3gIV.setVisibility(View.VISIBLE);
+							no3gIV.setImageResource(R.drawable.no_connection);
+							no3gtxt.setText("NO 3G");
+							animToggle = !animToggle;
+							no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedredbox);
+							break;
+						case "bonus"://Bonus
+							no3gIV.setVisibility(View.GONE);
+							no3gtxt.setText("BONUS");
+							no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedorangebox);
+							animToggle = !animToggle;
+							break;
+
+					}
+
+					animFull = !animFull;
+				} else
+					animFull = !animFull;
+			}
+
+		});
+
+		String jsonFile = "";
+
+		File outDir = new File(App.getPoiPositionFolder());
+		if (!outDir.isDirectory()) {
+			outDir.mkdir();
+		}
+		try {
+			File outputFile = new File(outDir, "POIS_POS.json");
+			if (outputFile.exists()) {
+				jsonFile = getStringFromFile(outputFile.getPath());
+				jsonmd5 = md5(jsonFile);
+				parseJsonPos(jsonFile);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		AMainOBC activity = (AMainOBC) getActivity();
+		if (activity != null) {
+			updateParkAreaStatus(activity.isInsideParkArea(), activity.getRotationToParkAngle());
+		}
+
+		if (App.first_UP_poi && App.hasNetworkConnection()) {
+			new Thread(new Runnable() {
+				public void run() {
+					dlog.d(FMap.class.toString() + " onCreateView: Primo aggiornamento Poi");
+					updatePoiIcon(App.URL_PoisIcons);
+					updatePoiPos(App.URL_PoisBanner);
+				}
+			}).start();
+
+		}
+
+		if ((new Date().getTime() - App.update_Poi.getTime()) > 3 * 60 * 60 * 1000 && App.hasNetworkConnection() && !App.first_UP_poi) {    //3600000 = 1 ora
+
+			new Thread(new Runnable() {
+				public void run() {
+					updatePoiIcon(App.URL_PoisIcons);
+					updatePoiPos(App.URL_PoisBanner);
+				}
+			}).start();
+		}
+
+		App.first_UP_poi = false;
+
+		if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
+			fmap_top_LL.setBackgroundColor(getResources().getColor(R.color.background_red));
+
+		} else {
+			fmap_top_LL.setBackgroundColor(getResources().getColor(R.color.background_green));
+		}
+
+		initNoTouchArea();
+
+		//timer for advertisment update
 //		timer_2min = new CountDownTimer((120)*1000,1000) {
 //		@Override
 //		public void onTick(long millisUntilFinished) {
@@ -629,398 +629,398 @@ public class FMap extends FBase implements OnClickListener {
 //			FHome.timer_2min.cancel();
 //			FHome.timer_2min.start();
 //		}
-        updateBanner("CAR");
+		updateBanner("CAR");
 
-        if (App.fuel_level != 0)
-            tvRange.setText(App.fuel_level + " Km");
-        else
-            fmapRange.setVisibility(View.INVISIBLE);
+		if (App.fuel_level != 0)
+			tvRange.setText(App.fuel_level + " Km");
+		else
+			fmapRange.setVisibility(View.INVISIBLE);
 
-        if (!SystemControl.hasNetworkConnection(getActivity(), eventRepository)) {
-            if (!animQueue.contains("3g"))
-                animQueue.add("3g");
-            if (no3gwarning.getAnimation() == null)
-                no3gwarning.startAnimation(alertAnimation);
-        }
+		if (!SystemControl.hasNetworkConnection(getActivity(), eventRepository)) {
+			if (!animQueue.contains("3g"))
+				animQueue.add("3g");
+			if (no3gwarning.getAnimation() == null)
+				no3gwarning.startAnimation(alertAnimation);
+		}
 
-        if (navigationActive) {
-            homeB.setVisibility(View.INVISIBLE);
-            findDestinationB.setVisibility(View.INVISIBLE);
-        }
+		if (navigationActive) {
+			homeB.setVisibility(View.INVISIBLE);
+			findDestinationB.setVisibility(View.INVISIBLE);
+		}
 
-        return view;
-    }
+		return view;
+	}
 
-    /**
-     * Resuming map and broadcast receiver
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (new File("/sdcard/SKMaps/Maps/v1/20150413/meta/").exists()) {
-            mapHolder.onResume();
-            FrameLayout frame = (FrameLayout) rootView.findViewById(R.id.fmapMapMV);
-            if (frame.getChildCount() == 0 && mapHolder != null) {
-                frame.addView(mapHolder);
-            }
-        }
+	/**
+	 * Resuming map and broadcast receiver
+	 */
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (new File("/sdcard/SKMaps/Maps/v1/20150413/meta/").exists()) {
+			mapHolder.onResume();
+			FrameLayout frame = (FrameLayout) rootView.findViewById(R.id.fmapMapMV);
+			if (frame.getChildCount() == 0 && mapHolder != null) {
+				frame.addView(mapHolder);
+			}
+		}
 
-        try {
-            getActivity().registerReceiver(this.ConnectivityChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
-        } catch (Exception e) {
-            dlog.e("onResume: eccezione nella registrazione del broadcast receiver ", e);
-        }
+		try {
+			getActivity().registerReceiver(this.ConnectivityChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+		} catch (Exception e) {
+			dlog.e("onResume: eccezione nella registrazione del broadcast receiver ", e);
+		}
 
-        updateUI();
-        //initWebBanner();
-        //lastInside=true;
+		updateUI();
+		//initWebBanner();
+		//lastInside=true;
 
-    }
+	}
 
-    /**
-     * Pausing map and broadcast receiver
-     */
-    public void onPause() {
-        super.onPause();
-        //seen=false;
-        //timer_2min.cancel();
-        //timer_5sec.cancel();
-        //statusAlertSOC=0;
-        //lastInside=1;
-        //alertAnimation.cancel();
-        if (new File("/sdcard/SKMaps/Maps/v1/20150413/meta/").exists()) {
-            if (mapHolder != null)
-                mapHolder.onPause();
-            //SKRouteManager.getInstance().clearCurrentRoute();
+	/**
+	 * Pausing map and broadcast receiver
+	 */
+	public void onPause() {
+		super.onPause();
+		//seen=false;
+		//timer_2min.cancel();
+		//timer_5sec.cancel();
+		//statusAlertSOC=0;
+		//lastInside=1;
+		//alertAnimation.cancel();
+		if (new File("/sdcard/SKMaps/Maps/v1/20150413/meta/").exists()) {
+			if (mapHolder != null)
+				mapHolder.onPause();
+			//SKRouteManager.getInstance().clearCurrentRoute();
 
-            //if(navigationActive) {
-            //	stopRouteNavigation();
-            //}
+			//if(navigationActive) {
+			//	stopRouteNavigation();
+			//}
 
-            FrameLayout frame = (FrameLayout) rootView.findViewById(R.id.fmapMapMV);
+			FrameLayout frame = (FrameLayout) rootView.findViewById(R.id.fmapMapMV);
 
-            frame.removeAllViews();
-        }
-        try {
-            getActivity().unregisterReceiver(this.ConnectivityChangeReceiver);
-        } catch (Exception e) {
-            dlog.e("onPause: Exception while unresisting receiver ", e);
-        }
+			frame.removeAllViews();
+		}
+		try {
+			getActivity().unregisterReceiver(this.ConnectivityChangeReceiver);
+		} catch (Exception e) {
+			dlog.e("onPause: Exception while unresisting receiver ", e);
+		}
 
-    }
+	}
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        try {
-            mapHolder = null;
-            statusAlertSOC = 0;
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		try {
+			mapHolder = null;
+			statusAlertSOC = 0;
 
-            if (localHandler != null)
-                localHandler.removeCallbacksAndMessages(null);
-            if (currentPositionProvider != null)
-                currentPositionProvider.stopLocationUpdates();
+			if (localHandler != null)
+				localHandler.removeCallbacksAndMessages(null);
+			if (currentPositionProvider != null)
+				currentPositionProvider.stopLocationUpdates();
 
-            if (FHome.timer_2min != null)
-                FHome.timer_2min.cancel();
-            if (FHome.timer_5sec != null)
-                FHome.timer_5sec.cancel();
-            firstRun = true;
-            firstLaunch = true;
-            drawCharging = true;
-            if (tts != null) {
-                tts.shutdown();
-                tts = null;
-            }
-        } catch (Exception e) {
-            dlog.e("Exception while detaching FMap", e);
-        }
+			if (FHome.timer_2min != null)
+				FHome.timer_2min.cancel();
+			if (FHome.timer_5sec != null)
+				FHome.timer_5sec.cancel();
+			firstRun = true;
+			firstLaunch = true;
+			drawCharging = true;
+			if (tts != null) {
+				tts.shutdown();
+				tts = null;
+			}
+		} catch (Exception e) {
+			dlog.e("Exception while detaching FMap", e);
+		}
 
-    }
+	}
 
-    /**
-     * Deleting references to free memory
-     */
-    @Override
-    public void onDestroy() {
-        if (navigationActive) {
-            stopRouteNavigation();
-        }
-        adIV = null;
-        rootView = null;
-        panelNavigation = null;
-        panelNavMenu = null;
-        panelRealReach = null;
-        panels = null;
-        panels = new ArrayList<View>();
-        fmapAlarm = null;
-        fmapRange = null;
-        tvRange = null;
-        descriptionAnnotation = null;
-        txtCurrentStreet = null;
-        txtNextStreet = null;
-        fmap_top_LL = null;
-        navigationFL = null;
-        navigationB = null;
-        no3gwarning = null;
-        no3gtxt = null;
-        no3gIV = null;
-        timeTV = null;
-        dayTV = null;
-        homeB = null;
-        sosB = null;
-        findDestinationB = null;
-        endB = null;
-        titleAnnotation = null;
-        parkingDirectionIV = null;
-        parkingStatusIV = null;
-        fmapAlertTV = null;
-        super.onDestroy();
-    }
+	/**
+	 * Deleting references to free memory
+	 */
+	@Override
+	public void onDestroy() {
+		if (navigationActive) {
+			stopRouteNavigation();
+		}
+		adIV = null;
+		rootView = null;
+		panelNavigation = null;
+		panelNavMenu = null;
+		panelRealReach = null;
+		panels = null;
+		panels = new ArrayList<View>();
+		fmapAlarm = null;
+		fmapRange = null;
+		tvRange = null;
+		descriptionAnnotation = null;
+		txtCurrentStreet = null;
+		txtNextStreet = null;
+		fmap_top_LL = null;
+		navigationFL = null;
+		navigationB = null;
+		no3gwarning = null;
+		no3gtxt = null;
+		no3gIV = null;
+		timeTV = null;
+		dayTV = null;
+		homeB = null;
+		sosB = null;
+		findDestinationB = null;
+		endB = null;
+		titleAnnotation = null;
+		parkingDirectionIV = null;
+		parkingStatusIV = null;
+		fmapAlertTV = null;
+		super.onDestroy();
+	}
 
-    /**
-     * Init no touch area for crash onClick on the bottom right write "provided by Scout by OSM"
-     */
-    public void initNoTouchArea() {
-        rootView.findViewById(R.id.flNoTouch).setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent e) {
-                return true;
-            }
+	/**
+	 * Init no touch area for crash onClick on the bottom right write "provided by Scout by OSM"
+	 */
+	public void initNoTouchArea() {
+		rootView.findViewById(R.id.flNoTouch).setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent e) {
+				return true;
+			}
 
-        });
+		});
 
-    }
+	}
 
-    /**
-     * Update the area status for alert the user via top right alert and vocal message
-     */
-    public void updateParkAreaStatus(boolean isInside, float rotationAngle) {
+	/**
+	 * Update the area status for alert the user via top right alert and vocal message
+	 */
+	public void updateParkAreaStatus(boolean isInside, float rotationAngle) {
 
-        //isInside = false;
-        //rotationAngle =0;
-        //dlog.d(FMap.class.toString()+"updateParkAreaStatus: "+String.valueOf(isInside));
+		//isInside = false;
+		//rotationAngle =0;
+		//dlog.d(FMap.class.toString()+"updateParkAreaStatus: "+String.valueOf(isInside));
 
-        if (isInside) {
+		if (isInside) {
 
-            if (animQueue.contains("area")) {
-                animQueue.remove("area");
-            }
-            if (lastInside != 0 && lastInside != 1)
-                eventRepository.outOfArea(false);
-            lastInside = 0;
+			if (animQueue.contains("area")) {
+				animQueue.remove("area");
+			}
+			if (lastInside != 0 && lastInside != 1)
+				eventRepository.outOfArea(false);
+			lastInside = 0;
 
-        } else {
-            updateArea = 0;
-            if (!animQueue.contains("area")) {
-                animQueue.add("area");
-            }
-            if (no3gwarning.getAnimation() == null)
-                no3gwarning.startAnimation(alertAnimation);
+		} else {
+			updateArea = 0;
+			if (!animQueue.contains("area")) {
+				animQueue.add("area");
+			}
+			if (no3gwarning.getAnimation() == null)
+				no3gwarning.startAnimation(alertAnimation);
 
-            if (lastInside == 0) {
-                lastInside = 2;
+			if (lastInside == 0) {
+				lastInside = 2;
 
-                //((AMainOBC) getActivity()).player.inizializePlayer();
-                if (App.USE_TTS_ALERT)
-                    queueTTS(getActivity().getResources().getString(R.string.alert_area));
-                else
-                    playAlertAdvice(R.raw.out_operative_area_tts, " alert area");
-            } else {
-                if (lastInside == 1) {
-                    lastInside = 2;
+				//((AMainOBC) getActivity()).player.inizializePlayer();
+				if (App.USE_TTS_ALERT)
+					queueTTS(getActivity().getResources().getString(R.string.alert_area));
+				else
+					playAlertAdvice(R.raw.out_operative_area_tts, " alert area");
+			} else {
+				if (lastInside == 1) {
+					lastInside = 2;
 
-                }
-            }
+				}
+			}
 
-        }
+		}
 
-        //parkingDirectionIV.setRotation((float)rotationAngle);
-    }
+		//parkingDirectionIV.setRotation((float)rotationAngle);
+	}
 
-    /**
-     * Update the Range indicator and handle the out of charge button display
-     */
-    public void updateCarInfo(CarInfo carInfo) {
+	/**
+	 * Update the Range indicator and handle the out of charge button display
+	 */
+	public void updateCarInfo(CarInfo carInfo) {
 
-        try {
+		try {
 
-            if (carInfo == null)
-                return;
+			if (carInfo == null)
+				return;
 
-            localCarInfo = carInfo;
-            int SOC = carInfo.batteryLevel;
+			localCarInfo = carInfo;
+			int SOC = carInfo.batteryLevel;
 
-            // if Soc==0 means that software has just started, or it is a demo kit or we lost some connection
-            // don't show anything for now
-            if (SOC == 0) {
-                fmapAlarm.setVisibility(View.INVISIBLE);
-                fmapRange.setVisibility(View.INVISIBLE);
-                return;
-            }
+			// if Soc==0 means that software has just started, or it is a demo kit or we lost some connection
+			// don't show anything for now
+			if (SOC == 0) {
+				fmapAlarm.setVisibility(View.INVISIBLE);
+				fmapRange.setVisibility(View.INVISIBLE);
+				return;
+			}
 
-            if (FMap.this.isVisible())
-                if (SOC < 15) {
+			if (FMap.this.isVisible())
+				if (SOC < 15) {
 
-                    if (statusAlertSOC <= 1) {
-                        dlog.d("Display popup 5km");
-                        statusAlertSOC = 2;
-                        eventRepository.eventSoc(SOC, "Popup 5km");
-                        rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
-                        rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
-                        rootView.findViewById(R.id.fmapAlertSOCFL).setBackgroundResource(R.drawable.sha_redalertbox);
-                        ((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
-                        ((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_5km);
-                        localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
-                        //((AMainOBC) getActivity()).player.inizializePlayer();
-                        if (App.USE_TTS_ALERT)
-                            queueTTS(getActivity().getResources().getString(R.string.alert_5km));
-                        else
-                            playAlertAdvice(R.raw.alert_tts_5km, " alert 5km");
-                    }
-                } else if (SOC <= 30) {
+					if (statusAlertSOC <= 1) {
+						dlog.d("Display popup 5km");
+						statusAlertSOC = 2;
+						eventRepository.eventSoc(SOC, "Popup 5km");
+						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+						rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
+						rootView.findViewById(R.id.fmapAlertSOCFL).setBackgroundResource(R.drawable.sha_redalertbox);
+						((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
+						((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_5km);
+						localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
+						//((AMainOBC) getActivity()).player.inizializePlayer();
+						if (App.USE_TTS_ALERT)
+							queueTTS(getActivity().getResources().getString(R.string.alert_5km));
+						else
+							playAlertAdvice(R.raw.alert_tts_5km, " alert 5km");
+					}
+				} else if (SOC <= 30) {
 
-                    if (statusAlertSOC <= 0) {
-                        dlog.d("Display popup 20km");
+					if (statusAlertSOC <= 0) {
+						dlog.d("Display popup 20km");
 
-                        statusAlertSOC = 1;
-                        eventRepository.eventSoc(SOC, "Popup 20km");
-                        rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
-                        rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
-                        rootView.findViewById(R.id.fmapAlertSOCFL).setBackgroundResource(R.drawable.sha_orangealertbox);
-                        ((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
+						statusAlertSOC = 1;
+						eventRepository.eventSoc(SOC, "Popup 20km");
+						rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
+						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+						rootView.findViewById(R.id.fmapAlertSOCFL).setBackgroundResource(R.drawable.sha_orangealertbox);
+						((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
 
-                        ((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_20km);
-                        //localHandler.sendEmptyMessageDelayed(MSG_CLOSE_SOC_ALERT, 20000);
-                        //(rootView.findViewById(R.id.fmapAlertSOCFL)).invalidate(); testinva
+						((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_20km);
+						//localHandler.sendEmptyMessageDelayed(MSG_CLOSE_SOC_ALERT, 20000);
+						//(rootView.findViewById(R.id.fmapAlertSOCFL)).invalidate(); testinva
 
-                        //((AMainOBC) getActivity()).player.inizializePlayer();
-                        if (App.USE_TTS_ALERT)
-                            queueTTS(getActivity().getResources().getString(R.string.alert_20km));
-                        else
-                            playAlertAdvice(R.raw.alert_tts_20km, " alert 20km");
-                    }
-                }
+						//((AMainOBC) getActivity()).player.inizializePlayer();
+						if (App.USE_TTS_ALERT)
+							queueTTS(getActivity().getResources().getString(R.string.alert_20km));
+						else
+							playAlertAdvice(R.raw.alert_tts_20km, " alert 20km");
+					}
+				}
 
-            if (SOC <= 30) {
-                if (SOC > 15)
-                    rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
-                else
-                    rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
-                fmapAlarm.setVisibility(View.VISIBLE);
-                fmapRange.setVisibility(View.INVISIBLE);
+			if (SOC <= 30) {
+				if (SOC > 15)
+					rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.almostoutofcharge);
+				else
+					rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
+				fmapAlarm.setVisibility(View.VISIBLE);
+				fmapRange.setVisibility(View.INVISIBLE);
 
-            } else {
-                //statusAlertSOC=0;  //commented to limit
-                localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
-                rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
-                fmapAlarm.setVisibility(View.INVISIBLE);
-                fmapRange.setVisibility(View.VISIBLE);
-                tvRange.setText((SOC >= 50 ? SOC : SOC - 10) + " Km");
-            }
+			} else {
+				//statusAlertSOC=0;  //commented to limit
+				localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
+				rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
+				fmapAlarm.setVisibility(View.INVISIBLE);
+				fmapRange.setVisibility(View.VISIBLE);
+				tvRange.setText((SOC >= 50 ? SOC : SOC - 10) + " Km");
+			}
 
-            range = carInfo.rangeKm;
-            //ShowRealReachTimed(carInfo.rangeKm,10000);
+			range = carInfo.rangeKm;
+			//ShowRealReachTimed(carInfo.rangeKm,10000);
 
-        } catch (Exception e) {
-            dlog.e("Exception while handling carInfo", e);
-        }
-    }
+		} catch (Exception e) {
+			dlog.e("Exception while handling carInfo", e);
+		}
+	}
 
-    /**
-     * Update the ui for display the navigation button
-     */
-    private void updateUI() {
+	/**
+	 * Update the ui for display the navigation button
+	 */
+	private void updateUI() {
 
-        if (navigationActive) {
-            rootView.findViewById(R.id.btnCloseNav).setVisibility(View.VISIBLE);
-        }
+		if (navigationActive) {
+			rootView.findViewById(R.id.btnCloseNav).setVisibility(View.VISIBLE);
+		}
 
 
 
 /*		else
-            ((Button)rootView.findViewById(R.id.btnCloseNav)).setVisibility(View.INVISIBLE);*/
+			((Button)rootView.findViewById(R.id.btnCloseNav)).setVisibility(View.INVISIBLE);*/
 
-    }
+	}
 
-    /**
-     * reset the ui before going in home
-     */
-    private boolean resetUI() {
+	/**
+	 * reset the ui before going in home
+	 */
+	private boolean resetUI() {
 
-        if (((AMainOBC) getActivity()).getFuelStation() != null) {
+		if (((AMainOBC) getActivity()).getFuelStation() != null) {
 
-            ((AMainOBC) getActivity()).setFuelStation(null);
-            ((AMainOBC) getActivity()).setEndingPosition(null);
-            ((AMainOBC) getActivity()).setCurrentRouting(null);
+			((AMainOBC) getActivity()).setFuelStation(null);
+			((AMainOBC) getActivity()).setEndingPosition(null);
+			((AMainOBC) getActivity()).setCurrentRouting(null);
 
-            if (showingFuelStations) {
-                drawFuelStationsOnMap();
-            }
+			if (showingFuelStations) {
+				drawFuelStationsOnMap();
+			}
 
-            updateUI();
+			updateUI();
 
-            return true;
+			return true;
 
-        } else if (((AMainOBC) getActivity()).getPOI() != null) {
+		} else if (((AMainOBC) getActivity()).getPOI() != null) {
 
-            ((AMainOBC) getActivity()).setPOI(null);
-            ((AMainOBC) getActivity()).setEndingPosition(null);
-            ((AMainOBC) getActivity()).setCurrentRouting(null);
+			((AMainOBC) getActivity()).setPOI(null);
+			((AMainOBC) getActivity()).setEndingPosition(null);
+			((AMainOBC) getActivity()).setCurrentRouting(null);
 
-            if (showingFuelStations) {
-                drawFuelStationsOnMap();
-            }
+			if (showingFuelStations) {
+				drawFuelStationsOnMap();
+			}
 
-            updateUI();
+			updateUI();
 
-            return true;
-        }
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    @Override
-    public void onClick(View v) {
+	@Override
+	public void onClick(View v) {
 
-        switch (v.getId()) {
+		switch (v.getId()) {
 
-            case R.id.fmapSearchB://Search
-                if (!navigationActive)
-                    ((ABase) getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
-                break;
+			case R.id.fmapSearchB://Search
+				if (!navigationActive)
+					((ABase) getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
+				break;
 
-            case R.id.fmapHomeB:
-                if (!navigationActive) {
-                    ((ABase) getActivity()).pushBackFragment(FHome.newInstance(), FHome.class.getName(), true);
+			case R.id.fmapHomeB:
+				if (!navigationActive) {
+					((ABase) getActivity()).pushBackFragment(FHome.newInstance(), FHome.class.getName(), true);
 
-                } else {
-                    Toast toast = Toast.makeText(getActivity(), R.string.navigation_active_error, Toast.LENGTH_LONG);
-                    toast.show();
-                }
-                //((AMainOBC)getActivity()).setGPS(true);
+				} else {
+					Toast toast = Toast.makeText(getActivity(), R.string.navigation_active_error, Toast.LENGTH_LONG);
+					toast.show();
+				}
+				//((AMainOBC)getActivity()).setGPS(true);
 
-                break;
+				break;
 
-            case R.id.fmapSOSB://sos
-                startActivity(new Intent(getActivity(), ASOS.class));
-                break;
+			case R.id.fmapSOSB://sos
+				startActivity(new Intent(getActivity(), ASOS.class));
+				break;
 
-            case R.id.fmapRadioB:
-                if (!navigationActive) {
-                    ((ABase) getActivity()).pushFragment(FRadio.newInstance(), FRadio.class.getName(), true);
-                } else {
+			case R.id.fmapRadioB:
+				if (!navigationActive) {
+					((ABase) getActivity()).pushFragment(FRadio.newInstance(), FRadio.class.getName(), true);
+				} else {
 
-                    Toast toast = Toast.makeText(getActivity(), R.string.navigation_active_error, Toast.LENGTH_LONG);
-                    toast.show();
-                }
-                break;
+					Toast toast = Toast.makeText(getActivity(), R.string.navigation_active_error, Toast.LENGTH_LONG);
+					toast.show();
+				}
+				break;
 
-            case R.id.fmapAlertCloseBTN:
+			case R.id.fmapAlertCloseBTN:
 
-                localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
-                dlog.cr("Chiusura alert SOC");
-                break;
+				localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
+				dlog.cr("Chiusura alert SOC");
+				break;
 
 		/*case R.id.fmapPOIIB:
 			((ABase)getActivity()).pushFragment(FPOI.newInstance(true), FPOI.class.getName(), true);
@@ -1050,168 +1050,168 @@ public class FMap extends FBase implements OnClickListener {
 
 			break; */
 
-            case R.id.fmapCloseTriplB:
-                FHome.timer_2min.cancel();
-                FHome.timer_5sec.cancel();
-                firstRun = true;
-                if (!resetUI()) {
-                    ((ABase) getActivity()).pushFragment(new FMenu(), FMenu.class.getName(), true);
-                }
+			case R.id.fmapCloseTriplB:
+				FHome.timer_2min.cancel();
+				FHome.timer_5sec.cancel();
+				firstRun = true;
+				if (!resetUI()) {
+					((ABase) getActivity()).pushFragment(new FMenu(), FMenu.class.getName(), true);
+				}
 
-                break;
+				break;
 
-            case R.id.fmapNavigationB:
-            case R.id.btnCloseNav:
+			case R.id.fmapNavigationB:
+			case R.id.btnCloseNav:
 
-                if (navigationActive)
-                    localHandler.sendEmptyMessage(MSG_STOP_NAVIGATION);
+				if (navigationActive)
+					localHandler.sendEmptyMessage(MSG_STOP_NAVIGATION);
 
-                mapView.deleteAnnotation(9);
-                mapView.deleteAnnotation(0);
-                break;
+				mapView.deleteAnnotation(9);
+				mapView.deleteAnnotation(0);
+				break;
 
-            case R.id.fmapLeftBorderIV:
-                if (App.BannerName.getBundle("CAR") != null) {
-                    if (App.BannerName.getBundle("CAR").getString("CLICK").compareTo("null") != 0) {
+			case R.id.fmapLeftBorderIV:
+				if (App.BannerName.getBundle("CAR") != null) {
+					if (App.BannerName.getBundle("CAR").getString("CLICK").compareTo("null") != 0) {
 
-                        if (!handleClick) {
-                            adIV.setColorFilter(R.color.overlay_click);
-                            FHome.timer_2min.cancel();
-                            handleClick = true;
-                            dlog.d(FMap.class.toString() + " Banner: Click su banner ");
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
+						if (!handleClick) {
+							adIV.setColorFilter(R.color.overlay_click);
+							FHome.timer_2min.cancel();
+							handleClick = true;
+							dlog.d(FMap.class.toString() + " Banner: Click su banner ");
+							new Thread(new Runnable() {
+								@Override
+								public void run() {
 
-                                    loadBanner(App.BannerName.getBundle("CAR").getString("CLICK"), "CAR", true);
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (FMap.this.isVisible()) {
-                                                adIV.clearColorFilter();
-                                                updateBanner("CAR");
-                                                FHome.timer_2min.cancel();
-                                                FHome.timer_5sec.start();//Modifico l'IV
-                                                handleClick = false;
-                                            }
-                                        }
-                                    });
+									loadBanner(App.BannerName.getBundle("CAR").getString("CLICK"), "CAR", true);
+									getActivity().runOnUiThread(new Runnable() {
+										@Override
+										public void run() {
+											if (FMap.this.isVisible()) {
+												adIV.clearColorFilter();
+												updateBanner("CAR");
+												FHome.timer_2min.cancel();
+												FHome.timer_5sec.start();//Modifico l'IV
+												handleClick = false;
+											}
+										}
+									});
 
-                                }
-                            }).start();
-                        }
-                    }
-                }
-                break;
+								}
+							}).start();
+						}
+					}
+				}
+				break;
 
-        }
-    }
+		}
+	}
 
-    private void drawDestination(SKCoordinate destination) {
+	private void drawDestination(SKCoordinate destination) {
 
-        SKAnnotation annotation = new SKAnnotation(0);
-        annotation.setLocation(destination);
-        annotation.setUniqueID(0);
-        annotation.setMininumZoomLevel(5);
-        annotation.setAnnotationType(SKAnnotation.SK_ANNOTATION_TYPE_DESTINATION_FLAG);
-        mapView.addAnnotation(annotation, SKAnimationSettings.ANIMATION_PIN_DROP);
+		SKAnnotation annotation = new SKAnnotation(0);
+		annotation.setLocation(destination);
+		annotation.setUniqueID(0);
+		annotation.setMininumZoomLevel(5);
+		annotation.setAnnotationType(SKAnnotation.SK_ANNOTATION_TYPE_DESTINATION_FLAG);
+		mapView.addAnnotation(annotation, SKAnimationSettings.ANIMATION_PIN_DROP);
 
-    }
+	}
 
-    private boolean drawPOIS() {
+	private boolean drawPOIS() {
 //TODO visualizzare solo un 30% dei poi
-        if (mapView == null || getActivity() == null) {
-            dlog.d(" drawPois: mapViw null or contemporary called, or activity null");
-            return false;
-        }
+		if (mapView == null || getActivity() == null) {
+			dlog.d(" drawPois: mapViw null or contemporary called, or activity null");
+			return false;
+		}
 
-        try {
-            mapView.deleteAllAnnotationsAndCustomPOIs();
-            customView = (RelativeLayout) ((LayoutInflater) (getActivity()).getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
-                    R.layout.layout_custom_view_poi, null, false);
-            List<SKAnnotation> MapAnnotations = mapView.getAllAnnotations();
-            ArrayList<Bundle> PoisTemp = Pois;
+		try {
+			mapView.deleteAllAnnotationsAndCustomPOIs();
+			customView = (RelativeLayout) ((LayoutInflater) (getActivity()).getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+					R.layout.layout_custom_view_poi, null, false);
+			List<SKAnnotation> MapAnnotations = mapView.getAllAnnotations();
+			ArrayList<Bundle> PoisTemp = Pois;
 
-            annotationList.clear();
-            customView.requestLayout();
-            for (Bundle poi : PoisTemp) {
-                Bitmap myBitmap;
-                SKAnnotation annotation = new SKAnnotation(poi.getInt("INDEX"));
-                annotation.setLocation(new SKCoordinate(poi.getDouble("LON"), poi.getDouble("LAT")));
-                switch (poi.getInt("type", 0)) {
-                    case 0://bring me there
-                        annotation.setMininumZoomLevel(9);
-                        break;
-                    case 1://gift event
-                        annotation.setMininumZoomLevel(9);
-                        break;
-                    case 2://christmas event
-                        annotation.setMininumZoomLevel(17);
-                        break;
-                    case 3://Charging station
-                        continue;
-                }
-                //annotation.setAnnotationType(SKAnnotation.SK_ANNOTATION_TYPE_GREEN);
-                SKAnnotationView annotationView = new SKAnnotationView();
+			annotationList.clear();
+			customView.requestLayout();
+			for (Bundle poi : PoisTemp) {
+				Bitmap myBitmap;
+				SKAnnotation annotation = new SKAnnotation(poi.getInt("INDEX"));
+				annotation.setLocation(new SKCoordinate(poi.getDouble("LON"), poi.getDouble("LAT")));
+				switch (poi.getInt("type", 0)) {
+					case 0://bring me there
+						annotation.setMininumZoomLevel(9);
+						break;
+					case 1://gift event
+						annotation.setMininumZoomLevel(9);
+						break;
+					case 2://christmas event
+						annotation.setMininumZoomLevel(17);
+						break;
+					case 3://Charging station
+						continue;
+				}
+				//annotation.setAnnotationType(SKAnnotation.SK_ANNOTATION_TYPE_GREEN);
+				SKAnnotationView annotationView = new SKAnnotationView();
 
-                if (customView.findViewById(R.id.customView_poi) != null) {
-                    File imgFile = new File(App.getPoiIconFolder().concat(poi.getString("id_icon")).concat(".png"));
-                    if (imgFile == null || !imgFile.exists())
-                        continue;
-                    myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                    ((ImageView) (customView.findViewById(R.id.customView_poi))).setImageBitmap(myBitmap);
+				if (customView.findViewById(R.id.customView_poi) != null) {
+					File imgFile = new File(App.getPoiIconFolder().concat(poi.getString("id_icon")).concat(".png"));
+					if (imgFile == null || !imgFile.exists())
+						continue;
+					myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+					((ImageView) (customView.findViewById(R.id.customView_poi))).setImageBitmap(myBitmap);
 
-                    //((ImageView) (customView.findViewById(R.id.customView_poi))).invalidate(); testinva
-                    annotationView.setView(customView.findViewById(R.id.customView_poi));
+					//((ImageView) (customView.findViewById(R.id.customView_poi))).invalidate(); testinva
+					annotationView.setView(customView.findViewById(R.id.customView_poi));
 
-                }
-                annotation.setAnnotationView(annotationView);
+				}
+				annotation.setAnnotationView(annotationView);
 
-                //annotation.setAnnotationType(SKAnnotation.SK_ANNOTATION_TYPE_DESTINATION_FLAG);
+				//annotation.setAnnotationType(SKAnnotation.SK_ANNOTATION_TYPE_DESTINATION_FLAG);
 
-                annotationList.add(annotation);
-                mapView.addAnnotation(annotation, SKAnimationSettings.ANIMATION_NONE);
+				annotationList.add(annotation);
+				mapView.addAnnotation(annotation, SKAnimationSettings.ANIMATION_NONE);
 
-            }
-            //mapView.deleteAllAnnotationsAndCustomPOIs();
+			}
+			//mapView.deleteAllAnnotationsAndCustomPOIs();
 
-            customView.removeAllViews();
-        } catch (Exception e) {
-            DLog.E("error handling bitmap", e);
+			customView.removeAllViews();
+		} catch (Exception e) {
+			DLog.E("error handling bitmap", e);
 
-            return false;
-        }
-        drawPolyline();
-        return true;
-    }
+			return false;
+		}
+		drawPolyline();
+		return true;
+	}
 
-    private void drawPolyline() {
-        int identifier = 500;
-        List<SKPolygon> areas = App.getSKPolylineEnvelope();
-        for (SKPolygon area : areas) {
-            area.setColor(new float[]{22 / 255f, 164 / 255f, 71 / 255f, 25 / 100f});
-            // Set properties for the outline
-            area.setOutlineColor(new float[]{22 / 255f, 164 / 255f, 71 / 255f, 25 / 100f});
-            area.setOutlineSize(0);
-            area.setOutlineDottedPixelsSolid(1);
-            area.setOutlineDottedPixelsSkip(1);
-            area.setIdentifier(identifier++);
-            mapView.addPolygon(area);
+	private void drawPolyline() {
+		int identifier = 500;
+		List<SKPolygon> areas = App.getSKPolylineEnvelope();
+		for (SKPolygon area : areas) {
+			area.setColor(new float[]{22 / 255f, 164 / 255f, 71 / 255f, 25 / 100f});
+			// Set properties for the outline
+			area.setOutlineColor(new float[]{22 / 255f, 164 / 255f, 71 / 255f, 25 / 100f});
+			area.setOutlineSize(0);
+			area.setOutlineDottedPixelsSolid(1);
+			area.setOutlineDottedPixelsSkip(1);
+			area.setIdentifier(identifier++);
+			mapView.addPolygon(area);
 
-        }
-    }
+		}
+	}
 
-    private void drawFuelStationsOnMap() {
+	private void drawFuelStationsOnMap() {
 
-        LongSparseArray<FuelStation> fuelStations = ((AMainOBC) getActivity()).computeFuelStations();
+		LongSparseArray<FuelStation> fuelStations = ((AMainOBC) getActivity()).computeFuelStations();
 
-        for (int i = 0; i < fuelStations.size(); i++) {
-            FuelStation aFuelStation = fuelStations.valueAt(i);
-            //mapView.getLayerManager().getLayers().add(createMarker(aFuelStation.location, R.drawable.ico_map_fuel_station));
-        }
+		for (int i = 0; i < fuelStations.size(); i++) {
+			FuelStation aFuelStation = fuelStations.valueAt(i);
+			//mapView.getLayerManager().getLayers().add(createMarker(aFuelStation.location, R.drawable.ico_map_fuel_station));
+		}
 
-        showingFuelStations = true;
-    }
+		showingFuelStations = true;
+	}
 
 
 	/*private void showCustomPois() {
@@ -1249,375 +1249,375 @@ public class FMap extends FBase implements OnClickListener {
 
 	}*/
 
-    private String createMarker(Location location, int resource) {
-        return "";
-    }
+	private String createMarker(Location location, int resource) {
+		return "";
+	}
 
-    private static SKCalloutView navigationCallout = null;
+	private static SKCalloutView navigationCallout = null;
 
-    private void confirmNavigation(final SKScreenPoint point) {
+	private void confirmNavigation(final SKScreenPoint point) {
 
-        if (navigationCallout != null)
-            navigationCallout.hide();
+		if (navigationCallout != null)
+			navigationCallout.hide();
 
-        final SKCoordinate position = mapView.pointToCoordinate(point);
-        navigationCallout = mapHolder.getCalloutView();
-        navigationCallout.setTitle("Conferma destinazione");
-        SKSearchResult address = SKReverseGeocoderManager.getInstance().reverseGeocodePosition(mapView.pointToCoordinate(point));
-        navigationCallout.setDescription(address != null ? address.getName() : "");
-        //navigationCallout.setDescription("Destinazione");
-        navigationCallout.setLeftImage(null);
-        navigationCallout.setOnRightImageClickListener(new OnClickListener() {
+		final SKCoordinate position = mapView.pointToCoordinate(point);
+		navigationCallout = mapHolder.getCalloutView();
+		navigationCallout.setTitle("Conferma destinazione");
+		SKSearchResult address = SKReverseGeocoderManager.getInstance().reverseGeocodePosition(mapView.pointToCoordinate(point));
+		navigationCallout.setDescription(address != null ? address.getName() : "");
+		//navigationCallout.setDescription("Destinazione");
+		navigationCallout.setLeftImage(null);
+		navigationCallout.setOnRightImageClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View arg0) {
-                navigationCallout.hide();
-                startRoute(position, true);
-            }
+			@Override
+			public void onClick(View arg0) {
+				navigationCallout.hide();
+				startRoute(position, true);
+			}
 
-        });
-        navigationCallout.setOnTextClickListener(new OnClickListener() {
+		});
+		navigationCallout.setOnTextClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View arg0) {
-                navigationCallout.hide();
-                startRoute(position, true);
-            }
+			@Override
+			public void onClick(View arg0) {
+				navigationCallout.hide();
+				startRoute(position, true);
+			}
 
-        });
-        navigationCallout.showAtLocation(position, true);
+		});
+		navigationCallout.showAtLocation(position, true);
 
-    }
+	}
 
-    private void confirmNavigation(final SKCoordinate position, Bundle Poi) {
+	private void confirmNavigation(final SKCoordinate position, Bundle Poi) {
 
-        if (navigationCallout != null)
-            navigationCallout.hide();
+		if (navigationCallout != null)
+			navigationCallout.hide();
 
-        //final SKCoordinate position = mapView.pointToCoordinate(point);
-        navigationCallout = mapHolder.getCalloutView();
-        navigationCallout.setTitle(Poi.getString("nome", "Raggiungi destinazione"));
-        navigationCallout.setTitleTextSize(25);
-        navigationCallout.setDescription(Poi.getString("address", " "));
-        navigationCallout.setLeftImage(null);
-        navigationCallout.setOnRightImageClickListener(new OnClickListener() {
+		//final SKCoordinate position = mapView.pointToCoordinate(point);
+		navigationCallout = mapHolder.getCalloutView();
+		navigationCallout.setTitle(Poi.getString("nome", "Raggiungi destinazione"));
+		navigationCallout.setTitleTextSize(25);
+		navigationCallout.setDescription(Poi.getString("address", " "));
+		navigationCallout.setLeftImage(null);
+		navigationCallout.setOnRightImageClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View arg0) {
-                navigationCallout.hide();
-                startRoute(position, true);
-            }
+			@Override
+			public void onClick(View arg0) {
+				navigationCallout.hide();
+				startRoute(position, true);
+			}
 
-        });
-        navigationCallout.setOnTextClickListener(new OnClickListener() {
+		});
+		navigationCallout.setOnTextClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View arg0) {
-                navigationCallout.hide();
-                startRoute(position, true);
-            }
+			@Override
+			public void onClick(View arg0) {
+				navigationCallout.hide();
+				startRoute(position, true);
+			}
 
-        });
-        navigationCallout.showAtLocation(position, true);
+		});
+		navigationCallout.showAtLocation(position, true);
 
-    }
+	}
 
-    private void eventCallout(final SKCoordinate position, Bundle Poi, int topOffset) {
+	private void eventCallout(final SKCoordinate position, Bundle Poi, int topOffset) {
 
-        calloutPoi = Poi;
-        calloutCoordinate = position;
+		calloutPoi = Poi;
+		calloutCoordinate = position;
 
-        if (getActivity() == null) {
-            dlog.e("eventCallout: Activity null");
-            return;
-        }
-        customView = (RelativeLayout) ((LayoutInflater) (getActivity()).getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.layout_custom_view, null, false);
-        customView.requestLayout();
+		if (getActivity() == null) {
+			dlog.e("eventCallout: Activity null");
+			return;
+		}
+		customView = (RelativeLayout) ((LayoutInflater) (getActivity()).getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.layout_custom_view, null, false);
+		customView.requestLayout();
 
-        if (navigationCallout != null) {
-            navigationCallout.hide();
-            navigationCallout.removeAllViews();
-        }
+		if (navigationCallout != null) {
+			navigationCallout.hide();
+			navigationCallout.removeAllViews();
+		}
 
-        //final SKCoordinate position = mapView.pointToCoordinate(point);
-        navigationCallout = mapHolder.getCalloutView();
-        //navigationCallout.setTitle(Poi.getString("nome","Raggiungi destinazione"));
-        //navigationCallout.setTitleTextSize(25);
-        //navigationCallout.setDescription("1111111111222222222233333333334444444444");//Poi.getString("address"," "));
-        //navigationCallout.setLeftImage(null);
-        if (customView.findViewById(R.id.customView) != null) {
-            try {
-                switch (Poi.getInt("type", 0)) {
-                    case 0:
-                        ((ImageView) (customView.findViewById(R.id.customView))).setImageResource(R.drawable.bring_me_callout);
-                        ((TextView) (customView.findViewById(R.id.customTitleTV))).setText(Poi.getString("nome", "Raggiungi destinazione"));
-                        ((TextView) (customView.findViewById(R.id.customDescTV))).setText(Poi.getString("address", " "));
-                        break;
-                    case 1:
-                        ((ImageView) (customView.findViewById(R.id.customView))).setImageResource(R.drawable.gift_callout_rev);
-                        ((TextView) (customView.findViewById(R.id.customTitleTV))).setText(Poi.getString("nome", "Gift"));
-                        ((TextView) (customView.findViewById(R.id.customDescTV))).setText(Poi.getString("description", ""));
-                        break;
-                    case 2:
-                        ((ImageView) (customView.findViewById(R.id.customView))).setImageResource(R.drawable.santa_callout);
-                        ((TextView) (customView.findViewById(R.id.customTitleTV))).setText(Poi.getString("nome", "Event"));
-                        ((TextView) (customView.findViewById(R.id.customTitleTV))).setTextColor(Color.BLACK);
-                        ((TextView) (customView.findViewById(R.id.customDescTV))).setText(Poi.getString("description", ""));
-                        ((TextView) (customView.findViewById(R.id.customDescTV))).setTextColor(Color.BLACK);
-                        break;
-                    case 3:
-                        ((ImageView) (customView.findViewById(R.id.customView))).setImageResource(R.drawable.bring_me_callout);
-                        ((TextView) (customView.findViewById(R.id.customTitleTV))).setText(R.string.poi_bonus_title);
-                        ((TextView) (customView.findViewById(R.id.customTitleTV))).setTextColor(Color.BLACK);
-                        ((TextView) (customView.findViewById(R.id.customDescTV))).setText(R.string.poi_bonus_body);
-                        ((TextView) (customView.findViewById(R.id.customDescTV))).setTextColor(Color.BLACK);
-                        break;
-                }
-                navigationCallout.setCustomView(customView);
-                calloutView = customView;
-                navigationCallout.setVerticalOffset(topOffset);
+		//final SKCoordinate position = mapView.pointToCoordinate(point);
+		navigationCallout = mapHolder.getCalloutView();
+		//navigationCallout.setTitle(Poi.getString("nome","Raggiungi destinazione"));
+		//navigationCallout.setTitleTextSize(25);
+		//navigationCallout.setDescription("1111111111222222222233333333334444444444");//Poi.getString("address"," "));
+		//navigationCallout.setLeftImage(null);
+		if (customView.findViewById(R.id.customView) != null) {
+			try {
+				switch (Poi.getInt("type", 0)) {
+					case 0:
+						((ImageView) (customView.findViewById(R.id.customView))).setImageResource(R.drawable.bring_me_callout);
+						((TextView) (customView.findViewById(R.id.customTitleTV))).setText(Poi.getString("nome", "Raggiungi destinazione"));
+						((TextView) (customView.findViewById(R.id.customDescTV))).setText(Poi.getString("address", " "));
+						break;
+					case 1:
+						((ImageView) (customView.findViewById(R.id.customView))).setImageResource(R.drawable.gift_callout_rev);
+						((TextView) (customView.findViewById(R.id.customTitleTV))).setText(Poi.getString("nome", "Gift"));
+						((TextView) (customView.findViewById(R.id.customDescTV))).setText(Poi.getString("description", ""));
+						break;
+					case 2:
+						((ImageView) (customView.findViewById(R.id.customView))).setImageResource(R.drawable.santa_callout);
+						((TextView) (customView.findViewById(R.id.customTitleTV))).setText(Poi.getString("nome", "Event"));
+						((TextView) (customView.findViewById(R.id.customTitleTV))).setTextColor(Color.BLACK);
+						((TextView) (customView.findViewById(R.id.customDescTV))).setText(Poi.getString("description", ""));
+						((TextView) (customView.findViewById(R.id.customDescTV))).setTextColor(Color.BLACK);
+						break;
+					case 3:
+						((ImageView) (customView.findViewById(R.id.customView))).setImageResource(R.drawable.bring_me_callout);
+						((TextView) (customView.findViewById(R.id.customTitleTV))).setText(R.string.poi_bonus_title);
+						((TextView) (customView.findViewById(R.id.customTitleTV))).setTextColor(Color.BLACK);
+						((TextView) (customView.findViewById(R.id.customDescTV))).setText(R.string.poi_bonus_body);
+						((TextView) (customView.findViewById(R.id.customDescTV))).setTextColor(Color.BLACK);
+						break;
+				}
+				navigationCallout.setCustomView(customView);
+				calloutView = customView;
+				navigationCallout.setVerticalOffset(topOffset);
 
-            } catch (Exception e) {
-                dlog.e("Exception during creation of custom layout", e);
-            }
+			} catch (Exception e) {
+				dlog.e("Exception during creation of custom layout", e);
+			}
 
-        }
+		}
 
-        navigationCallout.showAtLocation(position, false);
+		navigationCallout.showAtLocation(position, false);
 
-        mapView.centerMapOnPositionSmooth(position, 1);
+		mapView.centerMapOnPositionSmooth(position, 1);
 
-    }
+	}
 
-    public void navigateTo(Location location) {
-        SKCoordinate destination = new SKCoordinate();
-        destination.setLatitude(location.getLatitude());
-        destination.setLongitude(location.getLongitude());
-        dlog.d("NavigateTo: set destination to " + location.getLatitude() + " " + location.getLongitude());
-        startRoute(destination);
-    }
+	public void navigateTo(Location location) {
+		SKCoordinate destination = new SKCoordinate();
+		destination.setLatitude(location.getLatitude());
+		destination.setLongitude(location.getLongitude());
+		dlog.d("NavigateTo: set destination to " + location.getLatitude() + " " + location.getLongitude());
+		startRoute(destination);
+	}
 
-    private void resetMapSettings() {
-        SKCoordinate currentPoint = new SKCoordinate(12.9788f, 45.9559f);
+	private void resetMapSettings() {
+		SKCoordinate currentPoint = new SKCoordinate(12.9788f, 45.9559f);
 
-        if (App.getLastLocation() != null && App.getLastLocation().getLatitude() != 0 && App.getLastLocation().getLongitude() != 0) {
-            currentPoint.setLatitude(App.getLastLocation().getLatitude());
-            currentPoint.setLongitude(App.getLastLocation().getLongitude());
-        }
+		if (App.getLastLocation() != null && App.getLastLocation().getLatitude() != 0 && App.getLastLocation().getLongitude() != 0) {
+			currentPoint.setLatitude(App.getLastLocation().getLatitude());
+			currentPoint.setLongitude(App.getLastLocation().getLongitude());
+		}
 
-        //SKCoordinate currentPoint = new SKCoordinate(9.1910f, 45.4602f);
-        mapView.setPositionAsCurrent(currentPoint, 0, true);
-        mapView.rotateTheMapToNorth();
-        mapView.setZoom(18);
-        mapView.centerMapOnPosition(currentPoint);
-        mapView.getMapSettings().setFollowerMode(SKMapFollowerMode.NAVIGATION);
-        mapView.getMapSettings().setOneWayArrows(true);
-        mapView.getMapSettings().setOrientationIndicatorType(SKOrientationIndicatorType.CUSTOM_IMAGE);
-        mapView.getMapSettings().setHouseNumbersShown(true);
-        mapView.getMapSettings().setImportantPoisShown(true);
-        mapView.getMapSettings().setInertiaPanningEnabled(false);
-        mapView.getMapSettings().setMapZoomingEnabled(true);
-        mapView.getMapSettings().setMapRotationEnabled(true);
-        mapView.getMapSettings().setCompassShown(true);
-        mapView.getMapSettings().setMapDisplayMode(SKMapSettings.SKMapDisplayMode.MODE_2D);
-        currentPosition.setCoordinate(currentPoint);
-        SKPositionerManager.getInstance().reportNewGPSPosition(currentPosition);
+		//SKCoordinate currentPoint = new SKCoordinate(9.1910f, 45.4602f);
+		mapView.setPositionAsCurrent(currentPoint, 0, true);
+		mapView.rotateTheMapToNorth();
+		mapView.setZoom(18);
+		mapView.centerMapOnPosition(currentPoint);
+		mapView.getMapSettings().setFollowerMode(SKMapFollowerMode.NAVIGATION);
+		mapView.getMapSettings().setOneWayArrows(true);
+		mapView.getMapSettings().setOrientationIndicatorType(SKOrientationIndicatorType.CUSTOM_IMAGE);
+		mapView.getMapSettings().setHouseNumbersShown(true);
+		mapView.getMapSettings().setImportantPoisShown(true);
+		mapView.getMapSettings().setInertiaPanningEnabled(false);
+		mapView.getMapSettings().setMapZoomingEnabled(true);
+		mapView.getMapSettings().setMapRotationEnabled(true);
+		mapView.getMapSettings().setCompassShown(true);
+		mapView.getMapSettings().setMapDisplayMode(SKMapSettings.SKMapDisplayMode.MODE_2D);
+		currentPosition.setCoordinate(currentPoint);
+		SKPositionerManager.getInstance().reportNewGPSPosition(currentPosition);
 
-        //showCustomPois();
-    }
+		//showCustomPois();
+	}
 
-    private void initMapSettings() {
-        SKCoordinate currentPoint = new SKCoordinate(12.9788f, 45.9559f);
+	private void initMapSettings() {
+		SKCoordinate currentPoint = new SKCoordinate(12.9788f, 45.9559f);
 
-        if (App.getLastLocation() != null && App.getLastLocation().getLatitude() != 0 && App.getLastLocation().getLongitude() != 0) {
-            currentPoint.setLatitude(App.getLastLocation().getLatitude());
-            currentPoint.setLongitude(App.getLastLocation().getLongitude());
-        }
+		if (App.getLastLocation() != null && App.getLastLocation().getLatitude() != 0 && App.getLastLocation().getLongitude() != 0) {
+			currentPoint.setLatitude(App.getLastLocation().getLatitude());
+			currentPoint.setLongitude(App.getLastLocation().getLongitude());
+		}
 
-        //SKCoordinate currentPoint = new SKCoordinate(9.1910f, 45.4602f);
-        mapView.setPositionAsCurrent(currentPoint, 0, true);
-        mapView.rotateTheMapToNorth();
-        mapView.setZoom(18);
-        mapView.centerMapOnPosition(currentPoint);
-        mapView.getMapSettings().setFollowerMode(SKMapFollowerMode.NAVIGATION);
-        mapView.getMapSettings().setOneWayArrows(true);
-        mapView.getMapSettings().setOrientationIndicatorType(SKOrientationIndicatorType.CUSTOM_IMAGE);
-        mapView.getMapSettings().setHouseNumbersShown(true);
-        mapView.getMapSettings().setImportantPoisShown(true);
-        mapView.getMapSettings().setInertiaPanningEnabled(false);
-        mapView.getMapSettings().setMapZoomingEnabled(true);
-        mapView.getMapSettings().setMapRotationEnabled(true);
-        mapView.getMapSettings().setCompassShown(true);
-        mapView.getMapSettings().setMapDisplayMode(SKMapSettings.SKMapDisplayMode.MODE_2D);
-        currentPosition.setCoordinate(currentPoint);
-        SKPositionerManager.getInstance().reportNewGPSPosition(currentPosition);
-    }
+		//SKCoordinate currentPoint = new SKCoordinate(9.1910f, 45.4602f);
+		mapView.setPositionAsCurrent(currentPoint, 0, true);
+		mapView.rotateTheMapToNorth();
+		mapView.setZoom(18);
+		mapView.centerMapOnPosition(currentPoint);
+		mapView.getMapSettings().setFollowerMode(SKMapFollowerMode.NAVIGATION);
+		mapView.getMapSettings().setOneWayArrows(true);
+		mapView.getMapSettings().setOrientationIndicatorType(SKOrientationIndicatorType.CUSTOM_IMAGE);
+		mapView.getMapSettings().setHouseNumbersShown(true);
+		mapView.getMapSettings().setImportantPoisShown(true);
+		mapView.getMapSettings().setInertiaPanningEnabled(false);
+		mapView.getMapSettings().setMapZoomingEnabled(true);
+		mapView.getMapSettings().setMapRotationEnabled(true);
+		mapView.getMapSettings().setCompassShown(true);
+		mapView.getMapSettings().setMapDisplayMode(SKMapSettings.SKMapDisplayMode.MODE_2D);
+		currentPosition.setCoordinate(currentPoint);
+		SKPositionerManager.getInstance().reportNewGPSPosition(currentPosition);
+	}
 
-    public void startRouteCallout() {
-        if (navigationCallout != null)
-            navigationCallout.hide();
-        if (calloutCoordinate != null)
-            startRoute(calloutCoordinate, true);
-    }
+	public void startRouteCallout() {
+		if (navigationCallout != null)
+			navigationCallout.hide();
+		if (calloutCoordinate != null)
+			startRoute(calloutCoordinate, true);
+	}
 
-    private void startRoute(SKCoordinate destination) {
-        SKRouteManager.getInstance().clearAllRoutesFromCache();
-        // get a route object and populate it with the desired properties
-        SKRouteSettings route = new SKRouteSettings();
-        // set start and destination points
-        route.setStartCoordinate(currentPosition.getCoordinate());
-        route.setDestinationCoordinate(destination);
-        // set the number of routes to be calculated
-        route.setNoOfRoutes(1);
-        route.setRouteExposed(true);
-        //route.setTollRoadsAvoided(true);
-        route.setHighWaysAvoided(true);
-        // set the route mode
-        route.setRouteMode(SKRouteMode.CAR_FASTEST);
-        // set whether the route should be shown on the map after it's computed
-        route.setRouteExposed(true);
-        // set the route listener to be notified of route calculation
-        // events
+	private void startRoute(SKCoordinate destination) {
+		SKRouteManager.getInstance().clearAllRoutesFromCache();
+		// get a route object and populate it with the desired properties
+		SKRouteSettings route = new SKRouteSettings();
+		// set start and destination points
+		route.setStartCoordinate(currentPosition.getCoordinate());
+		route.setDestinationCoordinate(destination);
+		// set the number of routes to be calculated
+		route.setNoOfRoutes(1);
+		route.setRouteExposed(true);
+		//route.setTollRoadsAvoided(true);
+		route.setHighWaysAvoided(true);
+		// set the route mode
+		route.setRouteMode(SKRouteMode.CAR_FASTEST);
+		// set whether the route should be shown on the map after it's computed
+		route.setRouteExposed(true);
+		// set the route listener to be notified of route calculation
+		// events
 
-        route.setRouteConnectionMode(SKRouteConnectionMode.OFFLINE);
-        SKRouteManager.getInstance().setRouteListener(routeListener);
-        // pass the route to the calculation routine
-        SKRouteManager.getInstance().calculateRoute(route);
+		route.setRouteConnectionMode(SKRouteConnectionMode.OFFLINE);
+		SKRouteManager.getInstance().setRouteListener(routeListener);
+		// pass the route to the calculation routine
+		SKRouteManager.getInstance().calculateRoute(route);
 
-        drawDestination(destination);
-    }
+		drawDestination(destination);
+	}
 
-    private void startRoute(SKCoordinate destination, boolean draw) {
-        SKRouteManager.getInstance().clearAllRoutesFromCache();
-        // get a route object and populate it with the desired properties
-        SKRouteSettings route = new SKRouteSettings();
-        // set start and destination points
-        route.setStartCoordinate(currentPosition.getCoordinate());
-        route.setDestinationCoordinate(destination);
-        // set the number of routes to be calculated
-        route.setNoOfRoutes(1);
-        route.setRouteExposed(true);
-        route.setHighWaysAvoided(true);
-        // set the route mode
-        route.setRouteMode(SKRouteMode.CAR_FASTEST);
-        // set whether the route should be shown on the map after it's computed
-        route.setRouteExposed(true);
-        // set the route listener to be notified of route calculation
-        // events
+	private void startRoute(SKCoordinate destination, boolean draw) {
+		SKRouteManager.getInstance().clearAllRoutesFromCache();
+		// get a route object and populate it with the desired properties
+		SKRouteSettings route = new SKRouteSettings();
+		// set start and destination points
+		route.setStartCoordinate(currentPosition.getCoordinate());
+		route.setDestinationCoordinate(destination);
+		// set the number of routes to be calculated
+		route.setNoOfRoutes(1);
+		route.setRouteExposed(true);
+		route.setHighWaysAvoided(true);
+		// set the route mode
+		route.setRouteMode(SKRouteMode.CAR_FASTEST);
+		// set whether the route should be shown on the map after it's computed
+		route.setRouteExposed(true);
+		// set the route listener to be notified of route calculation
+		// events
 
-        route.setRouteConnectionMode(SKRouteConnectionMode.OFFLINE);
-        SKRouteManager.getInstance().setRouteListener(routeListener);
-        // pass the route to the calculation routine
-        SKRouteManager.getInstance().calculateRoute(route);
+		route.setRouteConnectionMode(SKRouteConnectionMode.OFFLINE);
+		SKRouteManager.getInstance().setRouteListener(routeListener);
+		// pass the route to the calculation routine
+		SKRouteManager.getInstance().calculateRoute(route);
 
-        if (draw)
-            drawDestination(destination);
-    }
+		if (draw)
+			drawDestination(destination);
+	}
 
-    private void startRouteNavigation() {
-        try {
+	private void startRouteNavigation() {
+		try {
     	/*
         if (TrackElementsActivity.selectedTrackElement != null) {
             mapView.clearTrackElement(TrackElementsActivity.selectedTrackElement);
         }
         */
 
-            showLeftPanel(0, 1);
+			showLeftPanel(0, 1);
 
-            // get navigation settings object
-            SKNavigationSettings navigationSettings = new SKNavigationSettings();
+			// get navigation settings object
+			SKNavigationSettings navigationSettings = new SKNavigationSettings();
 
-            // set the desired navigation setting
-            navigationSettings.setNavigationType(Debug.SIMULATE_NAVIGATION ? SKNavigationType.SIMULATION : SKNavigationType.REAL);
-            navigationSettings.setNavigationMode(SKNavigationMode.CAR);
-            navigationSettings.setPositionerVerticalAlignment(-0.25f);
+			// set the desired navigation setting
+			navigationSettings.setNavigationType(Debug.SIMULATE_NAVIGATION ? SKNavigationType.SIMULATION : SKNavigationType.REAL);
+			navigationSettings.setNavigationMode(SKNavigationMode.CAR);
+			navigationSettings.setPositionerVerticalAlignment(-0.25f);
 
-            navigationSettings.setShowRealGPSPositions(true);
-            navigationSettings.setCcpAsCurrentPosition(true);
-            // get the navigation manager object
+			navigationSettings.setShowRealGPSPositions(true);
+			navigationSettings.setCcpAsCurrentPosition(true);
+			// get the navigation manager object
 
-            SKNavigationManager navigationManager = SKNavigationManager.getInstance();
-            navigationManager.setMapView(mapView);
+			SKNavigationManager navigationManager = SKNavigationManager.getInstance();
+			navigationManager.setMapView(mapView);
 
-            // set listener for navigation events
-            navigationManager.setNavigationListener(navigationListener);
+			// set listener for navigation events
+			navigationManager.setNavigationListener(navigationListener);
 
-            // start navigating using the settings
-            navigationManager.increaseSimulationSpeed(5);
-            navigationManager.startNavigation(navigationSettings);
-            navigationActive = true;
+			// start navigating using the settings
+			navigationManager.increaseSimulationSpeed(5);
+			navigationManager.startNavigation(navigationSettings);
+			navigationActive = true;
 
-            mapView.getMapSettings().setMapDisplayMode(SKMapDisplayMode.MODE_3D);
-            mapView.getMapSettings().setStreetNamePopupsShown(true);
-            mapView.getMapSettings().setMapZoomingEnabled(false);
+			mapView.getMapSettings().setMapDisplayMode(SKMapDisplayMode.MODE_3D);
+			mapView.getMapSettings().setStreetNamePopupsShown(true);
+			mapView.getMapSettings().setMapZoomingEnabled(false);
 
-            txtCurrentStreet.setVisibility(View.VISIBLE);
-            txtNextStreet.setVisibility(View.VISIBLE);
-            rootView.findViewById(R.id.btnCloseNav).setVisibility(View.VISIBLE);
+			txtCurrentStreet.setVisibility(View.VISIBLE);
+			txtNextStreet.setVisibility(View.VISIBLE);
+			rootView.findViewById(R.id.btnCloseNav).setVisibility(View.VISIBLE);
 
-            dlog.d("startRouteNavigation: Imposto Audio a AUDIO_SYSTEM");
-            if (getActivity() != null)
-                ((AMainOBC) getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_SYSTEM, 15));
-            else
-                dlog.w("startRouteNavigation: getActivity null!!!");
+			dlog.d("startRouteNavigation: Imposto Audio a AUDIO_SYSTEM");
+			if (getActivity() != null)
+				((AMainOBC) getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_SYSTEM, 15));
+			else
+				dlog.w("startRouteNavigation: getActivity null!!!");
 
-        } catch (Exception e) {
-            dlog.e("startRouteNavigation: Exception while starting navigation ", e);
-        }
+		} catch (Exception e) {
+			dlog.e("startRouteNavigation: Exception while starting navigation ", e);
+		}
 
-    }
+	}
 
-    public void stopRouteNavigation() {
+	public void stopRouteNavigation() {
 
-        homeB.setVisibility(View.VISIBLE);
-        findDestinationB.setVisibility(View.VISIBLE);
-        try {
-            SKRouteManager.getInstance().clearCurrentRoute();
-            SKNavigationManager.getInstance().stopNavigation();
+		homeB.setVisibility(View.VISIBLE);
+		findDestinationB.setVisibility(View.VISIBLE);
+		try {
+			SKRouteManager.getInstance().clearCurrentRoute();
+			SKNavigationManager.getInstance().stopNavigation();
 
-            txtCurrentStreet.setVisibility(View.INVISIBLE);
-            txtNextStreet.setVisibility(View.INVISIBLE);
-            mapView.getMapSettings().setMapDisplayMode(SKMapDisplayMode.MODE_2D);
-            hideLeftPanel();
-            rootView.findViewById(R.id.btnCloseNav).setVisibility(View.INVISIBLE);
+			txtCurrentStreet.setVisibility(View.INVISIBLE);
+			txtNextStreet.setVisibility(View.INVISIBLE);
+			mapView.getMapSettings().setMapDisplayMode(SKMapDisplayMode.MODE_2D);
+			hideLeftPanel();
+			rootView.findViewById(R.id.btnCloseNav).setVisibility(View.INVISIBLE);
 
-            navigationActive = false;
+			navigationActive = false;
 
-            initMapSettings();
-        } catch (Exception e) {
-            dlog.e("stopRouteNavigation: Unexpected Exception", e);
-        }
+			initMapSettings();
+		} catch (Exception e) {
+			dlog.e("stopRouteNavigation: Unexpected Exception", e);
+		}
 
-    }
+	}
 
-    private boolean realReachShown = false;
+	private boolean realReachShown = false;
 
-    private void ShowRealReachTimed(int km, long time) {
+	private void ShowRealReachTimed(int km, long time) {
 
-        if (realReachShown || km == 0 || km > 150)
-            return;
+		if (realReachShown || km == 0 || km > 150)
+			return;
 
-        realReachShown = true;
+		realReachShown = true;
 
-        localHandler.sendEmptyMessage(MSG_SHOW_REAL_REACH);
-        localHandler.sendEmptyMessageDelayed(MSG_ZOOM_REAL_REACH, 1000);
-        localHandler.sendEmptyMessageDelayed(MSG_HIDE_REAL_REACH, time);
-    }
+		localHandler.sendEmptyMessage(MSG_SHOW_REAL_REACH);
+		localHandler.sendEmptyMessageDelayed(MSG_ZOOM_REAL_REACH, 1000);
+		localHandler.sendEmptyMessageDelayed(MSG_HIDE_REAL_REACH, time);
+	}
 
-    private void ShowRealReach(int km) {
+	private void ShowRealReach(int km) {
 
-        if (mapView == null) {
-            dlog.w("Invoked ShowRealReach with mapView==null");
-            return;
-        }
+		if (mapView == null) {
+			dlog.w("Invoked ShowRealReach with mapView==null");
+			return;
+		}
 
-        SKRealReachSettings realReachSettings = new SKRealReachSettings();
-        realReachSettings.setLocation(currentPosition.getCoordinate());
-        realReachSettings.setMeasurementUnit(SKRealReachSettings.SKRealReachMeasurementUnit.METER);
-        realReachSettings.setRange(km * 1000);
-        realReachSettings.setTransportMode(SKRealReachSettings.SKRealReachVehicleType.CAR);
-        realReachSettings.setConnectionMode(SKRouteConnectionMode.OFFLINE);
-        mapView.displayRealReachWithSettings(realReachSettings);
+		SKRealReachSettings realReachSettings = new SKRealReachSettings();
+		realReachSettings.setLocation(currentPosition.getCoordinate());
+		realReachSettings.setMeasurementUnit(SKRealReachSettings.SKRealReachMeasurementUnit.METER);
+		realReachSettings.setRange(km * 1000);
+		realReachSettings.setTransportMode(SKRealReachSettings.SKRealReachVehicleType.CAR);
+		realReachSettings.setConnectionMode(SKRouteConnectionMode.OFFLINE);
+		mapView.displayRealReachWithSettings(realReachSettings);
 
     	/*
     	localHandler.postDelayed(new Runnable() {
@@ -1631,316 +1631,313 @@ public class FMap extends FBase implements OnClickListener {
     	}, 2000);
     	*/
 
-    }
+	}
 
-    private void ZoomRealReach() {
+	private void ZoomRealReach() {
 
-        if (mapView == null)
-            return;
+		if (mapView == null)
+			return;
 
-        SKBoundingBox bb = mapView.getRealReachBoundingBox();
-        mapView.fitRealReachInView(bb, true, 1000);
-
-    }
+		SKBoundingBox bb = mapView.getRealReachBoundingBox();
+		mapView.fitRealReachInView(bb, true, 1000);
+
+	}
 
-    private void HideRealReach() {
-
-        if (mapView == null)
-            return;
+	private void HideRealReach() {
+
+		if (mapView == null)
+			return;
 
-        mapView.clearRealReachDisplay();
-    }
-
-    private void centerMap() {
-
-        if (mapView == null)
-            return;
-
-        mapView.centerMapOnCurrentPosition();
-        mapView.getMapSettings().setFollowerMode(SKMapFollowerMode.NAVIGATION);
-    }
-
-    public static Bitmap decodeFileToBitmap(String pathToFile) {
-        Bitmap decodedFile = null;
-        try {
-            decodedFile = BitmapFactory.decodeFile(pathToFile);
-        } catch (OutOfMemoryError ofmerr) {
-            return null;
-        }
-        return decodedFile;
-    }
-
-    private String formatTime(int s) {
-        String str = "";
-        int h = 0, m = 0;
-
-        if (s > 3600) {
-            h = s / 3600;
-            s %= 3600;
-        }
-
-        if (s > 60) {
-            m = s / 60;
-            str += m + ":";
-            s %= 60;
-        }
-
-        if (h > 0)
-            str = String.format("%d:%02d:%02d", h, m, s);
-        else
-            str = String.format("%d:%02d", m, s);
-
-        return str;
-
-    }
-
-    private Spanned distanceToHtml(String s, boolean twoRows) {
-
-        String p[] = s.split(" ");
-        if (p.length < 2) {
-            return Html.fromHtml(s);
-        } else {
-            String br = (twoRows ? "<BR>" : "&nbsp;");
-            return Html.fromHtml(p[0] + br + "<SMALL><SMALL>" + p[1] + "</SMALL></SMALL>");
-        }
-    }
-
-    boolean firstAdviceReceived;
-
-    /**
-     * Handles the navigation state update.
-     *
-     * @param skNavigationState
-     * @param mapStyle
-     */
-    private void handleNavigationState(final SKNavigationState skNavigationState,
-                                       final int mapStyle, final ViewGroup view) {
-
-        if (this.getActivity() == null)
-            return;
-
-        this.getActivity().runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-
-                boolean showDestinationReachedFlag = skNavigationState.isLastAdvice();
-
-                // Advice image
-                ImageView currentAdviceImage = (ImageView) view.findViewById(R.id.imgAdvice);
-                String currentVisualAdviceImage = skNavigationState.getCurrentAdviceVisualAdviceFile();
-                Bitmap decodedAdvice = decodeFileToBitmap(currentVisualAdviceImage);
-                if (decodedAdvice != null) {
-                    currentAdviceImage.setImageBitmap(decodedAdvice);
-                    currentAdviceImage.setVisibility(View.VISIBLE);
-                }
-
-                // Advice distance
-                TextView currentAdviceDistance = (TextView) view.findViewById(R.id.txtAdviceDistance);
-                final int currentDistanceToAdvice = skNavigationState.getCurrentAdviceDistanceToAdvice();
-                String strCurrentDistanceToAdvice = SKNavigationManager.getInstance().formatDistance(currentDistanceToAdvice);
-                currentAdviceDistance.setText(distanceToHtml(strCurrentDistanceToAdvice, true));
-
-                // Total distance
-                TextView txtTotalDistance = (TextView) view.findViewById(R.id.txtTotalDistance);
-                double totalDistance = skNavigationState.getDistanceToDestination();
-                String strTotalDistance = SKNavigationManager.getInstance().formatDistance((int) Math.round(totalDistance));
-                txtTotalDistance.setText(distanceToHtml(strTotalDistance, false));
-
-                // Total time
-                TextView txtTotalTime = (TextView) view.findViewById(R.id.txtTotalTime);
-                int totalTime = skNavigationState.getCurrentAdviceTimeToDestination();
-                txtTotalTime.setText(formatTime(totalTime));
-
-                //Current street
-                TextView txtCurrentStreet = (TextView) rootView.findViewById(R.id.txtCurrentStreet);
-                txtCurrentStreet.setText(skNavigationState.getCurrentAdviceCurrentStreetName());
-
-                //Next street
-                TextView txtNextStreet = (TextView) rootView.findViewById(R.id.txtNextStreet);
-                txtNextStreet.setText(skNavigationState.getCurrentAdviceNextStreetName());
-
-                //Arrival time
-                Date eta = new Date();
-                eta.setTime(eta.getTime() + totalTime * 1000);
-                TextView txtEta = (TextView) rootView.findViewById(R.id.txtEta);
-                txtEta.setText(String.format("%1$TR", eta));
-
-                // Instructions
-                String instruction = skNavigationState.getAdviceInstruction();
-                String output = "";
-                if (instruction != null && instruction.length() > 1)
-                    output = instruction.substring(0, 1).toUpperCase() + instruction.substring(1);
-                ((TextView) view.findViewById(R.id.txtInstructions)).setText(output);
-
-                double currentSpeedLimit = skNavigationState.getCurrentSpeedLimit();
-                if (currentSpeedLimit != skNavigationState.getCurrentSpeedLimit()) {
-                    currentSpeedLimit = skNavigationState.getCurrentSpeedLimit();
-                    //handleSpeedLimitAvailable(countryCode, distanceUnitType, mapStyle);
-                }
-
-                if (showDestinationReachedFlag) {
-                    if (currentAdviceImage != null) {
-                        currentAdviceImage.setImageResource(R.drawable.ic_destination_advise_black);
-                    }
-                    localHandler.sendEmptyMessageDelayed(MSG_STOP_NAVIGATION, 3000);
-
-                }
-
-                if (!firstAdviceReceived) {
-                    firstAdviceReceived = true;
-                }
-
-            }
-        });
-
-    }
-
-
-
-
-    private OnClickListener panelsClickListener = new OnClickListener() {
-
-        @Override
-        public void onClick(View v) {
-
-            switch (v.getId()) {
-
-                case R.id.btnCloseRealReach:
-                    CountDownTimer tmr = (CountDownTimer) v.getTag();
-                    if (tmr != null) {
-                        tmr.cancel();
-                        ((Button) v).setText("Chiudi");
-                    } else {
-                        hideLeftPanel();
-                    }
-                    break;
-
-                case R.id.btnClose:
-                    hideLeftPanel();
-                    break;
-
-                case R.id.btnSearch:
-                    ((ABase) getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
-                    break;
-
-                case R.id.btnFavorites:
-                    rootView.findViewById(R.id.tvSearchMap).setVisibility(View.VISIBLE);
-                    break;
-
-            }
-        }
-
-    };
-
-    private View inflateNavigationLayout(ViewGroup parent, OnClickListener listener) {
-        LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.la_navigation, null);
-
-        return view;
-    }
-
-    private View inflateRealReachLayout(ViewGroup parent, OnClickListener listener) {
-        LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.la_realreach, null);
-
-        view.findViewById(R.id.btnCloseRealReach).setOnClickListener(listener);
-
-        return view;
-    }
-
-    private View inflateNavMenuLayout(ViewGroup parent, OnClickListener listener) {
-        LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.la_navmenu, null);
-
-        view.findViewById(R.id.btnClose).setOnClickListener(listener);
-        view.findViewById(R.id.btnSearch).setOnClickListener(listener);
-        view.findViewById(R.id.btnFavorites).setOnClickListener(listener);
-
-        return view;
-    }
-
-    private void buildLeftPanels() {
-        try {
-            ViewGroup parent = (ViewGroup) rootView.findViewById(R.id.fmapLeftFrame);
-            try {
-                parent.removeAllViews();
-            } catch (Exception e) {
-                dlog.e(" eccezione rimuovendo le view da panels", e);
-            }
-
-            panelRealReach = inflateRealReachLayout(parent, panelsClickListener);
-            panelRealReach.setVisibility(View.INVISIBLE);
-            parent.addView(panelRealReach);
-            panels.add(panelRealReach);
-
-            panelNavigation = inflateNavigationLayout(parent, panelsClickListener);
-            panelNavigation.setVisibility(View.INVISIBLE);
-            parent.addView(panelNavigation);
-            panels.add(panelNavigation);
-
-            panelNavMenu = inflateNavMenuLayout(parent, panelsClickListener);
-            panelNavMenu.setVisibility(View.INVISIBLE);
-            parent.addView(panelNavMenu);
-            panels.add(panelNavMenu);
-        } catch (Exception e) {
-            dlog.e("Exception while building left panel", e);
-        }
-
-    }
-
-    private void showLeftPanel(int selfClose, int which) {
-
-        try {
-            final ViewGroup parent = (ViewGroup) rootView.findViewById(R.id.fmapLeftFrame);
-            final View v = rootView.findViewById(R.id.fmapLeftBorderIV);
-            //v.animate().translationXBy(-255);
-            //v.setVisibility(View.INVISIBLE);
-
-            for (View p : panels) {
-                if (p.getVisibility() == View.VISIBLE)
-                    p.setVisibility(View.INVISIBLE);
-            }
-
-            View panel = null;
-
-            switch (which) {
-                case 0:
-                    panel = panelRealReach;
-                    panel = null;
-                    if (selfClose > 0) {
-                        final CountDownTimer tmr = new CountDownTimer(selfClose * 1000, 1000) {
-                            @Override
-                            public void onTick(long millisUntilFinished) {
-                                ((Button) parent.findViewById(R.id.btnCloseRealReach)).setText((millisUntilFinished / 1000) + " sec");
-                            }
-
-                            @Override
-                            public void onFinish() {
-                                hideLeftPanel();
-                                parent.findViewById(R.id.btnCloseRealReach).setTag(null);
-                                localHandler.sendEmptyMessage(MSG_HIDE_REAL_REACH);
-                            }
-
-                        }.start();
-                        parent.findViewById(R.id.btnCloseRealReach).setTag(tmr);
-                    }
-
-                    break;
-                case 1:
-                    panel = panelNavigation;
-                    break;
-
-                case 2:
-                    panel = panelNavMenu;
-                    break;
-
-            }
-
-            if (panel == null)
-                return;
-
-            panel.setAlpha(0.0f);
+		mapView.clearRealReachDisplay();
+	}
+
+	private void centerMap() {
+
+		if (mapView == null)
+			return;
+
+		mapView.centerMapOnCurrentPosition();
+		mapView.getMapSettings().setFollowerMode(SKMapFollowerMode.NAVIGATION);
+	}
+
+	public static Bitmap decodeFileToBitmap(String pathToFile) {
+		Bitmap decodedFile = null;
+		try {
+			decodedFile = BitmapFactory.decodeFile(pathToFile);
+		} catch (OutOfMemoryError ofmerr) {
+			return null;
+		}
+		return decodedFile;
+	}
+
+	private String formatTime(int s) {
+		String str = "";
+		int h = 0, m = 0;
+
+		if (s > 3600) {
+			h = s / 3600;
+			s %= 3600;
+		}
+
+		if (s > 60) {
+			m = s / 60;
+			str += m + ":";
+			s %= 60;
+		}
+
+		if (h > 0)
+			str = String.format("%d:%02d:%02d", h, m, s);
+		else
+			str = String.format("%d:%02d", m, s);
+
+		return str;
+
+	}
+
+	private Spanned distanceToHtml(String s, boolean twoRows) {
+
+		String p[] = s.split(" ");
+		if (p.length < 2) {
+			return Html.fromHtml(s);
+		} else {
+			String br = (twoRows ? "<BR>" : "&nbsp;");
+			return Html.fromHtml(p[0] + br + "<SMALL><SMALL>" + p[1] + "</SMALL></SMALL>");
+		}
+	}
+
+	boolean firstAdviceReceived;
+
+	/**
+	 * Handles the navigation state update.
+	 *
+	 * @param skNavigationState
+	 * @param mapStyle
+	 */
+	private void handleNavigationState(final SKNavigationState skNavigationState,
+									   final int mapStyle, final ViewGroup view) {
+
+		if (this.getActivity() == null)
+			return;
+
+		this.getActivity().runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				boolean showDestinationReachedFlag = skNavigationState.isLastAdvice();
+
+				// Advice image
+				ImageView currentAdviceImage = (ImageView) view.findViewById(R.id.imgAdvice);
+				String currentVisualAdviceImage = skNavigationState.getCurrentAdviceVisualAdviceFile();
+				Bitmap decodedAdvice = decodeFileToBitmap(currentVisualAdviceImage);
+				if (decodedAdvice != null) {
+					currentAdviceImage.setImageBitmap(decodedAdvice);
+					currentAdviceImage.setVisibility(View.VISIBLE);
+				}
+
+				// Advice distance
+				TextView currentAdviceDistance = (TextView) view.findViewById(R.id.txtAdviceDistance);
+				final int currentDistanceToAdvice = skNavigationState.getCurrentAdviceDistanceToAdvice();
+				String strCurrentDistanceToAdvice = SKNavigationManager.getInstance().formatDistance(currentDistanceToAdvice);
+				currentAdviceDistance.setText(distanceToHtml(strCurrentDistanceToAdvice, true));
+
+				// Total distance
+				TextView txtTotalDistance = (TextView) view.findViewById(R.id.txtTotalDistance);
+				double totalDistance = skNavigationState.getDistanceToDestination();
+				String strTotalDistance = SKNavigationManager.getInstance().formatDistance((int) Math.round(totalDistance));
+				txtTotalDistance.setText(distanceToHtml(strTotalDistance, false));
+
+				// Total time
+				TextView txtTotalTime = (TextView) view.findViewById(R.id.txtTotalTime);
+				int totalTime = skNavigationState.getCurrentAdviceTimeToDestination();
+				txtTotalTime.setText(formatTime(totalTime));
+
+				//Current street
+				TextView txtCurrentStreet = (TextView) rootView.findViewById(R.id.txtCurrentStreet);
+				txtCurrentStreet.setText(skNavigationState.getCurrentAdviceCurrentStreetName());
+
+				//Next street
+				TextView txtNextStreet = (TextView) rootView.findViewById(R.id.txtNextStreet);
+				txtNextStreet.setText(skNavigationState.getCurrentAdviceNextStreetName());
+
+				//Arrival time
+				Date eta = new Date();
+				eta.setTime(eta.getTime() + totalTime * 1000);
+				TextView txtEta = (TextView) rootView.findViewById(R.id.txtEta);
+				txtEta.setText(String.format("%1$TR", eta));
+
+				// Instructions
+				String instruction = skNavigationState.getAdviceInstruction();
+				String output = "";
+				if (instruction != null && instruction.length() > 1)
+					output = instruction.substring(0, 1).toUpperCase() + instruction.substring(1);
+				((TextView) view.findViewById(R.id.txtInstructions)).setText(output);
+
+				double currentSpeedLimit = skNavigationState.getCurrentSpeedLimit();
+				if (currentSpeedLimit != skNavigationState.getCurrentSpeedLimit()) {
+					currentSpeedLimit = skNavigationState.getCurrentSpeedLimit();
+					//handleSpeedLimitAvailable(countryCode, distanceUnitType, mapStyle);
+				}
+
+				if (showDestinationReachedFlag) {
+					if (currentAdviceImage != null) {
+						currentAdviceImage.setImageResource(R.drawable.ic_destination_advise_black);
+					}
+					localHandler.sendEmptyMessageDelayed(MSG_STOP_NAVIGATION, 3000);
+
+				}
+
+				if (!firstAdviceReceived) {
+					firstAdviceReceived = true;
+				}
+
+			}
+		});
+
+	}
+
+	private OnClickListener panelsClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+
+			switch (v.getId()) {
+
+				case R.id.btnCloseRealReach:
+					CountDownTimer tmr = (CountDownTimer) v.getTag();
+					if (tmr != null) {
+						tmr.cancel();
+						((Button) v).setText("Chiudi");
+					} else {
+						hideLeftPanel();
+					}
+					break;
+
+				case R.id.btnClose:
+					hideLeftPanel();
+					break;
+
+				case R.id.btnSearch:
+					((ABase) getActivity()).pushFragment(FSearch.newInstance(), FSearch.class.getName(), true);
+					break;
+
+				case R.id.btnFavorites:
+					rootView.findViewById(R.id.tvSearchMap).setVisibility(View.VISIBLE);
+					break;
+
+			}
+		}
+
+	};
+
+	private View inflateNavigationLayout(ViewGroup parent, OnClickListener listener) {
+		LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View view = inflater.inflate(R.layout.la_navigation, null);
+
+		return view;
+	}
+
+	private View inflateRealReachLayout(ViewGroup parent, OnClickListener listener) {
+		LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View view = inflater.inflate(R.layout.la_realreach, null);
+
+		view.findViewById(R.id.btnCloseRealReach).setOnClickListener(listener);
+
+		return view;
+	}
+
+	private View inflateNavMenuLayout(ViewGroup parent, OnClickListener listener) {
+		LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View view = inflater.inflate(R.layout.la_navmenu, null);
+
+		view.findViewById(R.id.btnClose).setOnClickListener(listener);
+		view.findViewById(R.id.btnSearch).setOnClickListener(listener);
+		view.findViewById(R.id.btnFavorites).setOnClickListener(listener);
+
+		return view;
+	}
+
+	private void buildLeftPanels() {
+		try {
+			ViewGroup parent = (ViewGroup) rootView.findViewById(R.id.fmapLeftFrame);
+			try {
+				parent.removeAllViews();
+			} catch (Exception e) {
+				dlog.e(" eccezione rimuovendo le view da panels", e);
+			}
+
+			panelRealReach = inflateRealReachLayout(parent, panelsClickListener);
+			panelRealReach.setVisibility(View.INVISIBLE);
+			parent.addView(panelRealReach);
+			panels.add(panelRealReach);
+
+			panelNavigation = inflateNavigationLayout(parent, panelsClickListener);
+			panelNavigation.setVisibility(View.INVISIBLE);
+			parent.addView(panelNavigation);
+			panels.add(panelNavigation);
+
+			panelNavMenu = inflateNavMenuLayout(parent, panelsClickListener);
+			panelNavMenu.setVisibility(View.INVISIBLE);
+			parent.addView(panelNavMenu);
+			panels.add(panelNavMenu);
+		} catch (Exception e) {
+			dlog.e("Exception while building left panel", e);
+		}
+
+	}
+
+	private void showLeftPanel(int selfClose, int which) {
+
+		try {
+			final ViewGroup parent = (ViewGroup) rootView.findViewById(R.id.fmapLeftFrame);
+			final View v = rootView.findViewById(R.id.fmapLeftBorderIV);
+			//v.animate().translationXBy(-255);
+			//v.setVisibility(View.INVISIBLE);
+
+			for (View p : panels) {
+				if (p.getVisibility() == View.VISIBLE)
+					p.setVisibility(View.INVISIBLE);
+			}
+
+			View panel = null;
+
+			switch (which) {
+				case 0:
+					panel = panelRealReach;
+					panel = null;
+					if (selfClose > 0) {
+						final CountDownTimer tmr = new CountDownTimer(selfClose * 1000, 1000) {
+							@Override
+							public void onTick(long millisUntilFinished) {
+								((Button) parent.findViewById(R.id.btnCloseRealReach)).setText((millisUntilFinished / 1000) + " sec");
+							}
+
+							@Override
+							public void onFinish() {
+								hideLeftPanel();
+								parent.findViewById(R.id.btnCloseRealReach).setTag(null);
+								localHandler.sendEmptyMessage(MSG_HIDE_REAL_REACH);
+							}
+
+						}.start();
+						parent.findViewById(R.id.btnCloseRealReach).setTag(tmr);
+					}
+
+					break;
+				case 1:
+					panel = panelNavigation;
+					break;
+
+				case 2:
+					panel = panelNavMenu;
+					break;
+
+			}
+
+			if (panel == null)
+				return;
+
+			panel.setAlpha(0.0f);
 		/*if (App.currentTripInfo.isMaintenance) {
 			panel.setBackgroundColor(getResources().getColor(R.color.background_red));
 
@@ -1948,571 +1945,571 @@ public class FMap extends FBase implements OnClickListener {
 			//panel.setBackgroundColor(getResources().getColor(R.color.background_green));
 		}*/
 
-            panel.setVisibility(View.VISIBLE);
-            panel.animate().alpha(1.0f);
-            //panel.animate().translationX(0);
-            //panel.invalidate();
-            dlog.d(FMap.class.toString() + " showLeftPanel: panel " + String.valueOf(which) + " visibile");
+			panel.setVisibility(View.VISIBLE);
+			panel.animate().alpha(1.0f);
+			//panel.animate().translationX(0);
+			//panel.invalidate();
+			dlog.d(FMap.class.toString() + " showLeftPanel: panel " + String.valueOf(which) + " visibile");
 
-        } catch (Exception e) {
+		} catch (Exception e) {
 
-            homeB.setVisibility(View.VISIBLE);
-            findDestinationB.setVisibility(View.VISIBLE);
-            dlog.e("Exception while building left panel, restoring home button", e);
-        }
+			homeB.setVisibility(View.VISIBLE);
+			findDestinationB.setVisibility(View.VISIBLE);
+			dlog.e("Exception while building left panel, restoring home button", e);
+		}
 
-    }
+	}
 
-    private void hideLeftPanel() {
-        try {
-            for (View p : panels) {
-                if (p.getVisibility() == View.VISIBLE)
-                    p.setVisibility(View.INVISIBLE);
-            }
+	private void hideLeftPanel() {
+		try {
+			for (View p : panels) {
+				if (p.getVisibility() == View.VISIBLE)
+					p.setVisibility(View.INVISIBLE);
+			}
 
-            //rootView.findViewById(R.id.fmapLeftBorderIV).setVisibility(View.VISIBLE);
-            //rootView.findViewById(R.id.fmapLeftBorderIV).animate().translationX(0);
-        } catch (Exception e) {
-            dlog.e("Exception while hiding left panels", e);
-        }
-    }
+			//rootView.findViewById(R.id.fmapLeftBorderIV).setVisibility(View.VISIBLE);
+			//rootView.findViewById(R.id.fmapLeftBorderIV).animate().translationX(0);
+		} catch (Exception e) {
+			dlog.e("Exception while hiding left panels", e);
+		}
+	}
 
-    private void centerMap(Location position) {
+	private void centerMap(Location position) {
 
-    }
+	}
 
-    public void onActivityLocationChanged(Location location) {
+	public void onActivityLocationChanged(Location location) {
 
-        if (mapView != null && location != null) {
+		if (mapView != null && location != null) {
 
-            SKPosition position = new SKPosition();
-            SKCoordinate point = new SKCoordinate();
-            point.setLatitude(location.getLatitude());
-            point.setLongitude(location.getLongitude());
-            position.setCoordinate(point);
-            position.setAltitude(location.getAltitude());
-            position.setHeading(location.getBearing());
-            position.setSpeed(location.getSpeed());
-            SKPositionerManager.getInstance().reportNewGPSPosition(position);
-            currentPosition = position;
-        }
+			SKPosition position = new SKPosition();
+			SKCoordinate point = new SKCoordinate();
+			point.setLatitude(location.getLatitude());
+			point.setLongitude(location.getLongitude());
+			position.setCoordinate(point);
+			position.setAltitude(location.getAltitude());
+			position.setHeading(location.getBearing());
+			position.setSpeed(location.getSpeed());
+			SKPositionerManager.getInstance().reportNewGPSPosition(position);
+			currentPosition = position;
+		}
 
-    }
+	}
 
-    private Handler localActivityHandler = new Handler() {
+	private Handler localActivityHandler = new Handler() {
 
-        @Override
-        public void handleMessage(Message msg) {
+		@Override
+		public void handleMessage(Message msg) {
 
-            switch (msg.what) {
+			switch (msg.what) {
 
-                case AMainOBC.MSG_UPDATE_DATE:
-                    if (msg.obj != null && dayTV != null) {
-                        dayTV.setText((String) msg.obj);
-                    }
-                    break;
+				case AMainOBC.MSG_UPDATE_DATE:
+					if (msg.obj != null && dayTV != null) {
+						dayTV.setText((String) msg.obj);
+					}
+					break;
 
-                case AMainOBC.MSG_UPDATE_TIME:
-                    if (msg.obj != null && timeTV != null) {
-                        timeTV.setText((String) msg.obj);
-                    }
-                    break;
+				case AMainOBC.MSG_UPDATE_TIME:
+					if (msg.obj != null && timeTV != null) {
+						timeTV.setText((String) msg.obj);
+					}
+					break;
 
-            }
-        }
-    };
+			}
+		}
+	};
 
-    @SuppressLint("HandlerLeak")
-    private Handler localHandler = new Handler() {
+	@SuppressLint("HandlerLeak")
+	private Handler localHandler = new Handler() {
 
-        @Override
-        public void handleMessage(Message msg) {
-            try {
+		@Override
+		public void handleMessage(Message msg) {
+			try {
 
-                switch (msg.what) {
+				switch (msg.what) {
 
-                    case MSG_SHOW_REAL_REACH:
-                        //ShowRealReach(range);
-                        break;
+					case MSG_SHOW_REAL_REACH:
+						//ShowRealReach(range);
+						break;
 
-                    case MSG_ZOOM_REAL_REACH:
-                        //ZoomRealReach();
-                        break;
+					case MSG_ZOOM_REAL_REACH:
+						//ZoomRealReach();
+						break;
 
-                    case MSG_HIDE_REAL_REACH:
-                        HideRealReach();
-                        break;
+					case MSG_HIDE_REAL_REACH:
+						HideRealReach();
+						break;
 
-                    case MSG_STOP_NAVIGATION:
-                        stopRouteNavigation();
+					case MSG_STOP_NAVIGATION:
+						stopRouteNavigation();
 
-                    case MSG_CENTER_MAP:
-                        centerMap();
-                        break;
-                    case MSG_CLOSE_CALLOUT:
-                        hideCustomNavigationCallout();
-                        break;
-                    case MSG_CLOSE_SOC_ALERT:
+					case MSG_CENTER_MAP:
+						centerMap();
+						break;
+					case MSG_CLOSE_CALLOUT:
+						hideCustomNavigationCallout();
+						break;
+					case MSG_CLOSE_SOC_ALERT:
 
-                        localHandler.removeMessages(MSG_CLOSE_SOC_ALERT);
+						localHandler.removeMessages(MSG_CLOSE_SOC_ALERT);
 //						dlog.cr("Chiusura alert SOC");
-                        rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
-                        //rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
-                        break;
-                    case MSG_OPEN_SOC_ALERT:
-                        localHandler.removeMessages(MSG_OPEN_SOC_ALERT);
-                        if (localCarInfo.batteryLevel <= 15) {
-                            rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
-                            rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
-                            ((rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_redalertbox);
-                            ((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
-                            ((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_5km);
-                            localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
-                            rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
-                            //rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
-                        }
-                        break;
-                }
-            } catch (Exception e) {
-                dlog.e("Exception while handling message", e);
-            }
-        }
-    };
+						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
+						//rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
+						break;
+					case MSG_OPEN_SOC_ALERT:
+						localHandler.removeMessages(MSG_OPEN_SOC_ALERT);
+						if (localCarInfo.batteryLevel <= 15) {
+							rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+							rootView.findViewById(R.id.fmapAlarmIV).setBackgroundResource(R.drawable.outofcharge);
+							((rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_redalertbox);
+							((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_warning_title);
+							((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_5km);
+							localHandler.sendEmptyMessageDelayed(MSG_OPEN_SOC_ALERT, 120000);
+							rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+							//rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
+						}
+						break;
+				}
+			} catch (Exception e) {
+				dlog.e("Exception while handling message", e);
+			}
+		}
+	};
 
-    private SKMapSurfaceListener mapSurfaceListener = new SKMapSurfaceListener() {
+	private SKMapSurfaceListener mapSurfaceListener = new SKMapSurfaceListener() {
 
-        @Override
-        public void onActionPan() {
-            if (mapView != null) {
-                localHandler.removeMessages(MSG_CENTER_MAP);
-                localHandler.sendEmptyMessageDelayed(MSG_CENTER_MAP, 13000);
-                mapView.getMapSettings().setFollowerMode(SKMapFollowerMode.NONE);
-            } else {
-                DLog.W("Click su mapView ancora non inizializzato");
-            }
-        }
+		@Override
+		public void onActionPan() {
+			if (mapView != null) {
+				localHandler.removeMessages(MSG_CENTER_MAP);
+				localHandler.sendEmptyMessageDelayed(MSG_CENTER_MAP, 13000);
+				mapView.getMapSettings().setFollowerMode(SKMapFollowerMode.NONE);
+			} else {
+				DLog.W("Click su mapView ancora non inizializzato");
+			}
+		}
 
-        @Override
-        public void onActionZoom() {
+		@Override
+		public void onActionZoom() {
 
-        }
+		}
 
-        @Override
-        public void onAnnotationSelected(SKAnnotation annotation) {
+		@Override
+		public void onAnnotationSelected(SKAnnotation annotation) {
 
-            isSecondCallout = false;
+			isSecondCallout = false;
 
-            try {
-                eventCallout(annotation.getLocation(), Pois.get(annotation.getUniqueID() - 10), 20); //id annotazione-10 = posizione nel bundle
-                localHandler.removeMessages(MSG_CENTER_MAP);
-                localHandler.sendEmptyMessageDelayed(MSG_CENTER_MAP, 20000); //evito il reset della vista prima del tempo
-                localHandler.sendEmptyMessageDelayed(MSG_CLOSE_CALLOUT, 20000);
-            } catch (Exception e) {
-                dlog.e("onAnnotationSelected: Exception on callout creation", e);
-            }
-        }
+			try {
+				eventCallout(annotation.getLocation(), Pois.get(annotation.getUniqueID() - 10), 20); //id annotazione-10 = posizione nel bundle
+				localHandler.removeMessages(MSG_CENTER_MAP);
+				localHandler.sendEmptyMessageDelayed(MSG_CENTER_MAP, 20000); //evito il reset della vista prima del tempo
+				localHandler.sendEmptyMessageDelayed(MSG_CLOSE_CALLOUT, 20000);
+			} catch (Exception e) {
+				dlog.e("onAnnotationSelected: Exception on callout creation", e);
+			}
+		}
 
-        @Override
-        public void onBoundingBoxImageRendered(int arg0) {
+		@Override
+		public void onBoundingBoxImageRendered(int arg0) {
 
-        }
+		}
 
-        private boolean lockNorth = false;
+		private boolean lockNorth = false;
 
-        @Override
-        public void onCompassSelected() {
+		@Override
+		public void onCompassSelected() {
 
-            if (lockNorth) {
-                mapView.getMapSettings().setFollowerMode(SKMapFollowerMode.NAVIGATION);
-                lockNorth = false;
-            } else {
-                mapView.rotateTheMapToNorthSmooth(2);
-                mapView.getMapSettings().setFollowerMode(SKMapFollowerMode.POSITION);
-                lockNorth = true;
-            }
+			if (lockNorth) {
+				mapView.getMapSettings().setFollowerMode(SKMapFollowerMode.NAVIGATION);
+				lockNorth = false;
+			} else {
+				mapView.rotateTheMapToNorthSmooth(2);
+				mapView.getMapSettings().setFollowerMode(SKMapFollowerMode.POSITION);
+				lockNorth = true;
+			}
 
-        }
+		}
 
-        @Override
-        public void onCurrentPositionSelected() {
+		@Override
+		public void onCurrentPositionSelected() {
 
-        }
+		}
 
-        @Override
-        public void onCustomPOISelected(SKMapCustomPOI arg0) {
+		@Override
+		public void onCustomPOISelected(SKMapCustomPOI arg0) {
 
-        }
+		}
 
-        @Override
-        public void onSingleTap(SKScreenPoint point) {
-            if (mapView != null) {
-                if (navigationCallout != null)
-                    navigationCallout.hide();
-                rootView.findViewById(R.id.annotationLL).setVisibility(View.GONE);
-                mapView.deleteAnnotation(9);
-                mapView.deleteAnnotation(0);
-                isSecondCallout = false;
-                double pLat, pLon;
-                if (mapView.getMapSettings().getMapDisplayMode() == SKMapDisplayMode.MODE_3D) {
-                    pLat = (double) Math.round(mapView.pointToCoordinate(point).getLatitude() * 1000d) / 1000d;
-                    pLon = (double) Math.round(mapView.pointToCoordinate(point).getLongitude() * 1000d) / 1000d;
-                    for (final SKAnnotation annotation : annotationList) {
-                        double aLat = (double) Math.round(annotation.getLocation().getLatitude() * 1000d) / 1000d;
-                        double aLon = (double) Math.round(annotation.getLocation().getLongitude() * 1000d) / 1000d;
-                        if ((pLat == aLat) && (pLon == aLon)) {
-                            try {
-                                rootView.findViewById(R.id.annotationLL).setVisibility(View.VISIBLE);
-                                descriptionAnnotation.setText(Pois.get(annotation.getUniqueID() - 10).getString("address", " "));
-                                titleAnnotation.setText(Pois.get(annotation.getUniqueID() - 10).getString("nome", "Raggiungi destinazione"));
-                                titleAnnotation.setOnClickListener(new OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
+		@Override
+		public void onSingleTap(SKScreenPoint point) {
+			if (mapView != null) {
+				if (navigationCallout != null)
+					navigationCallout.hide();
+				rootView.findViewById(R.id.annotationLL).setVisibility(View.GONE);
+				mapView.deleteAnnotation(9);
+				mapView.deleteAnnotation(0);
+				isSecondCallout = false;
+				double pLat, pLon;
+				if (mapView.getMapSettings().getMapDisplayMode() == SKMapDisplayMode.MODE_3D) {
+					pLat = (double) Math.round(mapView.pointToCoordinate(point).getLatitude() * 1000d) / 1000d;
+					pLon = (double) Math.round(mapView.pointToCoordinate(point).getLongitude() * 1000d) / 1000d;
+					for (final SKAnnotation annotation : annotationList) {
+						double aLat = (double) Math.round(annotation.getLocation().getLatitude() * 1000d) / 1000d;
+						double aLon = (double) Math.round(annotation.getLocation().getLongitude() * 1000d) / 1000d;
+						if ((pLat == aLat) && (pLon == aLon)) {
+							try {
+								rootView.findViewById(R.id.annotationLL).setVisibility(View.VISIBLE);
+								descriptionAnnotation.setText(Pois.get(annotation.getUniqueID() - 10).getString("address", " "));
+								titleAnnotation.setText(Pois.get(annotation.getUniqueID() - 10).getString("nome", "Raggiungi destinazione"));
+								titleAnnotation.setOnClickListener(new OnClickListener() {
+									@Override
+									public void onClick(View v) {
 
-                                        rootView.findViewById(R.id.annotationLL).setVisibility(View.GONE);
-                                        startRoute(annotation.getLocation(), true);
-                                    }
-                                });
-                                rootView.findViewById(R.id.goBtn).setOnClickListener(new OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
+										rootView.findViewById(R.id.annotationLL).setVisibility(View.GONE);
+										startRoute(annotation.getLocation(), true);
+									}
+								});
+								rootView.findViewById(R.id.goBtn).setOnClickListener(new OnClickListener() {
+									@Override
+									public void onClick(View v) {
 
-                                        rootView.findViewById(R.id.annotationLL).setVisibility(View.GONE);
-                                        startRoute(annotation.getLocation(), true);
-                                    }
-                                });
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
+										rootView.findViewById(R.id.annotationLL).setVisibility(View.GONE);
+										startRoute(annotation.getLocation(), true);
+									}
+								});
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				}
 
-            } else {
-                DLog.W("mapView null");
-            }
-        }
+			} else {
+				DLog.W("mapView null");
+			}
+		}
 
-        @Override
-        public void onDoubleTap(SKScreenPoint arg0) {
+		@Override
+		public void onDoubleTap(SKScreenPoint arg0) {
 
-        }
+		}
 
-        @Override
-        public void onGLInitializationError(String arg0) {
-        }
+		@Override
+		public void onGLInitializationError(String arg0) {
+		}
 
-        @Override
-        public void onInternationalisationCalled(int arg0) {
-        }
+		@Override
+		public void onInternationalisationCalled(int arg0) {
+		}
 
-        @Override
-        public void onInternetConnectionNeeded() {
-        }
+		@Override
+		public void onInternetConnectionNeeded() {
+		}
 
-        @Override
-        public void onLongPress(SKScreenPoint point) {
-            if (mapView != null) {
-                final SKScreenPoint pointF = point;
+		@Override
+		public void onLongPress(SKScreenPoint point) {
+			if (mapView != null) {
+				final SKScreenPoint pointF = point;
 				/*if (mapView.getMapSettings().getMapDisplayMode() != SKMapDisplayMode.MODE_3D) {
 					confirmNavigation(point);
 				} else {*/
-                try {
-                    SKAnnotation annotation = new SKAnnotation(9);
-                    annotation.setLocation(mapView.pointToCoordinate(pointF));
-                    annotation.setMininumZoomLevel(5);
-                    annotation.setAnnotationType(SKAnnotation.SK_ANNOTATION_TYPE_DESTINATION_FLAG);
-                    mapView.addAnnotation(annotation, SKAnimationSettings.ANIMATION_NONE);
-                    rootView.findViewById(R.id.annotationLL).setVisibility(View.VISIBLE);
-                    ((TextView) rootView.findViewById(R.id.titleAnnotationTV)).setText("Conferma destinazione");
-                    //titleAnnotation.invalidate(); testinva
-                    SKSearchResult address = SKReverseGeocoderManager.getInstance().reverseGeocodePosition(mapView.pointToCoordinate(point));
-                    ((TextView) rootView.findViewById(R.id.descriptionAnnotationTV)).setText(address != null ? address.getName() : "");
-
-                    titleAnnotation.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            mapView.deleteAnnotation(9);
-                            rootView.findViewById(R.id.annotationLL).setVisibility(View.GONE);
-                            startRoute(mapView.pointToCoordinate(pointF), true);
-                        }
-                    });
-                    rootView.findViewById(R.id.goBtn).setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            mapView.deleteAnnotation(9);
-                            rootView.findViewById(R.id.annotationLL).setVisibility(View.GONE);
-                            startRoute(mapView.pointToCoordinate(pointF), true);
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                //}
-            } else {
-                DLog.W("Mapview null");
-            }
-        }
-
-        @Override
-        public void onMapActionDown(SKScreenPoint arg0) {
-            // TODO Auto-generated method stub
+				try {
+					SKAnnotation annotation = new SKAnnotation(9);
+					annotation.setLocation(mapView.pointToCoordinate(pointF));
+					annotation.setMininumZoomLevel(5);
+					annotation.setAnnotationType(SKAnnotation.SK_ANNOTATION_TYPE_DESTINATION_FLAG);
+					mapView.addAnnotation(annotation, SKAnimationSettings.ANIMATION_NONE);
+					rootView.findViewById(R.id.annotationLL).setVisibility(View.VISIBLE);
+					((TextView) rootView.findViewById(R.id.titleAnnotationTV)).setText("Conferma destinazione");
+					//titleAnnotation.invalidate(); testinva
+					SKSearchResult address = SKReverseGeocoderManager.getInstance().reverseGeocodePosition(mapView.pointToCoordinate(point));
+					((TextView) rootView.findViewById(R.id.descriptionAnnotationTV)).setText(address != null ? address.getName() : "");
+
+					titleAnnotation.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+
+							mapView.deleteAnnotation(9);
+							rootView.findViewById(R.id.annotationLL).setVisibility(View.GONE);
+							startRoute(mapView.pointToCoordinate(pointF), true);
+						}
+					});
+					rootView.findViewById(R.id.goBtn).setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+
+							mapView.deleteAnnotation(9);
+							rootView.findViewById(R.id.annotationLL).setVisibility(View.GONE);
+							startRoute(mapView.pointToCoordinate(pointF), true);
+						}
+					});
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				//}
+			} else {
+				DLog.W("Mapview null");
+			}
+		}
+
+		@Override
+		public void onMapActionDown(SKScreenPoint arg0) {
+			// TODO Auto-generated method stub
 
-        }
-
-        @Override
-        public void onMapActionUp(SKScreenPoint arg0) {
-        }
-
-        @Override
-        public void onMapPOISelected(SKMapPOI arg0) {
-        }
-
-        @Override
-        public void onMapRegionChangeEnded(SKCoordinateRegion arg0) {
-
-        }
-
-        @Override
-        public void onMapRegionChangeStarted(SKCoordinateRegion arg0) {
-
-        }
-
-        @Override
-        public void onMapRegionChanged(SKCoordinateRegion arg0) {
-
-        }
+		}
+
+		@Override
+		public void onMapActionUp(SKScreenPoint arg0) {
+		}
+
+		@Override
+		public void onMapPOISelected(SKMapPOI arg0) {
+		}
+
+		@Override
+		public void onMapRegionChangeEnded(SKCoordinateRegion arg0) {
+
+		}
+
+		@Override
+		public void onMapRegionChangeStarted(SKCoordinateRegion arg0) {
+
+		}
+
+		@Override
+		public void onMapRegionChanged(SKCoordinateRegion arg0) {
+
+		}
 
-        @Override
-        public void onObjectSelected(int arg0) {
+		@Override
+		public void onObjectSelected(int arg0) {
 
-        }
+		}
 
-        @Override
-        public void onPOIClusterSelected(SKPOICluster arg0) {
+		@Override
+		public void onPOIClusterSelected(SKPOICluster arg0) {
 
-        }
+		}
 
-        @Override
-        public void onRotateMap() {
+		@Override
+		public void onRotateMap() {
 
-        }
+		}
 
-        @Override
-        public void onSurfaceCreated(SKMapViewHolder holder) {
-            Boolean test = false;
-
-            mapView = holder.getMapSurfaceView();
-            mapView.deleteAnnotation(9);
-            mapView.deleteAnnotation(0);
-            if (firstLaunch) {
+		@Override
+		public void onSurfaceCreated(SKMapViewHolder holder) {
+			Boolean test = false;
+
+			mapView = holder.getMapSurfaceView();
+			mapView.deleteAnnotation(9);
+			mapView.deleteAnnotation(0);
+			if (firstLaunch) {
 
-                initMapSettings();
-
-                firstLaunch = false;
-                try {
-                    drawPOIS();
-                    //drawChargingStation();
-                    drawPolyline();
-                } catch (OutOfMemoryError e) {
-                    dlog.e("drawPois: out of memory ", e);
-                } catch (Exception e) {
-                    dlog.e("drawPois: Generic Exception ", e);
-                }
-                return;
+				initMapSettings();
+
+				firstLaunch = false;
+				try {
+					drawPOIS();
+					//drawChargingStation();
+					drawPolyline();
+				} catch (OutOfMemoryError e) {
+					dlog.e("drawPois: out of memory ", e);
+				} catch (Exception e) {
+					dlog.e("drawPois: Generic Exception ", e);
+				}
+				return;
 
-            }
-            try {
-                if (navigationActive) {
-                    startRouteNavigation();
-                } else
-                    resetMapSettings();
-            } catch (Exception e) {
-                dlog.e("exception startRouteNavigation() ", e);
-            }
+			}
+			try {
+				if (navigationActive) {
+					startRouteNavigation();
+				} else
+					resetMapSettings();
+			} catch (Exception e) {
+				dlog.e("exception startRouteNavigation() ", e);
+			}
 
-        }
+		}
 
-        @Override
-        public void onScreenshotReady(Bitmap arg0) {
+		@Override
+		public void onScreenshotReady(Bitmap arg0) {
 
-        }
+		}
 
-    };
+	};
 
-    private SKNavigationListener navigationListener = new SKNavigationListener() {
+	private SKNavigationListener navigationListener = new SKNavigationListener() {
 
-        @Override
-        public void onDestinationReached() {
+		@Override
+		public void onDestinationReached() {
 
-            SKRouteManager.getInstance().clearCurrentRoute();
-            SKNavigationManager.getInstance().stopNavigation();
-            navigationActive = false;
+			SKRouteManager.getInstance().clearCurrentRoute();
+			SKNavigationManager.getInstance().stopNavigation();
+			navigationActive = false;
 
-        }
+		}
 
-        @Override
-        public void onReRoutingStarted() {
-            // TODO Auto-generated method stub
+		@Override
+		public void onReRoutingStarted() {
+			// TODO Auto-generated method stub
 
-        }
+		}
 
-        @Override
-        public void onSignalNewAdviceWithAudioFiles(String[] arg0, boolean arg1) {
-            if (arg0 != null && arg0.length > 0) {
-                for (int i = 0; i < arg0.length; i++) {
-                    dlog.d("ADVICE: " + arg0[i]);
-                }
-            }
+		@Override
+		public void onSignalNewAdviceWithAudioFiles(String[] arg0, boolean arg1) {
+			if (arg0 != null && arg0.length > 0) {
+				for (int i = 0; i < arg0.length; i++) {
+					dlog.d("ADVICE: " + arg0[i]);
+				}
+			}
 
-        }
+		}
 
-        @Override
-        public void onSignalNewAdviceWithInstruction(String arg0) {
-            dlog.d("ADVICE STRING:" + arg0);
-            //tts.postpone();
-            tts.speak(arg0, TextToSpeech.QUEUE_FLUSH);
+		@Override
+		public void onSignalNewAdviceWithInstruction(String arg0) {
+			dlog.d("ADVICE STRING:" + arg0);
+			//tts.postpone();
+			tts.speak(arg0, TextToSpeech.QUEUE_FLUSH);
 
-        }
+		}
 
-        @Override
-        public void onSpeedExceededWithAudioFiles(String[] arg0, boolean arg1) {
-            // TODO Auto-generated method stub
+		@Override
+		public void onSpeedExceededWithAudioFiles(String[] arg0, boolean arg1) {
+			// TODO Auto-generated method stub
 
-        }
+		}
 
-        @Override
-        public void onSpeedExceededWithInstruction(String arg0, boolean arg1) {
-            // TODO Auto-generated method stub
+		@Override
+		public void onSpeedExceededWithInstruction(String arg0, boolean arg1) {
+			// TODO Auto-generated method stub
 
-        }
+		}
 
-        @Override
-        public void onTunnelEvent(boolean arg0) {
-            // TODO Auto-generated method stub
+		@Override
+		public void onTunnelEvent(boolean arg0) {
+			// TODO Auto-generated method stub
 
-        }
+		}
 
-        @Override
-        public void onUpdateNavigationState(SKNavigationState state) {
-            //DLog.D(state.toString());
-            try {
-                if (state != null)
-                    handleNavigationState(state, 0, (ViewGroup) rootView.findViewById(R.id.fmapLeftFrame));
-            } catch (Exception e) {
-                dlog.e("Exception handling navigation state", e);
-            }
+		@Override
+		public void onUpdateNavigationState(SKNavigationState state) {
+			//DLog.D(state.toString());
+			try {
+				if (state != null)
+					handleNavigationState(state, 0, (ViewGroup) rootView.findViewById(R.id.fmapLeftFrame));
+			} catch (Exception e) {
+				dlog.e("Exception handling navigation state", e);
+			}
 
-        }
+		}
 
-        @Override
-        public void onViaPointReached(int arg0) {
-            // TODO Auto-generated method stub
+		@Override
+		public void onViaPointReached(int arg0) {
+			// TODO Auto-generated method stub
 
-        }
+		}
 
-        @Override
-        public void onVisualAdviceChanged(boolean arg0, boolean arg1,
-                                          SKNavigationState arg2) {
-            // TODO Auto-generated method stub
+		@Override
+		public void onVisualAdviceChanged(boolean arg0, boolean arg1,
+										  SKNavigationState arg2) {
+			// TODO Auto-generated method stub
 
-        }
+		}
 
-        @Override
-        public void onFreeDriveUpdated(String arg0, String arg1, String arg2,
-                                       SKStreetType arg3, double arg4, double arg5) {
-            // TODO Auto-generated method stub
+		@Override
+		public void onFreeDriveUpdated(String arg0, String arg1, String arg2,
+									   SKStreetType arg3, double arg4, double arg5) {
+			// TODO Auto-generated method stub
 
-        }
+		}
 
-    };
+	};
 
-    private SKToolsNavigationListener toolsNavigationListener = new SKToolsNavigationListener() {
+	private SKToolsNavigationListener toolsNavigationListener = new SKToolsNavigationListener() {
 
-        @Override
-        public void onNavigationStarted() {
-            DLog.D("Start");
-            navigationActive = true;
-            ((AMainOBC) getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_SYSTEM, 15));
-        }
+		@Override
+		public void onNavigationStarted() {
+			DLog.D("Start");
+			navigationActive = true;
+			((AMainOBC) getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_SYSTEM, 15));
+		}
 
-        @Override
-        public void onNavigationEnded() {
-            navigationActive = false;
-            ((AMainOBC) getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE, -1));
+		@Override
+		public void onNavigationEnded() {
+			navigationActive = false;
+			((AMainOBC) getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE, -1));
 
-        }
+		}
 
-        @Override
-        public void onRouteCalculationStarted() {
-            // TODO Auto-generated method stub
+		@Override
+		public void onRouteCalculationStarted() {
+			// TODO Auto-generated method stub
 
-        }
+		}
 
-        @Override
-        public void onRouteCalculationCompleted() {
-            // TODO Auto-generated method stub
+		@Override
+		public void onRouteCalculationCompleted() {
+			// TODO Auto-generated method stub
 
-        }
+		}
 
-        @Override
-        public void onRouteCalculationCanceled() {
-            // TODO Auto-generated method stub
+		@Override
+		public void onRouteCalculationCanceled() {
+			// TODO Auto-generated method stub
 
-        }
+		}
 
-    };
+	};
 
-    public SKRouteListener routeListener = new SKRouteListener() {
+	public SKRouteListener routeListener = new SKRouteListener() {
 
-        @Override
-        public void onAllRoutesCompleted() {
-            // TODO Auto-generated method stub
-        }
+		@Override
+		public void onAllRoutesCompleted() {
+			// TODO Auto-generated method stub
+		}
 
-        @Override
-        public void onOnlineRouteComputationHanging(int arg0) {
-            // TODO Auto-generated method stub
+		@Override
+		public void onOnlineRouteComputationHanging(int arg0) {
+			// TODO Auto-generated method stub
 
-        }
+		}
 
-        @Override
-        public void onRouteCalculationCompleted(SKRouteInfo info) {
-            DLog.D(info.toString());
-            startRouteNavigation();
-        }
+		@Override
+		public void onRouteCalculationCompleted(SKRouteInfo info) {
+			DLog.D(info.toString());
+			startRouteNavigation();
+		}
 
-        @Override
-        public void onRouteCalculationFailed(SKRoutingErrorCode arg0) {
-            CharSequence text = arg0.toString();
-            Toast toast = Toast.makeText(getActivity(), text + " please move into a bigger street and retry", Toast.LENGTH_LONG);
-            toast.show();
+		@Override
+		public void onRouteCalculationFailed(SKRoutingErrorCode arg0) {
+			CharSequence text = arg0.toString();
+			Toast toast = Toast.makeText(getActivity(), text + " please move into a bigger street and retry", Toast.LENGTH_LONG);
+			toast.show();
 
-        }
+		}
 
-        @Override
-        public void onServerLikeRouteCalculationCompleted(SKRouteJsonAnswer arg0) {
-            // TODO Auto-generated method stub
+		@Override
+		public void onServerLikeRouteCalculationCompleted(SKRouteJsonAnswer arg0) {
+			// TODO Auto-generated method stub
 
-        }
-    };
+		}
+	};
 
-    private String maxIconID(String folder) {
+	private String maxIconID(String folder) {
 
-        try {
-            File f = new File(folder);
-            File file[] = f.listFiles();
-            Log.d("Files", "Size: " + file.length);
-            if (file.length == 0)
-                return "0";
-            String name = file[file.length - 1].getName();
-            name = name.substring(0, name.lastIndexOf('.'));
-            return name;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		try {
+			File f = new File(folder);
+			File file[] = f.listFiles();
+			Log.d("Files", "Size: " + file.length);
+			if (file.length == 0)
+				return "0";
+			String name = file[file.length - 1].getName();
+			name = name.substring(0, name.lastIndexOf('.'));
+			return name;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		/*int i=0;
 		File maxID;
@@ -2531,735 +2528,735 @@ public class FMap extends FBase implements OnClickListener {
 		}while(maxID.exists());
 		return String.valueOf(i-1);*/
 
-        return "0";
-    }
-
-    private void updatePoiIcon(String Url) {
-        try {
-
-            String jsonStr = "";
-            if (Icons != null)
-                Icons.clear();
-
-            File outDir = new File(App.getPoiIconFolder());
-            if (!outDir.isDirectory()) {
-                outDir.mkdir();
-            }
-
-            Url = Url.concat("?ID=").concat(maxIconID(App.getPoiIconFolder()));
-            dlog.d("updatePoiIcon: load url" + Url);
-            StringBuilder builder = new StringBuilder();
-            HttpClient client = new DefaultHttpClient();
-            HttpGet httpGet = new HttpGet(Url);
-            try {
-                HttpResponse response = client.execute(httpGet);
-                StatusLine statusLine = response.getStatusLine();
-                int statusCode = statusLine.getStatusCode();
-                if (statusCode == 200) {
-                    App.update_Poi = new Date();
-                    HttpEntity entity = response.getEntity();
-                    InputStream content = entity.getContent();
-                    BufferedReader reader = new BufferedReader(
-                            new InputStreamReader(content));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        builder.append(line);
-                    }
-                    reader.close();
-                    content.close();
-                } else {
-
-                    dlog.e(FMap.class.toString() + "Failed to download file");
-                }
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-            } catch (NetworkOnMainThreadException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                client.getConnectionManager().shutdown();
-            }
-            jsonStr = builder.toString();
-            builder.delete(0, builder.length());
-            dlog.d("updatePoiIcon got Response: " + jsonStr);
-            parseJsonIcon(jsonStr);
-            String filename = "";
-            FileOutputStream fileOutput = null;
-            InputStream inputStream = null;
-
-            for (Bundle Icon : Icons) {    //-- start loop download and save image
-                try {
-                    URL url = new URL(Icon.getString("URL"));
-                    String extension = url.getFile().substring(url.getFile().lastIndexOf('.') + 1);
-                    filename = Icon.getString("ID").concat(".").concat(extension);
-                    dlog.d("Local filename:" + filename);
-                    File file = new File(outDir, filename);
-
-                    if (file.exists())
-                        continue;
-
-                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                    urlConnection.setRequestMethod("GET");
-                    urlConnection.setDoOutput(true);
-                    urlConnection.connect();
-                    if (file.createNewFile()) {
-                        file.createNewFile();
-                    }
-                    fileOutput = new FileOutputStream(file);
-                    inputStream = urlConnection.getInputStream();
-                    byte[] buffer = new byte[1024];
-                    int bufferLength = 0;
-                    while ((bufferLength = inputStream.read(buffer)) > 0) {
-                        fileOutput.write(buffer, 0, bufferLength);
-                    }
-
-                    urlConnection.disconnect();
-                } catch (Exception e) {
-                    dlog.e("Exception while downloading image");
-                    File file = new File(outDir, filename);
-                    if (file.exists())
-                        file.delete();
-                } finally {
-                    if (fileOutput != null)
-                        fileOutput.close();
-                    if (inputStream != null)
-                        inputStream.close();
-                }
-            }
-            //return filepath;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return;
-
-    }
-
-    private void parseJsonIcon(String jsonStr) {
-
-        try {
-            JSONObject json = new JSONObject(jsonStr);
-            Log.i(FMap.class.getName(), "creazione oggetto Json");
-            //Get the instance of JSONArray that contains JSONObjects
-            JSONArray jsonArray = json.optJSONArray("Icons");
-
-            //Iterate the jsonArray and print the info of JSONObjects
-            for (int k = 0; k < jsonArray.length(); k++) {
-                Bundle Icon = new Bundle();
-                JSONObject jsonObject = jsonArray.getJSONObject(k);
-                if (jsonObject.has("ID"))
-                    Icon.putString("ID", jsonObject.getString("ID"));
-                if (jsonObject.has("URL"))
-                    Icon.putString("URL", jsonObject.getString("URL"));
-                Icons.add(Icon);
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void updatePoiPos(String Url) {
-        try {
-
-            String jsonStr = "";
-
-            File outDir = new File(App.getPoiPositionFolder());
-            if (!outDir.isDirectory()) {
-                outDir.mkdir();
-            }
-            File outputFile = new File(outDir, "POIS_POS.json");
-
-            StringBuilder builder = new StringBuilder();
-            Writer writer;
-            HttpClient client = new DefaultHttpClient();
-            List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
-            if (!jsonmd5.equals("")) {
-                paramsList.add(new BasicNameValuePair("md5", jsonmd5));//Url = Url.concat("?md5=").concat(jsonmd5);
-            }
-            paramsList.add(new BasicNameValuePair("versione", "2")); //corrisponde al type massimo di poi che gestisce
-            paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));
-            Url = UrlTools.buildQuery(Url.concat("?"), paramsList).toString();
-            dlog.d(FMap.class.toString() + " updatePoiPos: Richiesta url " + Url);
-            HttpGet httpGet = new HttpGet(Url);
-            try {
-                HttpResponse response = client.execute(httpGet);
-                StatusLine statusLine = response.getStatusLine();
-                int statusCode = statusLine.getStatusCode();
-                if (statusCode == 200) {
-                    App.update_Poi = new Date();
-                    HttpEntity entity = response.getEntity();
-                    InputStream content = entity.getContent();
-                    BufferedReader reader = new BufferedReader(
-                            new InputStreamReader(content));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        builder.append(line);
-                    }
-                    reader.close();
-                    content.close();
-                } else {
-
-                    dlog.e(FMap.class.toString() + "updatePoiPos: Failed to download file: " + statusLine.toString());
-                }
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-            } catch (NetworkOnMainThreadException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                client.getConnectionManager().shutdown();
-            }
-            jsonStr = builder.toString();
-            dlog.d(FMap.class.toString() + " updatePoiPos: Risposta a url " + jsonStr);
-            if (jsonStr.equals(""))
-                return;
-            parseJsonPos(jsonStr);
-            try {
-
-                if (!outDir.isDirectory()) {
-                    throw new IOException(
-                            "Unable to create directory . Maybe the SD card is mounted?");
-                }
-                writer = new BufferedWriter(new FileWriter(outputFile));
-                writer.write(jsonStr);
-
-                writer.close();
-                jsonmd5 = md5(jsonStr);
-                if (mapView != null) {
-                    mapView.deleteAllAnnotationsAndCustomPOIs();
-                    drawPOIS();
-                    drawChargingStation();
-                }
-
-                dlog.d(FMap.class.toString() + " updatePoiPos: Poi aggiornati");
-            } catch (IOException e) {
-                dlog.e(FMap.class.toString() + " updatePoiPos: eccezione nel salvataggio del json o crazione Poi ", e);
-
-            }
-        } catch (Exception e) {
-            dlog.e(FMap.class.toString() + " updatePoiPos: eccezione nel reperimento e salvataggio del json ", e);
-            e.printStackTrace();
-        }
-
-        return;
-
-    }
-
-    private void parseJsonPos(String jsonStr) {
-
-        //dlog.d(FMap.class.getName()+ " parseJsonPos: parse del json: "+jsonStr);
-        if (jsonStr.equals(""))
-            return;
-
-        try {
-
-            JSONObject json = new JSONObject(jsonStr);
-
-            //Get the instance of JSONArray that contains JSONObjects
-            JSONArray jsonArray = json.optJSONArray("Position");
-
-            //Iterate the jsonArray and print the info of JSONObjects
-            ArrayList<Bundle> PoisTemp = new ArrayList<Bundle>();
-
-            int k;
-            for (k = 0; k < jsonArray.length(); k++) {
-                Bundle Poi = new Bundle();
-                JSONObject jsonObject = jsonArray.getJSONObject(k);
-                try {
-                    if (jsonObject.has("ID"))
-                        Poi.putInt("ID", Integer.parseInt(jsonObject.getString("ID")));
-                    if (jsonObject.has("LAT"))
-                        Poi.putDouble("LAT", Double.parseDouble(jsonObject.getString("LAT")));
-                    if (jsonObject.has("LON"))
-                        Poi.putDouble("LON", Double.parseDouble(jsonObject.getString("LON")));
-                    if (jsonObject.has("id_icon"))
-                        Poi.putString("id_icon", jsonObject.getString("id_icon"));
-                    if (jsonObject.has("address"))
-                        Poi.putString("address", jsonObject.getString("address"));
-                    if (jsonObject.has("nome"))
-                        Poi.putString("nome", jsonObject.getString("nome"));
-                    Poi.putInt("INDEX", k + 10);
-                    if (jsonObject.has("type"))
-                        Poi.putInt("type", jsonObject.getInt("type"));
-                    if (jsonObject.has("description"))
-                        Poi.putString("description", jsonObject.getString("description"));
-                    if (jsonObject.has("code"))
-                        Poi.putString("code", jsonObject.getString("code"));
-                } catch (Exception e) {
-
-                    dlog.e(FMap.class.getName() + " parseJsonPos: eccezione durante  parse JsonObject", e);
-                }
-                PoisTemp.add(Poi);
-
-            }
-
-            List<Poi> PoiList = retriveChargingList();
-
-            for (Poi singlePoi : PoiList) {
-                Bundle Poi = new Bundle();
-                try {
-                    Poi.putInt("ID", singlePoi.id);
-                    Poi.putDouble("LAT", singlePoi.lat);
-                    Poi.putDouble("LON", singlePoi.lon);
-                    Poi.putString("id_icon", "pois_icon");
-                    Poi.putString("address", singlePoi.town);
-                    Poi.putString("nome", singlePoi.name);
-                    Poi.putInt("INDEX", k + 10);
-                    Poi.putInt("type", 3);
-                    Poi.putString("description", singlePoi.type);
-                    Poi.putString("code", singlePoi.code);
-                } catch (Exception e) {
-
-                    dlog.e(FMap.class.getName() + " parseJsonPos: eccezione durante  parse JsonObject", e);
-                }
-                PoisTemp.add(Poi);
-                k++;
-            }
-
-            if (!PoisTemp.equals(Pois))
-                Pois = PoisTemp;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public String md5(String encTarget) {
-        MessageDigest mdEnc = null;
-        try {
-            mdEnc = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            dlog.e(FMap.class.toString() + " md5: Exception while encrypting to md5", e);
-            e.printStackTrace();
-        } // Encryption algorithm
-        mdEnc.update(encTarget.getBytes(), 0, encTarget.length());
-        String md5 = new BigInteger(1, mdEnc.digest()).toString(16);
-        while (md5.length() < 32) {
-            md5 = "0" + md5;
-        }
-        mdEnc.reset();
-        return md5;
-    }
-
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-
-    public static String getStringFromFile(String filePath) throws Exception {
-        File fl = new File(filePath);
-        FileInputStream fin = new FileInputStream(fl);
-        String ret = convertStreamToString(fin);
-        //Make sure you close all streams.
-        fin.close();
-        return ret;
-    }
-
-    public void hideCustomNavigationCallout() {
-        if (navigationCallout != null)
-            navigationCallout.hide();
-    }
-
-    private final BroadcastReceiver ConnectivityChangeReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context c, Intent i) {
-            boolean status = SystemControl.hasNetworkConnection(c, eventRepository);
-
-            if (status) {
-                if (animQueue.contains("3g")) {
-                    animQueue.remove("3g");
-                }
-
-            } else {
-                if (!animQueue.contains("3g")) {
-                    animQueue.add("3g");
-                }
-                if (no3gwarning.getAnimation() == null)
-                    no3gwarning.startAnimation(alertAnimation);
-            }
-        }
-
-    };
-
-    public void loadBanner(String Url, String type, Boolean isClick) {
-
-        File outDir = new File(App.getBannerImagesFolder());
-        if (!outDir.isDirectory()) {
-            outDir.mkdir();
-        }
-
-        if (App.parkMode.isOn()) {
-
-            dlog.i("loadBanner: Park mode ON");
-            return;
-        }
-
-        if (!App.hasNetworkConnection()) {
-            dlog.e(FMap.class.toString() + " loadBanner: nessuna connessione");
-            App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
-            return;
-        }
-        StringBuilder builder = new StringBuilder();
-        List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
-        HttpResponse response = null;
-        if (!isClick) {
-
-            if (App.currentTripInfo != null && App.currentTripInfo.customer != null)
-                paramsList.add(new BasicNameValuePair("id", App.currentTripInfo.customer.id + ""));//App.currentTripInfo.customer.id + "")); //"3"));
-
-            if (App.getLastLocation() != null) {
-                paramsList.add(new BasicNameValuePair("lat", App.getLastLocation().getLatitude() + ""));
-                paramsList.add(new BasicNameValuePair("lon", App.getLastLocation().getLongitude() + ""));
-            }
-            paramsList.add(new BasicNameValuePair("id_fleet", App.FleetId + ""));
-            paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));//"ED93107"));//App.CarPlate));
-        }
-        try {
-            if (App.BannerName.getBundle(type) != null)
-                paramsList.add(new BasicNameValuePair("index", App.BannerName.getBundle(type).getString("INDEX", null)));
-
-            if (App.BannerName.getBundle(type) != null)
-                paramsList.add(new BasicNameValuePair("end", App.BannerName.getBundle(type).getString("END", null)));
-
-            Url = UrlTools.buildQuery(Url.concat("?"), paramsList).toString();
-            //connessione per scaricare id immagine
-
-            DLog.I(FMap.class.toString() + " loadBanner: Url richiesta " + Url);
-            HttpClient client = new DefaultHttpClient();
-            HttpGet httpGet = new HttpGet(Url);
-
-            response = client.execute(httpGet);
-            StatusLine statusLine = response.getStatusLine();
-            int statusCode = statusLine.getStatusCode();
-            if (statusCode == 200) {
-                //App.update_StartImages = new Date();
-                HttpEntity entity = response.getEntity();
-                InputStream content = entity.getContent();
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(content));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line);
-                }
-                content.close();
-                reader.close();
-            } else {
-
-                dlog.e(FMap.class.toString() + " loadBanner: Failed to connect " + String.valueOf(statusCode));
-                App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
-                return;
-            }
-            client.getConnectionManager().shutdown();
-        } catch (Exception e) {
-            dlog.e(FMap.class.toString() + " loadBanner: eccezione in connessione ", e);
-            App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
-            return;
-        }
-        String jsonStr = builder.toString();
-        builder.delete(0, builder.length());
-        if (jsonStr.compareTo("") == 0) {
-            dlog.e(FMap.class.toString() + " loadBanner: nessuna connessione");
-            App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
-            return;
-        }
-
-        DLog.I(FMap.class.toString() + " loadBanner: risposta " + jsonStr);
-        File file = new File(outDir, "placeholder.lol");
-
-        try {
-            JSONObject json = new JSONObject(jsonStr);
-
-            //Get the instance of JSONArray that contains JSONObjects
-            JSONArray jsonArray = json.optJSONArray("Image");
-
-            //Iterate the jsonArray and print the info of JSONObjects
-
-            Bundle Image = new Bundle();
-            JSONObject jsonObject = jsonArray.getJSONObject(0);
-
-            Image.putString("ID", jsonObject.getString("ID"));
-            Image.putString("URL", jsonObject.getString("URL"));
-            Image.putString(("CLICK"), jsonObject.getString("CLICK"));
-            Image.putString(("INDEX"), jsonObject.getString("INDEX"));
-            Image.putString(("END"), jsonObject.getString("END"));
-            if (jsonObject.has("FLEET"))
-                updateFleet(jsonObject.getInt("FLEET"));
-
-            App.BannerName.putBundle(type, Image);
-
-            //ricavo nome file
-            URL urlImg = new URL(Image.getString("URL"));
-            String extension = urlImg.getFile().substring(urlImg.getFile().lastIndexOf('.') + 1);
-            String filename = Image.getString("ID").concat(".").concat(extension);
-
-            //download imagine se non esiste
-            file = new File(outDir, filename);
-
-            if (file.exists()) {
-                Image.putString(("FILENAME"), filename);
-                App.BannerName.putBundle(type, Image);
-                dlog.i(FMap.class.toString() + " loadBanner: file già esistente: " + filename);
-                return;
-            }
-
-            dlog.i(FMap.class.toString() + " loadBanner: file mancante inizio download a url: " + urlImg.toString());
-            HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setDoOutput(true);
-            urlConnection.connect();
-            if (file.createNewFile()) {
-                file.createNewFile();
-            }
-            FileOutputStream fileOutput = new FileOutputStream(file);
-            InputStream inputStream = urlConnection.getInputStream();
-            int totalSize = urlConnection.getContentLength();
-            int downloadedSize = 0;
-            byte[] buffer = new byte[1024];
-            int bufferLength = 0;
-            while ((bufferLength = inputStream.read(buffer)) > 0) {
-                fileOutput.write(buffer, 0, bufferLength);
-                //downloadedSize += bufferLength;
-                //Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
-            }
-            fileOutput.close();
-            urlConnection.disconnect();
-            inputStream.close();
-            Image.putString(("FILENAME"), filename);
-            App.BannerName.putBundle(type, Image);
-            DLog.I(FMap.class.toString() + " loadBanner: File scaricato e creato " + filename);
-
-        } catch (Exception e) {
-            if (file.exists()) file.delete();
-            App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
-            dlog.e(FMap.class.toString() + " loadBanner: eccezione in creazione e download file ", e);
-
-            e.printStackTrace();
-        }
-
-    }
-
-    public void updateBanner(String type) {
-
-        File ImageV;
-        Bundle Banner = App.BannerName.getBundle(type);
-        if (Banner != null) {
-            ImageV = new File(App.getBannerImagesFolder(), Banner.getString("FILENAME", "nope"));
-
-            try {
-                if (ImageV != null && ImageV.exists()) {
-                    dlog.d(FMap.class.toString() + " updateBanner: file trovato imposto immagine " + ImageV.getName());
-                    Bitmap myBitmap = BitmapFactory.decodeFile(ImageV.getAbsolutePath());
-                    if (myBitmap == null) {
-
-                        dlog.e(FMap.class.toString() + " updateBanner: file corrotto, elimino e visualizzo offline ");
-                        ImageV.delete();
-                        //initWebBanner(Banner.getString("URL",null));
-                        //webViewBanner.setVisibility(View.INVISIBLE);
-                        adIV.setImageResource(R.drawable.car_banner_offline);
-                        adIV.setVisibility(View.VISIBLE);
-                        if (!FHome.started) {
-                            FHome.started = !FHome.started;
-                            FHome.timer_2min.cancel();
-                            FHome.timer_2min.start();
-                        }
-                        return;
-                    }
-                    //webViewBanner.setVisibility(View.INVISIBLE);
-                    adIV.setImageBitmap(myBitmap);
-                    adIV.setVisibility(View.VISIBLE);
-                    //adIV.invalidate(); testinva
-
-                }
-            } catch (Exception e) {
-                dlog.e(FMap.class.toString() + " updateBanner: eccezione in caricamento file visualizzo offline ", e);
-                e.printStackTrace();
-                //initWebBanner(Banner.getString("URL",null));
-                //webViewBanner.setVisibility(View.INVISIBLE);
-                adIV.setImageResource(R.drawable.car_banner_offline);
-                adIV.setVisibility(View.VISIBLE);
-
-            }
-        } else {
-            dlog.e(FMap.class.toString() + " updateBanner: Bundle null, visualizzo offline");
-            //initWebBanner(Banner.getString("URL",null));
-            //webViewBanner.setVisibility(View.INVISIBLE);
-            adIV.setImageResource(R.drawable.car_banner_offline);
-            adIV.setVisibility(View.VISIBLE);
-
-        }
-
-        if (!FHome.started) {
-            FHome.started = !FHome.started;
-            FHome.timer_2min.cancel();
-            FHome.timer_2min.start();
-        }
-    }
-
-    private void updateFleet(int fleet) {
-
-        dlog.d("updateFleet: ricevuto fleet id " + fleet);
-        if (App.FleetId != fleet && fleet != 0) {
-            App.FleetId = fleet;
-            App.Instance.persistFleetId();
-            switch (fleet) {
-                case 1:
-                    App.Instance.SaveDefaultCity("Milano");
-                    break;
-                case 2:
-                    App.Instance.SaveDefaultCity("Firenze");
-                    break;
-                case 3:
-                    App.Instance.SaveDefaultCity("Roma");
-                    break;
-                case 4:
-                    App.Instance.SaveDefaultCity("Modena");
-                    break;
-            }
-        }
-
-    }
-
-    private List<Poi> retriveChargingList() {
-
-        DbManager dbm = App.Instance.dbManager;
-        eu.philcar.csg.OBC.db.Pois DaoPois = dbm.getPoisDao();
-        return DaoPois.getCityPois(App.DefaultCity);
-
-    }
-
-    private boolean drawChargingStation() {
-
-        if (!firstUpReceived) {
-            return false;
-        }
-        dlog.d("drawChargingStation: " + firstUpReceived);
-
-        if (mapView == null || getActivity() == null) {
-            dlog.d(" drawPois: mapViw null or contemporary called, or activity null");
-            return false;
-        }
-
-        try {
-            //mapView.deleteAllAnnotationsAndCustomPOIs();
-            customView = (RelativeLayout) ((LayoutInflater) (getActivity()).getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
-                    R.layout.layout_custom_view_poi, null, false);
-            List<SKAnnotation> MapAnnotations = mapView.getAllAnnotations();
-            ArrayList<Bundle> PoisTemp = Pois;
-
-            //annotationList.clear();
-            customView.requestLayout();
-            for (Bundle poi : PoisTemp) {
-                Bitmap myBitmap;
-                SKAnnotation annotation = new SKAnnotation(poi.getInt("INDEX"));
-                annotation.setLocation(new SKCoordinate(poi.getDouble("LON"), poi.getDouble("LAT")));
-                switch (poi.getInt("type", 0)) {
-                    case 3://Charging station
-                        annotation.setMininumZoomLevel(9);
-                        break;
-                    default:
-                        continue;
-                }
-                //annotation.setAnnotationType(SKAnnotation.SK_ANNOTATION_TYPE_GREEN);
-                SKAnnotationView annotationView = new SKAnnotationView();
-
-                if (customView.findViewById(R.id.customView_poi) != null) {
-
-                    ((ImageView) (customView.findViewById(R.id.customView_poi))).setImageResource(R.drawable.poi_bonus);
-
-                    //((ImageView) (customView.findViewById(R.id.customView_poi))).invalidate(); testinva
-                    annotationView.setView(customView.findViewById(R.id.customView_poi));
-
-                }
-                annotation.setAnnotationView(annotationView);
-
-                //annotation.setAnnotationType(SKAnnotation.SK_ANNOTATION_TYPE_DESTINATION_FLAG);
-
-                annotationList.add(annotation);
-                mapView.addAnnotation(annotation, SKAnimationSettings.ANIMATION_NONE);
-
-            }
-            //mapView.deleteAllAnnotationsAndCustomPOIs();
-
-            customView.removeAllViews();
-        } catch (Exception e) {
-            DLog.E("error handling bitmap", e);
-
-            return false;
-        }
-
-        return true;
-    }
-
-    public void updatePoiInfo(int status, Poi Poi) {
-
-        if (drawCharging) {
-            //rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
-            //localHandler.sendEmptyMessageDelayed(MSG_CLOSE_SOC_ALERT, 60000);
-            //((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_bonus_title);
-            //((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_bonus);
-            drawCharging = false;
-            firstUpReceived = true;
-            drawChargingStation();
-            dlog.d("Displayed bonus poi");
-
-        }
-        if (status > 0) {
-            if (!animQueue.contains("bonus")) {
-                animQueue.add("bonus");
-                drawChargingStation();
-                dlog.d("Stating bonus anim");
-
-            }
-            if (no3gwarning.getAnimation() == null)
-                no3gwarning.startAnimation(alertAnimation);
-        } else {
-
-            if (animQueue.contains("bonus")) {
-                animQueue.remove("bonus");
-            }
-        }
-    }
-
-    private void queueTTS(String text) {
-        try {
-            if (!ProTTS.reqSystem) {
-                ProTTS.askForSystem();
-                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM, LowLevelInterface.AUDIO_LEVEL_ALERT);
-            }
-            tts.speak(text);
-            dlog.d("queueTTS: leggo " + text);
-
-        } catch (Exception e) {
-            dlog.e("queueTTS exception while start speak", e);
-        }
-
-    }
-
-    private void playAlertAdvice(int resID, String name) {
-        try {
-            if (!AudioPlayer.reqSystem) {
-                AudioPlayer.askForSystem();
-                ((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM, LowLevelInterface.AUDIO_LEVEL_ALERT);
-            }
-            player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/" + resID));
-            dlog.d("playAlertAdvice: play " + name);
-            dlog.cr("Riproduco avviso vocale: play " + name);
-
-        } catch (Exception e) {
-            dlog.e("playAlertAdvice exception while start speak", e);
-        }
-
-    }
+		return "0";
+	}
+
+	private void updatePoiIcon(String Url) {
+		try {
+
+			String jsonStr = "";
+			if (Icons != null)
+				Icons.clear();
+
+			File outDir = new File(App.getPoiIconFolder());
+			if (!outDir.isDirectory()) {
+				outDir.mkdir();
+			}
+
+			Url = Url.concat("?ID=").concat(maxIconID(App.getPoiIconFolder()));
+			dlog.d("updatePoiIcon: load url" + Url);
+			StringBuilder builder = new StringBuilder();
+			HttpClient client = new DefaultHttpClient();
+			HttpGet httpGet = new HttpGet(Url);
+			try {
+				HttpResponse response = client.execute(httpGet);
+				StatusLine statusLine = response.getStatusLine();
+				int statusCode = statusLine.getStatusCode();
+				if (statusCode == 200) {
+					App.update_Poi = new Date();
+					HttpEntity entity = response.getEntity();
+					InputStream content = entity.getContent();
+					BufferedReader reader = new BufferedReader(
+							new InputStreamReader(content));
+					String line;
+					while ((line = reader.readLine()) != null) {
+						builder.append(line);
+					}
+					reader.close();
+					content.close();
+				} else {
+
+					dlog.e(FMap.class.toString() + "Failed to download file");
+				}
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (NetworkOnMainThreadException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				client.getConnectionManager().shutdown();
+			}
+			jsonStr = builder.toString();
+			builder.delete(0, builder.length());
+			dlog.d("updatePoiIcon got Response: " + jsonStr);
+			parseJsonIcon(jsonStr);
+			String filename = "";
+			FileOutputStream fileOutput = null;
+			InputStream inputStream = null;
+
+			for (Bundle Icon : Icons) {    //-- start loop download and save image
+				try {
+					URL url = new URL(Icon.getString("URL"));
+					String extension = url.getFile().substring(url.getFile().lastIndexOf('.') + 1);
+					filename = Icon.getString("ID").concat(".").concat(extension);
+					dlog.d("Local filename:" + filename);
+					File file = new File(outDir, filename);
+
+					if (file.exists())
+						continue;
+
+					HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+					urlConnection.setRequestMethod("GET");
+					urlConnection.setDoOutput(true);
+					urlConnection.connect();
+					if (file.createNewFile()) {
+						file.createNewFile();
+					}
+					fileOutput = new FileOutputStream(file);
+					inputStream = urlConnection.getInputStream();
+					byte[] buffer = new byte[1024];
+					int bufferLength = 0;
+					while ((bufferLength = inputStream.read(buffer)) > 0) {
+						fileOutput.write(buffer, 0, bufferLength);
+					}
+
+					urlConnection.disconnect();
+				} catch (Exception e) {
+					dlog.e("Exception while downloading image");
+					File file = new File(outDir, filename);
+					if (file.exists())
+						file.delete();
+				} finally {
+					if (fileOutput != null)
+						fileOutput.close();
+					if (inputStream != null)
+						inputStream.close();
+				}
+			}
+			//return filepath;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return;
+
+	}
+
+	private void parseJsonIcon(String jsonStr) {
+
+		try {
+			JSONObject json = new JSONObject(jsonStr);
+			Log.i(FMap.class.getName(), "creazione oggetto Json");
+			//Get the instance of JSONArray that contains JSONObjects
+			JSONArray jsonArray = json.optJSONArray("Icons");
+
+			//Iterate the jsonArray and print the info of JSONObjects
+			for (int k = 0; k < jsonArray.length(); k++) {
+				Bundle Icon = new Bundle();
+				JSONObject jsonObject = jsonArray.getJSONObject(k);
+				if (jsonObject.has("ID"))
+					Icon.putString("ID", jsonObject.getString("ID"));
+				if (jsonObject.has("URL"))
+					Icon.putString("URL", jsonObject.getString("URL"));
+				Icons.add(Icon);
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void updatePoiPos(String Url) {
+		try {
+
+			String jsonStr = "";
+
+			File outDir = new File(App.getPoiPositionFolder());
+			if (!outDir.isDirectory()) {
+				outDir.mkdir();
+			}
+			File outputFile = new File(outDir, "POIS_POS.json");
+
+			StringBuilder builder = new StringBuilder();
+			Writer writer;
+			HttpClient client = new DefaultHttpClient();
+			List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
+			if (!jsonmd5.equals("")) {
+				paramsList.add(new BasicNameValuePair("md5", jsonmd5));//Url = Url.concat("?md5=").concat(jsonmd5);
+			}
+			paramsList.add(new BasicNameValuePair("versione", "2")); //corrisponde al type massimo di poi che gestisce
+			paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));
+			Url = UrlTools.buildQuery(Url.concat("?"), paramsList).toString();
+			dlog.d(FMap.class.toString() + " updatePoiPos: Richiesta url " + Url);
+			HttpGet httpGet = new HttpGet(Url);
+			try {
+				HttpResponse response = client.execute(httpGet);
+				StatusLine statusLine = response.getStatusLine();
+				int statusCode = statusLine.getStatusCode();
+				if (statusCode == 200) {
+					App.update_Poi = new Date();
+					HttpEntity entity = response.getEntity();
+					InputStream content = entity.getContent();
+					BufferedReader reader = new BufferedReader(
+							new InputStreamReader(content));
+					String line;
+					while ((line = reader.readLine()) != null) {
+						builder.append(line);
+					}
+					reader.close();
+					content.close();
+				} else {
+
+					dlog.e(FMap.class.toString() + "updatePoiPos: Failed to download file: " + statusLine.toString());
+				}
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (NetworkOnMainThreadException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				client.getConnectionManager().shutdown();
+			}
+			jsonStr = builder.toString();
+			dlog.d(FMap.class.toString() + " updatePoiPos: Risposta a url " + jsonStr);
+			if (jsonStr.equals(""))
+				return;
+			parseJsonPos(jsonStr);
+			try {
+
+				if (!outDir.isDirectory()) {
+					throw new IOException(
+							"Unable to create directory . Maybe the SD card is mounted?");
+				}
+				writer = new BufferedWriter(new FileWriter(outputFile));
+				writer.write(jsonStr);
+
+				writer.close();
+				jsonmd5 = md5(jsonStr);
+				if (mapView != null) {
+					mapView.deleteAllAnnotationsAndCustomPOIs();
+					drawPOIS();
+					drawChargingStation();
+				}
+
+				dlog.d(FMap.class.toString() + " updatePoiPos: Poi aggiornati");
+			} catch (IOException e) {
+				dlog.e(FMap.class.toString() + " updatePoiPos: eccezione nel salvataggio del json o crazione Poi ", e);
+
+			}
+		} catch (Exception e) {
+			dlog.e(FMap.class.toString() + " updatePoiPos: eccezione nel reperimento e salvataggio del json ", e);
+			e.printStackTrace();
+		}
+
+		return;
+
+	}
+
+	private void parseJsonPos(String jsonStr) {
+
+		//dlog.d(FMap.class.getName()+ " parseJsonPos: parse del json: "+jsonStr);
+		if (jsonStr.equals(""))
+			return;
+
+		try {
+
+			JSONObject json = new JSONObject(jsonStr);
+
+			//Get the instance of JSONArray that contains JSONObjects
+			JSONArray jsonArray = json.optJSONArray("Position");
+
+			//Iterate the jsonArray and print the info of JSONObjects
+			ArrayList<Bundle> PoisTemp = new ArrayList<Bundle>();
+
+			int k;
+			for (k = 0; k < jsonArray.length(); k++) {
+				Bundle Poi = new Bundle();
+				JSONObject jsonObject = jsonArray.getJSONObject(k);
+				try {
+					if (jsonObject.has("ID"))
+						Poi.putInt("ID", Integer.parseInt(jsonObject.getString("ID")));
+					if (jsonObject.has("LAT"))
+						Poi.putDouble("LAT", Double.parseDouble(jsonObject.getString("LAT")));
+					if (jsonObject.has("LON"))
+						Poi.putDouble("LON", Double.parseDouble(jsonObject.getString("LON")));
+					if (jsonObject.has("id_icon"))
+						Poi.putString("id_icon", jsonObject.getString("id_icon"));
+					if (jsonObject.has("address"))
+						Poi.putString("address", jsonObject.getString("address"));
+					if (jsonObject.has("nome"))
+						Poi.putString("nome", jsonObject.getString("nome"));
+					Poi.putInt("INDEX", k + 10);
+					if (jsonObject.has("type"))
+						Poi.putInt("type", jsonObject.getInt("type"));
+					if (jsonObject.has("description"))
+						Poi.putString("description", jsonObject.getString("description"));
+					if (jsonObject.has("code"))
+						Poi.putString("code", jsonObject.getString("code"));
+				} catch (Exception e) {
+
+					dlog.e(FMap.class.getName() + " parseJsonPos: eccezione durante  parse JsonObject", e);
+				}
+				PoisTemp.add(Poi);
+
+			}
+
+			List<Poi> PoiList = retriveChargingList();
+
+			for (Poi singlePoi : PoiList) {
+				Bundle Poi = new Bundle();
+				try {
+					Poi.putInt("ID", singlePoi.id);
+					Poi.putDouble("LAT", singlePoi.lat);
+					Poi.putDouble("LON", singlePoi.lon);
+					Poi.putString("id_icon", "pois_icon");
+					Poi.putString("address", singlePoi.town);
+					Poi.putString("nome", singlePoi.name);
+					Poi.putInt("INDEX", k + 10);
+					Poi.putInt("type", 3);
+					Poi.putString("description", singlePoi.type);
+					Poi.putString("code", singlePoi.code);
+				} catch (Exception e) {
+
+					dlog.e(FMap.class.getName() + " parseJsonPos: eccezione durante  parse JsonObject", e);
+				}
+				PoisTemp.add(Poi);
+				k++;
+			}
+
+			if (!PoisTemp.equals(Pois))
+				Pois = PoisTemp;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public String md5(String encTarget) {
+		MessageDigest mdEnc = null;
+		try {
+			mdEnc = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			dlog.e(FMap.class.toString() + " md5: Exception while encrypting to md5", e);
+			e.printStackTrace();
+		} // Encryption algorithm
+		mdEnc.update(encTarget.getBytes(), 0, encTarget.length());
+		String md5 = new BigInteger(1, mdEnc.digest()).toString(16);
+		while (md5.length() < 32) {
+			md5 = "0" + md5;
+		}
+		mdEnc.reset();
+		return md5;
+	}
+
+	public static String convertStreamToString(InputStream is) throws Exception {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		StringBuilder sb = new StringBuilder();
+		String line = null;
+		while ((line = reader.readLine()) != null) {
+			sb.append(line);
+		}
+		reader.close();
+		return sb.toString();
+	}
+
+	public static String getStringFromFile(String filePath) throws Exception {
+		File fl = new File(filePath);
+		FileInputStream fin = new FileInputStream(fl);
+		String ret = convertStreamToString(fin);
+		//Make sure you close all streams.
+		fin.close();
+		return ret;
+	}
+
+	public void hideCustomNavigationCallout() {
+		if (navigationCallout != null)
+			navigationCallout.hide();
+	}
+
+	private final BroadcastReceiver ConnectivityChangeReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context c, Intent i) {
+			boolean status = SystemControl.hasNetworkConnection(c, eventRepository);
+
+			if (status) {
+				if (animQueue.contains("3g")) {
+					animQueue.remove("3g");
+				}
+
+			} else {
+				if (!animQueue.contains("3g")) {
+					animQueue.add("3g");
+				}
+				if (no3gwarning.getAnimation() == null)
+					no3gwarning.startAnimation(alertAnimation);
+			}
+		}
+
+	};
+
+	public void loadBanner(String Url, String type, Boolean isClick) {
+
+		File outDir = new File(App.getBannerImagesFolder());
+		if (!outDir.isDirectory()) {
+			outDir.mkdir();
+		}
+
+		if (App.parkMode.isOn()) {
+
+			dlog.i("loadBanner: Park mode ON");
+			return;
+		}
+
+		if (!App.hasNetworkConnection()) {
+			dlog.e(FMap.class.toString() + " loadBanner: nessuna connessione");
+			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+			return;
+		}
+		StringBuilder builder = new StringBuilder();
+		List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
+		HttpResponse response = null;
+		if (!isClick) {
+
+			if (App.currentTripInfo != null && App.currentTripInfo.customer != null)
+				paramsList.add(new BasicNameValuePair("id", App.currentTripInfo.customer.id + ""));//App.currentTripInfo.customer.id + "")); //"3"));
+
+			if (App.getLastLocation() != null) {
+				paramsList.add(new BasicNameValuePair("lat", App.getLastLocation().getLatitude() + ""));
+				paramsList.add(new BasicNameValuePair("lon", App.getLastLocation().getLongitude() + ""));
+			}
+			paramsList.add(new BasicNameValuePair("id_fleet", App.FleetId + ""));
+			paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));//"ED93107"));//App.CarPlate));
+		}
+		try {
+			if (App.BannerName.getBundle(type) != null)
+				paramsList.add(new BasicNameValuePair("index", App.BannerName.getBundle(type).getString("INDEX", null)));
+
+			if (App.BannerName.getBundle(type) != null)
+				paramsList.add(new BasicNameValuePair("end", App.BannerName.getBundle(type).getString("END", null)));
+
+			Url = UrlTools.buildQuery(Url.concat("?"), paramsList).toString();
+			//connessione per scaricare id immagine
+
+			DLog.I(FMap.class.toString() + " loadBanner: Url richiesta " + Url);
+			HttpClient client = new DefaultHttpClient();
+			HttpGet httpGet = new HttpGet(Url);
+
+			response = client.execute(httpGet);
+			StatusLine statusLine = response.getStatusLine();
+			int statusCode = statusLine.getStatusCode();
+			if (statusCode == 200) {
+				//App.update_StartImages = new Date();
+				HttpEntity entity = response.getEntity();
+				InputStream content = entity.getContent();
+				BufferedReader reader = new BufferedReader(
+						new InputStreamReader(content));
+				String line;
+				while ((line = reader.readLine()) != null) {
+					builder.append(line);
+				}
+				content.close();
+				reader.close();
+			} else {
+
+				dlog.e(FMap.class.toString() + " loadBanner: Failed to connect " + String.valueOf(statusCode));
+				App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+				return;
+			}
+			client.getConnectionManager().shutdown();
+		} catch (Exception e) {
+			dlog.e(FMap.class.toString() + " loadBanner: eccezione in connessione ", e);
+			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+			return;
+		}
+		String jsonStr = builder.toString();
+		builder.delete(0, builder.length());
+		if (jsonStr.compareTo("") == 0) {
+			dlog.e(FMap.class.toString() + " loadBanner: nessuna connessione");
+			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+			return;
+		}
+
+		DLog.I(FMap.class.toString() + " loadBanner: risposta " + jsonStr);
+		File file = new File(outDir, "placeholder.lol");
+
+		try {
+			JSONObject json = new JSONObject(jsonStr);
+
+			//Get the instance of JSONArray that contains JSONObjects
+			JSONArray jsonArray = json.optJSONArray("Image");
+
+			//Iterate the jsonArray and print the info of JSONObjects
+
+			Bundle Image = new Bundle();
+			JSONObject jsonObject = jsonArray.getJSONObject(0);
+
+			Image.putString("ID", jsonObject.getString("ID"));
+			Image.putString("URL", jsonObject.getString("URL"));
+			Image.putString(("CLICK"), jsonObject.getString("CLICK"));
+			Image.putString(("INDEX"), jsonObject.getString("INDEX"));
+			Image.putString(("END"), jsonObject.getString("END"));
+			if (jsonObject.has("FLEET"))
+				updateFleet(jsonObject.getInt("FLEET"));
+
+			App.BannerName.putBundle(type, Image);
+
+			//ricavo nome file
+			URL urlImg = new URL(Image.getString("URL"));
+			String extension = urlImg.getFile().substring(urlImg.getFile().lastIndexOf('.') + 1);
+			String filename = Image.getString("ID").concat(".").concat(extension);
+
+			//download imagine se non esiste
+			file = new File(outDir, filename);
+
+			if (file.exists()) {
+				Image.putString(("FILENAME"), filename);
+				App.BannerName.putBundle(type, Image);
+				dlog.i(FMap.class.toString() + " loadBanner: file già esistente: " + filename);
+				return;
+			}
+
+			dlog.i(FMap.class.toString() + " loadBanner: file mancante inizio download a url: " + urlImg.toString());
+			HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
+			urlConnection.setRequestMethod("GET");
+			urlConnection.setDoOutput(true);
+			urlConnection.connect();
+			if (file.createNewFile()) {
+				file.createNewFile();
+			}
+			FileOutputStream fileOutput = new FileOutputStream(file);
+			InputStream inputStream = urlConnection.getInputStream();
+			int totalSize = urlConnection.getContentLength();
+			int downloadedSize = 0;
+			byte[] buffer = new byte[1024];
+			int bufferLength = 0;
+			while ((bufferLength = inputStream.read(buffer)) > 0) {
+				fileOutput.write(buffer, 0, bufferLength);
+				//downloadedSize += bufferLength;
+				//Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
+			}
+			fileOutput.close();
+			urlConnection.disconnect();
+			inputStream.close();
+			Image.putString(("FILENAME"), filename);
+			App.BannerName.putBundle(type, Image);
+			DLog.I(FMap.class.toString() + " loadBanner: File scaricato e creato " + filename);
+
+		} catch (Exception e) {
+			if (file.exists()) file.delete();
+			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+			dlog.e(FMap.class.toString() + " loadBanner: eccezione in creazione e download file ", e);
+
+			e.printStackTrace();
+		}
+
+	}
+
+	public void updateBanner(String type) {
+
+		File ImageV;
+		Bundle Banner = App.BannerName.getBundle(type);
+		if (Banner != null) {
+			ImageV = new File(App.getBannerImagesFolder(), Banner.getString("FILENAME", "nope"));
+
+			try {
+				if (ImageV != null && ImageV.exists()) {
+					dlog.d(FMap.class.toString() + " updateBanner: file trovato imposto immagine " + ImageV.getName());
+					Bitmap myBitmap = BitmapFactory.decodeFile(ImageV.getAbsolutePath());
+					if (myBitmap == null) {
+
+						dlog.e(FMap.class.toString() + " updateBanner: file corrotto, elimino e visualizzo offline ");
+						ImageV.delete();
+						//initWebBanner(Banner.getString("URL",null));
+						//webViewBanner.setVisibility(View.INVISIBLE);
+						adIV.setImageResource(R.drawable.car_banner_offline);
+						adIV.setVisibility(View.VISIBLE);
+						if (!FHome.started) {
+							FHome.started = !FHome.started;
+							FHome.timer_2min.cancel();
+							FHome.timer_2min.start();
+						}
+						return;
+					}
+					//webViewBanner.setVisibility(View.INVISIBLE);
+					adIV.setImageBitmap(myBitmap);
+					adIV.setVisibility(View.VISIBLE);
+					//adIV.invalidate(); testinva
+
+				}
+			} catch (Exception e) {
+				dlog.e(FMap.class.toString() + " updateBanner: eccezione in caricamento file visualizzo offline ", e);
+				e.printStackTrace();
+				//initWebBanner(Banner.getString("URL",null));
+				//webViewBanner.setVisibility(View.INVISIBLE);
+				adIV.setImageResource(R.drawable.car_banner_offline);
+				adIV.setVisibility(View.VISIBLE);
+
+			}
+		} else {
+			dlog.e(FMap.class.toString() + " updateBanner: Bundle null, visualizzo offline");
+			//initWebBanner(Banner.getString("URL",null));
+			//webViewBanner.setVisibility(View.INVISIBLE);
+			adIV.setImageResource(R.drawable.car_banner_offline);
+			adIV.setVisibility(View.VISIBLE);
+
+		}
+
+		if (!FHome.started) {
+			FHome.started = !FHome.started;
+			FHome.timer_2min.cancel();
+			FHome.timer_2min.start();
+		}
+	}
+
+	private void updateFleet(int fleet) {
+
+		dlog.d("updateFleet: ricevuto fleet id " + fleet);
+		if (App.FleetId != fleet && fleet != 0) {
+			App.FleetId = fleet;
+			App.Instance.persistFleetId();
+			switch (fleet) {
+				case 1:
+					App.Instance.SaveDefaultCity("Milano");
+					break;
+				case 2:
+					App.Instance.SaveDefaultCity("Firenze");
+					break;
+				case 3:
+					App.Instance.SaveDefaultCity("Roma");
+					break;
+				case 4:
+					App.Instance.SaveDefaultCity("Modena");
+					break;
+			}
+		}
+
+	}
+
+	private List<Poi> retriveChargingList() {
+
+		DbManager dbm = App.Instance.dbManager;
+		eu.philcar.csg.OBC.db.Pois DaoPois = dbm.getPoisDao();
+		return DaoPois.getCityPois(App.DefaultCity);
+
+	}
+
+	private boolean drawChargingStation() {
+
+		if (!firstUpReceived) {
+			return false;
+		}
+		dlog.d("drawChargingStation: " + firstUpReceived);
+
+		if (mapView == null || getActivity() == null) {
+			dlog.d(" drawPois: mapViw null or contemporary called, or activity null");
+			return false;
+		}
+
+		try {
+			//mapView.deleteAllAnnotationsAndCustomPOIs();
+			customView = (RelativeLayout) ((LayoutInflater) (getActivity()).getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+					R.layout.layout_custom_view_poi, null, false);
+			List<SKAnnotation> MapAnnotations = mapView.getAllAnnotations();
+			ArrayList<Bundle> PoisTemp = Pois;
+
+			//annotationList.clear();
+			customView.requestLayout();
+			for (Bundle poi : PoisTemp) {
+				Bitmap myBitmap;
+				SKAnnotation annotation = new SKAnnotation(poi.getInt("INDEX"));
+				annotation.setLocation(new SKCoordinate(poi.getDouble("LON"), poi.getDouble("LAT")));
+				switch (poi.getInt("type", 0)) {
+					case 3://Charging station
+						annotation.setMininumZoomLevel(9);
+						break;
+					default:
+						continue;
+				}
+				//annotation.setAnnotationType(SKAnnotation.SK_ANNOTATION_TYPE_GREEN);
+				SKAnnotationView annotationView = new SKAnnotationView();
+
+				if (customView.findViewById(R.id.customView_poi) != null) {
+
+					((ImageView) (customView.findViewById(R.id.customView_poi))).setImageResource(R.drawable.poi_bonus);
+
+					//((ImageView) (customView.findViewById(R.id.customView_poi))).invalidate(); testinva
+					annotationView.setView(customView.findViewById(R.id.customView_poi));
+
+				}
+				annotation.setAnnotationView(annotationView);
+
+				//annotation.setAnnotationType(SKAnnotation.SK_ANNOTATION_TYPE_DESTINATION_FLAG);
+
+				annotationList.add(annotation);
+				mapView.addAnnotation(annotation, SKAnimationSettings.ANIMATION_NONE);
+
+			}
+			//mapView.deleteAllAnnotationsAndCustomPOIs();
+
+			customView.removeAllViews();
+		} catch (Exception e) {
+			DLog.E("error handling bitmap", e);
+
+			return false;
+		}
+
+		return true;
+	}
+
+	public void updatePoiInfo(int status, Poi Poi) {
+
+		if (drawCharging) {
+			//rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
+			//localHandler.sendEmptyMessageDelayed(MSG_CLOSE_SOC_ALERT, 60000);
+			//((TextView) (rootView.findViewById(R.id.fmapAlertTitleTV))).setText(R.string.alert_bonus_title);
+			//((TextView) (rootView.findViewById(R.id.fmapAlertDescTV))).setText(R.string.alert_bonus);
+			drawCharging = false;
+			firstUpReceived = true;
+			drawChargingStation();
+			dlog.d("Displayed bonus poi");
+
+		}
+		if (status > 0) {
+			if (!animQueue.contains("bonus")) {
+				animQueue.add("bonus");
+				drawChargingStation();
+				dlog.d("Stating bonus anim");
+
+			}
+			if (no3gwarning.getAnimation() == null)
+				no3gwarning.startAnimation(alertAnimation);
+		} else {
+
+			if (animQueue.contains("bonus")) {
+				animQueue.remove("bonus");
+			}
+		}
+	}
+
+	private void queueTTS(String text) {
+		try {
+			if (!ProTTS.reqSystem) {
+				ProTTS.askForSystem();
+				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM, LowLevelInterface.AUDIO_LEVEL_ALERT);
+			}
+			tts.speak(text);
+			dlog.d("queueTTS: leggo " + text);
+
+		} catch (Exception e) {
+			dlog.e("queueTTS exception while start speak", e);
+		}
+
+	}
+
+	private void playAlertAdvice(int resID, String name) {
+		try {
+			if (!AudioPlayer.reqSystem) {
+				AudioPlayer.askForSystem();
+				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM, LowLevelInterface.AUDIO_LEVEL_ALERT);
+			}
+			player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/" + resID));
+			dlog.d("playAlertAdvice: play " + name);
+			dlog.cr("Riproduco avviso vocale: play " + name);
+
+		} catch (Exception e) {
+			dlog.e("playAlertAdvice exception while start speak", e);
+		}
+
+	}
 
 }

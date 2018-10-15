@@ -7,27 +7,27 @@ import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
  */
 
 public class EventResponse extends BaseResponse {
-    private int result;
-    private String message;
+	private int result;
+	private String message;
 
-    public EventResponse(int result, String message) {
-        this.result = result;
-        this.message = message;
-    }
+	public EventResponse(int result, String message) {
+		this.result = result;
+		this.message = message;
+	}
 
-    public int getResult() {
-        return result;
-    }
+	public int getResult() {
+		return result;
+	}
 
-    public void setResult(int result) {
-        this.result = result;
-    }
+	public void setResult(int result) {
+		this.result = result;
+	}
 
-    public String getMessage() {
-        return message;
-    }
+	public String getMessage() {
+		return message;
+	}
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+	public void setMessage(String message) {
+		this.message = message;
+	}
 }

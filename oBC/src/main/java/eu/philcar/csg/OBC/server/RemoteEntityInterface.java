@@ -6,18 +6,18 @@ import java.util.List;
 
 public interface RemoteEntityInterface {
 
-    enum eDirection {UPLOAD, DOWNLOAD}
+	enum eDirection {UPLOAD, DOWNLOAD}
 
-    int MsgId();
+	int MsgId();
 
-    String GetRemoteUrl();
+	String GetRemoteUrl();
 
-    List<NameValuePair> GetParams();
+	List<NameValuePair> GetParams();
 
-    int DecodeJson(String response);
+	int DecodeJson(String response);
 
-    String EncodeJson();
+	String EncodeJson();
 
-    eDirection getDirection();
+	eDirection getDirection();
 
 }

@@ -24,118 +24,118 @@ import eu.philcar.csg.OBC.service.MessageFactory;
 @Deprecated
 public class FInstructionsClose extends FBase implements OnClickListener {
 
-    private DLog dlog = new DLog(this.getClass());
+	private DLog dlog = new DLog(this.getClass());
 
-    private View rootView;
-    private TextView tvOutside;
-    private Button End;
-    private RelativeLayout fins_right_FL;
+	private View rootView;
+	private TextView tvOutside;
+	private Button End;
+	private RelativeLayout fins_right_FL;
 
-    public static FInstructionsClose newInstance() {
+	public static FInstructionsClose newInstance() {
 
-        FInstructionsClose fm = new FInstructionsClose();
-        return fm;
-    }
+		FInstructionsClose fm = new FInstructionsClose();
+		return fm;
+	}
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        final View view = inflater.inflate(R.layout.f_instructions_close, container, false);
-        rootView = view;
-        dlog.d("OnCreareViewFInstructionClose");
+		final View view = inflater.inflate(R.layout.f_instructions_close, container, false);
+		rootView = view;
+		dlog.d("OnCreareViewFInstructionClose");
 
-        view.findViewById(R.id.fmenBackIB).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((ABase) getActivity()).popFragment();
-            }
+		view.findViewById(R.id.fmenBackIB).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((ABase) getActivity()).popFragment();
+			}
 
-        });
+		});
 
-        view.findViewById(R.id.finsSOSB).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getActivity(), ASOS.class));
-            }
-        });
+		view.findViewById(R.id.finsSOSB).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(getActivity(), ASOS.class));
+			}
+		});
 
-        Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
+		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 
-        ((TextView) view.findViewById(R.id.fins_message_TV)).setTypeface(font);
-        tvOutside = (TextView) view.findViewById(R.id.tvOutside);
-        ((TextView) view.findViewById(R.id.finsInstructions1TV)).setTypeface(font);
-        ((TextView) view.findViewById(R.id.finsInstructions2TV)).setTypeface(font);
-        ((TextView) view.findViewById(R.id.finsInstructions3TV)).setTypeface(font);
-        ((TextView) view.findViewById(R.id.finsInstructions4TV)).setTypeface(font);
-        ((TextView) view.findViewById(R.id.finsInstructions5TV)).setTypeface(font);
+		((TextView) view.findViewById(R.id.fins_message_TV)).setTypeface(font);
+		tvOutside = (TextView) view.findViewById(R.id.tvOutside);
+		((TextView) view.findViewById(R.id.finsInstructions1TV)).setTypeface(font);
+		((TextView) view.findViewById(R.id.finsInstructions2TV)).setTypeface(font);
+		((TextView) view.findViewById(R.id.finsInstructions3TV)).setTypeface(font);
+		((TextView) view.findViewById(R.id.finsInstructions4TV)).setTypeface(font);
+		((TextView) view.findViewById(R.id.finsInstructions5TV)).setTypeface(font);
 
-        ((AMainOBC) getActivity()).sendMessage(MessageFactory.RadioVolume(0));
+		((AMainOBC) getActivity()).sendMessage(MessageFactory.RadioVolume(0));
 
-        fins_right_FL = (RelativeLayout) view.findViewById(R.id.fins_right_FL);
+		fins_right_FL = (RelativeLayout) view.findViewById(R.id.fins_right_FL);
 
-        view.findViewById(R.id.ivDamages).setOnClickListener(this);
-        view.findViewById(R.id.fmenPauseRentIB).setOnClickListener(this);
-        End = (Button) view.findViewById(R.id.fmenEndRentIB);
-        view.findViewById(R.id.fmenEndRentIB).setOnClickListener(this);
+		view.findViewById(R.id.ivDamages).setOnClickListener(this);
+		view.findViewById(R.id.fmenPauseRentIB).setOnClickListener(this);
+		End = (Button) view.findViewById(R.id.fmenEndRentIB);
+		view.findViewById(R.id.fmenEndRentIB).setOnClickListener(this);
 
-        if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
-            fins_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
+		if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
+			fins_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
-        } else {
-            fins_right_FL.setBackgroundColor(getResources().getColor(R.color.background_green));
-        }
-        End.setVisibility(View.VISIBLE);
-        tvOutside.setVisibility(View.GONE);
-        return view;
-    }
+		} else {
+			fins_right_FL.setBackgroundColor(getResources().getColor(R.color.background_green));
+		}
+		End.setVisibility(View.VISIBLE);
+		tvOutside.setVisibility(View.GONE);
+		return view;
+	}
 
-    @Override
-    public boolean handleBackButton() {
-        return true;
+	@Override
+	public boolean handleBackButton() {
+		return true;
 
-    }
+	}
 
-    @Override
-    public void onClick(View v) {
+	@Override
+	public void onClick(View v) {
 
-        switch (v.getId()) {
+		switch (v.getId()) {
 
-            case R.id.ivDamages:
-                Intent intent = new Intent(getActivity(), AGoodbye.class);
-                intent.putExtra("fragment", "damages");
-                startActivity(intent);
-                break;
+			case R.id.ivDamages:
+				Intent intent = new Intent(getActivity(), AGoodbye.class);
+				intent.putExtra("fragment", "damages");
+				startActivity(intent);
+				break;
 
-            case R.id.fmenEndRentIB:
-                //if((new Date().getTime()-App.AppStartupTime.getTime())>90000) {
-                if (((AMainOBC) getActivity()).isInsideParkArea()) {
+			case R.id.fmenEndRentIB:
+				//if((new Date().getTime()-App.AppStartupTime.getTime())>90000) {
+				if (((AMainOBC) getActivity()).isInsideParkArea()) {
 
-                    ((AMainOBC) getActivity()).sendMessage(MessageFactory.setEngine(false));
-                    startActivity(new Intent(getActivity(), AGoodbye.class));
-                    getActivity().finish();
-                } else {
-                    End.setVisibility(View.GONE);
-                    tvOutside.setVisibility(View.VISIBLE);
-                }
-                // else{
+					((AMainOBC) getActivity()).sendMessage(MessageFactory.setEngine(false));
+					startActivity(new Intent(getActivity(), AGoodbye.class));
+					getActivity().finish();
+				} else {
+					End.setVisibility(View.GONE);
+					tvOutside.setVisibility(View.VISIBLE);
+				}
+				// else{
 
-                //	End.setVisibility(View.GONE);
-                //	tvOutside.setVisibility(View.VISIBLE);
+				//	End.setVisibility(View.GONE);
+				//	tvOutside.setVisibility(View.VISIBLE);
 
-                //}
-                break;
+				//}
+				break;
 
-            case R.id.fmenPauseRentIB:
-                boolean startParkingMode = (App.getParkModeStarted() == null);
-                ((AMainOBC) getActivity()).setParkModeStarted(startParkingMode);
+			case R.id.fmenPauseRentIB:
+				boolean startParkingMode = (App.getParkModeStarted() == null);
+				((AMainOBC) getActivity()).setParkModeStarted(startParkingMode);
 
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
 
-                }
+				}
 
-                ((ABase) getActivity()).pushFragment(FPark.newInstance(), FPark.class.getName(), true);
+				((ABase) getActivity()).pushFragment(FPark.newInstance(), FPark.class.getName(), true);
 
 			/*
 			if (startParkingMode) {
@@ -149,24 +149,24 @@ public class FInstructionsClose extends FBase implements OnClickListener {
 			}
 			*/
 
-                break;
+				break;
 
-            case R.id.fmenSOSB:
-                startActivity(new Intent(getActivity(), ASOS.class));
-                break;
+			case R.id.fmenSOSB:
+				startActivity(new Intent(getActivity(), ASOS.class));
+				break;
 
-            case R.id.fmenBackIB:
-                //((ABase)getActivity()).popFragment();
-                try {
-                    ((ABase) getActivity()).popTillFragment(FHome.class.getName());
-                } catch (Exception e) {
-                    dlog.d("Exception while popping fragment");
-                }
+			case R.id.fmenBackIB:
+				//((ABase)getActivity()).popFragment();
+				try {
+					((ABase) getActivity()).popTillFragment(FHome.class.getName());
+				} catch (Exception e) {
+					dlog.d("Exception while popping fragment");
+				}
 
-                break;
+				break;
 
-        }
+		}
 
-    }
+	}
 
 }

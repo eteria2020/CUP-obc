@@ -6,16 +6,16 @@ package eu.philcar.csg.OBC.interfaces;
 
 public interface BasicJsonCollection {
 
-    boolean add(BasicJson unit);
+	boolean add(BasicJson unit);
 
-    BasicJson remove(int index);
+	BasicJson remove(int index);
 
-    String toJson();
+	String toJson();
 
-    BasicJson get(int index);
+	BasicJson get(int index);
 
-    boolean contains(BasicJson unit);
+	boolean contains(BasicJson unit);
 
-    BasicJson find(BasicJson unit);
+	BasicJson find(BasicJson unit);
 
 }

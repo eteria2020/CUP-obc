@@ -5,5 +5,5 @@ package eu.philcar.csg.OBC.db;
  */
 
 public interface CustomOp {
-    void onDbWrite();
+	void onDbWrite();
 }

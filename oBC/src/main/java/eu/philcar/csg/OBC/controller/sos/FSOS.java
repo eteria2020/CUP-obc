@@ -32,177 +32,177 @@ import eu.philcar.csg.OBC.service.MessageFactory;
 
 public class FSOS extends FBase implements OnClickListener {
 
-    public static FSOS newInstance() {
+	public static FSOS newInstance() {
 
-        FSOS fsos = new FSOS();
-        return fsos;
-    }
+		FSOS fsos = new FSOS();
+		return fsos;
+	}
 
-    @Inject
-    EventRepository eventRepository;
+	@Inject
+	EventRepository eventRepository;
 
-    private TextView messageTV, numberTV, tvCarPlate;
-    private ImageButton cancelIB;
-    private FrameLayout fsos_right_FL;
-    private Button changeNumberB, dialCallB;
-    private int logoTaps = 0;
-    private DLog dlog = new DLog(this.getClass());
+	private TextView messageTV, numberTV, tvCarPlate;
+	private ImageButton cancelIB;
+	private FrameLayout fsos_right_FL;
+	private Button changeNumberB, dialCallB;
+	private int logoTaps = 0;
+	private DLog dlog = new DLog(this.getClass());
 
-    private String customerCenterNumber;
+	private String customerCenterNumber;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        App.get(getActivity()).getComponent().inject(this);
-    }
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		App.get(getActivity()).getComponent().inject(this);
+	}
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.f_sos, container, false);
+		View view = inflater.inflate(R.layout.f_sos, container, false);
 
-        dlog.d("OnCreareView FSOS");
+		dlog.d("OnCreareView FSOS");
 
-        Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
+		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 
-        cancelIB = (ImageButton) view.findViewById(R.id.fsosCancelIB);
+		cancelIB = (ImageButton) view.findViewById(R.id.fsosCancelIB);
 
-        messageTV = (TextView) view.findViewById(R.id.fsosMessageTV);
-        numberTV = (TextView) view.findViewById(R.id.fsosNumberTV);
-        tvCarPlate = (TextView) view.findViewById(R.id.tvCarPlate);
-        fsos_right_FL = (FrameLayout) view.findViewById(R.id.fsos_right_FL);
+		messageTV = (TextView) view.findViewById(R.id.fsosMessageTV);
+		numberTV = (TextView) view.findViewById(R.id.fsosNumberTV);
+		tvCarPlate = (TextView) view.findViewById(R.id.tvCarPlate);
+		fsos_right_FL = (FrameLayout) view.findViewById(R.id.fsos_right_FL);
 
-        numberTV.setTypeface(font);
+		numberTV.setTypeface(font);
 
-        messageTV.setTypeface(font);
+		messageTV.setTypeface(font);
 
-        tvCarPlate.setTypeface(font);
+		tvCarPlate.setTypeface(font);
 
-        if (App.CarPlate.equalsIgnoreCase("XH123KM"))
-            tvCarPlate.setText("CONFIGURARE TARGA");
-        else
-            tvCarPlate.setText(App.CarPlate);
+		if (App.CarPlate.equalsIgnoreCase("XH123KM"))
+			tvCarPlate.setText("CONFIGURARE TARGA");
+		else
+			tvCarPlate.setText(App.CarPlate);
 
-        dialCallB = (Button) view.findViewById(R.id.fsosDialCallB);
-        changeNumberB = (Button) view.findViewById(R.id.fsosChangeNumberB);
+		dialCallB = (Button) view.findViewById(R.id.fsosDialCallB);
+		changeNumberB = (Button) view.findViewById(R.id.fsosChangeNumberB);
 
-        messageTV.setText(R.string.call_book);
-        view.findViewById(R.id.fsosAlertIV).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logoTaps++;
-            }
-        });
+		messageTV.setText(R.string.call_book);
+		view.findViewById(R.id.fsosAlertIV).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				logoTaps++;
+			}
+		});
 
-        // Verify long press after min 5 taps for show service login dialog
-        view.findViewById(R.id.fsosAlertIV).setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (logoTaps >= 5) {
-                    logoTaps = 0;
-                    askAdminPassword();
-                }
-                return true;
-            }
-        });
+		// Verify long press after min 5 taps for show service login dialog
+		view.findViewById(R.id.fsosAlertIV).setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				if (logoTaps >= 5) {
+					logoTaps = 0;
+					askAdminPassword();
+				}
+				return true;
+			}
+		});
 
-        dialCallB.setOnClickListener(this);
-        changeNumberB.setOnClickListener(this);
-        cancelIB.setOnClickListener(this);
+		dialCallB.setOnClickListener(this);
+		changeNumberB.setOnClickListener(this);
+		cancelIB.setOnClickListener(this);
 
-        if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
-            fsos_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
+		if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
+			fsos_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
-        } else {
-            fsos_right_FL.setBackgroundColor(getResources().getColor(R.color.background_green));
-        }
-        return view;
-    }
+		} else {
+			fsos_right_FL.setBackgroundColor(getResources().getColor(R.color.background_green));
+		}
+		return view;
+	}
 
-    @Override
-    public void onResume() {
+	@Override
+	public void onResume() {
 
-        super.onResume();
+		super.onResume();
 
-        if (App.currentTripInfo != null && App.currentTripInfo.customer != null) {
-            customerCenterNumber = App.currentTripInfo.customer.mobile;
-        } else {
-            customerCenterNumber = "";
-        }
+		if (App.currentTripInfo != null && App.currentTripInfo.customer != null) {
+			customerCenterNumber = App.currentTripInfo.customer.mobile;
+		} else {
+			customerCenterNumber = "";
+		}
 
-        numberTV.setText(customerCenterNumber);
-    }
+		numberTV.setText(customerCenterNumber);
+	}
 
-    public void failedSos() {
+	public void failedSos() {
 
-        messageTV.setText(R.string.call_dealt);
-        messageTV.setText(String.format(getString(R.string.call_error), App.callCenterNumer));
-    }
+		messageTV.setText(R.string.call_dealt);
+		messageTV.setText(String.format(getString(R.string.call_error), App.callCenterNumer));
+	}
 
-    @Override
-    public void onClick(View v) {
+	@Override
+	public void onClick(View v) {
 
-        switch (v.getId()) {
+		switch (v.getId()) {
 
-            case R.id.fsosCancelIB:
-                ((ABase) getActivity()).popFragment();
-                break;
+			case R.id.fsosCancelIB:
+				((ABase) getActivity()).popFragment();
+				break;
 
-            case R.id.fsosChangeNumberB:
-                dlog.d("Click on fsosChangeNumberB");
-                ((ABase) getActivity()).pushFragment(FNumber.newInstance(), FNumber.class.getName(), true);
-                break;
+			case R.id.fsosChangeNumberB:
+				dlog.d("Click on fsosChangeNumberB");
+				((ABase) getActivity()).pushFragment(FNumber.newInstance(), FNumber.class.getName(), true);
+				break;
 
-            case R.id.fsosDialCallB:
+			case R.id.fsosDialCallB:
 
-                ((ASOS) getActivity()).sendMessage(MessageFactory.requestCallCenterCallSOS(customerCenterNumber));
+				((ASOS) getActivity()).sendMessage(MessageFactory.requestCallCenterCallSOS(customerCenterNumber));
 
-                changeNumberB.setVisibility(View.INVISIBLE);
-                dialCallB.setVisibility(View.INVISIBLE);
-                messageTV.setText(R.string.call_dealt);
-                break;
-        }
-    }
+				changeNumberB.setVisibility(View.INVISIBLE);
+				dialCallB.setVisibility(View.INVISIBLE);
+				messageTV.setText(R.string.call_dealt);
+				break;
+		}
+	}
 
-    private void askAdminPassword() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+	private void askAdminPassword() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
 
-        ((ASOS) this.getActivity()).sendMessage(MessageFactory.setDisplayStatus(true));
+		((ASOS) this.getActivity()).sendMessage(MessageFactory.setDisplayStatus(true));
 
-        builder.setTitle("Accesso manutenzione");
+		builder.setTitle("Accesso manutenzione");
 
-        // Add edit text for password input
-        final EditText input = new EditText(this.getActivity());
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
+		// Add edit text for password input
+		final EditText input = new EditText(this.getActivity());
+		input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+		builder.setView(input);
 
-        // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String pwd = input.getText().toString();
-                App.isAdmin = 0;
-                //TODO: use external config for password in hashed form
-                if (pwd.equals("Roger18")) App.isAdmin = 1;
-                if (pwd.equals("redrum18")) App.isAdmin = 2;
+		// Set up the buttons
+		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				String pwd = input.getText().toString();
+				App.isAdmin = 0;
+				//TODO: use external config for password in hashed form
+				if (pwd.equals("Roger18")) App.isAdmin = 1;
+				if (pwd.equals("redrum18")) App.isAdmin = 2;
 
-                if (App.isAdmin > 0) {
-                    eventRepository.DiagnosticPage(App.isAdmin);
-                    Intent intent = new Intent(FSOS.this.getActivity(), ServiceTestActivity.class);
-                    FSOS.this.getActivity().startActivity(intent);
-                } else {
-                    eventRepository.DiagnosticPageFail(pwd);
-                }
-            }
-        });
-        builder.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+				if (App.isAdmin > 0) {
+					eventRepository.DiagnosticPage(App.isAdmin);
+					Intent intent = new Intent(FSOS.this.getActivity(), ServiceTestActivity.class);
+					FSOS.this.getActivity().startActivity(intent);
+				} else {
+					eventRepository.DiagnosticPageFail(pwd);
+				}
+			}
+		});
+		builder.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
 
-        builder.show();
-    }
+		builder.show();
+	}
 
 }

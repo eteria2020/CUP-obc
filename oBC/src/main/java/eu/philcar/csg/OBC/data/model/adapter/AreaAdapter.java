@@ -15,26 +15,26 @@ import eu.philcar.csg.OBC.data.model.Area;
 
 public class AreaAdapter extends TypeAdapter<Area> {
 
-    @Override
-    public void write(JsonWriter out, Area value) throws IOException {
+	@Override
+	public void write(JsonWriter out, Area value) throws IOException {
 
-        out.beginObject();
-        out.name("close_trip").value(value.getClose_trip());
-        out.name("costo_apertura").value(value.getCosto_apertura());
-        out.name("costo_chiusura").value(value.getCosto_chiusura());
-        out.name("coordinates").beginArray();
-        for (Double coord : value.getCoordinates()) {
-            if (coord == 0D)
-                out.value(0);
-            else
-                out.value(coord);
-        }
-        out.endArray();
-        out.endObject();
-    }
+		out.beginObject();
+		out.name("close_trip").value(value.getClose_trip());
+		out.name("costo_apertura").value(value.getCosto_apertura());
+		out.name("costo_chiusura").value(value.getCosto_chiusura());
+		out.name("coordinates").beginArray();
+		for (Double coord : value.getCoordinates()) {
+			if (coord == 0D)
+				out.value(0);
+			else
+				out.value(coord);
+		}
+		out.endArray();
+		out.endObject();
+	}
 
-    @Override
-    public Area read(JsonReader in) throws IOException {
-        return new Area();
-    }
+	@Override
+	public Area read(JsonReader in) throws IOException {
+		return new Area();
+	}
 }

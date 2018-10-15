@@ -31,55 +31,55 @@ import eu.philcar.csg.OBC.service.TripInfo;
 
 @Singleton
 @Component(
-        modules = {
-                ApplicationModule.class,
-                DataSourceModule.class,
-                ApiModule.class
-        }
+		modules = {
+				ApplicationModule.class,
+				DataSourceModule.class,
+				ApiModule.class
+		}
 )
 public interface ApplicationComponent {
 
-    void inject(SystemControl.TestConnection testConnection);
+	void inject(SystemControl.TestConnection testConnection);
 
-    void inject(App app);
+	void inject(App app);
 
-    void inject(SystemControl.Shutdown shutdown);
+	void inject(SystemControl.Shutdown shutdown);
 
-    void inject(CarInfo carInfo);
+	void inject(CarInfo carInfo);
 
-    void inject(FSOS fsos);
+	void inject(FSOS fsos);
 
-    void inject(FMap fMap);
+	void inject(FMap fMap);
 
-    void inject(FWelcome fWelcome);
+	void inject(FWelcome fWelcome);
 
-    void inject(FGoodbye fGoodbye);
+	void inject(FGoodbye fGoodbye);
 
-    void inject(Hik_io hik_io);
+	void inject(Hik_io hik_io);
 
-    void inject(ServiceTestActivity serviceTestActivity);
+	void inject(ServiceTestActivity serviceTestActivity);
 
-    void inject(FMenu fMenu);
+	void inject(FMenu fMenu);
 
-    void inject(FCleanliness fCleanliness);
+	void inject(FCleanliness fCleanliness);
 
-    void inject(FMaintenance fMaintenance);
+	void inject(FMaintenance fMaintenance);
 
-    void inject(TripInfo tripInfo);
+	void inject(TripInfo tripInfo);
 
-    void inject(FHome fHome);
+	void inject(FHome fHome);
 
-    void inject(ObcService obcService);
+	void inject(ObcService obcService);
 
-    void inject(GPSController.ResetHandler resetHandler);
+	void inject(GPSController.ResetHandler resetHandler);
 
-    @ApplicationContext
-    Context context();
+	@ApplicationContext
+	Context context();
 
-    Application application();
+	Application application();
 
-    SharengoService sharengoService();
+	SharengoService sharengoService();
 
-    SharengoPhpRepository sharengoPhpRepository();
+	SharengoPhpRepository sharengoPhpRepository();
 
 }

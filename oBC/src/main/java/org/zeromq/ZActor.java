@@ -132,430 +132,430 @@ import java.util.List;
 public class ZActor extends ZStar
 // once on stage, any actor IS a star
 {
-    /**
-     * Defines the contract for the acting instance.
-     */
-    // contract interface for acting on the distant stage
-    // TODO what can be isSystem to reduce the amount of methods ? Split interface?
-    public interface Actor {
-        /**
-         * This is the grand premiere!
-         * Called before the creation of the first double and the sockets
-         * 2nd in the order call of the global acting.
-         *
-         * @param pipe the backstage control pipe
-         * @return the name of the upcoming performance
-         */
-        String premiere(Socket pipe);
+	/**
+	 * Defines the contract for the acting instance.
+	 */
+	// contract interface for acting on the distant stage
+	// TODO what can be isSystem to reduce the amount of methods ? Split interface?
+	public interface Actor {
+		/**
+		 * This is the grand premiere!
+		 * Called before the creation of the first double and the sockets
+		 * 2nd in the order call of the global acting.
+		 *
+		 * @param pipe the backstage control pipe
+		 * @return the name of the upcoming performance
+		 */
+		String premiere(Socket pipe);
 
-        /**
-         * Creates and initializes sockets for the double.
-         * This is isSystem at each creation of a new double.
-         * 3rd in the order call of the global acting.
-         * 1st in the order call of the new double.
-         *
-         * @param ctx  the context used to create sockets
-         * @param args the arguments passed as parameters of the ZActor
-         * @return a list of created sockets that will be managed by the double. Not null.
-         */
-        List<Socket> createSockets(ZContext ctx, Object[] args);
+		/**
+		 * Creates and initializes sockets for the double.
+		 * This is isSystem at each creation of a new double.
+		 * 3rd in the order call of the global acting.
+		 * 1st in the order call of the new double.
+		 *
+		 * @param ctx  the context used to create sockets
+		 * @param args the arguments passed as parameters of the ZActor
+		 * @return a list of created sockets that will be managed by the double. Not null.
+		 */
+		List<Socket> createSockets(ZContext ctx, Object[] args);
 
-        /**
-         * Called when the double is started, before the first loop.
-         * 4th in the order call of the global acting.
-         * 2nd in the order call of the new double.
-         *
-         * @param pipe    the backstage control pipe
-         * @param sockets the managed sockets that were created in the previous step
-         * @param poller  the poller where to eventually register the sockets for events
-         */
-        void start(Socket pipe, List<Socket> sockets, ZPoller poller);
+		/**
+		 * Called when the double is started, before the first loop.
+		 * 4th in the order call of the global acting.
+		 * 2nd in the order call of the new double.
+		 *
+		 * @param pipe    the backstage control pipe
+		 * @param sockets the managed sockets that were created in the previous step
+		 * @param poller  the poller where to eventually register the sockets for events
+		 */
+		void start(Socket pipe, List<Socket> sockets, ZPoller poller);
 
-        /**
-         * Called every time just before a loop starts.
-         * 5th in the order call of the global acting.
-         * 3nd in the order call of the new double.
-         * 1st in the order call of the new loop.
-         *
-         * @param pipe   the backstage control pipe
-         * @param poller the poller of the double
-         * @return the timeout of the coming loop. <b>-1 to block, 0 to not wait, > 0 to wait</b> till max the returned duration in milliseconds
-         */
-        long looping(Socket pipe, ZPoller poller);
+		/**
+		 * Called every time just before a loop starts.
+		 * 5th in the order call of the global acting.
+		 * 3nd in the order call of the new double.
+		 * 1st in the order call of the new loop.
+		 *
+		 * @param pipe   the backstage control pipe
+		 * @param poller the poller of the double
+		 * @return the timeout of the coming loop. <b>-1 to block, 0 to not wait, > 0 to wait</b> till max the returned duration in milliseconds
+		 */
+		long looping(Socket pipe, ZPoller poller);
 
-        /**
-         * Called when the actor received a control message from its pipe during a loop.
-         * 2nd in the order call of the new loop.
-         *
-         * @param pipe   the backstage control pipe receiving the message
-         * @param poller the poller of the double.
-         * @param events the events source of the call
-         * @return true in case of success, <b>false to stop the double</b>.
-         */
-        boolean backstage(Socket pipe, ZPoller poller, int events);
+		/**
+		 * Called when the actor received a control message from its pipe during a loop.
+		 * 2nd in the order call of the new loop.
+		 *
+		 * @param pipe   the backstage control pipe receiving the message
+		 * @param poller the poller of the double.
+		 * @param events the events source of the call
+		 * @return true in case of success, <b>false to stop the double</b>.
+		 */
+		boolean backstage(Socket pipe, ZPoller poller, int events);
 
-        /**
-         * The actor received a message from the created sockets during a loop.
-         * 2nd ex-aequo in the order call of the new loop.
-         *
-         * @param socket the socket receiving the message
-         * @param pipe   the backstage control pipe
-         * @param poller the poller of the double.
-         * @param events the events source of the call
-         * @return true in case of success, <b>false to stop the double</b>.
-         */
-        boolean stage(Socket socket, Socket pipe, ZPoller poller, int events);
+		/**
+		 * The actor received a message from the created sockets during a loop.
+		 * 2nd ex-aequo in the order call of the new loop.
+		 *
+		 * @param socket the socket receiving the message
+		 * @param pipe   the backstage control pipe
+		 * @param poller the poller of the double.
+		 * @param events the events source of the call
+		 * @return true in case of success, <b>false to stop the double</b>.
+		 */
+		boolean stage(Socket socket, Socket pipe, ZPoller poller, int events);
 
-        /**
-         * Called at the end of each loop.
-         * 3rd in the order call of the new loop.
-         *
-         * @param pipe   the backstage control pipe
-         * @param poller the poller of the double.
-         * @return true to continue with the current double, <b>false to stop it</b>.
-         */
-        boolean looped(Socket pipe, ZPoller poller);
+		/**
+		 * Called at the end of each loop.
+		 * 3rd in the order call of the new loop.
+		 *
+		 * @param pipe   the backstage control pipe
+		 * @param poller the poller of the double.
+		 * @return true to continue with the current double, <b>false to stop it</b>.
+		 */
+		boolean looped(Socket pipe, ZPoller poller);
 
-        /**
-         * Called when a created socket has been closed.
-         * The process of destroying the double has already started.
-         *
-         * @param socket the closed socked.
-         */
-        void closed(Socket socket);
+		/**
+		 * Called when a created socket has been closed.
+		 * The process of destroying the double has already started.
+		 *
+		 * @param socket the closed socked.
+		 */
+		void closed(Socket socket);
 
-        /**
-         * Called when the current double has been destroyed.
-         * Last in the order call of the double.
-         *
-         * @param pipe   the backstage control pipe
-         * @param poller the poller of the double.
-         * @return <b>true to restart a new double</b>, false to stop the acting process
-         */
-        boolean destroyed(Socket pipe, ZPoller poller);
+		/**
+		 * Called when the current double has been destroyed.
+		 * Last in the order call of the double.
+		 *
+		 * @param pipe   the backstage control pipe
+		 * @param poller the poller of the double.
+		 * @return <b>true to restart a new double</b>, false to stop the acting process
+		 */
+		boolean destroyed(Socket pipe, ZPoller poller);
 
-        /**
-         * Called when the stage is finished.
-         * This is the last call to the actor.
-         * Last in the order call of the global acting.
-         *
-         * @param pipe the backstage control pipe
-         * @return true to spread the word of the actor's leaving
-         */
-        boolean finished(Socket pipe);
-    }
+		/**
+		 * Called when the stage is finished.
+		 * This is the last call to the actor.
+		 * Last in the order call of the global acting.
+		 *
+		 * @param pipe the backstage control pipe
+		 * @return true to spread the word of the actor's leaving
+		 */
+		boolean finished(Socket pipe);
+	}
 
-    /**
-     * Simple adapter for an actor, with no sockets, blocking calls and immediate termination.
-     */
-    // simple contract implementation for acting on the stage
-    public static class SimpleActor implements Actor {
-        @Override
-        public String premiere(final Socket pipe) {
-            // do nothing
-            return "?";
-        }
+	/**
+	 * Simple adapter for an actor, with no sockets, blocking calls and immediate termination.
+	 */
+	// simple contract implementation for acting on the stage
+	public static class SimpleActor implements Actor {
+		@Override
+		public String premiere(final Socket pipe) {
+			// do nothing
+			return "?";
+		}
 
-        @Override
-        public List<Socket> createSockets(final ZContext ctx,
-                                          final Object[] args) {
-            return Collections.emptyList();
-        }
+		@Override
+		public List<Socket> createSockets(final ZContext ctx,
+										  final Object[] args) {
+			return Collections.emptyList();
+		}
 
-        @Override
-        public void start(final Socket pipe, final List<Socket> sockets,
-                          final ZPoller poller) {
-            // do nothing
-        }
+		@Override
+		public void start(final Socket pipe, final List<Socket> sockets,
+						  final ZPoller poller) {
+			// do nothing
+		}
 
-        @Override
-        public long looping(Socket pipe, ZPoller poller) {
-            // blocking loop
-            return -1;
-        }
+		@Override
+		public long looping(Socket pipe, ZPoller poller) {
+			// blocking loop
+			return -1;
+		}
 
-        @Override
-        public boolean backstage(final Socket pipe, final ZPoller poller,
-                                 final int events) {
-            // stop looping
-            return false;
-        }
+		@Override
+		public boolean backstage(final Socket pipe, final ZPoller poller,
+								 final int events) {
+			// stop looping
+			return false;
+		}
 
-        @Override
-        public boolean stage(final Socket socket, final Socket pipe,
-                             final ZPoller poller, int events) {
-            // stop looping
-            return false;
-        }
+		@Override
+		public boolean stage(final Socket socket, final Socket pipe,
+							 final ZPoller poller, int events) {
+			// stop looping
+			return false;
+		}
 
-        @Override
-        public boolean looped(final Socket pipe, final ZPoller poller) {
-            // continue with the same double
-            return true;
-        }
+		@Override
+		public boolean looped(final Socket pipe, final ZPoller poller) {
+			// continue with the same double
+			return true;
+		}
 
-        @Override
-        public void closed(final Socket socket) {
-            // do nothing
-        }
+		@Override
+		public void closed(final Socket socket) {
+			// do nothing
+		}
 
-        @Override
-        public boolean destroyed(final Socket pipe, ZPoller poller) {
-            // no restart
-            return false;
-        }
+		@Override
+		public boolean destroyed(final Socket pipe, ZPoller poller) {
+			// no restart
+			return false;
+		}
 
-        @Override
-        public boolean finished(final Socket pipe) {
-            // mot de la fin if not null
-            return true;
-        }
-    }
+		@Override
+		public boolean finished(final Socket pipe) {
+			// mot de la fin if not null
+			return true;
+		}
+	}
 
-    /**
-     * Another actor will be called just before the main one,
-     * without participating to the decisions.
-     */
-    // contract implementation for a duo actor on the stage
-    public static class Duo implements Actor {
-        // the actor that will play an active role on the stage
-        private final Actor main;
-        // the actor that will play a passive role on the stage
-        private final Actor shadow;
+	/**
+	 * Another actor will be called just before the main one,
+	 * without participating to the decisions.
+	 */
+	// contract implementation for a duo actor on the stage
+	public static class Duo implements Actor {
+		// the actor that will play an active role on the stage
+		private final Actor main;
+		// the actor that will play a passive role on the stage
+		private final Actor shadow;
 
-        public Duo(final Actor main, final Actor shadow) {
-            super();
-            assert (main != null);
-            assert (shadow != null);
-            this.main = main;
-            this.shadow = shadow;
-        }
+		public Duo(final Actor main, final Actor shadow) {
+			super();
+			assert (main != null);
+			assert (shadow != null);
+			this.main = main;
+			this.shadow = shadow;
+		}
 
-        @Override
-        public String premiere(final Socket pipe) {
-            shadow.premiere(pipe);
-            return main.premiere(pipe);
-        }
+		@Override
+		public String premiere(final Socket pipe) {
+			shadow.premiere(pipe);
+			return main.premiere(pipe);
+		}
 
-        @Override
-        public List<Socket> createSockets(final ZContext ctx,
-                                          final Object[] args) {
-            shadow.createSockets(ctx, args);
-            return main.createSockets(ctx, args);
-        }
+		@Override
+		public List<Socket> createSockets(final ZContext ctx,
+										  final Object[] args) {
+			shadow.createSockets(ctx, args);
+			return main.createSockets(ctx, args);
+		}
 
-        @Override
-        public void start(final Socket pipe, final List<Socket> sockets,
-                          final ZPoller poller) {
-            shadow.start(pipe, sockets, poller);
-            main.start(pipe, sockets, poller);
-        }
+		@Override
+		public void start(final Socket pipe, final List<Socket> sockets,
+						  final ZPoller poller) {
+			shadow.start(pipe, sockets, poller);
+			main.start(pipe, sockets, poller);
+		}
 
-        @Override
-        public long looping(Socket pipe, ZPoller poller) {
-            shadow.looping(pipe, poller);
-            return main.looping(pipe, poller);
-        }
+		@Override
+		public long looping(Socket pipe, ZPoller poller) {
+			shadow.looping(pipe, poller);
+			return main.looping(pipe, poller);
+		}
 
-        @Override
-        public boolean backstage(final Socket pipe, final ZPoller poller,
-                                 final int events) {
-            shadow.backstage(pipe, poller, events);
-            return main.backstage(pipe, poller, events);
-        }
+		@Override
+		public boolean backstage(final Socket pipe, final ZPoller poller,
+								 final int events) {
+			shadow.backstage(pipe, poller, events);
+			return main.backstage(pipe, poller, events);
+		}
 
-        @Override
-        public boolean stage(final Socket socket, final Socket pipe,
-                             final ZPoller poller, final int events) {
-            shadow.stage(socket, pipe, poller, events);
-            return main.stage(socket, pipe, poller, events);
-        }
+		@Override
+		public boolean stage(final Socket socket, final Socket pipe,
+							 final ZPoller poller, final int events) {
+			shadow.stage(socket, pipe, poller, events);
+			return main.stage(socket, pipe, poller, events);
+		}
 
-        @Override
-        public boolean looped(final Socket pipe, final ZPoller poller) {
-            shadow.looped(pipe, poller);
-            return main.looped(pipe, poller);
-        }
+		@Override
+		public boolean looped(final Socket pipe, final ZPoller poller) {
+			shadow.looped(pipe, poller);
+			return main.looped(pipe, poller);
+		}
 
-        @Override
-        public void closed(final Socket socket) {
-            shadow.closed(socket);
-            main.closed(socket);
-        }
+		@Override
+		public void closed(final Socket socket) {
+			shadow.closed(socket);
+			main.closed(socket);
+		}
 
-        @Override
-        public boolean destroyed(final Socket pipe, final ZPoller poller) {
-            shadow.destroyed(pipe, poller);
-            return main.destroyed(pipe, poller);
-        }
+		@Override
+		public boolean destroyed(final Socket pipe, final ZPoller poller) {
+			shadow.destroyed(pipe, poller);
+			return main.destroyed(pipe, poller);
+		}
 
-        @Override
-        public boolean finished(final Socket pipe) {
-            shadow.finished(pipe);
-            return main.finished(pipe);
-        }
-    }
+		@Override
+		public boolean finished(final Socket pipe) {
+			shadow.finished(pipe);
+			return main.finished(pipe);
+		}
+	}
 
-    /**
-     * Creates a new ZActor.
-     *
-     * @param actor the actor handling messages from either stage and backstage
-     * @param args  the optional arguments that will be passed to the distant actor
-     */
-    public ZActor(Actor actor, final String motdelafin, Object... args) {
-        this(null, null, actor, motdelafin, args);
-    }
+	/**
+	 * Creates a new ZActor.
+	 *
+	 * @param actor the actor handling messages from either stage and backstage
+	 * @param args  the optional arguments that will be passed to the distant actor
+	 */
+	public ZActor(Actor actor, final String motdelafin, Object... args) {
+		this(null, null, actor, motdelafin, args);
+	}
 
-    /**
-     * Creates a new ZActor.
-     *
-     * @param selector the creator of the selector used on the Plateau.
-     * @param actor    the actor handling messages from either stage and backstage
-     * @param args     the optional arguments that will be passed to the distant actor
-     */
-    public ZActor(final SelectorCreator selector, final Actor actor, final String motdelafin, final Object... args) {
-        this(null, selector, actor, motdelafin, args);
-    }
+	/**
+	 * Creates a new ZActor.
+	 *
+	 * @param selector the creator of the selector used on the Plateau.
+	 * @param actor    the actor handling messages from either stage and backstage
+	 * @param args     the optional arguments that will be passed to the distant actor
+	 */
+	public ZActor(final SelectorCreator selector, final Actor actor, final String motdelafin, final Object... args) {
+		this(null, selector, actor, motdelafin, args);
+	}
 
-    /**
-     * Creates a new ZActor.
-     *
-     * @param context  the main context used. If null, a new context will be created
-     *                 and closed at the stop of the operation.
-     *                 <b>If not null, it is the responsibility of the caller to close it.</b>
-     * @param selector the creator of the selector used on the Plateau.
-     * @param actor    the actor handling messages from either stage and backstage
-     * @param args     the optional arguments that will be passed to the distant actor
-     */
-    public ZActor(final ZContext context, final SelectorCreator selector,
-                  final Actor actor, final String motdelafin, final Object[] args) {
-        super(context, selector, new ActorFortune(actor), motdelafin, args);
-    }
+	/**
+	 * Creates a new ZActor.
+	 *
+	 * @param context  the main context used. If null, a new context will be created
+	 *                 and closed at the stop of the operation.
+	 *                 <b>If not null, it is the responsibility of the caller to close it.</b>
+	 * @param selector the creator of the selector used on the Plateau.
+	 * @param actor    the actor handling messages from either stage and backstage
+	 * @param args     the optional arguments that will be passed to the distant actor
+	 */
+	public ZActor(final ZContext context, final SelectorCreator selector,
+				  final Actor actor, final String motdelafin, final Object[] args) {
+		super(context, selector, new ActorFortune(actor), motdelafin, args);
+	}
 
-    // actor creator
-    private static final class ActorFortune implements Fortune {
-        private final Actor actor;
+	// actor creator
+	private static final class ActorFortune implements Fortune {
+		private final Actor actor;
 
-        public ActorFortune(Actor actor) {
-            assert (actor != null);
-            this.actor = actor;
-        }
+		public ActorFortune(Actor actor) {
+			assert (actor != null);
+			this.actor = actor;
+		}
 
-        @Override
-        public String premiere(Socket mic, Object[] args) {
-            return actor.premiere(mic);
-        }
+		@Override
+		public String premiere(Socket mic, Object[] args) {
+			return actor.premiere(mic);
+		}
 
-        @Override
-        public Star create(ZContext ctx, Socket pipe, Selector sel,
-                           int count, Star previous, Object[] args) {
-            Star star = new ZActor.Double(ctx, pipe, sel, actor, args);
-            return star;
-        }
+		@Override
+		public Star create(ZContext ctx, Socket pipe, Selector sel,
+						   int count, Star previous, Object[] args) {
+			Star star = new ZActor.Double(ctx, pipe, sel, actor, args);
+			return star;
+		}
 
-        @Override
-        public boolean interview(Socket mic) {
-            return actor.finished(mic);
-        }
+		@Override
+		public boolean interview(Socket mic) {
+			return actor.finished(mic);
+		}
 
-        @Override
-        public void party(ZContext ctx) {
-        }
-    }
+		@Override
+		public void party(ZContext ctx) {
+		}
+	}
 
-    // double for the loops, easing life for the actor
-    private static final class Double implements EventsHandler, Star {
-        // poller used for the loop
-        private final ZPoller poller;
+	// double for the loops, easing life for the actor
+	private static final class Double implements EventsHandler, Star {
+		// poller used for the loop
+		private final ZPoller poller;
 
-        // control pipe for Backstage side
-        private final Socket pipe;
+		// control pipe for Backstage side
+		private final Socket pipe;
 
-        // managed sockets
-        private final List<Socket> sockets;
+		// managed sockets
+		private final List<Socket> sockets;
 
-        // actor responsible for processing messages
-        private final Actor actor;
+		// actor responsible for processing messages
+		private final Actor actor;
 
-        // creates a new double
-        public Double(final ZContext ctx, final Socket pipe,
-                      final Selector selector, final Actor actor,
-                      final Object[] args) {
-            this.pipe = pipe;
-            this.actor = actor;
+		// creates a new double
+		public Double(final ZContext ctx, final Socket pipe,
+					  final Selector selector, final Actor actor,
+					  final Object[] args) {
+			this.pipe = pipe;
+			this.actor = actor;
 
-            final List<Socket> created = actor.createSockets(ctx, args);
-            assert (created != null);
+			final List<Socket> created = actor.createSockets(ctx, args);
+			assert (created != null);
 
-            sockets = new ArrayList<Socket>(created);
+			sockets = new ArrayList<Socket>(created);
 
-            poller = new ZPoller(selector);
-            poller.setGlobalHandler(this);
-        }
+			poller = new ZPoller(selector);
+			poller.setGlobalHandler(this);
+		}
 
-        // before starting the loops
-        @Override
-        public void prepare() {
-            poller.register(pipe, ZPoller.POLLIN);
-            actor.start(pipe, Collections.unmodifiableList(sockets), poller);
-        }
+		// before starting the loops
+		@Override
+		public void prepare() {
+			poller.register(pipe, ZPoller.POLLIN);
+			actor.start(pipe, Collections.unmodifiableList(sockets), poller);
+		}
 
-        // gives the number of events to process
-        @Override
-        public int breathe() {
-            long timeout = actor.looping(pipe, poller);
-            return poller.poll(timeout);
-            // events have been dispatched,
-        }
+		// gives the number of events to process
+		@Override
+		public int breathe() {
+			long timeout = actor.looping(pipe, poller);
+			return poller.poll(timeout);
+			// events have been dispatched,
+		}
 
-        // acting takes place, return true to continue till the end
-        @Override
-        public boolean act(int events) {
-            // act is actually already finished for handlers
-            return events >= 0; //  Context is not shut down
-        }
+		// acting takes place, return true to continue till the end
+		@Override
+		public boolean act(int events) {
+			// act is actually already finished for handlers
+			return events >= 0; //  Context is not shut down
+		}
 
-        // a loop just finished, return true to continue acting
-        @Override
-        public boolean entract() {
-            return actor.looped(pipe, poller);
-        }
+		// a loop just finished, return true to continue acting
+		@Override
+		public boolean entract() {
+			return actor.looped(pipe, poller);
+		}
 
-        // destroys the double
-        @Override
-        public boolean renews() {
-            // close every managed sockets
-            Iterator<Socket> iter = sockets.iterator();
-            while (iter.hasNext()) {
-                final Socket socket = iter.next();
-                iter.remove();
-                if (socket != null) {
-                    poller.unregister(socket);
-                    socket.close();
-                    // call back the actor to inform that a socket has been closed.
-                    actor.closed(socket);
-                }
-            }
-            // let the actor decide if the stage restarts a new double
-            return actor.destroyed(pipe, poller);
-        }
+		// destroys the double
+		@Override
+		public boolean renews() {
+			// close every managed sockets
+			Iterator<Socket> iter = sockets.iterator();
+			while (iter.hasNext()) {
+				final Socket socket = iter.next();
+				iter.remove();
+				if (socket != null) {
+					poller.unregister(socket);
+					socket.close();
+					// call back the actor to inform that a socket has been closed.
+					actor.closed(socket);
+				}
+			}
+			// let the actor decide if the stage restarts a new double
+			return actor.destroyed(pipe, poller);
+		}
 
-        @Override
-        public boolean events(SelectableChannel channel, int events) {
-            // TODO dispatch events from channels
-            return true;
-        }
+		@Override
+		public boolean events(SelectableChannel channel, int events) {
+			// TODO dispatch events from channels
+			return true;
+		}
 
-        // an event has occurred on a registered socket
-        @Override
-        public boolean events(final Socket socket, final int events) {
-            if (socket != pipe) {
-                // Process a stage message, time to play
-                return actor.stage(socket, pipe, poller, events);
-            } else {
-                // Process a control message, time to update your playing
-                return actor.backstage(pipe, poller, events);
-            }
-        }
-    }
+		// an event has occurred on a registered socket
+		@Override
+		public boolean events(final Socket socket, final int events) {
+			if (socket != pipe) {
+				// Process a stage message, time to play
+				return actor.stage(socket, pipe, poller, events);
+			} else {
+				// Process a control message, time to update your playing
+				return actor.backstage(pipe, poller, events);
+			}
+		}
+	}
 }

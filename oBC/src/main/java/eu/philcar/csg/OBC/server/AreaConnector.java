@@ -16,58 +16,58 @@ import eu.philcar.csg.OBC.helpers.DLog;
 @Deprecated
 public class AreaConnector implements RemoteEntityInterface {
 
-    private DLog dlog = new DLog(this.getClass());
+	private DLog dlog = new DLog(this.getClass());
 
-    public static AreaConnector GetDownloadConnector() {
-        return new AreaConnector();
-    }
+	public static AreaConnector GetDownloadConnector() {
+		return new AreaConnector();
+	}
 
-    public int MsgId() {
-        return Connectors.MSG_DN_AREAS;
-    }
+	public int MsgId() {
+		return Connectors.MSG_DN_AREAS;
+	}
 
-    public String GetRemoteUrl() {
-        return App.URL_Area;
-    }
+	public String GetRemoteUrl() {
+		return App.URL_Area;
+	}
 
-    public int DecodeJson(String responseBody) {
+	public int DecodeJson(String responseBody) {
 
-        if (responseBody == null || responseBody.isEmpty() || responseBody.trim().isEmpty())
-            return MsgId();
+		if (responseBody == null || responseBody.isEmpty() || responseBody.trim().isEmpty())
+			return MsgId();
 
-        File file = new File(App.getAppDataPath(), "area.json");
+		File file = new File(App.getAppDataPath(), "area.json");
 
-        try {
-            OutputStream os = new FileOutputStream(file);
-            os.write(responseBody.getBytes());
-            os.close();
-        } catch (IOException e) {
-            dlog.e("File output error area.json", e);
-            return MsgId();
-        }
+		try {
+			OutputStream os = new FileOutputStream(file);
+			os.write(responseBody.getBytes());
+			os.close();
+		} catch (IOException e) {
+			dlog.e("File output error area.json", e);
+			return MsgId();
+		}
 
-        App.Instance.initAreaPolygon();
+		App.Instance.initAreaPolygon();
 
-        return MsgId();
-    }
+		return MsgId();
+	}
 
-    public eDirection getDirection() {
-        return eDirection.DOWNLOAD;
-    }
+	public eDirection getDirection() {
+		return eDirection.DOWNLOAD;
+	}
 
-    public String EncodeJson() {
+	public String EncodeJson() {
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public List<NameValuePair> GetParams() {
+	@Override
+	public List<NameValuePair> GetParams() {
 
-        ArrayList<NameValuePair> list = new ArrayList<NameValuePair>();
-        list.add(new BasicNameValuePair("targa", "" + App.CarPlate));
-        list.add(new BasicNameValuePair("md5", "" + App.AreaPolygonMD5));
+		ArrayList<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add(new BasicNameValuePair("targa", "" + App.CarPlate));
+		list.add(new BasicNameValuePair("md5", "" + App.AreaPolygonMD5));
 
-        return list;
-    }
+		return list;
+	}
 
 }

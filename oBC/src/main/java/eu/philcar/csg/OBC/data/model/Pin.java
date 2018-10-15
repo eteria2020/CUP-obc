@@ -7,38 +7,38 @@ import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
  */
 
 public class Pin extends BaseResponse {
-    private String primary;
-    private String secondary;
-    private String company;
+	private String primary;
+	private String secondary;
+	private String company;
 
-    public Pin(String primary, String secondary, String company) {
-        this.primary = primary;
-        this.secondary = secondary;
-        this.company = company;
-    }
+	public Pin(String primary, String secondary, String company) {
+		this.primary = primary;
+		this.secondary = secondary;
+		this.company = company;
+	}
 
-    public String getPrimary() {
-        return primary;
-    }
+	public String getPrimary() {
+		return primary;
+	}
 
-    public void setPrimary(String primary) {
-        this.primary = primary;
-    }
+	public void setPrimary(String primary) {
+		this.primary = primary;
+	}
 
-    public String getSecondary() {
-        return secondary;
-    }
+	public String getSecondary() {
+		return secondary;
+	}
 
-    public void setSecondary(String secondary) {
-        this.secondary = secondary;
-    }
+	public void setSecondary(String secondary) {
+		this.secondary = secondary;
+	}
 
-    public String getCompany() {
-        return company;
-    }
+	public String getCompany() {
+		return company;
+	}
 
-    public void setCompany(String company) {
-        this.company = company;
-    }
+	public void setCompany(String company) {
+		this.company = company;
+	}
 
 }

@@ -59,35 +59,35 @@ import eu.philcar.csg.OBC.service.MessageFactory;
 
 public class FDriveMessage_new extends FBase {
 
-    private DLog dlog = new DLog(this.getClass());
+	private DLog dlog = new DLog(this.getClass());
 
-    public static FDriveMessage_new newInstance(boolean login) {
+	public static FDriveMessage_new newInstance(boolean login) {
 
-        FDriveMessage_new fi = new FDriveMessage_new();
+		FDriveMessage_new fi = new FDriveMessage_new();
 
-        fi.login = login;
+		fi.login = login;
 
-        return fi;
-    }
+		return fi;
+	}
 
-    private final static int MSG_CLOSE_FRAGMENT = 1;
-    private boolean login;
-    //private WebView webViewBanner;
-    private static Boolean handleClick = false;
-    private static CountDownTimer timer_5sec;
+	private final static int MSG_CLOSE_FRAGMENT = 1;
+	private boolean login;
+	//private WebView webViewBanner;
+	private static Boolean handleClick = false;
+	private static CountDownTimer timer_5sec;
 
-    private ArrayList<Bundle> startImages = new ArrayList<Bundle>();
+	private ArrayList<Bundle> startImages = new ArrayList<Bundle>();
 
-    private ImageView adIV;
-    private VideoView video;
-    private static Boolean RequestBanner = false;
+	private ImageView adIV;
+	private VideoView video;
+	private static Boolean RequestBanner = false;
 
-    public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 
-        super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);
 
 		/*if(App.first_UP_Start){
-            App.first_UP_Start=false;
+			App.first_UP_Start=false;
 
 			new Thread(new Runnable() {
 				public void run() {
@@ -105,139 +105,139 @@ public class FDriveMessage_new extends FBase {
 			}).start();
 		}*/
 
-    }
+	}
 
-    private Handler localHandler = new Handler() {
+	private Handler localHandler = new Handler() {
 
-        @Override
-        public void handleMessage(Message msg) {
+		@Override
+		public void handleMessage(Message msg) {
 
-            switch (msg.what) {
+			switch (msg.what) {
 
-                case MSG_CLOSE_FRAGMENT:
-                    try {
-                        dlog.d("FDriveMessage selfclose : " + login);
-                        Intent i = new Intent(getActivity(), AMainOBC.class);
-                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(i);
-                        getActivity().finish();
-                    } catch (Exception e) {
-                        dlog.e("localHandler: MSG_CLOSE_FRAGMENT Exception", e);
-                    }
-                    break;
-            }
-        }
-    };
+				case MSG_CLOSE_FRAGMENT:
+					try {
+						dlog.d("FDriveMessage selfclose : " + login);
+						Intent i = new Intent(getActivity(), AMainOBC.class);
+						i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(i);
+						getActivity().finish();
+					} catch (Exception e) {
+						dlog.e("localHandler: MSG_CLOSE_FRAGMENT Exception", e);
+					}
+					break;
+			}
+		}
+	};
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        System.gc();
+		System.gc();
 
-        final View view = inflater.inflate(R.layout.f_lanes_new, container, false);
-        dlog.d("OnCreareView FDriveMessage_new");
+		final View view = inflater.inflate(R.layout.f_lanes_new, container, false);
+		dlog.d("OnCreareView FDriveMessage_new");
 
-        if (App.BannerName.getBundle("START") == null) {
-            Intent i = new Intent(getActivity(), AMainOBC.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(i);
-            getActivity().finish();
-        }
+		if (App.BannerName.getBundle("START") == null) {
+			Intent i = new Intent(getActivity(), AMainOBC.class);
+			i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(i);
+			getActivity().finish();
+		}
 
-        if (App.BannerName.getBundle("START") == null && !RequestBanner) {
-            //controllo se ho il banner e se non ho già iniziato a scaricarlo.
-            RequestBanner = true;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        loadBanner(App.URL_AdsBuilderStart, "START", false);        //scarico banner
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (FDriveMessage_new.this.isVisible()) {
+		if (App.BannerName.getBundle("START") == null && !RequestBanner) {
+			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
+			RequestBanner = true;
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						loadBanner(App.URL_AdsBuilderStart, "START", false);        //scarico banner
+						getActivity().runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								if (FDriveMessage_new.this.isVisible()) {
 
-                                    updateBanner("START");                            //Modifico l'IV
-                                }
-                            }
-                        });
-                    } catch (Exception e) {
-                        dlog.e("Eccezione durante caricamento banner iniziale");
-                    }
-                }
-            }).start();
-        }
+									updateBanner("START");                            //Modifico l'IV
+								}
+							}
+						});
+					} catch (Exception e) {
+						dlog.e("Eccezione durante caricamento banner iniziale");
+					}
+				}
+			}).start();
+		}
 
-        view.findViewById(R.id.btnNext).setVisibility(View.INVISIBLE);
-        view.findViewById(R.id.tvCountdown).setVisibility(View.VISIBLE);
+		view.findViewById(R.id.btnNext).setVisibility(View.INVISIBLE);
+		view.findViewById(R.id.tvCountdown).setVisibility(View.VISIBLE);
 
-        view.findViewById(R.id.btnNext).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dlog.d("FDriveMessage btnNext click : " + login);
-                Intent i = new Intent(getActivity(), AMainOBC.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(i);
-                getActivity().finish();
+		view.findViewById(R.id.btnNext).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dlog.d("FDriveMessage btnNext click : " + login);
+				Intent i = new Intent(getActivity(), AMainOBC.class);
+				i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(i);
+				getActivity().finish();
 
-            }
-        });
+			}
+		});
 
-        view.findViewById(R.id.btnSOS).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getActivity(), ASOS.class));
-            }
-        });
+		view.findViewById(R.id.btnSOS).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(getActivity(), ASOS.class));
+			}
+		});
 
-        Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
+		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 
-        //webViewBanner=(WebView) view.findViewById(R.id.bannerfsWV);
+		//webViewBanner=(WebView) view.findViewById(R.id.bannerfsWV);
 
-        timer_5sec = new CountDownTimer((5) * 1000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
+		timer_5sec = new CountDownTimer((5) * 1000, 1000) {
+			@Override
+			public void onTick(long millisUntilFinished) {
 
-            }
+			}
 
-            @Override
-            public void onFinish() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            loadBanner(App.URL_AdsBuilderStart, "START", false);
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (FDriveMessage_new.this.isVisible()) {
+			@Override
+			public void onFinish() {
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							loadBanner(App.URL_AdsBuilderStart, "START", false);
+							getActivity().runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									if (FDriveMessage_new.this.isVisible()) {
 
-                                        updateBanner("START");
-                                    }
-                                }
-                            });
-                        } catch (Exception e) {
-                            dlog.e("Exception during loadbanner:", e);
-                        }
+										updateBanner("START");
+									}
+								}
+							});
+						} catch (Exception e) {
+							dlog.e("Exception during loadbanner:", e);
+						}
 
-                    }
-                }).start();
-            }
-        };
+					}
+				}).start();
+			}
+		};
 
-        adIV = (ImageView) view.findViewById(R.id.imgfsIV);
-        video = (VideoView) view.findViewById(R.id.video);
+		adIV = (ImageView) view.findViewById(R.id.imgfsIV);
+		video = (VideoView) view.findViewById(R.id.video);
 
-        adIV.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
+		adIV.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
 
-                if (App.BannerName.getBundle("START") != null) {
-                    if (App.BannerName.getBundle("START").getString("CLICK").compareTo("null") != 0) {
+				if (App.BannerName.getBundle("START") != null) {
+					if (App.BannerName.getBundle("START").getString("CLICK").compareTo("null") != 0) {
 
-						if(!handleClick) {
+						if (!handleClick) {
 							adIV.setColorFilter(R.color.overlay_click);
-							handleClick=true;
+							handleClick = true;
 							dlog.i(" Click su banner ");
 							new Thread(new Runnable() {
 								@Override
@@ -255,79 +255,79 @@ public class FDriveMessage_new extends FBase {
 												}
 											}
 										});
-									}catch(Exception e){
-										dlog.e("Exception during start loadbanner:",e);
+									} catch (Exception e) {
+										dlog.e("Exception during start loadbanner:", e);
 									}
 
-                                }
-                            }).start();
-                        } else {
+								}
+							}).start();
+						} else {
 
-                        }
+						}
 
-                    }
-                }
-            }
-        });
+					}
+				}
+			}
+		});
 
-        new CountDownTimer(3100, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                ((TextView) view.findViewById(R.id.tvCountdown)).setText(String.format(Locale.ITALY, "%d s", (millisUntilFinished / 1000)));
-            }
+		new CountDownTimer(3100, 1000) {
+			@Override
+			public void onTick(long millisUntilFinished) {
+				((TextView) view.findViewById(R.id.tvCountdown)).setText(String.format(Locale.ITALY, "%d s", (millisUntilFinished / 1000)));
+			}
 
-            @Override
-            public void onFinish() {
-                view.findViewById(R.id.tvCountdown).setVisibility(View.INVISIBLE);
-                view.findViewById(R.id.btnNext).setVisibility(View.VISIBLE);
+			@Override
+			public void onFinish() {
+				view.findViewById(R.id.tvCountdown).setVisibility(View.INVISIBLE);
+				view.findViewById(R.id.btnNext).setVisibility(View.VISIBLE);
 
-                //localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,10000);
+				//localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,10000);
 
-            }
+			}
 
-        }.start();
+		}.start();
 
-        if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
-            view.findViewById(R.id.fchn_right_FL).setBackgroundColor(getResources().getColor(R.color.background_red));
+		if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
+			view.findViewById(R.id.fchn_right_FL).setBackgroundColor(getResources().getColor(R.color.background_red));
 
-        } else {
-            view.findViewById(R.id.fchn_right_FL).setBackgroundColor(getResources().getColor(R.color.background_green));
-        }
-        updateBanner("START");
-        return view;
-    }
+		} else {
+			view.findViewById(R.id.fchn_right_FL).setBackgroundColor(getResources().getColor(R.color.background_green));
+		}
+		updateBanner("START");
+		return view;
+	}
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
 
-        if (App.BannerName.getBundle("START") != null) {
+		if (App.BannerName.getBundle("START") != null) {
 
-            dlog.i("STRINGID" + App.BannerName.getBundle("START").getString("ID"));
+			dlog.i("STRINGID" + App.BannerName.getBundle("START").getString("ID"));
 
-            if (App.BannerName.getBundle("START").getString("ID").compareTo("680") == 0) {
-                dlog.i("video caricato");
-                View noDataView = getView().findViewById(R.id.imgfsIV);
-                noDataView.setVisibility(View.GONE);
-                video.setVisibility(View.VISIBLE);
-                video.setVideoURI(Uri.parse(Environment.getExternalStorageDirectory() + "/video.mp4"));
-                video.requestFocus();
-                ((AWelcome) getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_SYSTEM, 15));
-                video.start();
-                localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT, 45000);
+			if (App.BannerName.getBundle("START").getString("ID").compareTo("680") == 0) {
+				dlog.i("video caricato");
+				View noDataView = getView().findViewById(R.id.imgfsIV);
+				noDataView.setVisibility(View.GONE);
+				video.setVisibility(View.VISIBLE);
+				video.setVideoURI(Uri.parse(Environment.getExternalStorageDirectory() + "/video.mp4"));
+				video.requestFocus();
+				((AWelcome) getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_SYSTEM, 15));
+				video.start();
+				localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT, 45000);
 
-            } else {
-                localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT, 10000);
-            }
-        } else {
-            localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT, 10000);
-        }
+			} else {
+				localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT, 10000);
+			}
+		} else {
+			localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT, 10000);
+		}
 
-    }
+	}
 
-    @Override
-    public void onResume() {
-        super.onResume();
+	@Override
+	public void onResume() {
+		super.onResume();
 
 		/*new Thread(new Runnable() {
 			public void run() {
@@ -335,13 +335,13 @@ public class FDriveMessage_new extends FBase {
 			}
 		}).start();*/
 
-    }
+	}
 
-    @Override
-    public void onPause() {
-        localHandler.removeCallbacksAndMessages(null);
-        super.onPause();
-    }
+	@Override
+	public void onPause() {
+		localHandler.removeCallbacksAndMessages(null);
+		super.onPause();
+	}
 
     /*private void  initWebViewBanner() {
 
@@ -489,133 +489,133 @@ public class FDriveMessage_new extends FBase {
 
     }*/
 
-    private void updatePoiIcon(String Url) {
+	private void updatePoiIcon(String Url) {
 
-        String jsonStr = "";
-        if (startImages != null)
-            startImages.clear();
+		String jsonStr = "";
+		if (startImages != null)
+			startImages.clear();
 
-        File outDir = new File(App.getBannerImagesFolder());
-        if (!outDir.isDirectory()) {
-            outDir.mkdir();
-        }
+		File outDir = new File(App.getBannerImagesFolder());
+		if (!outDir.isDirectory()) {
+			outDir.mkdir();
+		}
 
-        Url = Url.concat("?ID=").concat(maxIconID(App.getBannerImagesFolder()));
-        StringBuilder builder = new StringBuilder();
-        HttpClient client = new DefaultHttpClient();
-        HttpGet httpGet = new HttpGet(Url);
-        try {
-            HttpResponse response = client.execute(httpGet);
-            StatusLine statusLine = response.getStatusLine();
-            int statusCode = statusLine.getStatusCode();
-            if (statusCode == 200) {
-                App.update_StartImages = new Date();
-                HttpEntity entity = response.getEntity();
-                InputStream content = entity.getContent();
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(content));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line);
-                }
-                reader.close();
-                content.close();
-            } else {
+		Url = Url.concat("?ID=").concat(maxIconID(App.getBannerImagesFolder()));
+		StringBuilder builder = new StringBuilder();
+		HttpClient client = new DefaultHttpClient();
+		HttpGet httpGet = new HttpGet(Url);
+		try {
+			HttpResponse response = client.execute(httpGet);
+			StatusLine statusLine = response.getStatusLine();
+			int statusCode = statusLine.getStatusCode();
+			if (statusCode == 200) {
+				App.update_StartImages = new Date();
+				HttpEntity entity = response.getEntity();
+				InputStream content = entity.getContent();
+				BufferedReader reader = new BufferedReader(
+						new InputStreamReader(content));
+				String line;
+				while ((line = reader.readLine()) != null) {
+					builder.append(line);
+				}
+				reader.close();
+				content.close();
+			} else {
 
-                Log.e(FDriveMessage_new.class.toString(), "Failed to download file");
-            }
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (NetworkOnMainThreadException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        jsonStr = builder.toString();
-        parseJsonIcon(jsonStr);
+				Log.e(FDriveMessage_new.class.toString(), "Failed to download file");
+			}
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (NetworkOnMainThreadException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		jsonStr = builder.toString();
+		parseJsonIcon(jsonStr);
 
-        for (Bundle Image : startImages) {    //-- start loop download and save image
-            try {
-                URL url = new URL(Image.getString("URL"));
-                String extension = url.getFile().substring(url.getFile().lastIndexOf('.') + 1);
-                String filename = Image.getString("ID").concat(".").concat(extension);
-                Log.i("Local filename:", "" + filename);
-                File file = new File(outDir, filename);
+		for (Bundle Image : startImages) {    //-- start loop download and save image
+			try {
+				URL url = new URL(Image.getString("URL"));
+				String extension = url.getFile().substring(url.getFile().lastIndexOf('.') + 1);
+				String filename = Image.getString("ID").concat(".").concat(extension);
+				Log.i("Local filename:", "" + filename);
+				File file = new File(outDir, filename);
 
-                if (file.exists())
-                    continue;
+				if (file.exists())
+					continue;
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.setDoOutput(true);
-                urlConnection.connect();
-                if (file.createNewFile()) {
-                    file.createNewFile();
-                }
-                FileOutputStream fileOutput = new FileOutputStream(file);
-                InputStream inputStream = urlConnection.getInputStream();
-                int totalSize = urlConnection.getContentLength();
-                int downloadedSize = 0;
-                byte[] buffer = new byte[1024];
-                int bufferLength = 0;
-                while ((bufferLength = inputStream.read(buffer)) > 0) {
-                    fileOutput.write(buffer, 0, bufferLength);
-                    downloadedSize += bufferLength;
-                    Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
-                }
-                fileOutput.close();
-                urlConnection.disconnect();
-                inputStream.close();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        //return filepath;
+				HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+				urlConnection.setRequestMethod("GET");
+				urlConnection.setDoOutput(true);
+				urlConnection.connect();
+				if (file.createNewFile()) {
+					file.createNewFile();
+				}
+				FileOutputStream fileOutput = new FileOutputStream(file);
+				InputStream inputStream = urlConnection.getInputStream();
+				int totalSize = urlConnection.getContentLength();
+				int downloadedSize = 0;
+				byte[] buffer = new byte[1024];
+				int bufferLength = 0;
+				while ((bufferLength = inputStream.read(buffer)) > 0) {
+					fileOutput.write(buffer, 0, bufferLength);
+					downloadedSize += bufferLength;
+					Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
+				}
+				fileOutput.close();
+				urlConnection.disconnect();
+				inputStream.close();
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		//return filepath;
 
-        return;
+		return;
 
-    }
+	}
 
-    private void parseJsonIcon(String jsonStr) {
+	private void parseJsonIcon(String jsonStr) {
 
-        try {
-            JSONObject json = new JSONObject(jsonStr);
-            Log.i(FDriveMessage_new.class.getName(), "creazione oggetto Json");
-            //Get the instance of JSONArray that contains JSONObjects
-            JSONArray jsonArray = json.optJSONArray("Image");
+		try {
+			JSONObject json = new JSONObject(jsonStr);
+			Log.i(FDriveMessage_new.class.getName(), "creazione oggetto Json");
+			//Get the instance of JSONArray that contains JSONObjects
+			JSONArray jsonArray = json.optJSONArray("Image");
 
-            //Iterate the jsonArray and print the info of JSONObjects
-            for (int k = 0; k < jsonArray.length(); k++) {
-                Bundle Image = new Bundle();
-                JSONObject jsonObject = jsonArray.getJSONObject(k);
+			//Iterate the jsonArray and print the info of JSONObjects
+			for (int k = 0; k < jsonArray.length(); k++) {
+				Bundle Image = new Bundle();
+				JSONObject jsonObject = jsonArray.getJSONObject(k);
 
-                Image.putString("ID", jsonObject.getString("ID"));
-                Image.putString("URL", jsonObject.getString("URL"));
-                startImages.add(Image);
+				Image.putString("ID", jsonObject.getString("ID"));
+				Image.putString("URL", jsonObject.getString("URL"));
+				startImages.add(Image);
 
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-    }
+	}
 
-    private String maxIconID(String folder) {
+	private String maxIconID(String folder) {
 
-        try {
-            File f = new File(folder);
-            File file[] = f.listFiles();
-            Log.d("Files", "Size: " + file.length);
-            if (file.length == 0)
-                return "0";
-            String name = file[file.length - 1].getName();
-            name = name.substring(0, name.lastIndexOf('.'));
-            return name;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		try {
+			File f = new File(folder);
+			File file[] = f.listFiles();
+			Log.d("Files", "Size: " + file.length);
+			if (file.length == 0)
+				return "0";
+			String name = file[file.length - 1].getName();
+			name = name.substring(0, name.lastIndexOf('.'));
+			return name;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		/*int i=0;
 		File maxID;
@@ -634,227 +634,227 @@ public class FDriveMessage_new extends FBase {
 		}while(maxID.exists());
 		return String.valueOf(i-1);*/
 
-        return "0";
-    }
+		return "0";
+	}
 
-    public void loadBanner(String Url, String type, Boolean isClick) {
+	public void loadBanner(String Url, String type, Boolean isClick) {
 
-        File outDir = new File(App.getBannerImagesFolder());
-        if (!outDir.isDirectory()) {
-            outDir.mkdir();
-        }
+		File outDir = new File(App.getBannerImagesFolder());
+		if (!outDir.isDirectory()) {
+			outDir.mkdir();
+		}
 
-        if (!App.hasNetworkConnection()) {
-            dlog.e(" loadBanner: nessuna connessione");
-            App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+		if (!App.hasNetworkConnection()) {
+			dlog.e(" loadBanner: nessuna connessione");
+			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
 
-            return;
-        }
-        StringBuilder builder = new StringBuilder();
-        List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
-        HttpResponse response = null;
-        if (!isClick) {
+			return;
+		}
+		StringBuilder builder = new StringBuilder();
+		List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
+		HttpResponse response = null;
+		if (!isClick) {
 
-            if (App.currentTripInfo != null && App.currentTripInfo.customer != null)
-                paramsList.add(new BasicNameValuePair("id", App.currentTripInfo.customer.id + ""));//App.currentTripInfo.customer.id + "")); //"3"));
+			if (App.currentTripInfo != null && App.currentTripInfo.customer != null)
+				paramsList.add(new BasicNameValuePair("id", App.currentTripInfo.customer.id + ""));//App.currentTripInfo.customer.id + "")); //"3"));
 
-            if (App.getLastLocation() != null) {
-                paramsList.add(new BasicNameValuePair("lat", App.getLastLocation().getLatitude() + ""));
-                paramsList.add(new BasicNameValuePair("lon", App.getLastLocation().getLongitude() + ""));
-            }
-            paramsList.add(new BasicNameValuePair("id_fleet", App.FleetId + ""));
-            paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));//"ED93107"));//App.CarPlate));
-        }
-        try {
-            if (App.BannerName.getBundle(type) != null)
-                paramsList.add(new BasicNameValuePair("index", App.BannerName.getBundle(type).getString("INDEX", null)));
+			if (App.getLastLocation() != null) {
+				paramsList.add(new BasicNameValuePair("lat", App.getLastLocation().getLatitude() + ""));
+				paramsList.add(new BasicNameValuePair("lon", App.getLastLocation().getLongitude() + ""));
+			}
+			paramsList.add(new BasicNameValuePair("id_fleet", App.FleetId + ""));
+			paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));//"ED93107"));//App.CarPlate));
+		}
+		try {
+			if (App.BannerName.getBundle(type) != null)
+				paramsList.add(new BasicNameValuePair("index", App.BannerName.getBundle(type).getString("INDEX", null)));
 
-            if (App.BannerName.getBundle(type) != null)
-                paramsList.add(new BasicNameValuePair("end", App.BannerName.getBundle(type).getString("END", null)));
+			if (App.BannerName.getBundle(type) != null)
+				paramsList.add(new BasicNameValuePair("end", App.BannerName.getBundle(type).getString("END", null)));
 
-            Url = UrlTools.buildQuery(Url.concat("?"), paramsList).toString();
-            //connessione per scaricare id immagine
+			Url = UrlTools.buildQuery(Url.concat("?"), paramsList).toString();
+			//connessione per scaricare id immagine
 
-            HttpClient client = new DefaultHttpClient();
-            HttpGet httpGet = new HttpGet(Url);
+			HttpClient client = new DefaultHttpClient();
+			HttpGet httpGet = new HttpGet(Url);
 
-            response = client.execute(httpGet);
-            DLog.I(" loadBanner: Url richiesta " + Url);
-            StatusLine statusLine = response.getStatusLine();
-            int statusCode = statusLine.getStatusCode();
-            if (statusCode == 200) {
-                //App.update_StartImages = new Date();
-                HttpEntity entity = response.getEntity();
-                InputStream content = entity.getContent();
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(content));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line);
-                }
-                reader.close();
-                content.close();
-            } else {
+			response = client.execute(httpGet);
+			DLog.I(" loadBanner: Url richiesta " + Url);
+			StatusLine statusLine = response.getStatusLine();
+			int statusCode = statusLine.getStatusCode();
+			if (statusCode == 200) {
+				//App.update_StartImages = new Date();
+				HttpEntity entity = response.getEntity();
+				InputStream content = entity.getContent();
+				BufferedReader reader = new BufferedReader(
+						new InputStreamReader(content));
+				String line;
+				while ((line = reader.readLine()) != null) {
+					builder.append(line);
+				}
+				reader.close();
+				content.close();
+			} else {
 
-                dlog.e(" loadBanner: Failed to connect " + String.valueOf(statusCode));
-                App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
-                return;
-            }
-        } catch (Exception e) {
-            dlog.e(" loadBanner: eccezione in connessione ", e);
-            App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
-            return;
-        }
-        String jsonStr = builder.toString();
-        if (jsonStr.compareTo("") == 0) {
-            dlog.e(" loadBanner: nessuna connessione");
-            App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
-            return;
-        }
+				dlog.e(" loadBanner: Failed to connect " + String.valueOf(statusCode));
+				App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+				return;
+			}
+		} catch (Exception e) {
+			dlog.e(" loadBanner: eccezione in connessione ", e);
+			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+			return;
+		}
+		String jsonStr = builder.toString();
+		if (jsonStr.compareTo("") == 0) {
+			dlog.e(" loadBanner: nessuna connessione");
+			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+			return;
+		}
 
-        DLog.I(" loadBanner: risposta " + jsonStr);
-        File file = new File(outDir, "placeholder.lol");
+		DLog.I(" loadBanner: risposta " + jsonStr);
+		File file = new File(outDir, "placeholder.lol");
 
-        try {
-            JSONObject json = new JSONObject(jsonStr);
+		try {
+			JSONObject json = new JSONObject(jsonStr);
 
-            //Get the instance of JSONArray that contains JSONObjects
-            JSONArray jsonArray = json.optJSONArray("Image");
+			//Get the instance of JSONArray that contains JSONObjects
+			JSONArray jsonArray = json.optJSONArray("Image");
 
-            //Iterate the jsonArray and print the info of JSONObjects
+			//Iterate the jsonArray and print the info of JSONObjects
 
-            Bundle Image = new Bundle();
-            JSONObject jsonObject = jsonArray.getJSONObject(0);
+			Bundle Image = new Bundle();
+			JSONObject jsonObject = jsonArray.getJSONObject(0);
 
-            if (jsonObject.has("ID"))
-                Image.putString("ID", jsonObject.getString("ID"));
-            if (jsonObject.has("URL"))
-                Image.putString("URL", jsonObject.getString("URL"));
-            if (jsonObject.has("CLICK"))
-                Image.putString(("CLICK"), jsonObject.getString("CLICK"));
-            if (jsonObject.has("INDEX"))
-                Image.putString(("INDEX"), jsonObject.getString("INDEX"));
-            if (jsonObject.has("END"))
-                Image.putString(("END"), jsonObject.getString("END"));
+			if (jsonObject.has("ID"))
+				Image.putString("ID", jsonObject.getString("ID"));
+			if (jsonObject.has("URL"))
+				Image.putString("URL", jsonObject.getString("URL"));
+			if (jsonObject.has("CLICK"))
+				Image.putString(("CLICK"), jsonObject.getString("CLICK"));
+			if (jsonObject.has("INDEX"))
+				Image.putString(("INDEX"), jsonObject.getString("INDEX"));
+			if (jsonObject.has("END"))
+				Image.putString(("END"), jsonObject.getString("END"));
 
-            App.BannerName.putBundle(type, Image);
+			App.BannerName.putBundle(type, Image);
 
 			//ricavo nome file
 			URL urlImg = new URL(Image.getString("URL").replace(" ", "%20"));
 			String extension = urlImg.getFile().substring(urlImg.getFile().lastIndexOf('.') + 1);
 			String filename = Image.getString("ID").concat(".").concat(extension);
 
-            //download imagine se non esiste
-            file = new File(outDir, filename);
+			//download imagine se non esiste
+			file = new File(outDir, filename);
 
-            if (file.exists()) {
-                Image.putString(("FILENAME"), filename);
-                App.BannerName.putBundle(type, Image);
-                dlog.i(" loadBanner: file già esistente: " + filename);
-                return;
-            }
+			if (file.exists()) {
+				Image.putString(("FILENAME"), filename);
+				App.BannerName.putBundle(type, Image);
+				dlog.i(" loadBanner: file già esistente: " + filename);
+				return;
+			}
 
-            dlog.i(" loadBanner: file mancante inizio download a url: " + urlImg.toString());
-            HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setDoOutput(true);
-            urlConnection.connect();
-            if (file.createNewFile()) {
-                file.createNewFile();
-            }
-            FileOutputStream fileOutput = new FileOutputStream(file);
-            InputStream inputStream = urlConnection.getInputStream();
-            int totalSize = urlConnection.getContentLength();
-            int downloadedSize = 0;
-            byte[] buffer = new byte[1024];
-            int bufferLength = 0;
-            while ((bufferLength = inputStream.read(buffer)) > 0) {
-                fileOutput.write(buffer, 0, bufferLength);
-                //downloadedSize += bufferLength;
-                //Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
-            }
-            fileOutput.close();
-            inputStream.close();
-            urlConnection.disconnect();
-            Image.putString(("FILENAME"), filename);
-            App.BannerName.putBundle(type, Image);
-            dlog.i(" loadBanner: File scaricato e creato " + filename);
+			dlog.i(" loadBanner: file mancante inizio download a url: " + urlImg.toString());
+			HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
+			urlConnection.setRequestMethod("GET");
+			urlConnection.setDoOutput(true);
+			urlConnection.connect();
+			if (file.createNewFile()) {
+				file.createNewFile();
+			}
+			FileOutputStream fileOutput = new FileOutputStream(file);
+			InputStream inputStream = urlConnection.getInputStream();
+			int totalSize = urlConnection.getContentLength();
+			int downloadedSize = 0;
+			byte[] buffer = new byte[1024];
+			int bufferLength = 0;
+			while ((bufferLength = inputStream.read(buffer)) > 0) {
+				fileOutput.write(buffer, 0, bufferLength);
+				//downloadedSize += bufferLength;
+				//Log.i("Progress:", "downloadedSize:" + downloadedSize + "totalSize:" + totalSize);
+			}
+			fileOutput.close();
+			inputStream.close();
+			urlConnection.disconnect();
+			Image.putString(("FILENAME"), filename);
+			App.BannerName.putBundle(type, Image);
+			dlog.i(" loadBanner: File scaricato e creato " + filename);
 
-        } catch (Exception e) {
-            if (file.exists()) file.delete();
-            App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
-            dlog.e(" loadBanner: eccezione in creazione e download file ", e);
+		} catch (Exception e) {
+			if (file.exists()) file.delete();
+			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+			dlog.e(" loadBanner: eccezione in creazione e download file ", e);
 
-            e.printStackTrace();
-        }
+			e.printStackTrace();
+		}
 
-    }
+	}
 
-    private void updateBanner(String type) {
+	private void updateBanner(String type) {
 
-        File ImageV;
-        Bundle Banner = App.BannerName.getBundle(type);
-        if (Banner != null) {
-            File outDir = new File(App.getBannerImagesFolder());
-            if (!outDir.isDirectory()) {
-                dlog.e(FDriveMessage_new.class.toString() + " updateBanner: la cartella non esiste visualizzo offline ");
+		File ImageV;
+		Bundle Banner = App.BannerName.getBundle(type);
+		if (Banner != null) {
+			File outDir = new File(App.getBannerImagesFolder());
+			if (!outDir.isDirectory()) {
+				dlog.e(FDriveMessage_new.class.toString() + " updateBanner: la cartella non esiste visualizzo offline ");
 
-                //webViewBanner.setVisibility(View.INVISIBLE);
-                adIV.setImageResource(R.drawable.offline_welcome);
-                adIV.setVisibility(View.VISIBLE);
-                return;
-            }
-            ImageV = new File(outDir, Banner.getString("FILENAME", null));
+				//webViewBanner.setVisibility(View.INVISIBLE);
+				adIV.setImageResource(R.drawable.offline_welcome);
+				adIV.setVisibility(View.VISIBLE);
+				return;
+			}
+			ImageV = new File(outDir, Banner.getString("FILENAME", null));
 
-            try {
-                if (ImageV != null && ImageV.exists()) {
-                    dlog.i(FDriveMessage_new.class.toString() + " updateBanner: file trovato imposto immagine " + Banner.getString("FILENAME", "ERRORE CONTROLLARE"));
-                    Bitmap myBitmap = BitmapFactory.decodeFile(ImageV.getAbsolutePath());
-                    if (myBitmap == null) {
+			try {
+				if (ImageV != null && ImageV.exists()) {
+					dlog.i(FDriveMessage_new.class.toString() + " updateBanner: file trovato imposto immagine " + Banner.getString("FILENAME", "ERRORE CONTROLLARE"));
+					Bitmap myBitmap = BitmapFactory.decodeFile(ImageV.getAbsolutePath());
+					if (myBitmap == null) {
 
-                        dlog.e(FDriveMessage_new.class.toString() + " updateBanner: file corrotto, elimino e visualizzo offline ");
-                        ImageV.delete();
-                        //initWebBanner(Banner.getString("URL",null));
-                        //webViewBanner.setVisibility(View.INVISIBLE);
-                        adIV.setImageResource(R.drawable.offline_welcome);
-                        adIV.setVisibility(View.VISIBLE);
-                        return;
-                    }
-                    //webViewBanner.setVisibility(View.INVISIBLE);
-                    adIV.setImageBitmap(myBitmap);
-                    adIV.setVisibility(View.VISIBLE);
-                    adIV.invalidate();
-                    return;
+						dlog.e(FDriveMessage_new.class.toString() + " updateBanner: file corrotto, elimino e visualizzo offline ");
+						ImageV.delete();
+						//initWebBanner(Banner.getString("URL",null));
+						//webViewBanner.setVisibility(View.INVISIBLE);
+						adIV.setImageResource(R.drawable.offline_welcome);
+						adIV.setVisibility(View.VISIBLE);
+						return;
+					}
+					//webViewBanner.setVisibility(View.INVISIBLE);
+					adIV.setImageBitmap(myBitmap);
+					adIV.setVisibility(View.VISIBLE);
+					adIV.invalidate();
+					return;
 
-                }
-                dlog.e(FDriveMessage_new.class.toString() + " updateBanner: file non esiste visualizzo offline ");
-                //webViewBanner.setVisibility(View.INVISIBLE);
-                adIV.setImageResource(R.drawable.offline_welcome);
-                adIV.setVisibility(View.VISIBLE);
-            } catch (Exception e) {
-                dlog.e(FDriveMessage_new.class.toString() + " updateBanner: eccezione in caricamento file visualizzo offline ", e);
-                e.printStackTrace();
-                //initWebBanner(Banner.getString("URL",null));
-                //webViewBanner.setVisibility(View.INVISIBLE);
-                adIV.setImageResource(R.drawable.offline_welcome);
-                adIV.setVisibility(View.VISIBLE);
-                return;
-            }
-        } else {
-            dlog.e(FDriveMessage_new.class.toString() + " updateBanner: Bundle null, visualizzo offline");
-            //initWebBanner(Banner.getString("URL",null));
-            //webViewBanner.setVisibility(View.INVISIBLE);
-            adIV.setImageResource(R.drawable.offline_welcome);
-            adIV.setVisibility(View.VISIBLE);
-            return;
-        }
+				}
+				dlog.e(FDriveMessage_new.class.toString() + " updateBanner: file non esiste visualizzo offline ");
+				//webViewBanner.setVisibility(View.INVISIBLE);
+				adIV.setImageResource(R.drawable.offline_welcome);
+				adIV.setVisibility(View.VISIBLE);
+			} catch (Exception e) {
+				dlog.e(FDriveMessage_new.class.toString() + " updateBanner: eccezione in caricamento file visualizzo offline ", e);
+				e.printStackTrace();
+				//initWebBanner(Banner.getString("URL",null));
+				//webViewBanner.setVisibility(View.INVISIBLE);
+				adIV.setImageResource(R.drawable.offline_welcome);
+				adIV.setVisibility(View.VISIBLE);
+				return;
+			}
+		} else {
+			dlog.e(FDriveMessage_new.class.toString() + " updateBanner: Bundle null, visualizzo offline");
+			//initWebBanner(Banner.getString("URL",null));
+			//webViewBanner.setVisibility(View.INVISIBLE);
+			adIV.setImageResource(R.drawable.offline_welcome);
+			adIV.setVisibility(View.VISIBLE);
+			return;
+		}
 
-    }
+	}
 
-    @Override
-    public void onDestroy() {
-        adIV = null;
-        startImages = null;
-        super.onDestroy();
-    }
+	@Override
+	public void onDestroy() {
+		adIV = null;
+		startImages = null;
+		super.onDestroy();
+	}
 }

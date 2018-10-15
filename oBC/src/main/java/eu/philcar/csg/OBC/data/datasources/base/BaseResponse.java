@@ -10,13 +10,13 @@ import eu.philcar.csg.OBC.data.model.ServerResponse;
 
 public abstract class BaseResponse implements ServerResponse {
 
-    /**
-     * Use String type property for optional value, they will be discarded if null when the Json get built
-     *
-     * @return the Json built from the Object property
-     */
-    public String getJson() {
-        Gson gson = new Gson();
-        return gson.toJson(this);
-    }
+	/**
+	 * Use String type property for optional value, they will be discarded if null when the Json get built
+	 *
+	 * @return the Json built from the Object property
+	 */
+	public String getJson() {
+		Gson gson = new Gson();
+		return gson.toJson(this);
+	}
 }

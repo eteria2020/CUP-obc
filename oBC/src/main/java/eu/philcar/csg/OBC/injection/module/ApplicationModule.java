@@ -15,27 +15,27 @@ import eu.philcar.csg.OBC.injection.ApplicationContext;
  */
 @Module
 public class ApplicationModule {
-    protected final Application mApplication;
+	protected final Application mApplication;
 
-    public ApplicationModule(Application application) {
-        mApplication = application;
-    }
+	public ApplicationModule(Application application) {
+		mApplication = application;
+	}
 
-    @Provides
-    Application provideApplication() {
-        return mApplication;
-    }
+	@Provides
+	Application provideApplication() {
+		return mApplication;
+	}
 
-    @Provides
-    @ApplicationContext
-    Context provideContext() {
-        return mApplication;
-    }
+	@Provides
+	@ApplicationContext
+	Context provideContext() {
+		return mApplication;
+	}
 
-    @Provides
-    @Singleton
-    SharengoService provideSharengoService() {
-        return SharengoService.Creator.newSharengoService();
-    }
+	@Provides
+	@Singleton
+	SharengoService provideSharengoService() {
+		return SharengoService.Creator.newSharengoService();
+	}
 
 }

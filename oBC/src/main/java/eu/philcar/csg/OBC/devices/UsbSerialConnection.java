@@ -23,191 +23,191 @@ import eu.philcar.usbserial.driver.UsbSerialProber;
 import eu.philcar.usbserial.util.SerialInputOutputManager;
 
 public class UsbSerialConnection {
-    private DLog dlog = new DLog(this.getClass());
+	private DLog dlog = new DLog(this.getClass());
 
-    private UsbSerialPort sPort = null;
-    private List<UsbSerialPort> usbSerialPortList;
+	private UsbSerialPort sPort = null;
+	private List<UsbSerialPort> usbSerialPortList;
 
-    private SerialInputOutputManager mSerialIoManager;
-    private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
+	private SerialInputOutputManager mSerialIoManager;
+	private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
-    public static final int MSG_RECEIVE = 2;
-    private Handler extHandler = null;
+	public static final int MSG_RECEIVE = 2;
+	private Handler extHandler = null;
 
-    private final SerialInputOutputManager.Listener mListener =
-            new SerialInputOutputManager.Listener() {
+	private final SerialInputOutputManager.Listener mListener =
+			new SerialInputOutputManager.Listener() {
 
-                @Override
-                public void onRunError(Exception e) {
-                    dlog.d("Runner stopped.");
-                }
+				@Override
+				public void onRunError(Exception e) {
+					dlog.d("Runner stopped.");
+				}
 
-                StringBuilder sBuffer;
+				StringBuilder sBuffer;
 
-                @Override
-                public void onNewData(final byte[] data) {
+				@Override
+				public void onNewData(final byte[] data) {
 
-                    try {
-                        if (sBuffer == null)
-                            sBuffer = new StringBuilder();
+					try {
+						if (sBuffer == null)
+							sBuffer = new StringBuilder();
 
-                        sBuffer.append(new String(data, "UTF-8"));
+						sBuffer.append(new String(data, "UTF-8"));
 
-                        int i;
-                        while ((i = sBuffer.indexOf("\n")) >= 0) {
-                            String str = sBuffer.substring(0, i);
-                            if (i < sBuffer.length())
-                                sBuffer = new StringBuilder(sBuffer.substring(i + 1));
-                            else
-                                sBuffer = null;
+						int i;
+						while ((i = sBuffer.indexOf("\n")) >= 0) {
+							String str = sBuffer.substring(0, i);
+							if (i < sBuffer.length())
+								sBuffer = new StringBuilder(sBuffer.substring(i + 1));
+							else
+								sBuffer = null;
 
-                            dlog.d("USB RX: " + str);
+							dlog.d("USB RX: " + str);
 
-                            if (extHandler != null)
-                                extHandler.obtainMessage(MSG_RECEIVE, str).sendToTarget();
-                        }
+							if (extHandler != null)
+								extHandler.obtainMessage(MSG_RECEIVE, str).sendToTarget();
+						}
 
-                    } catch (UnsupportedEncodingException e) {
+					} catch (UnsupportedEncodingException e) {
 
-                    }
+					}
 
-                }
-            };
+				}
+			};
 
-    private final String permissionAction = "PermissionGranted";
+	private final String permissionAction = "PermissionGranted";
 
-    public void startIntentFilter(Context ctx) {
+	public void startIntentFilter(Context ctx) {
 
-        IntentFilter filter = new IntentFilter(UsbReceiverActivity.ACTION_USB_DEVICE_ATTACHED);
-        filter.addAction(permissionAction);
-        ctx.registerReceiver(mUsbAttachedReceiver, filter);
+		IntentFilter filter = new IntentFilter(UsbReceiverActivity.ACTION_USB_DEVICE_ATTACHED);
+		filter.addAction(permissionAction);
+		ctx.registerReceiver(mUsbAttachedReceiver, filter);
 
-    }
+	}
 
-    private final BroadcastReceiver mUsbAttachedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
+	private final BroadcastReceiver mUsbAttachedReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
 
-            if (action == null)
-                return;
+			if (action == null)
+				return;
 
-            dlog.d("Received action : " + action);
+			dlog.d("Received action : " + action);
 
-            if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) || UsbReceiverActivity.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-                synchronized (this) {
-                    UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                    dlog.d("Extra_device:" + device.toString());
-                    enumerate(context);
-                    setPort(1);
-                    if (device != null) {
-                        connect(context, device);
-                    }
-                }
-            } else if (permissionAction.equals(action)) {
-                connect(context);
-            }
-        }
-    };
+			if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) || UsbReceiverActivity.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+				synchronized (this) {
+					UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+					dlog.d("Extra_device:" + device.toString());
+					enumerate(context);
+					setPort(1);
+					if (device != null) {
+						connect(context, device);
+					}
+				}
+			} else if (permissionAction.equals(action)) {
+				connect(context);
+			}
+		}
+	};
 
-    public void setPort(int n) {
-        if (n > 0 && usbSerialPortList != null && usbSerialPortList.size() >= n) {
-            sPort = usbSerialPortList.get(n - 1);
-            dlog.i("Selected port n. : " + n);
-        }
-    }
+	public void setPort(int n) {
+		if (n > 0 && usbSerialPortList != null && usbSerialPortList.size() >= n) {
+			sPort = usbSerialPortList.get(n - 1);
+			dlog.i("Selected port n. : " + n);
+		}
+	}
 
-    public void setHandler(Handler handler) {
-        extHandler = handler;
-    }
+	public void setHandler(Handler handler) {
+		extHandler = handler;
+	}
 
-    public int enumerate(Context ctx) {
-        final UsbManager usbManager = (UsbManager) ctx.getSystemService(Context.USB_SERVICE);
-        dlog.i("UsbManager :" + usbManager != null ? "OK" : "fail");
+	public int enumerate(Context ctx) {
+		final UsbManager usbManager = (UsbManager) ctx.getSystemService(Context.USB_SERVICE);
+		dlog.i("UsbManager :" + usbManager != null ? "OK" : "fail");
 
-        final List<UsbSerialDriver> drivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
+		final List<UsbSerialDriver> drivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
 
-        final List<UsbSerialPort> result = new ArrayList<UsbSerialPort>();
-        for (final UsbSerialDriver driver : drivers) {
-            final List<UsbSerialPort> ports = driver.getPorts();
-            dlog.d(String.format("+ %s: %s port%s",
-                    driver, Integer.valueOf(ports.size()), ports.size() == 1 ? "" : "s"));
-            result.addAll(ports);
-        }
+		final List<UsbSerialPort> result = new ArrayList<UsbSerialPort>();
+		for (final UsbSerialDriver driver : drivers) {
+			final List<UsbSerialPort> ports = driver.getPorts();
+			dlog.d(String.format("+ %s: %s port%s",
+					driver, Integer.valueOf(ports.size()), ports.size() == 1 ? "" : "s"));
+			result.addAll(ports);
+		}
 
-        usbSerialPortList = result;
+		usbSerialPortList = result;
 
-        return result.size();
-    }
+		return result.size();
+	}
 
-    public void connect(Context ctx) {
-        connect(ctx, null);
-    }
+	public void connect(Context ctx) {
+		connect(ctx, null);
+	}
 
-    public void connect(Context ctx, UsbDevice usbDevice) {
+	public void connect(Context ctx, UsbDevice usbDevice) {
 
-        if (sPort == null) {
-            dlog.e("Port is null");
-            return;
-        }
+		if (sPort == null) {
+			dlog.e("Port is null");
+			return;
+		}
 
-        final UsbManager usbManager = (UsbManager) ctx.getSystemService(Context.USB_SERVICE);
+		final UsbManager usbManager = (UsbManager) ctx.getSystemService(Context.USB_SERVICE);
 
-        if (usbDevice == null)
-            usbDevice = sPort.getDriver().getDevice();
+		if (usbDevice == null)
+			usbDevice = sPort.getDriver().getDevice();
 
-        if (!usbManager.hasPermission(usbDevice)) {
-            PendingIntent pi = PendingIntent.getBroadcast(ctx, 0, new Intent(permissionAction), 0);
-            usbManager.requestPermission(usbDevice, pi);
-            return;
-        }
-        UsbDeviceConnection connection = usbManager.openDevice(usbDevice);
+		if (!usbManager.hasPermission(usbDevice)) {
+			PendingIntent pi = PendingIntent.getBroadcast(ctx, 0, new Intent(permissionAction), 0);
+			usbManager.requestPermission(usbDevice, pi);
+			return;
+		}
+		UsbDeviceConnection connection = usbManager.openDevice(usbDevice);
 
-        if (connection == null) {
-            dlog.e("Opening device failed");
-            return;
-        }
+		if (connection == null) {
+			dlog.e("Opening device failed");
+			return;
+		}
 
-        try {
-            sPort.open(connection);
-            sPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
-            dlog.d("Port opened");
-            startIoManager();
-        } catch (Exception e) {
-            dlog.e("Opening or setting port: ", e);
-            try {
-                sPort.close();
-            } catch (Exception e1) {
+		try {
+			sPort.open(connection);
+			sPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+			dlog.d("Port opened");
+			startIoManager();
+		} catch (Exception e) {
+			dlog.e("Opening or setting port: ", e);
+			try {
+				sPort.close();
+			} catch (Exception e1) {
 
-            }
-            return;
-        }
+			}
+			return;
+		}
 
-    }
+	}
 
-    private void connectDevice() {
+	private void connectDevice() {
 
-    }
+	}
 
-    private void stopIoManager() {
-        if (mSerialIoManager != null) {
-            dlog.i("Stopping io manager ..");
-            mSerialIoManager.stop();
-            mSerialIoManager = null;
-        }
-    }
+	private void stopIoManager() {
+		if (mSerialIoManager != null) {
+			dlog.i("Stopping io manager ..");
+			mSerialIoManager.stop();
+			mSerialIoManager = null;
+		}
+	}
 
-    private void startIoManager() {
-        if (sPort != null) {
-            dlog.i("Starting io manager ..");
-            mSerialIoManager = new SerialInputOutputManager(sPort, mListener);
-            mExecutor.submit(mSerialIoManager);
-        }
-    }
+	private void startIoManager() {
+		if (sPort != null) {
+			dlog.i("Starting io manager ..");
+			mSerialIoManager = new SerialInputOutputManager(sPort, mListener);
+			mExecutor.submit(mSerialIoManager);
+		}
+	}
 
-    private void onDeviceStateChange() {
-        stopIoManager();
-        startIoManager();
-    }
+	private void onDeviceStateChange() {
+		stopIoManager();
+		startIoManager();
+	}
 
 }

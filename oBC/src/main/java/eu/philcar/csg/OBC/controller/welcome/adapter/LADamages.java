@@ -14,55 +14,55 @@ import eu.philcar.csg.OBC.R;
 
 public class LADamages extends BaseAdapter {
 
-    public static final int ADDITIONAL_ITEMS_PER_LIST = 3;
+	public static final int ADDITIONAL_ITEMS_PER_LIST = 3;
 
-    private ArrayList<String> damages;
-    private Context context;
+	private ArrayList<String> damages;
+	private Context context;
 
-    public LADamages(Context context, ArrayList<String> damages) {
-        this.context = context;
-        this.damages = damages;
-    }
+	public LADamages(Context context, ArrayList<String> damages) {
+		this.context = context;
+		this.damages = damages;
+	}
 
-    @Override
-    public int getCount() {
-        return damages.size() + ADDITIONAL_ITEMS_PER_LIST;
-    }
+	@Override
+	public int getCount() {
+		return damages.size() + ADDITIONAL_ITEMS_PER_LIST;
+	}
 
-    @Override
-    public Object getItem(int position) {
+	@Override
+	public Object getItem(int position) {
 
-        if (position < damages.size()) {
-            return damages.get(position);
-        }
+		if (position < damages.size()) {
+			return damages.get(position);
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public long getItemId(int position) {
-        return 0;
-    }
+	@Override
+	public long getItemId(int position) {
+		return 0;
+	}
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
 
-        if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.la_damages, parent, false);
-        }
+		if (convertView == null) {
+			convertView = LayoutInflater.from(context).inflate(R.layout.la_damages, parent, false);
+		}
 
-        TextView damageTV = (TextView) convertView.findViewById(R.id.ladamDamageTV);
+		TextView damageTV = (TextView) convertView.findViewById(R.id.ladamDamageTV);
 
-        Typeface font = Typeface.createFromAsset(context.getAssets(), "interstateregular.ttf");
-        damageTV.setTypeface(font);
+		Typeface font = Typeface.createFromAsset(context.getAssets(), "interstateregular.ttf");
+		damageTV.setTypeface(font);
 
-        if (position < damages.size()) {
-            damageTV.setText(damages.get(position));
-        } else {
-            damageTV.setText("");
-        }
+		if (position < damages.size()) {
+			damageTV.setText(damages.get(position));
+		} else {
+			damageTV.setText("");
+		}
 
-        return convertView;
-    }
+		return convertView;
+	}
 
 }

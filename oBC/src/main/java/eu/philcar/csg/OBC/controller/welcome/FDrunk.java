@@ -19,58 +19,58 @@ import eu.philcar.csg.OBC.controller.FBase;
 
 public class FDrunk extends FBase implements OnClickListener {
 
-    public static FDrunk newInstance() {
+	public static FDrunk newInstance() {
 
-        FDrunk fd = new FDrunk();
+		FDrunk fd = new FDrunk();
 
-        return fd;
-    }
+		return fd;
+	}
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.f_drunk, container, false);
+		View view = inflater.inflate(R.layout.f_drunk, container, false);
 
-        Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
+		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 
-        ((TextView) view.findViewById(R.id.fdruMessageTV)).setTypeface(font);
+		((TextView) view.findViewById(R.id.fdruMessageTV)).setTypeface(font);
 
-        ((Button) view.findViewById(R.id.fdruYesB)).setTypeface(font);
-        view.findViewById(R.id.fdruYesB).setOnClickListener(this);
+		((Button) view.findViewById(R.id.fdruYesB)).setTypeface(font);
+		view.findViewById(R.id.fdruYesB).setOnClickListener(this);
 
-        ((Button) view.findViewById(R.id.fdruNoB)).setTypeface(font);
-        view.findViewById(R.id.fdruNoB).setOnClickListener(this);
+		((Button) view.findViewById(R.id.fdruNoB)).setTypeface(font);
+		view.findViewById(R.id.fdruNoB).setOnClickListener(this);
 
-        ((Button) view.findViewById(R.id.fdruSOSB)).setTypeface(font);
-        view.findViewById(R.id.fdruSOSB).setOnClickListener(this);
+		((Button) view.findViewById(R.id.fdruSOSB)).setTypeface(font);
+		view.findViewById(R.id.fdruSOSB).setOnClickListener(this);
 
-        return view;
-    }
+		return view;
+	}
 
-    @Override
-    public void onClick(View v) {
+	@Override
+	public void onClick(View v) {
 
-        switch (v.getId()) {
-            case R.id.fdruYesB:
+		switch (v.getId()) {
+			case R.id.fdruYesB:
 
-                App.userDrunk = true;
-                App.Instance.persistUserDrunk();
+				App.userDrunk = true;
+				App.Instance.persistUserDrunk();
 
-                Intent i = new Intent(getActivity(), AGoodbye.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                i.putExtra(AGoodbye.JUMP_TO_END, true);
-                startActivity(i);
-                getActivity().finish();
-                break;
-            case R.id.fdruNoB:
+				Intent i = new Intent(getActivity(), AGoodbye.class);
+				i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				i.putExtra(AGoodbye.JUMP_TO_END, true);
+				startActivity(i);
+				getActivity().finish();
+				break;
+			case R.id.fdruNoB:
 
-                App.userDrunk = false;
-                App.Instance.persistUserDrunk();
+				App.userDrunk = false;
+				App.Instance.persistUserDrunk();
 
-                ((ABase) getActivity()).pushFragment(FCleanliness.newInstance(), FCleanliness.class.getName(), true);
-                break;
-            case R.id.fdruSOSB:
-                startActivity(new Intent(getActivity(), ASOS.class));
-                break;
-        }
-    }
+				((ABase) getActivity()).pushFragment(FCleanliness.newInstance(), FCleanliness.class.getName(), true);
+				break;
+			case R.id.fdruSOSB:
+				startActivity(new Intent(getActivity(), ASOS.class));
+				break;
+		}
+	}
 }

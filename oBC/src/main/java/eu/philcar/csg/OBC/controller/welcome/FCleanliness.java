@@ -25,185 +25,185 @@ import eu.philcar.csg.OBC.helpers.DLog;
 
 public class FCleanliness extends FBase implements OnClickListener {
 
-    public static FCleanliness newInstance() {
+	public static FCleanliness newInstance() {
 
-        FCleanliness fc = new FCleanliness();
-        return fc;
-    }
+		FCleanliness fc = new FCleanliness();
+		return fc;
+	}
 
-    @Inject
-    EventRepository eventRepository;
+	@Inject
+	EventRepository eventRepository;
 
-    private ImageButton insideGreenLedIB, insideYellowLedIB, insideRedLedIB, outsideGreenLedIB, outsideYellowLedIB, outsideRedLedIB;
-    private Button sosB;
-    private FrameLayout fcle_right_FL;
-    private DLog dlog = new DLog(this.getClass());
+	private ImageButton insideGreenLedIB, insideYellowLedIB, insideRedLedIB, outsideGreenLedIB, outsideYellowLedIB, outsideRedLedIB;
+	private Button sosB;
+	private FrameLayout fcle_right_FL;
+	private DLog dlog = new DLog(this.getClass());
 
-    private int insideState, outsideState;
+	private int insideState, outsideState;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        App.get(getActivity()).getComponent().inject(this);
-    }
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		App.get(getActivity()).getComponent().inject(this);
+	}
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.f_cleanliness, container, false);
-        dlog.d("OnCreareView FCleanliness");
+		View view = inflater.inflate(R.layout.f_cleanliness, container, false);
+		dlog.d("OnCreareView FCleanliness");
 
-        Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
+		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 
-        ((TextView) view.findViewById(R.id.fcleMessageInsideTV)).setTypeface(font);
-        ((TextView) view.findViewById(R.id.fcleMessageOutsideTV)).setTypeface(font);
-        ((TextView) view.findViewById(R.id.fcleMessageTV)).setTypeface(font);
-        fcle_right_FL = (FrameLayout) view.findViewById(R.id.fcle_right_FL);
-        insideGreenLedIB = (ImageButton) view.findViewById(R.id.fcleInsideGreenLedIB);
-        insideYellowLedIB = (ImageButton) view.findViewById(R.id.fcleInsideYellowLedIB);
-        insideRedLedIB = (ImageButton) view.findViewById(R.id.fcleInsideRedLedIB);
+		((TextView) view.findViewById(R.id.fcleMessageInsideTV)).setTypeface(font);
+		((TextView) view.findViewById(R.id.fcleMessageOutsideTV)).setTypeface(font);
+		((TextView) view.findViewById(R.id.fcleMessageTV)).setTypeface(font);
+		fcle_right_FL = (FrameLayout) view.findViewById(R.id.fcle_right_FL);
+		insideGreenLedIB = (ImageButton) view.findViewById(R.id.fcleInsideGreenLedIB);
+		insideYellowLedIB = (ImageButton) view.findViewById(R.id.fcleInsideYellowLedIB);
+		insideRedLedIB = (ImageButton) view.findViewById(R.id.fcleInsideRedLedIB);
 
-        outsideGreenLedIB = (ImageButton) view.findViewById(R.id.fcleOutsideGreenLedIB);
-        outsideYellowLedIB = (ImageButton) view.findViewById(R.id.fcleOutsideYellowLedIB);
-        outsideRedLedIB = (ImageButton) view.findViewById(R.id.fcleOutsideRedLedIB);
+		outsideGreenLedIB = (ImageButton) view.findViewById(R.id.fcleOutsideGreenLedIB);
+		outsideYellowLedIB = (ImageButton) view.findViewById(R.id.fcleOutsideYellowLedIB);
+		outsideRedLedIB = (ImageButton) view.findViewById(R.id.fcleOutsideRedLedIB);
 
-        sosB = (Button) view.findViewById(R.id.fcleSOSB);
+		sosB = (Button) view.findViewById(R.id.fcleSOSB);
 
-        enableUI();
+		enableUI();
 
-        if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
-            fcle_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
+		if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
+			fcle_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
 
-        } else {
-            fcle_right_FL.setBackgroundColor(getResources().getColor(R.color.background_green));
-        }
+		} else {
+			fcle_right_FL.setBackgroundColor(getResources().getColor(R.color.background_green));
+		}
 
-        return view;
-    }
+		return view;
+	}
 
-    private void setInsideCleanliness(int v) {
-        if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
-            App.currentTripInfo.trip.int_cleanliness = v;
-        }
-    }
+	private void setInsideCleanliness(int v) {
+		if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
+			App.currentTripInfo.trip.int_cleanliness = v;
+		}
+	}
 
-    private void setOutsideCleanliness(int v) {
-        if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
-            App.currentTripInfo.trip.ext_cleanliness = v;
-        }
-    }
+	private void setOutsideCleanliness(int v) {
+		if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
+			App.currentTripInfo.trip.ext_cleanliness = v;
+		}
+	}
 
-    @Override
-    public void onClick(View v) {
+	@Override
+	public void onClick(View v) {
 
-        disableUI();
+		disableUI();
 
-        switch (v.getId()) {
-            case R.id.fcleInsideGreenLedIB:
-                insideState = 3;
-                setInsideCleanliness(0);
-                break;
-            case R.id.fcleInsideYellowLedIB:
-                insideState = 2;
-                setInsideCleanliness(1);
-                break;
-            case R.id.fcleInsideRedLedIB:
-                insideState = 1;
-                setInsideCleanliness(2);
-                break;
-            case R.id.fcleOutsideGreenLedIB:
-                outsideState = 3;
-                setOutsideCleanliness(0);
-                break;
-            case R.id.fcleOutsideYellowLedIB:
-                outsideState = 2;
-                setOutsideCleanliness(1);
-                break;
-            case R.id.fcleOutsideRedLedIB:
-                outsideState = 1;
-                setOutsideCleanliness(2);
-                break;
-            case R.id.fcleSOSB:
-                startActivity(new Intent(getActivity(), ASOS.class));
-                break;
-        }
+		switch (v.getId()) {
+			case R.id.fcleInsideGreenLedIB:
+				insideState = 3;
+				setInsideCleanliness(0);
+				break;
+			case R.id.fcleInsideYellowLedIB:
+				insideState = 2;
+				setInsideCleanliness(1);
+				break;
+			case R.id.fcleInsideRedLedIB:
+				insideState = 1;
+				setInsideCleanliness(2);
+				break;
+			case R.id.fcleOutsideGreenLedIB:
+				outsideState = 3;
+				setOutsideCleanliness(0);
+				break;
+			case R.id.fcleOutsideYellowLedIB:
+				outsideState = 2;
+				setOutsideCleanliness(1);
+				break;
+			case R.id.fcleOutsideRedLedIB:
+				outsideState = 1;
+				setOutsideCleanliness(2);
+				break;
+			case R.id.fcleSOSB:
+				startActivity(new Intent(getActivity(), ASOS.class));
+				break;
+		}
 
-        if (updateUI()) {
-            enableUI();
-        }
-    }
+		if (updateUI()) {
+			enableUI();
+		}
+	}
 
-    private boolean updateUI() {
+	private boolean updateUI() {
 
-        insideRedLedIB.setSelected(false);
-        insideYellowLedIB.setSelected(false);
-        insideGreenLedIB.setSelected(false);
+		insideRedLedIB.setSelected(false);
+		insideYellowLedIB.setSelected(false);
+		insideGreenLedIB.setSelected(false);
 
-        switch (insideState) {
-            case 1:
-                insideRedLedIB.setSelected(true);
-                break;
-            case 2:
-                insideYellowLedIB.setSelected(true);
-                break;
-            case 3:
-                insideGreenLedIB.setSelected(true);
-                break;
-        }
+		switch (insideState) {
+			case 1:
+				insideRedLedIB.setSelected(true);
+				break;
+			case 2:
+				insideYellowLedIB.setSelected(true);
+				break;
+			case 3:
+				insideGreenLedIB.setSelected(true);
+				break;
+		}
 
-        outsideRedLedIB.setSelected(false);
-        outsideYellowLedIB.setSelected(false);
-        outsideGreenLedIB.setSelected(false);
+		outsideRedLedIB.setSelected(false);
+		outsideYellowLedIB.setSelected(false);
+		outsideGreenLedIB.setSelected(false);
 
-        switch (outsideState) {
-            case 1:
-                outsideRedLedIB.setSelected(true);
-                break;
-            case 2:
-                outsideYellowLedIB.setSelected(true);
-                break;
-            case 3:
-                outsideGreenLedIB.setSelected(true);
-                break;
-        }
+		switch (outsideState) {
+			case 1:
+				outsideRedLedIB.setSelected(true);
+				break;
+			case 2:
+				outsideYellowLedIB.setSelected(true);
+				break;
+			case 3:
+				outsideGreenLedIB.setSelected(true);
+				break;
+		}
 
-        if (insideState > 0 && outsideState > 0) {
+		if (insideState > 0 && outsideState > 0) {
 
-            if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
-                App.CounterCleanlines = 0;
-                App.Instance.persistCounterCleanlines();
-                eventRepository.eventCleanliness(App.currentTripInfo.trip.int_cleanliness, App.currentTripInfo.trip.ext_cleanliness);
-                App.currentTripInfo.UpdateCorsa();
+			if (App.currentTripInfo != null && App.currentTripInfo.trip != null) {
+				App.CounterCleanlines = 0;
+				App.Instance.persistCounterCleanlines();
+				eventRepository.eventCleanliness(App.currentTripInfo.trip.int_cleanliness, App.currentTripInfo.trip.ext_cleanliness);
+				App.currentTripInfo.UpdateCorsa();
 
-            }
+			}
 
-            ((ABase) getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
+			((ABase) getActivity()).pushFragment(FInstructions.newInstance(true), FInstructions.class.getName(), true);
 
-            return false;
-        }
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void disableUI() {
+	private void disableUI() {
 
-        insideGreenLedIB.setOnClickListener(null);
-        insideYellowLedIB.setOnClickListener(null);
-        insideRedLedIB.setOnClickListener(null);
-        outsideGreenLedIB.setOnClickListener(null);
-        outsideYellowLedIB.setOnClickListener(null);
-        outsideRedLedIB.setOnClickListener(null);
-        sosB.setOnClickListener(null);
-    }
+		insideGreenLedIB.setOnClickListener(null);
+		insideYellowLedIB.setOnClickListener(null);
+		insideRedLedIB.setOnClickListener(null);
+		outsideGreenLedIB.setOnClickListener(null);
+		outsideYellowLedIB.setOnClickListener(null);
+		outsideRedLedIB.setOnClickListener(null);
+		sosB.setOnClickListener(null);
+	}
 
-    private void enableUI() {
+	private void enableUI() {
 
-        insideGreenLedIB.setOnClickListener(this);
-        insideYellowLedIB.setOnClickListener(this);
-        insideRedLedIB.setOnClickListener(this);
-        outsideGreenLedIB.setOnClickListener(this);
-        outsideYellowLedIB.setOnClickListener(this);
-        outsideRedLedIB.setOnClickListener(this);
-        sosB.setOnClickListener(this);
-    }
+		insideGreenLedIB.setOnClickListener(this);
+		insideYellowLedIB.setOnClickListener(this);
+		insideRedLedIB.setOnClickListener(this);
+		outsideGreenLedIB.setOnClickListener(this);
+		outsideYellowLedIB.setOnClickListener(this);
+		outsideRedLedIB.setOnClickListener(this);
+		sosB.setOnClickListener(this);
+	}
 }

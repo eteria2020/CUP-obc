@@ -23,33 +23,33 @@ import io.reactivex.Observable;
 
 public interface SharengoDataSource {
 
-    Observable<List<Customer>> getCustomer(long lastupdate);
+	Observable<List<Customer>> getCustomer(long lastupdate);
 
-    Observable<List<BusinessEmployee>> getBusinessEmployees();
+	Observable<List<BusinessEmployee>> getBusinessEmployees();
 
-    Observable<Config> getConfig(String car_plate);
+	Observable<Config> getConfig(String car_plate);
 
-    Observable<List<Reservation>> getReservation(String car_plate);
+	Observable<List<Reservation>> getReservation(String car_plate);
 
-    Observable<Reservation> consumeReservation(int reservation_id);
+	Observable<Reservation> consumeReservation(int reservation_id);
 
-    Observable<List<Area>> getArea(String md5);
+	Observable<List<Area>> getArea(String md5);
 
-    Observable<List<ServerCommand>> getCommands(String plat);
+	Observable<List<ServerCommand>> getCommands(String plat);
 
-    Observable<List<ModelResponse>> getModel(String plate);
+	Observable<List<ModelResponse>> getModel(String plate);
 
-    Observable<List<Poi>> getPois(long lastupdate);
+	Observable<List<Poi>> getPois(long lastupdate);
 
-    Observable<EventResponse> sendEvent(Event trip, DataManager dataManager);
+	Observable<EventResponse> sendEvent(Event trip, DataManager dataManager);
 
-    Observable<TripResponse> openTrip(Trip trip, DataManager dataManager);
+	Observable<TripResponse> openTrip(Trip trip, DataManager dataManager);
 
-    Observable<Trip> openTripPassive(Trip trip, DataManager dataManager);
+	Observable<Trip> openTripPassive(Trip trip, DataManager dataManager);
 
-    Observable<Trip> closeTripPassive(Trip trip, DataManager dataManager);
+	Observable<Trip> closeTripPassive(Trip trip, DataManager dataManager);
 
-    Observable<TripResponse> updateTrip(Trip trip);
+	Observable<TripResponse> updateTrip(Trip trip);
 
-    Observable<TripResponse> closeTrip(Trip trip, DataManager dataManager);
+	Observable<TripResponse> closeTrip(Trip trip, DataManager dataManager);
 }

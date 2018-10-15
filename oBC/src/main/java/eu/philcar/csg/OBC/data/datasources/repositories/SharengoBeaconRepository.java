@@ -19,38 +19,38 @@ import io.reactivex.disposables.CompositeDisposable;
 @Singleton
 public class SharengoBeaconRepository extends BaseRepository {
 
-    private DataManager mDataManager;
-    private SharengoBeaconDataSource mRemoteDataSource;
+	private DataManager mDataManager;
+	private SharengoBeaconDataSource mRemoteDataSource;
 
-    private CompositeDisposable mSubscriptions;
+	private CompositeDisposable mSubscriptions;
 
-    @Inject
-    public SharengoBeaconRepository(DataManager mDataManager, SharengoBeaconDataSource mRemoteDataSource) {
-        this.mDataManager = mDataManager;
-        this.mRemoteDataSource = mRemoteDataSource;
-    }
+	@Inject
+	public SharengoBeaconRepository(DataManager mDataManager, SharengoBeaconDataSource mRemoteDataSource) {
+		this.mDataManager = mDataManager;
+		this.mRemoteDataSource = mRemoteDataSource;
+	}
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    //                                                                                            //
-    //                                      BEACON                                                //
-    //                                                                                            //
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	//                                                                                            //
+	//                                      BEACON                                                //
+	//                                                                                            //
+	////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public Observable<BeaconResponse> sendBeacon(String beacon) {
+	public Observable<BeaconResponse> sendBeacon(String beacon) {
 
-        //if(!RxUtil.isRunning(beaconDisposable)) {
-        return mRemoteDataSource.sendBeacon(App.CarPlate, beacon)
-                //.doOnNext(n -> mDataManager.saveArea(n))
-                .doOnError(e -> {
-                    DLog.E("Error insiede sendBeacon", ((ErrorResponse) e).error);
-                    //RxUtil.dispose(beaconDisposable);
-                })
-                .doOnComplete(() -> {
-                    //RxUtil.dispose(beaconDisposable);
+		//if(!RxUtil.isRunning(beaconDisposable)) {
+		return mRemoteDataSource.sendBeacon(App.CarPlate, beacon)
+				//.doOnNext(n -> mDataManager.saveArea(n))
+				.doOnError(e -> {
+					DLog.E("Error insiede sendBeacon", ((ErrorResponse) e).error);
+					//RxUtil.dispose(beaconDisposable);
+				})
+				.doOnComplete(() -> {
+					//RxUtil.dispose(beaconDisposable);
 
-                });
+				});
 
-        //}
-    }
+		//}
+	}
 
 }

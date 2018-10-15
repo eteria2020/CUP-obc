@@ -34,118 +34,118 @@ import java.util.concurrent.atomic.AtomicInteger;
 //  one will result in undefined behaviour.
 
 public class Signaler
-        implements Closeable {
-    //  Underlying write & read file descriptor.
-    private Pipe.SinkChannel w;
-    private Pipe.SourceChannel r;
-    private Selector selector;
+		implements Closeable {
+	//  Underlying write & read file descriptor.
+	private Pipe.SinkChannel w;
+	private Pipe.SourceChannel r;
+	private Selector selector;
 
-    // Selector.selectNow at every sending message doesn't show enough performance
-    private final AtomicInteger wcursor = new AtomicInteger(0);
-    private int rcursor = 0;
+	// Selector.selectNow at every sending message doesn't show enough performance
+	private final AtomicInteger wcursor = new AtomicInteger(0);
+	private int rcursor = 0;
 
-    public Signaler() {
-        //  Create the socketpair for signaling.
-        makeFdPair();
+	public Signaler() {
+		//  Create the socketpair for signaling.
+		makeFdPair();
 
-        //  Set both fds to non-blocking mode.
-        try {
-            Utils.unblockSocket(w);
-            Utils.unblockSocket(r);
-        } catch (IOException e) {
-            throw new ZError.IOException(e);
-        }
+		//  Set both fds to non-blocking mode.
+		try {
+			Utils.unblockSocket(w);
+			Utils.unblockSocket(r);
+		} catch (IOException e) {
+			throw new ZError.IOException(e);
+		}
 
-        try {
-            selector = Selector.open();
-            r.register(selector, SelectionKey.OP_READ);
-        } catch (IOException e) {
-            throw new ZError.IOException(e);
-        }
+		try {
+			selector = Selector.open();
+			r.register(selector, SelectionKey.OP_READ);
+		} catch (IOException e) {
+			throw new ZError.IOException(e);
+		}
 
-    }
+	}
 
-    @Override
-    public void close() throws IOException {
-        r.close();
-        w.close();
-        selector.close();
-    }
+	@Override
+	public void close() throws IOException {
+		r.close();
+		w.close();
+		selector.close();
+	}
 
-    //  Creates a pair of filedescriptors that will be used
-    //  to pass the signals.
-    private void makeFdPair() {
-        Pipe pipe;
+	//  Creates a pair of filedescriptors that will be used
+	//  to pass the signals.
+	private void makeFdPair() {
+		Pipe pipe;
 
-        try {
-            pipe = Pipe.open();
-        } catch (IOException e) {
-            throw new ZError.IOException(e);
-        }
-        r = pipe.source();
-        w = pipe.sink();
-    }
+		try {
+			pipe = Pipe.open();
+		} catch (IOException e) {
+			throw new ZError.IOException(e);
+		}
+		r = pipe.source();
+		w = pipe.sink();
+	}
 
-    public SelectableChannel getFd() {
-        return r;
-    }
+	public SelectableChannel getFd() {
+		return r;
+	}
 
-    public void send() {
-        int nbytes = 0;
-        ByteBuffer dummy = ByteBuffer.allocate(1);
+	public void send() {
+		int nbytes = 0;
+		ByteBuffer dummy = ByteBuffer.allocate(1);
 
-        while (true) {
-            try {
-                nbytes = w.write(dummy);
-            } catch (IOException e) {
-                throw new ZError.IOException(e);
-            }
-            if (nbytes == 0) {
-                continue;
-            }
-            assert (nbytes == 1);
-            wcursor.incrementAndGet();
-            break;
-        }
-    }
+		while (true) {
+			try {
+				nbytes = w.write(dummy);
+			} catch (IOException e) {
+				throw new ZError.IOException(e);
+			}
+			if (nbytes == 0) {
+				continue;
+			}
+			assert (nbytes == 1);
+			wcursor.incrementAndGet();
+			break;
+		}
+	}
 
-    public boolean waitEvent(long timeout) {
-        int rc = 0;
+	public boolean waitEvent(long timeout) {
+		int rc = 0;
 
-        try {
-            if (timeout == 0) {
-                // waitEvent(0) is called every read/send of SocketBase
-                // instant readiness is not strictly required
-                // On the other hand, we can save lots of system call and increase performance
-                return rcursor < wcursor.get();
+		try {
+			if (timeout == 0) {
+				// waitEvent(0) is called every read/send of SocketBase
+				// instant readiness is not strictly required
+				// On the other hand, we can save lots of system call and increase performance
+				return rcursor < wcursor.get();
 
-            } else if (timeout < 0) {
-                rc = selector.select(0);
-            } else {
-                rc = selector.select(timeout);
-            }
-        } catch (IOException e) {
-            throw new ZError.IOException(e);
-        }
+			} else if (timeout < 0) {
+				rc = selector.select(0);
+			} else {
+				rc = selector.select(timeout);
+			}
+		} catch (IOException e) {
+			throw new ZError.IOException(e);
+		}
 
-        if (rc == 0) {
-            return false;
-        }
+		if (rc == 0) {
+			return false;
+		}
 
-        selector.selectedKeys().clear();
+		selector.selectedKeys().clear();
 
-        return true;
-    }
+		return true;
+	}
 
-    public void recv() {
-        int nbytes = 0;
-        try {
-            ByteBuffer dummy = ByteBuffer.allocate(1);
-            nbytes = r.read(dummy);
-            assert nbytes == 1;
-        } catch (IOException e) {
-            throw new ZError.IOException(e);
-        }
-        rcursor++;
-    }
+	public void recv() {
+		int nbytes = 0;
+		try {
+			ByteBuffer dummy = ByteBuffer.allocate(1);
+			nbytes = r.read(dummy);
+			assert nbytes == 1;
+		} catch (IOException e) {
+			throw new ZError.IOException(e);
+		}
+		rcursor++;
+	}
 }

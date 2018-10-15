@@ -49,358 +49,358 @@ import eu.philcar.csg.OBC.helpers.DLog;
 
 @Deprecated
 public class HttpConnector {
-    private DLog dlog = new DLog(this.getClass());
+	private DLog dlog = new DLog(this.getClass());
 
-    public static final int METHOD_GET = 0;
-    public static final int METHOD_POST = 1;
-    private static int exceptionCount = 0;
+	public static final int METHOD_GET = 0;
+	public static final int METHOD_POST = 1;
+	private static int exceptionCount = 0;
 
-    public final boolean AUTH_ENABLED = false;
-    public final String AUTH_USER = "";
-    public final String AUTH_PASSWORD = "";
-    public final String AUTH_DOMAIN = "";
+	public final boolean AUTH_ENABLED = false;
+	public final String AUTH_USER = "";
+	public final String AUTH_PASSWORD = "";
+	public final String AUTH_DOMAIN = "";
 
-    private final boolean COMPRESSION_ENABLED = true;
+	private final boolean COMPRESSION_ENABLED = true;
 
-    private ReceiveDataTask receiveDataTask;
-    public int HttpMethod = METHOD_GET;
+	private ReceiveDataTask receiveDataTask;
+	public int HttpMethod = METHOD_GET;
 
-    public HttpConnector(Context ctx) {
-        receiveDataTask = new ReceiveDataTask(ctx);
-    }
+	public HttpConnector(Context ctx) {
+		receiveDataTask = new ReceiveDataTask(ctx);
+	}
 
-    private Handler _handler;
+	private Handler _handler;
 
-    public void SetHandler(Handler hnd) {
-        _handler = hnd;
-    }
+	public void SetHandler(Handler hnd) {
+		_handler = hnd;
+	}
 
-    private Messenger _messenger;
+	private Messenger _messenger;
 
-    public void setMessenger(Messenger msgr) {
-        _messenger = msgr;
-    }
+	public void setMessenger(Messenger msgr) {
+		_messenger = msgr;
+	}
 
-    public void Execute(RemoteEntityInterface entity) {
-        if (entity == null) {
-            dlog.e("Execute: entity==NULL");
-            return;
-        }
+	public void Execute(RemoteEntityInterface entity) {
+		if (entity == null) {
+			dlog.e("Execute: entity==NULL");
+			return;
+		}
 
-        dlog.i(entity.getClass().getName());
+		dlog.i(entity.getClass().getName());
 
-        receiveDataTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, entity);
+		receiveDataTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, entity);
 
-    }
+	}
 
-    public void WaitTermination() {
-        try {
-            receiveDataTask.get(30, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	public void WaitTermination() {
+		try {
+			receiveDataTask.get(30, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-    private class ReceiveDataTask extends AsyncTask<RemoteEntityInterface, Context, String> {
+	private class ReceiveDataTask extends AsyncTask<RemoteEntityInterface, Context, String> {
 
-        private Context ctx;
-        private String responseBody = "";
-        private RemoteEntityInterface entity;
-        private int EntityId;
+		private Context ctx;
+		private String responseBody = "";
+		private RemoteEntityInterface entity;
+		private int EntityId;
 
-        private long start;
+		private long start;
 
-        public ReceiveDataTask(Context ctx) {
-            this.ctx = ctx;
-        }
+		public ReceiveDataTask(Context ctx) {
+			this.ctx = ctx;
+		}
 
-        @Override
-        protected String doInBackground(final RemoteEntityInterface... entity) {
-            start = System.currentTimeMillis();
+		@Override
+		protected String doInBackground(final RemoteEntityInterface... entity) {
+			start = System.currentTimeMillis();
 
-            this.entity = entity[0];
-            String URL = this.entity.GetRemoteUrl();
+			this.entity = entity[0];
+			String URL = this.entity.GetRemoteUrl();
 
-            if (URL == null) {
-                dlog.e("ABORTED : URL is null, probably connection is down or connector is busy");
-                return null;
-            }
+			if (URL == null) {
+				dlog.e("ABORTED : URL is null, probably connection is down or connector is busy");
+				return null;
+			}
 
-            if (this.entity.getDirection() == RemoteEntityInterface.eDirection.DOWNLOAD) {
-                DownloadJson(URL, HttpMethod, this.entity.GetParams());
-                //updateTime(responseBody);
-                EntityId = this.entity.DecodeJson(responseBody);
-            } else {
-                String data = this.entity.EncodeJson();
-                UploadJson(URL, data);
-                EntityId = this.entity.MsgId();
-            }
+			if (this.entity.getDirection() == RemoteEntityInterface.eDirection.DOWNLOAD) {
+				DownloadJson(URL, HttpMethod, this.entity.GetParams());
+				//updateTime(responseBody);
+				EntityId = this.entity.DecodeJson(responseBody);
+			} else {
+				String data = this.entity.EncodeJson();
+				UploadJson(URL, data);
+				EntityId = this.entity.MsgId();
+			}
 
-            dlog.d("Completed in : " + (System.currentTimeMillis() - start));
+			dlog.d("Completed in : " + (System.currentTimeMillis() - start));
 
-            return null;
-        }
+			return null;
+		}
 
-        protected void onProgressUpdate(Context... ctx) {
-        }
+		protected void onProgressUpdate(Context... ctx) {
+		}
 
-        protected void onPostExecute(String result) {
+		protected void onPostExecute(String result) {
 
-            if (_handler != null) {
-                Message msg = _handler.obtainMessage();
-                msg.what = EntityId;
-                msg.obj = entity; //can't remove previous message, may have empty new message
-                _handler.sendMessageDelayed(msg, 3000);
-                dlog.d("Sent message to handler ID " + EntityId);
-            } else if (_messenger != null) {
-                Message msg = new Message();
-                msg.what = EntityId;
-                msg.obj = entity;
-                try {
-                    _messenger.send(msg);
-                } catch (RemoteException e) {
-                }
-                dlog.d("Sent message to messenger ID " + EntityId);
-            } else {
-                dlog.d("No notify handler");
-            }
+			if (_handler != null) {
+				Message msg = _handler.obtainMessage();
+				msg.what = EntityId;
+				msg.obj = entity; //can't remove previous message, may have empty new message
+				_handler.sendMessageDelayed(msg, 3000);
+				dlog.d("Sent message to handler ID " + EntityId);
+			} else if (_messenger != null) {
+				Message msg = new Message();
+				msg.what = EntityId;
+				msg.obj = entity;
+				try {
+					_messenger.send(msg);
+				} catch (RemoteException e) {
+				}
+				dlog.d("Sent message to messenger ID " + EntityId);
+			} else {
+				dlog.d("No notify handler");
+			}
 
-        }
+		}
 
-        private String DeGzip(String str) {
-            String outStr = "";
+		private String DeGzip(String str) {
+			String outStr = "";
 
-            GZIPInputStream gis;
-            try {
-                gis = new GZIPInputStream(new ByteArrayInputStream(str.getBytes()));
-                BufferedReader bf = new BufferedReader(new InputStreamReader(gis));
+			GZIPInputStream gis;
+			try {
+				gis = new GZIPInputStream(new ByteArrayInputStream(str.getBytes()));
+				BufferedReader bf = new BufferedReader(new InputStreamReader(gis));
 
-                String line;
-                while ((line = bf.readLine()) != null) {
-                    outStr += line;
-                }
-                bf.close();
-            } catch (UnsupportedEncodingException e) {
-                dlog.e("DeGzip", e);
+				String line;
+				while ((line = bf.readLine()) != null) {
+					outStr += line;
+				}
+				bf.close();
+			} catch (UnsupportedEncodingException e) {
+				dlog.e("DeGzip", e);
 
-            } catch (IOException e) {
-                dlog.e("DeGzip", e);
-            }
+			} catch (IOException e) {
+				dlog.e("DeGzip", e);
+			}
 
-            return outStr;
-        }
+			return outStr;
+		}
 
-        private class GzipDecompressingEntity extends HttpEntityWrapper {
-            public GzipDecompressingEntity(final HttpEntity entity) {
-                super(entity);
-            }
+		private class GzipDecompressingEntity extends HttpEntityWrapper {
+			public GzipDecompressingEntity(final HttpEntity entity) {
+				super(entity);
+			}
 
-            @Override
-            public InputStream getContent() throws IOException, IllegalStateException {
-                InputStream wrappedin = wrappedEntity.getContent();
-                return new GZIPInputStream(wrappedin);
-            }
+			@Override
+			public InputStream getContent() throws IOException, IllegalStateException {
+				InputStream wrappedin = wrappedEntity.getContent();
+				return new GZIPInputStream(wrappedin);
+			}
 
-            @Override
-            public long getContentLength() {
-                // length of ungzipped content is not known
-                return -1;
-            }
-        }
+			@Override
+			public long getContentLength() {
+				// length of ungzipped content is not known
+				return -1;
+			}
+		}
 
-        public String DownloadJson(String url) {
-            return DownloadJson(url, METHOD_GET);
-        }
+		public String DownloadJson(String url) {
+			return DownloadJson(url, METHOD_GET);
+		}
 
-        public String DownloadJson(String url, int method) {
-            return DownloadJson(url, method, null);
-        }
+		public String DownloadJson(String url, int method) {
+			return DownloadJson(url, method, null);
+		}
 
-        public String DownloadJson(String url, int method, List<NameValuePair> paramsList) {
+		public String DownloadJson(String url, int method, List<NameValuePair> paramsList) {
 
-            final HttpParams httpParams = new BasicHttpParams();
-            HttpConnectionParams.setConnectionTimeout(httpParams, App.ConnectionTimeout);
-            HttpConnectionParams.setStaleCheckingEnabled(httpParams, true);
-            HttpConnectionParams.setSoTimeout(httpParams, App.ConnectionTimeout);
-            StringBuilder logtxt = null;
-            DefaultHttpClient httpclient = new DefaultHttpClient(httpParams);
+			final HttpParams httpParams = new BasicHttpParams();
+			HttpConnectionParams.setConnectionTimeout(httpParams, App.ConnectionTimeout);
+			HttpConnectionParams.setStaleCheckingEnabled(httpParams, true);
+			HttpConnectionParams.setSoTimeout(httpParams, App.ConnectionTimeout);
+			StringBuilder logtxt = null;
+			DefaultHttpClient httpclient = new DefaultHttpClient(httpParams);
 
-            Locale locale = ctx.getResources().getConfiguration().locale;
+			Locale locale = ctx.getResources().getConfiguration().locale;
 
-            if (AUTH_ENABLED) {
-                UsernamePasswordCredentials authCredentials = new UsernamePasswordCredentials(AUTH_USER, AUTH_PASSWORD);
-                httpclient.getCredentialsProvider().setCredentials(new AuthScope(AUTH_DOMAIN, 443), authCredentials);
-                dlog.d("Http auth enabled");
-            }
+			if (AUTH_ENABLED) {
+				UsernamePasswordCredentials authCredentials = new UsernamePasswordCredentials(AUTH_USER, AUTH_PASSWORD);
+				httpclient.getCredentialsProvider().setCredentials(new AuthScope(AUTH_DOMAIN, 443), authCredentials);
+				dlog.d("Http auth enabled");
+			}
 
-            HttpRequestBase httpRequest;
+			HttpRequestBase httpRequest;
 
-            if (method == METHOD_POST) {
-                httpRequest = new HttpPost(url);
-                if (paramsList != null)
-                    try {
-                        ((HttpPost) httpRequest).setEntity(new UrlEncodedFormEntity(paramsList));
-                    } catch (UnsupportedEncodingException e) {
-                        dlog.e("setEntity:", e);
-                    }
-                dlog.d("HTTP POST : " + url);
-            } else {
-                String params = "";
-                if (paramsList != null)
-                    params = URLEncodedUtils.format(paramsList, "utf-8");
+			if (method == METHOD_POST) {
+				httpRequest = new HttpPost(url);
+				if (paramsList != null)
+					try {
+						((HttpPost) httpRequest).setEntity(new UrlEncodedFormEntity(paramsList));
+					} catch (UnsupportedEncodingException e) {
+						dlog.e("setEntity:", e);
+					}
+				dlog.d("HTTP POST : " + url);
+			} else {
+				String params = "";
+				if (paramsList != null)
+					params = URLEncodedUtils.format(paramsList, "utf-8");
 
-                httpRequest = new HttpGet(url + params);
-                dlog.d("HTTP GET :" + url + params);
+				httpRequest = new HttpGet(url + params);
+				dlog.d("HTTP GET :" + url + params);
 
-            }
+			}
 
-            if (COMPRESSION_ENABLED) {
-                httpRequest.addHeader("Accept-Encoding", "gzip");
-                dlog.d("HTTP compression enabled");
-            }
+			if (COMPRESSION_ENABLED) {
+				httpRequest.addHeader("Accept-Encoding", "gzip");
+				dlog.d("HTTP compression enabled");
+			}
 
-            try {
+			try {
 
-                long timer = System.currentTimeMillis();
+				long timer = System.currentTimeMillis();
 
-                HttpResponse response = httpclient.execute(httpRequest);
-                App.networkExceptions = 0;
+				HttpResponse response = httpclient.execute(httpRequest);
+				App.networkExceptions = 0;
 
-                int responseCode = response.getStatusLine().getStatusCode();
-                logtxt = new StringBuilder("Got HttpResponse (" + responseCode + ") in :" + (System.currentTimeMillis() - timer) + " ms");
+				int responseCode = response.getStatusLine().getStatusCode();
+				logtxt = new StringBuilder("Got HttpResponse (" + responseCode + ") in :" + (System.currentTimeMillis() - timer) + " ms");
 
-                switch (responseCode) {
+				switch (responseCode) {
 
-                    case 200:
-                        exceptionCount = 0;
-                        HttpEntity entity = response.getEntity();
-                        logtxt.append("- Content length: ").append(entity.getContentLength());
+					case 200:
+						exceptionCount = 0;
+						HttpEntity entity = response.getEntity();
+						logtxt.append("- Content length: ").append(entity.getContentLength());
 
-                        Header encoding = entity.getContentEncoding();
+						Header encoding = entity.getContentEncoding();
 
-                        if (encoding != null) {
-                            for (HeaderElement element : encoding.getElements()) {
-                                if (element.getName().equalsIgnoreCase("gzip")) {
-                                    response.setEntity(new GzipDecompressingEntity(response.getEntity()));
-                                    entity = response.getEntity();
-                                    logtxt.append(" - Compressed entity");
-                                    break;
-                                }
-                            }
-                        }
+						if (encoding != null) {
+							for (HeaderElement element : encoding.getElements()) {
+								if (element.getName().equalsIgnoreCase("gzip")) {
+									response.setEntity(new GzipDecompressingEntity(response.getEntity()));
+									entity = response.getEntity();
+									logtxt.append(" - Compressed entity");
+									break;
+								}
+							}
+						}
 
-                        if (entity != null) {
-                            responseBody = EntityUtils.toString(entity);
-                            logtxt.append(" Response body length: ").append(responseBody.length());
-                        }
-                        break;
+						if (entity != null) {
+							responseBody = EntityUtils.toString(entity);
+							logtxt.append(" Response body length: ").append(responseBody.length());
+						}
+						break;
 
-                    default:
-                        responseBody = "";
-                        dlog.e("HTTP ERROR : " + responseCode);
-                        break;
-                }
+					default:
+						responseBody = "";
+						dlog.e("HTTP ERROR : " + responseCode);
+						break;
+				}
 
-            } catch (ClientProtocolException e) {
-                dlog.e("Http ClientProtocolException", e);
-            } catch (java.net.UnknownHostException e) {
-                App.networkExceptions++;
-                if (App.networkExceptions % 100 == 0) {
-                    dlog.e("Network exceptions: " + App.networkExceptions, e);
-                }
-            } catch (IOException e) {
-                App.networkExceptions++;
-                if (App.networkExceptions % 100 == 0) {
-                    dlog.e("Network exceptions: " + App.networkExceptions);
-                }
-                dlog.e("Http IOException", e);
-                if (System.currentTimeMillis() - App.lastConnReset > 10 * 60 * 1000 && exceptionCount++ > 15) {
-                    exceptionCount = 0;
-                    App.lastConnReset = System.currentTimeMillis();
-                    dlog.d("Reset 3g Connection exception");
-                    SystemControl.Reset3G(null);
-                }
-            } catch (Exception e) {
-                dlog.e("Http Unexpected exception", e);
-            } finally {
-                httpclient.getConnectionManager().shutdown();
-            }
+			} catch (ClientProtocolException e) {
+				dlog.e("Http ClientProtocolException", e);
+			} catch (java.net.UnknownHostException e) {
+				App.networkExceptions++;
+				if (App.networkExceptions % 100 == 0) {
+					dlog.e("Network exceptions: " + App.networkExceptions, e);
+				}
+			} catch (IOException e) {
+				App.networkExceptions++;
+				if (App.networkExceptions % 100 == 0) {
+					dlog.e("Network exceptions: " + App.networkExceptions);
+				}
+				dlog.e("Http IOException", e);
+				if (System.currentTimeMillis() - App.lastConnReset > 10 * 60 * 1000 && exceptionCount++ > 15) {
+					exceptionCount = 0;
+					App.lastConnReset = System.currentTimeMillis();
+					dlog.d("Reset 3g Connection exception");
+					SystemControl.Reset3G(null);
+				}
+			} catch (Exception e) {
+				dlog.e("Http Unexpected exception", e);
+			} finally {
+				httpclient.getConnectionManager().shutdown();
+			}
 
-            if (logtxt != null)
-                dlog.d(logtxt.toString());
-            return responseBody;
+			if (logtxt != null)
+				dlog.d(logtxt.toString());
+			return responseBody;
 
-        }
+		}
 
-        public String UploadJson(String url, String data) {
+		public String UploadJson(String url, String data) {
 
-            DefaultHttpClient httpclient = new DefaultHttpClient();
+			DefaultHttpClient httpclient = new DefaultHttpClient();
 
-            Locale locale = ctx.getResources().getConfiguration().locale;
+			Locale locale = ctx.getResources().getConfiguration().locale;
 
 //		 		UsernamePasswordCredentials authCredentials = new UsernamePasswordCredentials("mnbzxc124","plmokn120.Qaz");
 //		 		
 //		 		httpclient.getCredentialsProvider().setCredentials(new AuthScope("www.fvgsnow.it",443), authCredentials);
 
-            HttpPost httpPost = new HttpPost(url);
+			HttpPost httpPost = new HttpPost(url);
 //		 		HttpGet  httpGet = new HttpGet(url);
-            DLog.D(url);
+			DLog.D(url);
 
-            try {
+			try {
 
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-                nameValuePairs.add(new BasicNameValuePair("data", data));
+				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+				nameValuePairs.add(new BasicNameValuePair("data", data));
 
 //		 	        httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs,HTTP.UTF_8));
-                httpPost.setEntity(new StringEntity(data));
-                httpPost.setHeader("Accept", "application/json");
-                httpPost.setHeader("Content-type", "application/json");
+				httpPost.setEntity(new StringEntity(data));
+				httpPost.setHeader("Accept", "application/json");
+				httpPost.setHeader("Content-type", "application/json");
 
-                //
+				//
 //		 	        String params = URLEncodedUtils.format(nameValuePairs, "utf-8");
 
-                // Execute HTTP Post Request
-                HttpResponse response = httpclient.execute(httpPost);
-                //HttpResponse response = httpclient.execute(httpGet);
+				// Execute HTTP Post Request
+				HttpResponse response = httpclient.execute(httpPost);
+				//HttpResponse response = httpclient.execute(httpGet);
 
-                int responseCode = response.getStatusLine().getStatusCode();
+				int responseCode = response.getStatusLine().getStatusCode();
 
-                responseBody = "";
+				responseBody = "";
 
-                switch (responseCode) {
-                    case 200:
-                        HttpEntity entity = response.getEntity();
-                        if (entity != null) {
-                            responseBody = EntityUtils.toString(entity);
-                        }
-                        break;
+				switch (responseCode) {
+					case 200:
+						HttpEntity entity = response.getEntity();
+						if (entity != null) {
+							responseBody = EntityUtils.toString(entity);
+						}
+						break;
 
-                    default:
-                        responseBody = "";
-                        DLog.E("HTTP ERROR : " + responseCode);
-                        break;
-                }
+					default:
+						responseBody = "";
+						DLog.E("HTTP ERROR : " + responseCode);
+						break;
+				}
 
-            } catch (ClientProtocolException e) {
-                DLog.E(e.toString());
-            } catch (IOException e) {
-                DLog.E(e.toString());
-            } catch (Exception e) {
-                DLog.E("Http Unexpected exception", e);
-            } finally {
-                httpclient.getConnectionManager().shutdown();
-            }
+			} catch (ClientProtocolException e) {
+				DLog.E(e.toString());
+			} catch (IOException e) {
+				DLog.E(e.toString());
+			} catch (Exception e) {
+				DLog.E("Http Unexpected exception", e);
+			} finally {
+				httpclient.getConnectionManager().shutdown();
+			}
 
-            return responseBody;
+			return responseBody;
 
-        }
+		}
 
-    }
+	}
 }

@@ -41,31 +41,31 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Module
 public class ApiModule {
 
-    @Provides
-    @Singleton
-    SharengoApi provideSharengoApi(@ApplicationContext Context context) {
+	@Provides
+	@Singleton
+	SharengoApi provideSharengoApi(@ApplicationContext Context context) {
 
-        Gson gson = new GsonBuilder()
-                .addSerializationExclusionStrategy(new SerializationExclusionStrategy())
-                .create();
+		Gson gson = new GsonBuilder()
+				.addSerializationExclusionStrategy(new SerializationExclusionStrategy())
+				.create();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(context.getString(R.string.endpointSharengo))
-                //.baseUrl("http:gr3dcomunication.com/sharengo/")
-                .client(provideOkHttpClientTrusted(context))
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
+		Retrofit retrofit = new Retrofit.Builder()
+				.baseUrl(context.getString(R.string.endpointSharengo))
+				//.baseUrl("http:gr3dcomunication.com/sharengo/")
+				.client(provideOkHttpClientTrusted(context))
+				.addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+				.addConverterFactory(GsonConverterFactory.create(gson))
+				.build();
 
-        return retrofit.create(SharengoApi.class);
-    }
+		return retrofit.create(SharengoApi.class);
+	}
 
-    @Provides
-    @Singleton
-    SharengoPhpApi provideSharengoPhpApi(@ApplicationContext Context context) {
+	@Provides
+	@Singleton
+	SharengoPhpApi provideSharengoPhpApi(@ApplicationContext Context context) {
 
        /* HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        if (BuildConfig.DEBUG) {
+		if (BuildConfig.DEBUG) {
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         } else {
             logging.setLevel(HttpLoggingInterceptor.Level.NONE);
@@ -74,104 +74,104 @@ public class ApiModule {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);*/
 
-        Gson gson = new GsonBuilder()
-                .addSerializationExclusionStrategy(new SerializationExclusionStrategy())
-                .create();
+		Gson gson = new GsonBuilder()
+				.addSerializationExclusionStrategy(new SerializationExclusionStrategy())
+				.create();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(context.getString(R.string.endpointSharengoPhp))
-                //.baseUrl("http:gr3dcomunication.com/sharengo/")
-                .client(provideOkHttpClient())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
+		Retrofit retrofit = new Retrofit.Builder()
+				.baseUrl(context.getString(R.string.endpointSharengoPhp))
+				//.baseUrl("http:gr3dcomunication.com/sharengo/")
+				.client(provideOkHttpClient())
+				.addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+				.addConverterFactory(GsonConverterFactory.create(gson))
+				.build();
 
-        return retrofit.create(SharengoPhpApi.class);
-    }
+		return retrofit.create(SharengoPhpApi.class);
+	}
 
-    @Provides
-    @Singleton
-    SharengoBeaconApi provideSharengoBeaconApi(@ApplicationContext Context context) {
+	@Provides
+	@Singleton
+	SharengoBeaconApi provideSharengoBeaconApi(@ApplicationContext Context context) {
 
-        Gson gson = new GsonBuilder()
-                .addSerializationExclusionStrategy(new SerializationExclusionStrategy())
-                .create();
+		Gson gson = new GsonBuilder()
+				.addSerializationExclusionStrategy(new SerializationExclusionStrategy())
+				.create();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(context.getString(R.string.endpointSharengoBeacon))
-                //.baseUrl("http:gr3dcomunication.com/sharengo/")
-                .client(provideOkHttpClient())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
+		Retrofit retrofit = new Retrofit.Builder()
+				.baseUrl(context.getString(R.string.endpointSharengoBeacon))
+				//.baseUrl("http:gr3dcomunication.com/sharengo/")
+				.client(provideOkHttpClient())
+				.addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+				.addConverterFactory(GsonConverterFactory.create(gson))
+				.build();
 
-        return retrofit.create(SharengoBeaconApi.class);
-    }
+		return retrofit.create(SharengoBeaconApi.class);
+	}
 
-    @Provides
-    @Singleton
-    OkHttpClient provideOkHttpClientTrusted(Context context) {
+	@Provides
+	@Singleton
+	OkHttpClient provideOkHttpClientTrusted(Context context) {
         /*HttpLogger logger = new HttpLogger();
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(logger){
 
         };
             logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);*/
 
-        LoggerInterceptor logging = new LoggerInterceptor();
+		LoggerInterceptor logging = new LoggerInterceptor();
 
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(logging);
+		OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+		httpClient.addInterceptor(logging);
 
-        try {
+		try {
 
-            final TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        @Override
-                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+			final TrustManager[] trustAllCerts = new TrustManager[]{
+					new X509TrustManager() {
+						@Override
+						public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
 
-                        }
+						}
 
-                        @Override
-                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+						@Override
+						public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
 
-                        }
+						}
 
-                        @Override
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                            return new java.security.cert.X509Certificate[]{};
-                        }
-                    }
-            };
+						@Override
+						public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+							return new java.security.cert.X509Certificate[]{};
+						}
+					}
+			};
 
-            CertificateFactory cf = CertificateFactory.getInstance("X509");
-            Certificate caServer;
-            //                    context.getResources().openRawResource(R.raw.client);
-            InputStream cert2 = context.getAssets().open("ca.cer");
-            try (InputStream cert = context.getAssets().open("client_car1.p12")) {
-                // Key
-                KeyStore keyStore = KeyStore.getInstance("PKCS12");
-                keyStore.load(cert, "x9aStp:k4:".toCharArray());
+			CertificateFactory cf = CertificateFactory.getInstance("X509");
+			Certificate caServer;
+			//                    context.getResources().openRawResource(R.raw.client);
+			InputStream cert2 = context.getAssets().open("ca.cer");
+			try (InputStream cert = context.getAssets().open("client_car1.p12")) {
+				// Key
+				KeyStore keyStore = KeyStore.getInstance("PKCS12");
+				keyStore.load(cert, "x9aStp:k4:".toCharArray());
 
-                KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
-                kmf.init(keyStore, "x9aStp:k4:".toCharArray());
-                KeyManager[] keyManagers = kmf.getKeyManagers();
+				KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
+				kmf.init(keyStore, "x9aStp:k4:".toCharArray());
+				KeyManager[] keyManagers = kmf.getKeyManagers();
 
-                // Trust
-                caServer = cf.generateCertificate(cert2);
-                KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                trustStore.load(null, null);
-                trustStore.setCertificateEntry("ca", caServer);
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
-                tmf.init(trustStore);
-                TrustManager[] trustManagers = tmf.getTrustManagers();
-                SSLContext sslContext = SSLContext.getInstance("SSL");
-                sslContext.init(keyManagers, trustManagers, null);
+				// Trust
+				caServer = cf.generateCertificate(cert2);
+				KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+				trustStore.load(null, null);
+				trustStore.setCertificateEntry("ca", caServer);
+				TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
+				tmf.init(trustStore);
+				TrustManager[] trustManagers = tmf.getTrustManagers();
+				SSLContext sslContext = SSLContext.getInstance("SSL");
+				sslContext.init(keyManagers, trustManagers, null);
 
-                httpClient.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-            }
-        } catch (Exception e) {
-            DLog.E("Exception while providing OKHTTPCLIENTTrusted", e);
-        }
+				httpClient.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
+			}
+		} catch (Exception e) {
+			DLog.E("Exception while providing OKHTTPCLIENTTrusted", e);
+		}
 
         /*httpClient.addInterceptor(new Interceptor() {
             @Override
@@ -193,30 +193,30 @@ public class ApiModule {
             }
         });*/
 
-        httpClient.hostnameVerifier(new HostnameVerifier() {
-                                        @Override
-                                        public boolean verify(String hostname, SSLSession session) {
-                                            return true;
-                                        }
-                                    }
-        );
-        httpClient.readTimeout(40, TimeUnit.SECONDS);
-        httpClient.connectTimeout(40, TimeUnit.SECONDS);
-        httpClient.writeTimeout(40,TimeUnit.SECONDS);
-        httpClient.retryOnConnectionFailure(true);
+		httpClient.hostnameVerifier(new HostnameVerifier() {
+										@Override
+										public boolean verify(String hostname, SSLSession session) {
+											return true;
+										}
+									}
+		);
+		httpClient.readTimeout(40, TimeUnit.SECONDS);
+		httpClient.connectTimeout(40, TimeUnit.SECONDS);
+		httpClient.writeTimeout(40, TimeUnit.SECONDS);
+		httpClient.retryOnConnectionFailure(true);
 
-        return httpClient.build();
-    }
+		return httpClient.build();
+	}
 
-    @Provides
-    @Singleton
-    OkHttpClient provideOkHttpClient() {
+	@Provides
+	@Singleton
+	OkHttpClient provideOkHttpClient() {
 /*        HttpLogger logger = new HttpLogger();
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(logger);
             logging.setLevel(HttpLoggingInterceptor.Level.BASIC);*/
-        LoggerInterceptor logging = new LoggerInterceptor();
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(logging);
+		LoggerInterceptor logging = new LoggerInterceptor();
+		OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+		httpClient.addInterceptor(logging);
 
 
 
@@ -240,11 +240,11 @@ public class ApiModule {
             }
         });*/
 
-        httpClient.readTimeout(20, TimeUnit.SECONDS);
-        httpClient.connectTimeout(20, TimeUnit.SECONDS);
-        //httpClient.retryOnConnectionFailure(false);
+		httpClient.readTimeout(20, TimeUnit.SECONDS);
+		httpClient.connectTimeout(20, TimeUnit.SECONDS);
+		//httpClient.retryOnConnectionFailure(false);
 
-        return httpClient.build();
-    }
+		return httpClient.build();
+	}
 
 }

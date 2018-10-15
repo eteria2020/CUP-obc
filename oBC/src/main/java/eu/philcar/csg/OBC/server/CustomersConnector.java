@@ -21,185 +21,185 @@ import eu.philcar.csg.OBC.helpers.DLog;
 @Deprecated
 public class CustomersConnector implements RemoteEntityInterface {
 
-    private DLog dlog = new DLog(this.getClass());
+	private DLog dlog = new DLog(this.getClass());
 
-    public static CustomersConnector GetDownloadConnector() {
-        return new CustomersConnector();
-    }
+	public static CustomersConnector GetDownloadConnector() {
+		return new CustomersConnector();
+	}
 
-    private String cardCode = null;
-    private long lastUpdate;
-    private int receivedRecords;
+	private String cardCode = null;
+	private long lastUpdate;
+	private int receivedRecords;
 
-    private static boolean busy = false;
+	private static boolean busy = false;
 
-    public void setLastUpdate(long v) {
-        this.lastUpdate = v;
-    }
+	public void setLastUpdate(long v) {
+		this.lastUpdate = v;
+	}
 
-    public void setCardCodeQuery(String cardCode) {
-        this.cardCode = cardCode;
-    }
+	public void setCardCodeQuery(String cardCode) {
+		this.cardCode = cardCode;
+	}
 
-    public int getReceivedRecords() {
-        return receivedRecords;
-    }
+	public int getReceivedRecords() {
+		return receivedRecords;
+	}
 
-    public int MsgId() {
-        return Connectors.MSG_DN_CLIENTI;
-    }
+	public int MsgId() {
+		return Connectors.MSG_DN_CLIENTI;
+	}
 
-    public String GetRemoteUrl() {
-        if (!App.hasNetworkConnection()) {
-            dlog.w("Customers : No network");
-            return null;
-        }
+	public String GetRemoteUrl() {
+		if (!App.hasNetworkConnection()) {
+			dlog.w("Customers : No network");
+			return null;
+		}
 
-        if (!busy) {
-            busy = true;
-            return App.URL_Clienti;
-        } else {
-            dlog.w("Customers : busy");
-            return null;
-        }
-    }
+		if (!busy) {
+			busy = true;
+			return App.URL_Clienti;
+		} else {
+			dlog.w("Customers : busy");
+			return null;
+		}
+	}
 
-    public int DecodeJson(String responseBody) {
+	public int DecodeJson(String responseBody) {
 
-        if (responseBody == null || responseBody.isEmpty()) {
-            dlog.e("Empty response");
-            return MsgId();
-        }
+		if (responseBody == null || responseBody.isEmpty()) {
+			dlog.e("Empty response");
+			return MsgId();
+		}
 
-        DbManager dbm = App.Instance.getDbManager();
+		DbManager dbm = App.Instance.getDbManager();
 
-        final Customers customers = dbm.getClientiDao();
+		final Customers customers = dbm.getClientiDao();
 
-        final JSONArray jArray;
-        try {
-            jArray = new JSONArray(responseBody);
-        } catch (JSONException e) {
-            dlog.e("Errore estraendo array json", e);
-            return MsgId();
-        }
+		final JSONArray jArray;
+		try {
+			jArray = new JSONArray(responseBody);
+		} catch (JSONException e) {
+			dlog.e("Errore estraendo array json", e);
+			return MsgId();
+		}
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-        dlog.d("Downloaded " + jArray.length() + " records");
-        long ts_begin = System.currentTimeMillis();
-        try {
-            customers.callBatchTasks(new Callable<Void>() {
+		dlog.d("Downloaded " + jArray.length() + " records");
+		long ts_begin = System.currentTimeMillis();
+		try {
+			customers.callBatchTasks(new Callable<Void>() {
 
-                @Override
-                public Void call() throws Exception {
-                    String abilitato;
-                    int n = jArray.length();
-                    for (int i = 0; i < n; i++) {
+				@Override
+				public Void call() throws Exception {
+					String abilitato;
+					int n = jArray.length();
+					for (int i = 0; i < n; i++) {
 
-                        try {
-                            JSONObject jobj = jArray.getJSONObject(i);
+						try {
+							JSONObject jobj = jArray.getJSONObject(i);
 
-                            int id = jobj.getInt("i");
-                            long tms = jobj.getLong("tm");
-                            JSONArray ojarray = new JSONArray();
+							int id = jobj.getInt("i");
+							long tms = jobj.getLong("tm");
+							JSONArray ojarray = new JSONArray();
 
-                            // if (!clienti.isPresent(id, tms)) {
-                            Customer c = new Customer(true);
-                            c.id = id;
-                            c.name = jobj.getString("n");
-                            c.surname = jobj.getString("c");
-                            //	c.language = jobj.getString("lingua");
-                            c.mobile = jobj.getString("t");
+							// if (!clienti.isPresent(id, tms)) {
+							Customer c = new Customer(true);
+							c.id = id;
+							c.name = jobj.getString("n");
+							c.surname = jobj.getString("c");
+							//	c.language = jobj.getString("lingua");
+							c.mobile = jobj.getString("t");
 
-                            abilitato = jobj.getString("a");
-                            if (abilitato != null)
-                                c.enabled = abilitato.equalsIgnoreCase("TRUE");
-                            else
-                                c.enabled = false;
+							abilitato = jobj.getString("a");
+							if (abilitato != null)
+								c.enabled = abilitato.equalsIgnoreCase("TRUE");
+							else
+								c.enabled = false;
 
-                            c.info_display = jobj.getString("id");
+							c.info_display = jobj.getString("id");
 
-                            c.card_code = jobj.getString("cc");
+							c.card_code = jobj.getString("cc");
 
-                            ojarray.put(jobj.getString("p"));
-                            if (jobj.has("pin2")) {
-                                String pin2 = jobj.getString("pin2");
-                                if (pin2 != null && !pin2.isEmpty()) {
-                                    ojarray.put(pin2);
-                                }
-                            }
+							ojarray.put(jobj.getString("p"));
+							if (jobj.has("pin2")) {
+								String pin2 = jobj.getString("pin2");
+								if (pin2 != null && !pin2.isEmpty()) {
+									ojarray.put(pin2);
+								}
+							}
 
-                            c.pin = ojarray.toString();
+							c.pin = ojarray.toString();
 
-                            if (jobj.has("ps")) {
-                                String pins = jobj.getString("ps");
-                                if (pins != null && !pins.isEmpty()) {
-                                    c.pin = pins;
-                                }
-                            }
+							if (jobj.has("ps")) {
+								String pins = jobj.getString("ps");
+								if (pins != null && !pins.isEmpty()) {
+									c.pin = pins;
+								}
+							}
 
-                            c.update_timestamp = tms;
+							c.update_timestamp = tms;
 
-                            c.encrypt();
+							c.encrypt();
 
-                            try {
-                                customers.createOrUpdate(c);
-                            } catch (SQLException e) {
-                                dlog.e("Insert or update:", e);
+							try {
+								customers.createOrUpdate(c);
+							} catch (SQLException e) {
+								dlog.e("Insert or update:", e);
 
-                            }
-                            // }
-                        } catch (JSONException e) {
-                            dlog.e("Errore estraendo array json", e);
+							}
+							// }
+						} catch (JSONException e) {
+							dlog.e("Errore estraendo array json", e);
 
-                        }
+						}
 
-                    }
-                    return null;
-                }
+					}
+					return null;
+				}
 
-            });
-        } catch (SQLException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+			});
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
-        long time = System.currentTimeMillis() - ts_begin;
-        receivedRecords = jArray.length();
-        dlog.d("WHITELIST PARSE: " + time + "ms for " + receivedRecords);
+		long time = System.currentTimeMillis() - ts_begin;
+		receivedRecords = jArray.length();
+		dlog.d("WHITELIST PARSE: " + time + "ms for " + receivedRecords);
 
-        App.whiteListSize = customers.getSize();
+		App.whiteListSize = customers.getSize();
 
-        busy = false;
+		busy = false;
 
-        return MsgId();
-    }
+		return MsgId();
+	}
 
-    public eDirection getDirection() {
-        return eDirection.DOWNLOAD;
-    }
+	public eDirection getDirection() {
+		return eDirection.DOWNLOAD;
+	}
 
-    public String EncodeJson() {
+	public String EncodeJson() {
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public List<NameValuePair> GetParams() {
+	@Override
+	public List<NameValuePair> GetParams() {
 
-        ArrayList<NameValuePair> list = null;
+		ArrayList<NameValuePair> list = null;
 
-        if (cardCode != null) {
-            list = new ArrayList<NameValuePair>();
-            list.add(new BasicNameValuePair("cardcode", cardCode));
-        }
+		if (cardCode != null) {
+			list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("cardcode", cardCode));
+		}
 
-        if (lastUpdate > 0) {
-            list = new ArrayList<NameValuePair>();
-            list.add(new BasicNameValuePair("lastupdate", "" + lastUpdate));
-        }
+		if (lastUpdate > 0) {
+			list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("lastupdate", "" + lastUpdate));
+		}
 
-        return list;
-    }
+		return list;
+	}
 
 }

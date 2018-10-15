@@ -24,121 +24,121 @@ import java.io.IOException;
 import java.nio.channels.SelectableChannel;
 
 public class Reaper extends ZObject implements IPollEvents, Closeable {
-    //  Reaper thread accesses incoming commands via this mailbox.
-    private final Mailbox mailbox;
+	//  Reaper thread accesses incoming commands via this mailbox.
+	private final Mailbox mailbox;
 
-    //  Handle associated with mailbox' file descriptor.
-    private SelectableChannel mailboxHandle;
+	//  Handle associated with mailbox' file descriptor.
+	private SelectableChannel mailboxHandle;
 
-    //  I/O multiplexing is performed using a poller object.
-    private final Poller poller;
+	//  I/O multiplexing is performed using a poller object.
+	private final Poller poller;
 
-    //  Number of sockets being reaped at the moment.
-    private int sockets;
+	//  Number of sockets being reaped at the moment.
+	private int sockets;
 
-    //  If true, we were already asked to terminate.
-    private volatile boolean terminating;
+	//  If true, we were already asked to terminate.
+	private volatile boolean terminating;
 
-    private String name;
+	private String name;
 
-    public Reaper(Ctx ctx, int tid) {
-        super(ctx, tid);
-        sockets = 0;
-        terminating = false;
-        name = "reaper-" + tid;
-        poller = new Poller(name);
+	public Reaper(Ctx ctx, int tid) {
+		super(ctx, tid);
+		sockets = 0;
+		terminating = false;
+		name = "reaper-" + tid;
+		poller = new Poller(name);
 
-        mailbox = new Mailbox(name);
+		mailbox = new Mailbox(name);
 
-        mailboxHandle = mailbox.getFd();
-        poller.addHandle(mailboxHandle, this);
-        poller.setPollIn(mailboxHandle);
-    }
+		mailboxHandle = mailbox.getFd();
+		poller.addHandle(mailboxHandle, this);
+		poller.setPollIn(mailboxHandle);
+	}
 
-    @Override
-    public void close() throws IOException {
-        poller.destroy();
-        mailbox.close();
-    }
+	@Override
+	public void close() throws IOException {
+		poller.destroy();
+		mailbox.close();
+	}
 
-    public Mailbox getMailbox() {
-        return mailbox;
-    }
+	public Mailbox getMailbox() {
+		return mailbox;
+	}
 
-    public void start() {
-        poller.start();
-    }
+	public void start() {
+		poller.start();
+	}
 
-    public void stop() {
-        if (!terminating) {
-            sendStop();
-        }
-    }
+	public void stop() {
+		if (!terminating) {
+			sendStop();
+		}
+	}
 
-    @Override
-    public void inEvent() {
-        while (true) {
-            //  Get the next command. If there is none, exit.
-            Command cmd = mailbox.recv(0);
-            if (cmd == null) {
-                break;
-            }
+	@Override
+	public void inEvent() {
+		while (true) {
+			//  Get the next command. If there is none, exit.
+			Command cmd = mailbox.recv(0);
+			if (cmd == null) {
+				break;
+			}
 
-            //  Process the command.
-            cmd.destination().processCommand(cmd);
-        }
-    }
+			//  Process the command.
+			cmd.destination().processCommand(cmd);
+		}
+	}
 
-    @Override
-    public void outEvent() {
-        throw new UnsupportedOperationException();
-    }
+	@Override
+	public void outEvent() {
+		throw new UnsupportedOperationException();
+	}
 
-    @Override
-    public void connectEvent() {
-        throw new UnsupportedOperationException();
-    }
+	@Override
+	public void connectEvent() {
+		throw new UnsupportedOperationException();
+	}
 
-    @Override
-    public void acceptEvent() {
-        throw new UnsupportedOperationException();
-    }
+	@Override
+	public void acceptEvent() {
+		throw new UnsupportedOperationException();
+	}
 
-    @Override
-    public void timerEvent(int id) {
-        throw new UnsupportedOperationException();
-    }
+	@Override
+	public void timerEvent(int id) {
+		throw new UnsupportedOperationException();
+	}
 
-    @Override
-    protected void processStop() {
-        terminating = true;
+	@Override
+	protected void processStop() {
+		terminating = true;
 
-        //  If there are no sockets being reaped finish immediately.
-        if (sockets == 0) {
-            sendDone();
-            poller.removeHandle(mailboxHandle);
-            poller.stop();
-        }
-    }
+		//  If there are no sockets being reaped finish immediately.
+		if (sockets == 0) {
+			sendDone();
+			poller.removeHandle(mailboxHandle);
+			poller.stop();
+		}
+	}
 
-    @Override
-    protected void processReap(SocketBase socket) {
-        //  Add the socket to the poller.
-        socket.startReaping(poller);
+	@Override
+	protected void processReap(SocketBase socket) {
+		//  Add the socket to the poller.
+		socket.startReaping(poller);
 
-        ++sockets;
-    }
+		++sockets;
+	}
 
-    @Override
-    protected void processReaped() {
-        --sockets;
+	@Override
+	protected void processReaped() {
+		--sockets;
 
-        //  If reaped was already asked to terminate and there are no more sockets,
-        //  finish immediately.
-        if (sockets == 0 && terminating) {
-            sendDone();
-            poller.removeHandle(mailboxHandle);
-            poller.stop();
-        }
-    }
+		//  If reaped was already asked to terminate and there are no more sockets,
+		//  finish immediately.
+		if (sockets == 0 && terminating) {
+			sendDone();
+			poller.removeHandle(mailboxHandle);
+			poller.stop();
+		}
+	}
 }

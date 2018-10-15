@@ -7,9 +7,9 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class SharengoResponse<T> {
-    public int status;
-    public String reason;
-    public T data;
-    @SerializedName("time")
-    public long timestamp;
+	public int status;
+	public String reason;
+	public T data;
+	@SerializedName("time")
+	public long timestamp;
 }

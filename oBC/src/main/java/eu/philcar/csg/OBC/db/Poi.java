@@ -11,64 +11,64 @@ import eu.philcar.csg.OBC.service.DataManager;
 @DatabaseTable(tableName = "poi", daoClass = Pois.class)
 public class Poi extends DbRecord<ServerResponse> implements CustomOp {
 
-    @DatabaseField(id = true)
-    public int id;
+	@DatabaseField(id = true)
+	public int id;
 
-    @DatabaseField(index = true)
-    public String type;
+	@DatabaseField(index = true)
+	public String type;
 
-    @DatabaseField(index = true)
-    public String type_group;
+	@DatabaseField(index = true)
+	public String type_group;
 
-    @DatabaseField
-    public String code;
+	@DatabaseField
+	public String code;
 
-    @DatabaseField
-    public String name;
+	@DatabaseField
+	public String name;
 
-    @DatabaseField
-    public String brand;
+	@DatabaseField
+	public String brand;
 
-    @DatabaseField
-    public String address;
+	@DatabaseField
+	public String address;
 
-    @DatabaseField
-    public String town;
+	@DatabaseField
+	public String town;
 
-    @DatabaseField
-    public String zip;
+	@DatabaseField
+	public String zip;
 
-    @DatabaseField
-    public String province;
+	@DatabaseField
+	public String province;
 
-    @DatabaseField
-    public Boolean attivo;
+	@DatabaseField
+	public Boolean attivo;
 
-    @DatabaseField
-    public Double lon;
+	@DatabaseField
+	public Double lon;
 
-    @DatabaseField
-    public Double lat;
+	@DatabaseField
+	public Double lat;
 
-    @DatabaseField(index = true)
-    public long update;
+	@DatabaseField(index = true)
+	public long update;
 
-    public Location getLoc() {
-        Location loc1 = new Location("");
-        loc1.setLatitude(lat);
-        loc1.setLongitude(lon);
-        return loc1;
-    }
+	public Location getLoc() {
+		Location loc1 = new Location("");
+		loc1.setLatitude(lat);
+		loc1.setLongitude(lon);
+		return loc1;
+	}
 
-    @Override
-    public void handleResponse(ServerResponse e, DataManager manager, int callOrder) {
+	@Override
+	public void handleResponse(ServerResponse e, DataManager manager, int callOrder) {
 
-    }
+	}
 
-    @Override
-    public void onDbWrite() {
-        brand = "";
-        type_group = "";
-        attivo = true;
-    }
+	@Override
+	public void onDbWrite() {
+		brand = "";
+		type_group = "";
+		attivo = true;
+	}
 }

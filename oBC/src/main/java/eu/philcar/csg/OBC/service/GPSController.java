@@ -18,67 +18,67 @@ import eu.philcar.csg.OBC.injection.ApplicationContext;
 @Singleton
 public class GPSController {
 
-    private final static int MSG_HAS_STOPPED = 1;
+	private final static int MSG_HAS_STOPPED = 1;
 
-    private final long MILLI_STOP_MOVING = 120 * 1000;
+	private final long MILLI_STOP_MOVING = 120 * 1000;
 
-    private final Context mContext;
+	private final Context mContext;
 
-    private Location lastLocation;
-    private static boolean moving = false;
+	private Location lastLocation;
+	private static boolean moving = false;
 
-    private static Handler localHandler;
+	private static Handler localHandler;
 
-    @Inject
-    public GPSController(@ApplicationContext Context mContext) {
-        this.mContext = mContext;
-        lastLocation = new Location("default");
-        moving = false;
-        localHandler = new ResetHandler(this);
-    }
+	@Inject
+	public GPSController(@ApplicationContext Context mContext) {
+		this.mContext = mContext;
+		lastLocation = new Location("default");
+		moving = false;
+		localHandler = new ResetHandler(this);
+	}
 
-    public void onNewLocation(@NonNull Location newLocation) {
-        if (lastLocation.distanceTo(newLocation) > 100) {
-            updateLocation(newLocation);
-        }
-    }
+	public void onNewLocation(@NonNull Location newLocation) {
+		if (lastLocation.distanceTo(newLocation) > 100) {
+			updateLocation(newLocation);
+		}
+	}
 
-    private void updateLocation(Location location) {
-        lastLocation.set(location);
-        moving = true;
-        localHandler.removeMessages(MSG_HAS_STOPPED);
-        localHandler.sendEmptyMessageDelayed(MSG_HAS_STOPPED, MILLI_STOP_MOVING);
-    }
+	private void updateLocation(Location location) {
+		lastLocation.set(location);
+		moving = true;
+		localHandler.removeMessages(MSG_HAS_STOPPED);
+		localHandler.sendEmptyMessageDelayed(MSG_HAS_STOPPED, MILLI_STOP_MOVING);
+	}
 
-    public void stopMoving() {
-        moving = false;
-    }
+	public void stopMoving() {
+		moving = false;
+	}
 
-    public static boolean isMoving() {
-        return moving;
-    }
+	public static boolean isMoving() {
+		return moving;
+	}
 
-    static public class ResetHandler extends Handler {
+	static public class ResetHandler extends Handler {
 
-        GPSController controller;
+		GPSController controller;
 
-        public ResetHandler(GPSController mContext) {
-            this.controller = mContext;
-        }
+		public ResetHandler(GPSController mContext) {
+			this.controller = mContext;
+		}
 
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_HAS_STOPPED:
-                    resetController();
-                    break;
-            }
-        }
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+				case MSG_HAS_STOPPED:
+					resetController();
+					break;
+			}
+		}
 
-        private void resetController() {
-            controller.stopMoving();
-        }
+		private void resetController() {
+			controller.stopMoving();
+		}
 
-    }
+	}
 
 }

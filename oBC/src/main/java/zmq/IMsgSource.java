@@ -20,6 +20,6 @@
 package zmq;
 
 public interface IMsgSource {
-    //  Fetch a message. Returns a Msg instance if successful; null otherwise.
-    Msg pullMsg();
+	//  Fetch a message. Returns a Msg instance if successful; null otherwise.
+	Msg pullMsg();
 }

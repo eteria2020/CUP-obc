@@ -18,25 +18,25 @@ import retrofit2.http.GET;
  */
 
 public interface SharengoService {
-    String ENDPOINT = "http://corestage.sharengo.it/api/";
+	String ENDPOINT = "http://corestage.sharengo.it/api/";
 
-    @GET("test.txt")
-    Observable<List<Customer>> getCustomer();
+	@GET("test.txt")
+	Observable<List<Customer>> getCustomer();
 
-    /******** Helper class that sets up a new services *******/
-    class Creator {
+	/******** Helper class that sets up a new services *******/
+	class Creator {
 
-        public static SharengoService newSharengoService() {
-            Gson gson = new GsonBuilder()
-                    .addSerializationExclusionStrategy(new SerializationExclusionStrategy())
-                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                    .create();
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(SharengoService.ENDPOINT)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .build();
-            return retrofit.create(SharengoService.class);
-        }
-    }
+		public static SharengoService newSharengoService() {
+			Gson gson = new GsonBuilder()
+					.addSerializationExclusionStrategy(new SerializationExclusionStrategy())
+					.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+					.create();
+			Retrofit retrofit = new Retrofit.Builder()
+					.baseUrl(SharengoService.ENDPOINT)
+					.addConverterFactory(GsonConverterFactory.create(gson))
+					.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+					.build();
+			return retrofit.create(SharengoService.class);
+		}
+	}
 }

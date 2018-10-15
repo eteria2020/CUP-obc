@@ -7,52 +7,52 @@ import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
  */
 
 public class TripResponse extends BaseResponse {
-    private int result;
-    private String message;
-    private String extra;
-    private boolean preauthDone;
+	private int result;
+	private String message;
+	private String extra;
+	private boolean preauthDone;
 
-    public TripResponse(int result, String message, String extra, boolean preauthDone) {
-        this.result = result;
-        this.message = message;
-        this.extra = extra;
-        this.preauthDone = preauthDone;
-    }
+	public TripResponse(int result, String message, String extra, boolean preauthDone) {
+		this.result = result;
+		this.message = message;
+		this.extra = extra;
+		this.preauthDone = preauthDone;
+	}
 
-    public int getResult() {
-        return result;
-    }
+	public int getResult() {
+		return result;
+	}
 
-    public void setResult(int result) {
-        this.result = result;
-    }
+	public void setResult(int result) {
+		this.result = result;
+	}
 
-    public String getMessage() {
-        return message;
-    }
+	public String getMessage() {
+		return message;
+	}
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+	public void setMessage(String message) {
+		this.message = message;
+	}
 
-    public String getExtra() {
-        return extra;
-    }
+	public String getExtra() {
+		return extra;
+	}
 
-    public void setExtra(String extra) {
-        this.extra = extra;
-    }
+	public void setExtra(String extra) {
+		this.extra = extra;
+	}
 
-    public boolean isPreauthDone() {
-        return preauthDone;
-    }
+	public boolean isPreauthDone() {
+		return preauthDone;
+	}
 
-    public void setPreauthDone(boolean preauthDone) {
-        this.preauthDone = preauthDone;
-    }
+	public void setPreauthDone(boolean preauthDone) {
+		this.preauthDone = preauthDone;
+	}
 
-    public int getRemoteID() {
-        int response = getResult() > 0 ? getResult() : Integer.parseInt(getExtra());
-        return response;
-    }
+	public int getRemoteID() {
+		int response = getResult() > 0 ? getResult() : Integer.parseInt(getExtra());
+		return response;
+	}
 }

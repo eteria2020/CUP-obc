@@ -16,8 +16,8 @@ import eu.philcar.csg.OBC.injection.module.FragmentModule;
 @Component(dependencies = ApplicationComponent.class)
 public interface ConfigPersistentComponent {
 
-    ActivityComponent activityComponent(ActivityModule activityModule);
+	ActivityComponent activityComponent(ActivityModule activityModule);
 
-    FragmentComponent fragmentComponent(FragmentModule fragmentModule);
+	FragmentComponent fragmentComponent(FragmentModule fragmentModule);
 
 }

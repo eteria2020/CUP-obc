@@ -10,25 +10,24 @@ import eu.philcar.csg.OBC.service.DataManager;
 
 public class SuperSocScheduler implements Runnable {
 
-    private final LowLevelInterface obcIO;
-    private final DataManager dataManager;
-    private final DLog dlog;
+	private final LowLevelInterface obcIO;
+	private final DataManager dataManager;
+	private final DLog dlog;
 
-    public SuperSocScheduler(LowLevelInterface obcIO, DataManager dataManager) {
-        this.obcIO = obcIO;
-        this.dataManager = dataManager;
-        this.dlog = new DLog(this.getClass());
-    }
+	public SuperSocScheduler(LowLevelInterface obcIO, DataManager dataManager) {
+		this.obcIO = obcIO;
+		this.dataManager = dataManager;
+		this.dlog = new DLog(this.getClass());
+	}
 
-    @Override
-    public void run() {
-        try {
+	@Override
+	public void run() {
+		try {
 
-            //update data from last iteration
+			//update data from last iteration
 
-
-        } catch (Exception e) {
-            dlog.e("serverUpdateScheduler error", e);
-        }
-    }
+		} catch (Exception e) {
+			dlog.e("serverUpdateScheduler error", e);
+		}
+	}
 }

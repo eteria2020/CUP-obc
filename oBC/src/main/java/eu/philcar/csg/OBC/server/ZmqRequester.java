@@ -22,231 +22,231 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.Encryption;
 
 public class ZmqRequester {
-    private DLog dlog = new DLog(this.getClass());
+	private DLog dlog = new DLog(this.getClass());
 
-    private ZMQ.Context zmqContext;
-    private ZMQ.Socket zmqSocket;
-    private int counter = 0;
-    private ExecutorService executor;
+	private ZMQ.Context zmqContext;
+	private ZMQ.Socket zmqSocket;
+	private int counter = 0;
+	private ExecutorService executor;
 
-    private class Request {
+	private class Request {
 
-        public Request(RemoteEntityInterface entity, Handler handler, Message msg) {
-            this((String) null, handler, msg);
-            this.entity = entity;
-            if (entity != null) {
-                this.payload = ParamsToJson(entity.GetParams());
-            }
-        }
+		public Request(RemoteEntityInterface entity, Handler handler, Message msg) {
+			this((String) null, handler, msg);
+			this.entity = entity;
+			if (entity != null) {
+				this.payload = ParamsToJson(entity.GetParams());
+			}
+		}
 
-        public Request(String payload, Handler handler, Message msg) {
-            this.payload = payload;
-            this.msg = msg;
-            this.handler = handler;
-            this.sent = System.currentTimeMillis();
-            this.entity = null;
+		public Request(String payload, Handler handler, Message msg) {
+			this.payload = payload;
+			this.msg = msg;
+			this.handler = handler;
+			this.sent = System.currentTimeMillis();
+			this.entity = null;
 
-        }
+		}
 
-        public String sid;
-        public String payload;
-        public long sent;
-        public Message msg;
-        public Handler handler;
-        public RemoteEntityInterface entity;
+		public String sid;
+		public String payload;
+		public long sent;
+		public Message msg;
+		public Handler handler;
+		public RemoteEntityInterface entity;
 
-    }
+	}
 
-    private HashMap<String, Request> requests;
+	private HashMap<String, Request> requests;
 
-    public ZmqRequester() {
+	public ZmqRequester() {
 
-        requests = new HashMap<String, Request>();
-        executor = Executors.newCachedThreadPool();
+		requests = new HashMap<String, Request>();
+		executor = Executors.newCachedThreadPool();
 
-        zmqContext = ZMQ.context(1);
-        zmqSocket = zmqContext.socket(ZMQ.REQ);
-        zmqSocket.setIdentity(App.CarPlate.getBytes());
-        zmqSocket.setLinger(5000);
-        zmqSocket.setSndHWM(10);
-        zmqSocket.setRcvHWM(10);
+		zmqContext = ZMQ.context(1);
+		zmqSocket = zmqContext.socket(ZMQ.REQ);
+		zmqSocket.setIdentity(App.CarPlate.getBytes());
+		zmqSocket.setLinger(5000);
+		zmqSocket.setSndHWM(10);
+		zmqSocket.setRcvHWM(10);
 
-        Start();
-    }
+		Start();
+	}
 
-    private ZmqRunnable zmqRunnable;
-    private Thread zmqThread;
-    private Handler handler;
+	private ZmqRunnable zmqRunnable;
+	private Thread zmqThread;
+	private Handler handler;
 
-    private String ParamsToJson(List<NameValuePair> list) {
+	private String ParamsToJson(List<NameValuePair> list) {
 
-        if (list == null || list.size() == 0)
-            return "{}";
+		if (list == null || list.size() == 0)
+			return "{}";
 
-        JSONObject jobj = new JSONObject();
+		JSONObject jobj = new JSONObject();
 
-        for (NameValuePair pair : list) {
-            try {
-                jobj.put(pair.getName(), pair.getValue());
-            } catch (JSONException e) {
-                dlog.e("Error build JSON", e);
-            }
-        }
+		for (NameValuePair pair : list) {
+			try {
+				jobj.put(pair.getName(), pair.getValue());
+			} catch (JSONException e) {
+				dlog.e("Error build JSON", e);
+			}
+		}
 
-        return jobj.toString();
+		return jobj.toString();
 
-    }
+	}
 
-    public synchronized void Send(RemoteEntityInterface entity, Handler handler, Message msg) {
+	public synchronized void Send(RemoteEntityInterface entity, Handler handler, Message msg) {
 
-        Request req = new Request(entity, handler, msg);
-        Send(req);
+		Request req = new Request(entity, handler, msg);
+		Send(req);
 
-    }
+	}
 
-    public void Send(String payload, Handler handler, Message msg) {
+	public void Send(String payload, Handler handler, Message msg) {
 
-        Request req = new Request(payload, handler, msg);
-        Send(req);
+		Request req = new Request(payload, handler, msg);
+		Send(req);
 
-    }
+	}
 
-    private synchronized void Send(final Request req) {
+	private synchronized void Send(final Request req) {
 
-        if (req == null)
-            return;
+		if (req == null)
+			return;
 
-        counter++;
+		counter++;
 
-        req.sid = App.CarPlate + "_" + counter;
-        requests.put(req.sid, req);
-        executor.submit(new Runnable() {
+		req.sid = App.CarPlate + "_" + counter;
+		requests.put(req.sid, req);
+		executor.submit(new Runnable() {
 
-            @Override
-            public void run() {
-                zmqSocket.send(req.sid);
-                zmqSocket.sendMore(req.payload);
-            }
+			@Override
+			public void run() {
+				zmqSocket.send(req.sid);
+				zmqSocket.sendMore(req.payload);
+			}
 
-        });
+		});
 
-    }
+	}
 
-    private void Start() {
+	private void Start() {
 
-        dlog.d("Starting thread");
-        zmqRunnable = new ZmqRunnable();
-        zmqThread = new Thread(zmqRunnable);
-        zmqThread.start();
-    }
+		dlog.d("Starting thread");
+		zmqRunnable = new ZmqRunnable();
+		zmqThread = new Thread(zmqRunnable);
+		zmqThread.start();
+	}
 
-    public void Restart() {
-        dlog.d("Restarting thread");
-        if (zmqThread != null && zmqRunnable != null) {
-            zmqRunnable.zmqStop(zmqThread);
-            try {
-                zmqThread.join(5000);
-            } catch (InterruptedException e) {
-            }
+	public void Restart() {
+		dlog.d("Restarting thread");
+		if (zmqThread != null && zmqRunnable != null) {
+			zmqRunnable.zmqStop(zmqThread);
+			try {
+				zmqThread.join(5000);
+			} catch (InterruptedException e) {
+			}
 
-        }
+		}
 
-        zmqRunnable = new ZmqRunnable();
-        zmqThread = new Thread(zmqRunnable);
-        zmqThread.start();
+		zmqRunnable = new ZmqRunnable();
+		zmqThread = new Thread(zmqRunnable);
+		zmqThread.start();
 
-    }
+	}
 
-    private void handleZmqMessage(String sid, String payload) {
+	private void handleZmqMessage(String sid, String payload) {
 
-        dlog.d("Received ZMQ message sid: '" + sid + "' with payload : '" + payload + "'");
+		dlog.d("Received ZMQ message sid: '" + sid + "' with payload : '" + payload + "'");
 
-        if (requests == null)
-            return;
+		if (requests == null)
+			return;
 
-        if (!requests.containsKey(sid)) {
-            dlog.e("Requests list does not contain this sid :" + sid);
-            return;
-        }
+		if (!requests.containsKey(sid)) {
+			dlog.e("Requests list does not contain this sid :" + sid);
+			return;
+		}
 
-        Request req = requests.get(sid);
+		Request req = requests.get(sid);
 
-        Message msg;
-        if (req.msg != null)
-            msg = req.msg;
-        else if (req.handler != null)
-            msg = req.handler.obtainMessage();
-        else
-            msg = new Message();
+		Message msg;
+		if (req.msg != null)
+			msg = req.msg;
+		else if (req.handler != null)
+			msg = req.handler.obtainMessage();
+		else
+			msg = new Message();
 
-        //If there is an etitity object let it handle the response
-        if (req.entity != null) {
-            msg.arg1 = req.entity.DecodeJson(payload);
-            msg.what = req.entity.MsgId();
-        } else {
-            msg.obj = payload;
-        }
+		//If there is an etitity object let it handle the response
+		if (req.entity != null) {
+			msg.arg1 = req.entity.DecodeJson(payload);
+			msg.what = req.entity.MsgId();
+		} else {
+			msg.obj = payload;
+		}
 
-        if (req.handler != null)
-            handler.sendMessage(msg);
+		if (req.handler != null)
+			handler.sendMessage(msg);
 
-        requests.remove(sid);
+		requests.remove(sid);
 
-    }
+	}
 
-    private class ZmqRunnable implements Runnable {
-        private ZMQ.Context context;
+	private class ZmqRunnable implements Runnable {
+		private ZMQ.Context context;
 
-        public void zmqStop(final Thread th) {
+		public void zmqStop(final Thread th) {
 
-            Thread t = new Thread() {
-                public void run() {
-                    context.term();
-                    th.interrupt();
-                }
-            };
+			Thread t = new Thread() {
+				public void run() {
+					context.term();
+					th.interrupt();
+				}
+			};
 
-            t.start();
+			t.start();
 
-        }
+		}
 
-        @Override
-        public void run() {
+		@Override
+		public void run() {
 
-            zmqSocket.connect(App.Instance.getString(R.string.endpointSharengoZMQ));
+			zmqSocket.connect(App.Instance.getString(R.string.endpointSharengoZMQ));
 
-            String sid = "";
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    sid = zmqSocket.recvStr();
-                } catch (ZMQException e) {
-                    if (e != null && e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
-                        break;
-                    }
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e1) {
-                    }
-                }
-                if (zmqSocket.hasReceiveMore()) {
+			String sid = "";
+			while (!Thread.currentThread().isInterrupted()) {
+				try {
+					sid = zmqSocket.recvStr();
+				} catch (ZMQException e) {
+					if (e != null && e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
+						break;
+					}
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e1) {
+					}
+				}
+				if (zmqSocket.hasReceiveMore()) {
 
-                    byte[] zmsg = zmqSocket.recv(0);
+					byte[] zmsg = zmqSocket.recv(0);
 
-                    String str = "";
-                    try {
-                        String strRaw = new String(zmsg, "UTF-8");
-                        str = Encryption.decryptAes(strRaw);
-                        handleZmqMessage(sid, str);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    Log.d("ZMQ", str);
-                }
-            }
-            zmqSocket.close();
+					String str = "";
+					try {
+						String strRaw = new String(zmsg, "UTF-8");
+						str = Encryption.decryptAes(strRaw);
+						handleZmqMessage(sid, str);
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+					Log.d("ZMQ", str);
+				}
+			}
+			zmqSocket.close();
 
-        }
+		}
 
-    }
+	}
 
 }

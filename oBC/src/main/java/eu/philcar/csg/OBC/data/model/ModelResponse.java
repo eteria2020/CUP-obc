@@ -7,24 +7,24 @@ import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
  */
 
 public class ModelResponse extends BaseResponse {
-    private String model;
+	private String model;
 
-    public String getModel() {
-        return model;
-    }
+	public String getModel() {
+		return model;
+	}
 
-    public void setModel(String model) {
-        this.model = model;
-    }
+	public void setModel(String model) {
+		this.model = model;
+	}
 
-    public ModelResponse(String model) {
-        this.model = model;
-    }
+	public ModelResponse(String model) {
+		this.model = model;
+	}
 
-    @Override
-    public String toString() {
-        return "ModelResponse{" +
-                "model='" + model + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "ModelResponse{" +
+				"model='" + model + '\'' +
+				'}';
+	}
 }

@@ -19,30 +19,30 @@ import io.reactivex.Observable;
 
 public interface SharengoPhpDataSource {
 
-    Observable<List<Area>> getArea(String plate, String md5);
+	Observable<List<Area>> getArea(String plate, String md5);
 
-    Observable<List<ServerCommand>> getCommands(String plat);
+	Observable<List<ServerCommand>> getCommands(String plat);
 
     /*Observable<List<ServerCommand>> openTrip( int cmd_type,  String plate,  int customerId,  long beginTimestamp,  int km,  int soc,
-                                              double beginLon,  double beginLat,  String warning,  int intCleanliness,
+											  double beginLon,  double beginLat,  String warning,  int intCleanliness,
                                               int extCleanliness,String macAddress, String imei,  int nPin);*/
 
-    Observable<TripResponse> openTrip(Trip trip, DataManager dataManager);
+	Observable<TripResponse> openTrip(Trip trip, DataManager dataManager);
 
-    Observable<Trip> openTripPassive(Trip trip, DataManager dataManager);
+	Observable<Trip> openTripPassive(Trip trip, DataManager dataManager);
 
-    Observable<Trip> closeTripPassive(Trip trip, DataManager dataManager);
+	Observable<Trip> closeTripPassive(Trip trip, DataManager dataManager);
 
-    Observable<TripResponse> updateTrip(Trip trip);
+	Observable<TripResponse> updateTrip(Trip trip);
 
-    Observable<TripResponse> closeTrip(Trip trip, DataManager dataManager);
+	Observable<TripResponse> closeTrip(Trip trip, DataManager dataManager);
 
-    Observable<EventResponse> sendEvent(Event trip, DataManager dataManager);
+	Observable<EventResponse> sendEvent(Event trip, DataManager dataManager);
 
-    Observable<List<Reservation>> getReservation(String plate);
+	Observable<List<Reservation>> getReservation(String plate);
 
-    Observable<Void> consumeReservation(int reservation_id);
+	Observable<Void> consumeReservation(int reservation_id);
 
-    Observable<List<Poi>> getPois(long lastupdate);
+	Observable<List<Poi>> getPois(long lastupdate);
 
 }

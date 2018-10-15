@@ -11,105 +11,105 @@ import eu.philcar.csg.OBC.interfaces.BasicJson;
 
 public class CardRfid extends BasicJson {
 
-    private DLog dlog = new DLog(this.getClass());
+	private DLog dlog = new DLog(this.getClass());
 
-    private String code;
-    private String name;
+	private String code;
+	private String name;
 
-    public CardRfid(String code, String name) {
-        this.code = code;
-        this.name = name;
-    }
+	public CardRfid(String code, String name) {
+		this.code = code;
+		this.name = name;
+	}
 
-    public CardRfid() {
-        this.code = null;
-        this.name = null;
-    }
+	public CardRfid() {
+		this.code = null;
+		this.name = null;
+	}
 
-    public static CardRfid decodeFromJson(String json) {
-        CardRfid result = new CardRfid("", "");
-        try {
-            JSONObject jo = new JSONObject(json);
+	public static CardRfid decodeFromJson(String json) {
+		CardRfid result = new CardRfid("", "");
+		try {
+			JSONObject jo = new JSONObject(json);
 
-            result = new CardRfid(jo.optString("code", null), jo.optString("name", null));
+			result = new CardRfid(jo.optString("code", null), jo.optString("name", null));
 
-        } catch (Exception e) {
-            DLog.E("CardRfid decodefromJson: exception while decoding", e);
-        }
-        return result;
-    }
+		} catch (Exception e) {
+			DLog.E("CardRfid decodefromJson: exception while decoding", e);
+		}
+		return result;
+	}
 
-    public String getCode() {
-        return code != null ? code : "";
-    }
+	public String getCode() {
+		return code != null ? code : "";
+	}
 
-    public String getName() {
-        return name != null ? name : "";
-    }
+	public String getName() {
+		return name != null ? name : "";
+	}
 
-    @Override
-    public boolean isValid() {
-        return code != null && name != null;
-    }
+	@Override
+	public boolean isValid() {
+		return code != null && name != null;
+	}
 
-    @Override
-    public String toJson() {
+	@Override
+	public String toJson() {
 
-        JSONObject jo = new JSONObject();
-        try {
-            jo.put("code", getCode());
-            jo.put("name", getName());
-        } catch (JSONException e) {
-            dlog.e("Exception while writing json", e);
-        }
+		JSONObject jo = new JSONObject();
+		try {
+			jo.put("code", getCode());
+			jo.put("name", getName());
+		} catch (JSONException e) {
+			dlog.e("Exception while writing json", e);
+		}
 
-        return jo.toString();
+		return jo.toString();
 
-    }
+	}
 
-    @Override
-    public JSONObject toJsonObject() {
-        JSONObject jo = new JSONObject();
-        try {
-            jo.put("code", getCode());
-            jo.put("name", getName());
-        } catch (JSONException e) {
-            dlog.e("Exception while writing json", e);
-        }
+	@Override
+	public JSONObject toJsonObject() {
+		JSONObject jo = new JSONObject();
+		try {
+			jo.put("code", getCode());
+			jo.put("name", getName());
+		} catch (JSONException e) {
+			dlog.e("Exception while writing json", e);
+		}
 
-        return jo;
-    }
+		return jo;
+	}
 
-    @Override
-    public void fromJson(String json) {
-        try {
-            JSONObject jo = new JSONObject(json);
+	@Override
+	public void fromJson(String json) {
+		try {
+			JSONObject jo = new JSONObject(json);
 
-            this.code = jo.optString("code", null);
-            this.name = jo.optString("name", null);
+			this.code = jo.optString("code", null);
+			this.name = jo.optString("name", null);
 
-        } catch (Exception e) {
-            DLog.E("CardRfid decodefromJson: exception while decoding", e);
-            this.code = null;
-            this.name = null;
-        }
-    }
+		} catch (Exception e) {
+			DLog.E("CardRfid decodefromJson: exception while decoding", e);
+			this.code = null;
+			this.name = null;
+		}
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        CardRfid comparisonCard;
-        if (obj instanceof CardRfid) {
-            comparisonCard = (CardRfid) obj;
-        } else {
-            return false;
-        }
+	@Override
+	public boolean equals(Object obj) {
+		CardRfid comparisonCard;
+		if (obj instanceof CardRfid) {
+			comparisonCard = (CardRfid) obj;
+		} else {
+			return false;
+		}
 
-        return comparisonCard.getCode().equalsIgnoreCase(getCode());
+		return comparisonCard.getCode().equalsIgnoreCase(getCode());
 
-    }
+	}
 
-    @Override
-    public String toString() {
-        return toJson();
-    }
+	@Override
+	public String toString() {
+		return toJson();
+	}
 }

@@ -33,146 +33,146 @@ import java.nio.ByteBuffer;
 //  Derived class should implement individual state machine actions.
 
 public class Decoder extends DecoderBase {
-    private static final int ONE_BYTE_SIZE_READY = 0;
-    private static final int EIGHT_BYTE_SIZE_READY = 1;
-    private static final int FLAGS_READY = 2;
-    private static final int MESSAGE_READY = 3;
+	private static final int ONE_BYTE_SIZE_READY = 0;
+	private static final int EIGHT_BYTE_SIZE_READY = 1;
+	private static final int FLAGS_READY = 2;
+	private static final int MESSAGE_READY = 3;
 
-    private final byte[] tmpbuf;
-    private Msg inProgress;
-    private final long maxmsgsize;
-    private IMsgSink msgSink;
+	private final byte[] tmpbuf;
+	private Msg inProgress;
+	private final long maxmsgsize;
+	private IMsgSink msgSink;
 
-    public Decoder(int bufsize, long maxmsgsize) {
-        super(bufsize);
-        this.maxmsgsize = maxmsgsize;
-        tmpbuf = new byte[8];
+	public Decoder(int bufsize, long maxmsgsize) {
+		super(bufsize);
+		this.maxmsgsize = maxmsgsize;
+		tmpbuf = new byte[8];
 
-        //  At the beginning, read one byte and go to oneByteSizeReady state.
-        nextStep(tmpbuf, 1, ONE_BYTE_SIZE_READY);
-    }
+		//  At the beginning, read one byte and go to oneByteSizeReady state.
+		nextStep(tmpbuf, 1, ONE_BYTE_SIZE_READY);
+	}
 
-    //  Set the receiver of decoded messages.
-    @Override
-    public void setMsgSink(IMsgSink msgSink) {
-        this.msgSink = msgSink;
-    }
+	//  Set the receiver of decoded messages.
+	@Override
+	public void setMsgSink(IMsgSink msgSink) {
+		this.msgSink = msgSink;
+	}
 
-    @Override
-    protected boolean next() {
-        switch (state()) {
-            case ONE_BYTE_SIZE_READY:
-                return oneByteSizeReady();
-            case EIGHT_BYTE_SIZE_READY:
-                return eightByteSizeReady();
-            case FLAGS_READY:
-                return flagsReady();
-            case MESSAGE_READY:
-                return messageReady();
-            default:
-                return false;
-        }
-    }
+	@Override
+	protected boolean next() {
+		switch (state()) {
+			case ONE_BYTE_SIZE_READY:
+				return oneByteSizeReady();
+			case EIGHT_BYTE_SIZE_READY:
+				return eightByteSizeReady();
+			case FLAGS_READY:
+				return flagsReady();
+			case MESSAGE_READY:
+				return messageReady();
+			default:
+				return false;
+		}
+	}
 
-    private boolean oneByteSizeReady() {
-        //  First byte of size is read. If it is 0xff(-1 for java byte) read 8-byte size.
-        //  Otherwise allocate the buffer for message data and read the
-        //  message data into it.
-        byte first = tmpbuf[0];
-        if (first == -1) {
-            nextStep(tmpbuf, 8, EIGHT_BYTE_SIZE_READY);
-        } else {
-            //  There has to be at least one byte (the flags) in the message).
-            if (first == 0) {
-                decodingError();
-                return false;
-            }
+	private boolean oneByteSizeReady() {
+		//  First byte of size is read. If it is 0xff(-1 for java byte) read 8-byte size.
+		//  Otherwise allocate the buffer for message data and read the
+		//  message data into it.
+		byte first = tmpbuf[0];
+		if (first == -1) {
+			nextStep(tmpbuf, 8, EIGHT_BYTE_SIZE_READY);
+		} else {
+			//  There has to be at least one byte (the flags) in the message).
+			if (first == 0) {
+				decodingError();
+				return false;
+			}
 
-            int size = (int) first;
-            if (size < 0) {
-                size = (0xFF) & first;
-            }
+			int size = (int) first;
+			if (size < 0) {
+				size = (0xFF) & first;
+			}
 
-            //  inProgress is initialised at this point so in theory we should
-            //  close it before calling zmq_msg_init_size, however, it's a 0-byte
-            //  message and thus we can treat it as uninitialised...
-            if (maxmsgsize >= 0 && (long) (size - 1) > maxmsgsize) {
-                decodingError();
-                return false;
+			//  inProgress is initialised at this point so in theory we should
+			//  close it before calling zmq_msg_init_size, however, it's a 0-byte
+			//  message and thus we can treat it as uninitialised...
+			if (maxmsgsize >= 0 && (long) (size - 1) > maxmsgsize) {
+				decodingError();
+				return false;
 
-            } else {
-                inProgress = new Msg(size - 1);
-            }
+			} else {
+				inProgress = new Msg(size - 1);
+			}
 
-            nextStep(tmpbuf, 1, FLAGS_READY);
-        }
-        return true;
+			nextStep(tmpbuf, 1, FLAGS_READY);
+		}
+		return true;
 
-    }
+	}
 
-    private boolean eightByteSizeReady() {
-        //  8-byte payload length is read. Allocate the buffer
-        //  for message body and read the message data into it.
-        final long payloadLength = ByteBuffer.wrap(tmpbuf).getLong();
+	private boolean eightByteSizeReady() {
+		//  8-byte payload length is read. Allocate the buffer
+		//  for message body and read the message data into it.
+		final long payloadLength = ByteBuffer.wrap(tmpbuf).getLong();
 
-        //  There has to be at least one byte (the flags) in the message).
-        if (payloadLength <= 0) {
-            decodingError();
-            return false;
-        }
+		//  There has to be at least one byte (the flags) in the message).
+		if (payloadLength <= 0) {
+			decodingError();
+			return false;
+		}
 
-        //  Message size must not exceed the maximum allowed size.
-        if (maxmsgsize >= 0 && payloadLength - 1 > maxmsgsize) {
-            decodingError();
-            return false;
-        }
+		//  Message size must not exceed the maximum allowed size.
+		if (maxmsgsize >= 0 && payloadLength - 1 > maxmsgsize) {
+			decodingError();
+			return false;
+		}
 
-        //  Message size must fit within range of size_t data type.
-        if (payloadLength - 1 > Integer.MAX_VALUE) {
-            decodingError();
-            return false;
-        }
+		//  Message size must fit within range of size_t data type.
+		if (payloadLength - 1 > Integer.MAX_VALUE) {
+			decodingError();
+			return false;
+		}
 
-        final int msgSize = (int) (payloadLength - 1);
-        //  inProgress is initialized at this point so in theory we should
-        //  close it before calling init_size, however, it's a 0-byte
-        //  message and thus we can treat it as uninitialized...
-        inProgress = new Msg(msgSize);
+		final int msgSize = (int) (payloadLength - 1);
+		//  inProgress is initialized at this point so in theory we should
+		//  close it before calling init_size, however, it's a 0-byte
+		//  message and thus we can treat it as uninitialized...
+		inProgress = new Msg(msgSize);
 
-        nextStep(tmpbuf, 1, FLAGS_READY);
+		nextStep(tmpbuf, 1, FLAGS_READY);
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean flagsReady() {
-        //  Store the flags from the wire into the message structure.
+	private boolean flagsReady() {
+		//  Store the flags from the wire into the message structure.
 
-        int first = tmpbuf[0];
+		int first = tmpbuf[0];
 
-        inProgress.setFlags(first & Msg.MORE);
+		inProgress.setFlags(first & Msg.MORE);
 
-        nextStep(inProgress,
-                MESSAGE_READY);
+		nextStep(inProgress,
+				MESSAGE_READY);
 
-        return true;
+		return true;
 
-    }
+	}
 
-    private boolean messageReady() {
-        //  Message is completely read. Push it further and start reading
-        //  new message. (inProgress is a 0-byte message after this point.)
+	private boolean messageReady() {
+		//  Message is completely read. Push it further and start reading
+		//  new message. (inProgress is a 0-byte message after this point.)
 
-        if (msgSink == null) {
-            return false;
-        }
+		if (msgSink == null) {
+			return false;
+		}
 
-        int rc = msgSink.pushMsg(inProgress);
-        if (rc != 0) {
-            return false;
-        }
+		int rc = msgSink.pushMsg(inProgress);
+		if (rc != 0) {
+			return false;
+		}
 
-        nextStep(tmpbuf, 1, ONE_BYTE_SIZE_READY);
+		nextStep(tmpbuf, 1, ONE_BYTE_SIZE_READY);
 
-        return true;
-    }
+		return true;
+	}
 }

@@ -10,14 +10,14 @@ import android.content.Intent;
 
 public class RunOnStartup extends BroadcastReceiver {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-            DLog.D(this.getClass().toString() + " Ricevuto boot del dispositivo, non è un crash");
-            DLog.CR("Avvio in seguito ad un boot di Android");
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+			DLog.D(this.getClass().toString() + " Ricevuto boot del dispositivo, non è un crash");
+			DLog.CR("Avvio in seguito ad un boot di Android");
 
            /* Runtime rt = Runtime.getRuntime();
-            try {
+			try {
                 rt.exec(new String[]{"cd ", App.SM_SCRIPT_PATH });
                 rt.exec("su");
                 rt.exec(new String[]{"sh ", App.SM_SCRIPT_NAME
@@ -27,10 +27,10 @@ public class RunOnStartup extends BroadcastReceiver {
                 DLog.E("Exception while starting script",e);
             }*/
 
-            Intent i = new Intent(context, StubActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(i);
-        }
-    }
+			Intent i = new Intent(context, StubActivity.class);
+			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			context.startActivity(i);
+		}
+	}
 
 }

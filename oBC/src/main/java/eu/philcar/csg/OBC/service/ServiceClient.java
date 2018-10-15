@@ -7,5 +7,5 @@ import android.os.Message;
  */
 
 public interface ServiceClient {
-    void sendMessage(Message msg);
+	void sendMessage(Message msg);
 }

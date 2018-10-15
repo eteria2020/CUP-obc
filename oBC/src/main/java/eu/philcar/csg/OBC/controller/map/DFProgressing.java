@@ -13,82 +13,82 @@ import eu.philcar.csg.OBC.helpers.DLog;
 
 public class DFProgressing extends DialogFragment {
 
-    public static DFProgressing newInstance(String message) {
-        DFProgressing dfpro = new DFProgressing();
-        dfpro.messageRes = 0;
-        dfpro.messageStr = message;
-        return dfpro;
-    }
+	public static DFProgressing newInstance(String message) {
+		DFProgressing dfpro = new DFProgressing();
+		dfpro.messageRes = 0;
+		dfpro.messageStr = message;
+		return dfpro;
+	}
 
-    public static DFProgressing newInstance(int message) {
-        DFProgressing dfpro = new DFProgressing();
-        dfpro.messageRes = message;
-        dfpro.messageStr = "";
-        return dfpro;
-    }
+	public static DFProgressing newInstance(int message) {
+		DFProgressing dfpro = new DFProgressing();
+		dfpro.messageRes = message;
+		dfpro.messageStr = "";
+		return dfpro;
+	}
 
-    private int messageRes;
-    private String messageStr;
-    private TextView messageTV;
+	private int messageRes;
+	private String messageStr;
+	private TextView messageTV;
 
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.df_progressing, null);
+		View view = LayoutInflater.from(getActivity()).inflate(R.layout.df_progressing, null);
 
-        messageTV = (TextView) view.findViewById(R.id.dfproMessageTV);
+		messageTV = (TextView) view.findViewById(R.id.dfproMessageTV);
 
-        updateMessage();
+		updateMessage();
 
-        builder.setView(view);
+		builder.setView(view);
 
-        setCancelable(false);
+		setCancelable(false);
 
-        return builder.create();
-    }
+		return builder.create();
+	}
 
-    public void setMessage(int message) {
-        messageRes = message;
-        updateMessage();
-    }
+	public void setMessage(int message) {
+		messageRes = message;
+		updateMessage();
+	}
 
-    public void setMessage(String message) {
-        if (message != null) {
-            messageStr = message;
-        }
-        updateMessage();
-    }
+	public void setMessage(String message) {
+		if (message != null) {
+			messageStr = message;
+		}
+		updateMessage();
+	}
 
-    public void appenMessage(String message) {
-        if (message != null) {
-            messageStr += message;
-        }
-        updateMessage();
-    }
+	public void appenMessage(String message) {
+		if (message != null) {
+			messageStr += message;
+		}
+		updateMessage();
+	}
 
-    private void updateMessage() {
+	private void updateMessage() {
 
-        if (messageTV != null) {
+		if (messageTV != null) {
 
-            if (messageRes == 0) {
+			if (messageRes == 0) {
 
-                messageTV.setText(messageStr);
+				messageTV.setText(messageStr);
 
-            } else {
+			} else {
 
-                messageTV.setText(messageRes);
-            }
-        }
-    }
+				messageTV.setText(messageRes);
+			}
+		}
+	}
 
-    @Override
-    public void dismiss() {
-        try {
-            super.dismiss();
-        } catch (Exception e) {
-            DLog.E("Exception dismissing progress dialog", e);
-        }
-    }
+	@Override
+	public void dismiss() {
+		try {
+			super.dismiss();
+		} catch (Exception e) {
+			DLog.E("Exception dismissing progress dialog", e);
+		}
+	}
 }

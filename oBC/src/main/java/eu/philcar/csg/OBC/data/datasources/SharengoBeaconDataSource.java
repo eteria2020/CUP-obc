@@ -9,5 +9,5 @@ import io.reactivex.Observable;
 
 public interface SharengoBeaconDataSource {
 
-    Observable<BeaconResponse> sendBeacon(String plate, String beacon);
+	Observable<BeaconResponse> sendBeacon(String plate, String beacon);
 }

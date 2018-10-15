@@ -15,87 +15,87 @@ import eu.philcar.csg.OBC.helpers.DLog;
 @Deprecated
 public class AdminsConnector implements RemoteEntityInterface {
 
-    private DLog dlog = new DLog(this.getClass());
+	private DLog dlog = new DLog(this.getClass());
 
-    public List<String> AdminsList = new ArrayList<String>();
+	public List<String> AdminsList = new ArrayList<String>();
 
-    public static AdminsConnector GetDownloadConnector() {
-        return new AdminsConnector();
-    }
+	public static AdminsConnector GetDownloadConnector() {
+		return new AdminsConnector();
+	}
 
-    private String carPlate = null;
+	private String carPlate = null;
 
-    public void setCarPlate(String plate) {
-        this.carPlate = plate;
-    }
+	public void setCarPlate(String plate) {
+		this.carPlate = plate;
+	}
 
-    public int MsgId() {
-        return Connectors.MSG_DN_ADMINS;
-    }
+	public int MsgId() {
+		return Connectors.MSG_DN_ADMINS;
+	}
 
-    public String GetRemoteUrl() {
-        return App.URL_Admins;
-    }
+	public String GetRemoteUrl() {
+		return App.URL_Admins;
+	}
 
-    public int DecodeJson(String responseBody) {
+	public int DecodeJson(String responseBody) {
 
-        if (responseBody == null || responseBody.isEmpty()) {
-            dlog.e("Empty response");
-            return MsgId();
-        }
+		if (responseBody == null || responseBody.isEmpty()) {
+			dlog.e("Empty response");
+			return MsgId();
+		}
 
-        JSONArray jArray;
-        try {
+		JSONArray jArray;
+		try {
 
-            jArray = new JSONArray(responseBody);
-        } catch (JSONException e) {
-            dlog.e("Errore estraendo array json", e);
-            return MsgId();
-        }
+			jArray = new JSONArray(responseBody);
+		} catch (JSONException e) {
+			dlog.e("Errore estraendo array json", e);
+			return MsgId();
+		}
 
-        int n = jArray.length();
-        AdminsList.clear();
+		int n = jArray.length();
+		AdminsList.clear();
 
-        dlog.d("Downloaded " + n + " records");
+		dlog.d("Downloaded " + n + " records");
 
-        for (int i = 0; i < n; i++) {
+		for (int i = 0; i < n; i++) {
 
-            try {
-                JSONObject jobj = jArray.getJSONObject(i);
-                int id = jobj.getInt("id");
-                String card = jobj.getString("card");
-                AdminsList.add(card);
+			try {
+				JSONObject jobj = jArray.getJSONObject(i);
+				int id = jobj.getInt("id");
+				String card = jobj.getString("card");
+				AdminsList.add(card);
 
-            } catch (JSONException e) {
-                dlog.e("Errore estraendo array json", e);
+			} catch (JSONException e) {
+				dlog.e("Errore estraendo array json", e);
 
-            }
+			}
 
-        }
+		}
 
-        return MsgId();
-    }
+		return MsgId();
+	}
 
-    public eDirection getDirection() {
-        return eDirection.DOWNLOAD;
-    }
+	public eDirection getDirection() {
+		return eDirection.DOWNLOAD;
+	}
 
-    public String EncodeJson() {
+	public String EncodeJson() {
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public List<NameValuePair> GetParams() {
+	@Override
+	public List<NameValuePair> GetParams() {
 
-        ArrayList<NameValuePair> list = null;
+		ArrayList<NameValuePair> list = null;
 
-        if (carPlate != null) {
-            list = new ArrayList<NameValuePair>();
-            list.add(new BasicNameValuePair("car_plate", carPlate));
-        }
+		if (carPlate != null) {
+			list = new ArrayList<NameValuePair>();
+			list.add(new BasicNameValuePair("car_plate", carPlate));
+		}
 
-        return list;
-    }
+		return list;
+	}
 
 }

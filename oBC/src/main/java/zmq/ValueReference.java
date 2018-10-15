@@ -20,20 +20,20 @@
 package zmq;
 
 public class ValueReference<V> {
-    private V value;
+	private V value;
 
-    public ValueReference(V value) {
-        this.value = value;
-    }
+	public ValueReference(V value) {
+		this.value = value;
+	}
 
-    public ValueReference() {
-    }
+	public ValueReference() {
+	}
 
-    public final V get() {
-        return value;
-    }
+	public final V get() {
+		return value;
+	}
 
-    public final void set(V value) {
-        this.value = value;
-    }
+	public final void set(V value) {
+		this.value = value;
+	}
 }

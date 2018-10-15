@@ -8,51 +8,51 @@ import java.util.Date;
  */
 
 public class Log implements Comparable<Log> {
-    File file = null;
-    Date date = null;
-    int index;
-    boolean deletingError = false;
+	File file = null;
+	Date date = null;
+	int index;
+	boolean deletingError = false;
 
-    public Log() {
+	public Log() {
 
-    }
+	}
 
-    public boolean isDeletingError() {
-        return deletingError;
-    }
+	public boolean isDeletingError() {
+		return deletingError;
+	}
 
-    public void setDeletingError(boolean deletingError) {
-        this.deletingError = deletingError;
-    }
+	public void setDeletingError(boolean deletingError) {
+		this.deletingError = deletingError;
+	}
 
-    public File getFile() {
-        return file;
-    }
+	public File getFile() {
+		return file;
+	}
 
-    public void setFile(File file) {
-        this.file = file;
-    }
+	public void setFile(File file) {
+		this.file = file;
+	}
 
-    public Date getDate() {
-        return date;
-    }
+	public Date getDate() {
+		return date;
+	}
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
+	public void setDate(Date date) {
+		this.date = date;
+	}
 
-    public int getIndex() {
-        return index;
-    }
+	public int getIndex() {
+		return index;
+	}
 
-    public void setIndex(int index) {
-        this.index = index;
-    }
+	public void setIndex(int index) {
+		this.index = index;
+	}
 
-    @Override
-    public int compareTo(Log another) {
-        if (getDate() == null || another.getDate() == null)
-            return 0;
-        return getDate().compareTo(another.getDate());
-    }
+	@Override
+	public int compareTo(Log another) {
+		if (getDate() == null || another.getDate() == null)
+			return 0;
+		return getDate().compareTo(another.getDate());
+	}
 }
