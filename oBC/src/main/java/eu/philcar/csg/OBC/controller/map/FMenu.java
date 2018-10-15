@@ -454,6 +454,7 @@ public class FMenu extends FBase implements OnClickListener {
 								}
 
 							} else {
+								dlog.d("updateUI: display area error");
 								UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_outside_park_area, null,
 										R.drawable.ic_letter_p, R.string.menu_park_mode_suspend, this,
 										R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,

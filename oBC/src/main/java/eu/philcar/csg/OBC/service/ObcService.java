@@ -3128,7 +3128,7 @@ public class ObcService extends Service implements OnTripCallback {
 		SimpleDateFormat d2 = new SimpleDateFormat("yyyyMMdd");
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MONTH, -1);
-		App.Instance.getDbManager().getDataLoggersDao().removeOldLog(cal.getTime());
+//		App.Instance.getDbManager().getDataLoggersDao().removeOldLog(cal.getTime());
 		int LastmonthDate = Integer.parseInt(d2.format(cal.getTime()));
 		File folder = new File(directory);
 		if (folder.exists()) {
@@ -3277,7 +3277,7 @@ public class ObcService extends Service implements OnTripCallback {
 
 		output.close();
 
-		App.Instance.getDbManager().getDataLoggersDao().saveLog(j);
+		//App.Instance.getDbManager().getDataLoggersDao().saveLog(j);
 
 	}
 
