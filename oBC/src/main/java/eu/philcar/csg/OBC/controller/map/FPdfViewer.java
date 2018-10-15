@@ -16,9 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
 
@@ -53,12 +51,10 @@ import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.helpers.DLog;
-import eu.philcar.csg.OBC.server.HttpConnector;
 import eu.philcar.csg.OBC.server.HttpsConnector;
 import eu.philcar.csg.OBC.server.SendEmail;
 
 import static java.lang.Boolean.FALSE;
-
 
 /**
  * Created by Momo on 23/11/2017.
@@ -80,7 +76,7 @@ public class FPdfViewer extends FBase {
     private int mega = 1024 * 1024; // per il buffer
     private String downloadUrl;
     private TextView tv1;
-    private   Button b;
+    private Button b;
     public String response;
     Handler h1;
     private Bundle bb = new Bundle();
@@ -100,14 +96,11 @@ public class FPdfViewer extends FBase {
         FPdfViewer.setUpdate(update);
         FPdfViewer.setOpenFile(openFile);
 
-
         return FPdfViewer;
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
 
         Log.i("pdf", "onCreate: pdf");
         super.onCreate(savedInstanceState);
@@ -123,21 +116,18 @@ public class FPdfViewer extends FBase {
             }
         };
 
-
         //  Toast.makeText(getActivity(), "No Application available to view PDF", Toast.LENGTH_SHORT).show();
     }
-
-
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setOpenFile(true);
 
         View view = inflater.inflate(R.layout.f_pdf, container, false);
 
-        tv1 = (TextView)view.findViewById(R.id.resp);
+        tv1 = (TextView) view.findViewById(R.id.resp);
         tv1.setVisibility(View.INVISIBLE);
 
-        ((ImageButton) view.findViewById(R.id.fmenBackIB)).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.fmenBackIB).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ((ABase) getActivity()).popFragment();
@@ -161,6 +151,7 @@ public class FPdfViewer extends FBase {
         });
         return view;
     }
+
     public void setTitleText(String resp) {
         this.response = resp;
         getActivity().runOnUiThread(new Runnable() {
@@ -174,7 +165,8 @@ public class FPdfViewer extends FBase {
         });
 
     }
-    public void getEmail(){
+
+    public void getEmail() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -182,35 +174,31 @@ public class FPdfViewer extends FBase {
 
         // Add edit text for password input
         final EditText input = new EditText(getActivity());
-        input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS );
+        input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         builder.setView(input);
 
         // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
-
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String email =  input.getText().toString();
-                DLog.I("Email inserita : " + ", "+email);
-                if(isEmailValid(email)){
+                String email = input.getText().toString();
+                DLog.I("Email inserita : " + ", " + email);
+                if (isEmailValid(email)) {
 
-                        try {
-                            SendEmail sendEmail= new SendEmail();
-                            sendEmail.setEmail(email);
-                            sendEmail.setHandler(h1);
-                            HttpsConnector httpConnector = new HttpsConnector(getActivity());
-                            httpConnector.Execute(sendEmail);
+                    try {
+                        SendEmail sendEmail = new SendEmail();
+                        sendEmail.setEmail(email);
+                        sendEmail.setHandler(h1);
+                        HttpsConnector httpConnector = new HttpsConnector(getActivity());
+                        httpConnector.Execute(sendEmail);
 
+                    } catch (Exception e) {
+                        DLog.E("SendEmail", e);
 
-                        } catch (Exception e) {
-                            DLog.E("SendEmail", e);
-
-                        }
                     }
-
-                else {
-                   // Toast.makeText(getActivity(), "EMAIL NON VALIDA", Toast.LENGTH_LONG).show();
+                } else {
+                    // Toast.makeText(getActivity(), "EMAIL NON VALIDA", Toast.LENGTH_LONG).show();
                     return;
                 }
                 //  sendemail.execute();
@@ -227,28 +215,24 @@ public class FPdfViewer extends FBase {
         builder.show();
     }
 
-    public boolean isEmailValid(String email)
-    {
+    public boolean isEmailValid(String email) {
         String regExpn =
                 "^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]{1}|[\\w-]{2,}))@"
-                        +"((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
-                        +"[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
-                        +"([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
-                        +"[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
-                        +"([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$";
+                        + "((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                        + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
+                        + "([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                        + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
+                        + "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$";
 
         CharSequence inputStr = email;
 
-        Pattern pattern = Pattern.compile(regExpn,Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile(regExpn, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(inputStr);
 
-        if(matcher.matches())
-            return true;
-        else
-            return false;
+        return matcher.matches();
     }
-    protected void openPdf(File pdf, PDFView pdfView) {
 
+    protected void openPdf(File pdf, PDFView pdfView) {
 
         if (pdf != null && pdf.exists()) {
             Uri path = Uri.fromFile(pdf);
@@ -275,7 +259,6 @@ public class FPdfViewer extends FBase {
                 }
             });
 
-
             if (listOfFiles.length > 0) {
                 return listOfFiles;
 
@@ -294,13 +277,8 @@ public class FPdfViewer extends FBase {
         String TodayDate = sdf.format(new Date());
         int x = Integer.parseInt(TodayDate);
         int y = Integer.parseInt(name);
-        if (x > y) {
+        return x > y;
 
-            return true;
-        }
-
-
-        return false;
     }
 
     public void fileType(String fileType) {
@@ -310,7 +288,6 @@ public class FPdfViewer extends FBase {
     public void setDirectory(String directory) {
         this.directory = directory;
     }
-
 
     public void setJson(String json) throws JSONException {
 
@@ -394,12 +371,11 @@ public class FPdfViewer extends FBase {
                     //    openPdf(pdf[0],getView());
                     setUpdate(false);
                 }
-            } else if(App.hasNetworkConnection()) {
+            } else if (App.hasNetworkConnection()) {
                 setDownload(true);
                 //Toast.makeText(getActivity(), "Scaricamento file, Attendere...", Toast.LENGTH_LONG).show();
                 new DownloadFile().execute();
-            }else
-            {
+            } else {
                 //Toast.makeText(getActivity(), "Nessuna connessione internet", Toast.LENGTH_SHORT).show();
             }
 
@@ -426,8 +402,9 @@ public class FPdfViewer extends FBase {
     }
 
     private class DownloadFile extends AsyncTask<String, String, String> {
-       private boolean downloaded = false;
+        private boolean downloaded = false;
         String txtJson;
+
         protected void onPreExecute() {
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -440,7 +417,6 @@ public class FPdfViewer extends FBase {
 
         @Override
         protected String doInBackground(String... voids) {
-
 
             HttpClient httpclient = new DefaultHttpClient(); // Create HTTP Client
             HttpGet httpget = new HttpGet(getURL() + "?PLATE=" + PLATE + "&FILE=" + fileType); // Set the action you want to do
@@ -455,7 +431,7 @@ public class FPdfViewer extends FBase {
                 HttpEntity entity = response.getEntity();
                 is = entity.getContent();
             } catch (IOException e) {
-                Log.e("FPDF", "Download pdf: ",e );
+                Log.e("FPDF", "Download pdf: ", e);
             }
             BufferedReader reader = null;
             try {
@@ -480,7 +456,7 @@ public class FPdfViewer extends FBase {
                 e.printStackTrace();
             }
             try {
-                if(Json.getString("filesize") == "false")
+                if (Json.getString("filesize") == "false")
                     return null;
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -500,11 +476,9 @@ public class FPdfViewer extends FBase {
             try {
 
                 url = Json.getString(fileType).replace(subDelete, "");
-                if (url != null)
-                {
+                if (url != null) {
                     setDownloadUrl(url);
-                }else
-                {
+                } else {
                     return null;
                 }
             } catch (JSONException e) {
@@ -526,23 +500,20 @@ public class FPdfViewer extends FBase {
 
         }
 
-
-
         @Override
         protected void onPostExecute(String result) {
 
-
+            try {
+                setJson(txtJson);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if (openFile)
                 try {
-                    setJson(txtJson);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                if (openFile)
-                    try{
-                    openPdf(file, PDFView);}
-                    catch (Exception e){
+                    openPdf(file, PDFView);
+                } catch (Exception e) {
 
-                    }
+                }
 
         }
 
@@ -555,12 +526,12 @@ public class FPdfViewer extends FBase {
                 return FALSE;
             if (Json.getString("filesize") == null || Json.getString("filesize") == "false")
                 return FALSE;
-       //     StringBuilder  temp = new StringBuilder();
-         //   temp.append();
-         //   temp.reverse();
-            String tmp[] =fileUrl.replace(PLATE,"").replace(".pdf","").split("--"); //replaceAll("[^?0-9]+", "")
+            //     StringBuilder  temp = new StringBuilder();
+            //   temp.append();
+            //   temp.reverse();
+            String tmp[] = fileUrl.replace(PLATE, "").replace(".pdf", "").split("--"); //replaceAll("[^?0-9]+", "")
             String temp[] = tmp[1].split("_");
-            String pdfname = fileType + "-" + temp[2]+temp[1]+temp[0] + ".pdf";
+            String pdfname = fileType + "-" + temp[2] + temp[1] + temp[0] + ".pdf";
 
             String extStorageDirectory = Environment.getExternalStorageDirectory().toString();
             File folder = new File(extStorageDirectory, directory);
@@ -600,7 +571,6 @@ public class FPdfViewer extends FBase {
             return false;
 
         }
-
 
     }
 }

@@ -7,19 +7,19 @@ package com.skobbler.ngx.sdktools.download;
  */
 public interface SKToolsDownloadListener {
 
-    public void onDownloadProgress(SKToolsDownloadItem currentDownloadItem);
+    void onDownloadProgress(SKToolsDownloadItem currentDownloadItem);
 
-    public void onDownloadCancelled(String currentDownloadItemCode);
+    void onDownloadCancelled(String currentDownloadItemCode);
 
-    public void onDownloadPaused(SKToolsDownloadItem currentDownloadItem);
+    void onDownloadPaused(SKToolsDownloadItem currentDownloadItem);
 
-    public void onInternetConnectionFailed(SKToolsDownloadItem currentDownloadItem, boolean responseReceivedFromServer);
+    void onInternetConnectionFailed(SKToolsDownloadItem currentDownloadItem, boolean responseReceivedFromServer);
 
-    public void onAllDownloadsCancelled();
+    void onAllDownloadsCancelled();
 
-    public void onNotEnoughMemoryOnCurrentStorage(SKToolsDownloadItem currentDownloadItem);
+    void onNotEnoughMemoryOnCurrentStorage(SKToolsDownloadItem currentDownloadItem);
 
-    public void onInstallStarted(SKToolsDownloadItem currentInstallingItem);
+    void onInstallStarted(SKToolsDownloadItem currentInstallingItem);
 
-    public void onInstallFinished(SKToolsDownloadItem currentInstallingItem);
+    void onInstallFinished(SKToolsDownloadItem currentInstallingItem);
 }

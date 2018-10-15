@@ -6,7 +6,6 @@ import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.data.model.Config;
 import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.ModelResponse;
-import eu.philcar.csg.OBC.data.model.ReservationResponse;
 import eu.philcar.csg.OBC.data.model.SharengoResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
@@ -36,7 +35,6 @@ public interface SharengoApi {
     @GET("business-employees")
     Observable<Result<List<BusinessEmployee>>> getBusinessEmployees();
 
-
     @Headers("Connection: close")
     @GET("v2/area")
     Observable<Result<SharengoResponse<List<Area>>>> getArea(@Query("md5") String md5);
@@ -64,7 +62,7 @@ public interface SharengoApi {
     @Headers("Connection: close")
     @FormUrlEncoded
     @POST("v2/events")
-    Observable<Result<SharengoResponse<EventResponse>>> sendEvent(@Field(value = "event_id", encoded=true) int event_id, @Field("label") String label, @Field("car_plate") String car_plate, @Field("customer_id") int customer_id,
+    Observable<Result<SharengoResponse<EventResponse>>> sendEvent(@Field(value = "event_id", encoded = true) int event_id, @Field("label") String label, @Field("car_plate") String car_plate, @Field("customer_id") int customer_id,
                                                                   @Field("trip_id") int trip_id, @Field("event_time") long event_time, @Field("intval") int intval, @Field("txtval") String txtval,
                                                                   @Field("lon") double lon, @Field("lat") double lat, @Field("km") int km, @Field("battery") int battery, @Field("imei") String imei,
                                                                   @Field("json_data") String json_data);
@@ -74,7 +72,6 @@ public interface SharengoApi {
     @POST("v2/trips")
     Observable<Result<Config>> postTrips(@Query("car_plate") String car_plate);
 
-
     @Headers("Connection: close")
     @GET("carmodel")
     Observable<Result<List<ModelResponse>>> getModel(@Query("plate") String car_plate);
@@ -83,15 +80,14 @@ public interface SharengoApi {
     @FormUrlEncoded
     @POST("v2/trips")
     Observable<Result<SharengoResponse<TripResponse>>> openTrip(@Field("cmd") int cmd_type, @Field("id_veicolo") String plate, @Field("id_cliente") int customerId, @Field("ora") long beginTimestamp, @Field("km") int km, @Field("carburante") int soc,
-                                              @Field("lon") double beginLon, @Field("lat") double beginLat, @Field("warning") String warning, @Field("pulizia_int") int intCleanliness, @Field("pulizia_ext") int extCleanliness,
-                                              @Field("mac") String macAddress, @Field("imei") String imei, @Field("n_pin") int nPin, @Field("id_parent") String id_parent);
+                                                                @Field("lon") double beginLon, @Field("lat") double beginLat, @Field("warning") String warning, @Field("pulizia_int") int intCleanliness, @Field("pulizia_ext") int extCleanliness,
+                                                                @Field("mac") String macAddress, @Field("imei") String imei, @Field("n_pin") int nPin, @Field("id_parent") String id_parent);
 
     @Headers("Connection: close")
     @FormUrlEncoded
     @POST("v2/trips")
-    Observable<Result<SharengoResponse<TripResponse>>> closeTrip(@Field("cmd") int cmd_type,@Field("id") int remote_id, @Field("id_veicolo") String plate, @Field("id_cliente") int customerId, @Field("ora") long endTimestamp, @Field("km") int km, @Field("carburante") int soc,
-                                               @Field("lon") double endLon, @Field("lat") double endLat, @Field("warning") String warning, @Field("pulizia_int") int intCleanliness, @Field("pulizia_ext") int extCleanliness,
-                                               @Field("park_seconds") int park_seconds, @Field("n_pin") int nPin, @Field("id_parent") String id_parent);
-
+    Observable<Result<SharengoResponse<TripResponse>>> closeTrip(@Field("cmd") int cmd_type, @Field("id") int remote_id, @Field("id_veicolo") String plate, @Field("id_cliente") int customerId, @Field("ora") long endTimestamp, @Field("km") int km, @Field("carburante") int soc,
+                                                                 @Field("lon") double endLon, @Field("lat") double endLat, @Field("warning") String warning, @Field("pulizia_int") int intCleanliness, @Field("pulizia_ext") int extCleanliness,
+                                                                 @Field("park_seconds") int park_seconds, @Field("n_pin") int nPin, @Field("id_parent") String id_parent);
 
 }

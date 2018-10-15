@@ -9,35 +9,35 @@ import java.util.Date;
  * Created by Fulvio on 19/09/2017.
  */
 
-public class Logs{
+public class Logs {
     private ArrayList<Log> logs;
-    private int validLogIndex=0;
+    private int validLogIndex = 0;
     private DLog dlog = new DLog(this.getClass());
-    private boolean sorted=false;
+    private boolean sorted = false;
 
     public Logs() {
-        logs=new ArrayList<Log>();
+        logs = new ArrayList<Log>();
     }
 
-    public void addLog(Log log){
-        try{
+    public void addLog(Log log) {
+        try {
             logs.add(log);
-            sorted=false;
-        }catch(Exception e){
+            sorted = false;
+        } catch (Exception e) {
             throw e;
         }
     }
 
-    public void addLog(Log log,int index){
-        try{
-            logs.add(index,log);
-            sorted=false;
-        }catch(Exception e){
+    public void addLog(Log log, int index) {
+        try {
+            logs.add(index, log);
+            sorted = false;
+        } catch (Exception e) {
             throw e;
         }
     }
 
-    public void sort(){
+    public void sort() {
         try {
             Collections.sort(logs, new Comparator<Log>() {
                 @Override
@@ -47,35 +47,36 @@ public class Logs{
                     return lhs.getDate().compareTo(rhs.getDate());
                 }
             });
-            sorted=true;
-        }catch (Exception e){
+            sorted = true;
+        } catch (Exception e) {
             dlog.e("Exceprion while sorting");
-            sorted=false;
+            sorted = false;
         }
     }
 
-    public void removeFromBottom(int quantity){
+    public void removeFromBottom(int quantity) {
         int i = 0;
-        if(!sorted)
+        if (!sorted)
             sort();
-        while(i++<quantity && logs.size()>0){
+        while (i++ < quantity && logs.size() > 0) {
             removeLog(getValidLogIndex());
         }
     }
 
-    public void removeFromBottom(Date time){
-        if(!sorted)
+    public void removeFromBottom(Date time) {
+        if (!sorted)
             sort();
-        while(logs.get(getValidLogIndex()).getDate().before(time) && logs.size()>0){
+        while (logs.get(getValidLogIndex()).getDate().before(time) && logs.size() > 0) {
             removeLog(getValidLogIndex());
         }
     }
-    private void removeLog(int index){
-        if(index >=0 && index<logs.size()-1){
+
+    private void removeLog(int index) {
+        if (index >= 0 && index < logs.size() - 1) {
             String filename = logs.get(index).getFile().getName();
             boolean success = logs.get(index).getFile().delete();
-            dlog.d("removeLog "+filename+" "+index +" " + success);
-            if(success)
+            dlog.d("removeLog " + filename + " " + index + " " + success);
+            if (success)
                 logs.remove(index);
             else {
                 logs.get(index).setDeletingError(true);
@@ -88,11 +89,11 @@ public class Logs{
         return validLogIndex;
     }
 
-    private void updateValidLogIndex(){
-        while(validLogIndex<logs.size() && logs.get(validLogIndex).isDeletingError()){
+    private void updateValidLogIndex() {
+        while (validLogIndex < logs.size() && logs.get(validLogIndex).isDeletingError()) {
             validLogIndex++;
-            if(validLogIndex>=logs.size()){
-                validLogIndex=-1;
+            if (validLogIndex >= logs.size()) {
+                validLogIndex = -1;
                 return;
             }
         }

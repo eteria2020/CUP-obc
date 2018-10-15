@@ -25,8 +25,7 @@ import java.util.List;
 //  Class manages a set of inbound pipes. On receive it performs fair
 //  queueing so that senders gone berserk won't cause denial of
 //  service for decent senders.
-class FQ
-{
+class FQ {
     //  Inbound pipes.
     private final List<Pipe> pipes;
 
@@ -41,8 +40,7 @@ class FQ
     //  there are following parts still waiting in the current pipe.
     private boolean more;
 
-    public FQ()
-    {
+    public FQ() {
         active = 0;
         current = 0;
         more = false;
@@ -50,15 +48,13 @@ class FQ
         pipes = new ArrayList<Pipe>();
     }
 
-    public void attach(Pipe pipe)
-    {
+    public void attach(Pipe pipe) {
         pipes.add(pipe);
         Utils.swap(pipes, active, pipes.size() - 1);
         active++;
     }
 
-    public void terminated(Pipe pipe)
-    {
+    public void terminated(Pipe pipe) {
         final int index = pipes.indexOf(pipe);
 
         //  Remove the pipe from the list; adjust number of active pipes
@@ -73,20 +69,17 @@ class FQ
         pipes.remove(pipe);
     }
 
-    public void activated(Pipe pipe)
-    {
+    public void activated(Pipe pipe) {
         //  Move the pipe to the list of active pipes.
         Utils.swap(pipes, pipes.indexOf(pipe), active);
         active++;
     }
 
-    public Msg recv(ValueReference<Integer> errno)
-    {
+    public Msg recv(ValueReference<Integer> errno) {
         return recvPipe(errno, null);
     }
 
-    public Msg recvPipe(ValueReference<Integer> errno, ValueReference<Pipe> pipe)
-    {
+    public Msg recvPipe(ValueReference<Integer> errno, ValueReference<Pipe> pipe) {
         //  Round-robin over the pipes to get the next message.
         while (active > 0) {
             //  Try to fetch new message. If we've already read part of the message
@@ -126,8 +119,7 @@ class FQ
         return null;
     }
 
-    public boolean hasIn()
-    {
+    public boolean hasIn() {
         //  There are subsequent parts of the partly-read message available.
         if (more) {
             return true;

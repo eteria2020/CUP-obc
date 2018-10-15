@@ -1,18 +1,5 @@
 package eu.philcar.csg.OBC.controller.welcome;
 
-import eu.philcar.csg.OBC.ABase;
-import eu.philcar.csg.OBC.AGoodbye;
-import eu.philcar.csg.OBC.ASOS;
-import eu.philcar.csg.OBC.AWelcome;
-import eu.philcar.csg.OBC.App;
-import eu.philcar.csg.OBC.R;
-import eu.philcar.csg.OBC.AMainOBC;
-import eu.philcar.csg.OBC.controller.FBase;
-import eu.philcar.csg.OBC.helpers.DLog;
-import eu.philcar.csg.OBC.server.HttpsConnector;
-import eu.philcar.csg.OBC.server.NoRedButton;
-import eu.philcar.csg.OBC.service.MessageFactory;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,227 +13,234 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import eu.philcar.csg.OBC.ABase;
+import eu.philcar.csg.OBC.AGoodbye;
+import eu.philcar.csg.OBC.AMainOBC;
+import eu.philcar.csg.OBC.ASOS;
+import eu.philcar.csg.OBC.AWelcome;
+import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.R;
+import eu.philcar.csg.OBC.controller.FBase;
+import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.server.HttpsConnector;
+import eu.philcar.csg.OBC.server.NoRedButton;
+import eu.philcar.csg.OBC.service.MessageFactory;
+
 public class FInstructions extends FBase {
-	
-	private DLog dlog = new DLog(this.getClass());
-	private RelativeLayout fins_right_FL;
-	private final static int  MSG_CLOSE_FRAGMENT  = 1;
-	private SharedPreferences preferences;
 
-	public static FInstructions newInstance(boolean login) {
-		
-		FInstructions fi = new FInstructions();
-		
-		fi.login = login;
-		
-		return fi;
-	}
+    private DLog dlog = new DLog(this.getClass());
+    private RelativeLayout fins_right_FL;
+    private final static int MSG_CLOSE_FRAGMENT = 1;
+    private SharedPreferences preferences;
 
-	private Handler localHandler = new Handler()  {
+    public static FInstructions newInstance(boolean login) {
 
-		@Override
-		public void handleMessage(Message msg) {
+        FInstructions fi = new FInstructions();
 
-			switch (msg.what)  {
+        fi.login = login;
 
+        return fi;
+    }
 
-				case MSG_CLOSE_FRAGMENT:
-					try {
-						dlog.d("FInstruction timeout ");
-						if(App.Instance.BannerName.getBundle("START")==null){
-							Intent i = new Intent(getActivity(), AMainOBC.class);
-							i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-							startActivity(i);
-							getActivity().finish();
-						}else {
-							((ABase) getActivity()).pushFragment(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true);
-						}
-					}catch(Exception e){
-						dlog.e("FInstruction : MSG_CLOSE_FRAGMENT Exception",e);
-					}
-					break;
-			}
-		}
-	};
+    private Handler localHandler = new Handler() {
 
-	private boolean login;
-	
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        @Override
+        public void handleMessage(Message msg) {
 
-		final View view = inflater.inflate(R.layout.f_instructions, container, false);
-		dlog.d("OnCreareView FInstruction");
-		// no red button init
-		preferences = this.getActivity().getSharedPreferences(App.COMMON_PREFERENCES, Context.MODE_PRIVATE);
+            switch (msg.what) {
 
-		App.NRD = preferences.getString("NRD","-1");
-		if (App.NRD == "-1" || App.NRD == ""   ) {
-			NoRedButton rd = new NoRedButton(this.getActivity());
-			HttpsConnector http = new HttpsConnector(this.getActivity());
-			http.Execute(rd);
-		}
-		
-		((LinearLayout)view.findViewById(R.id.llSelfClose)).setVisibility(View.INVISIBLE);
-		
-		((ImageButton)view.findViewById(R.id.finsNextIB)).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				dlog.d("FInstructions finsNextIB click : " + login);
-				if (login) {
-					if(App.Instance.BannerName.getBundle("START")==null){
-						Intent i = new Intent(getActivity(), AMainOBC.class);
-						i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						startActivity(i);
-						getActivity().finish();
-					}else
-						((ABase)getActivity()).pushFragmentNoBack(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true,FInstructions.this);
-				} else {
-					((ABase)getActivity()).pushFragment(FGoodbye.newInstance(), FGoodbye.class.getName(), true);
-				}
-			}
-		});
-		
-		((Button)view.findViewById(R.id.finsSOSB)).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startActivity(new Intent(getActivity(), ASOS.class));
-			}
-		});
+                case MSG_CLOSE_FRAGMENT:
+                    try {
+                        dlog.d("FInstruction timeout ");
+                        if (App.BannerName.getBundle("START") == null) {
+                            Intent i = new Intent(getActivity(), AMainOBC.class);
+                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(i);
+                            getActivity().finish();
+                        } else {
+                            ((ABase) getActivity()).pushFragment(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true);
+                        }
+                    } catch (Exception e) {
+                        dlog.e("FInstruction : MSG_CLOSE_FRAGMENT Exception", e);
+                    }
+                    break;
+            }
+        }
+    };
 
-		localHandler.removeMessages(MSG_CLOSE_FRAGMENT);
-		localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT,60000);
-		
-		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
-		
-		((TextView)view.findViewById(R.id.fins_message_TV)).setTypeface(font);
+    private boolean login;
 
-		fins_right_FL=(RelativeLayout)view.findViewById(R.id.fins_right_FL);
-		
-		((TextView)view.findViewById(R.id.finsInstructions1TV)).setTypeface(font);
-		((TextView)view.findViewById(R.id.finsInstructions2TV)).setTypeface(font);
-		((TextView)view.findViewById(R.id.finsInstructions3TV)).setTypeface(font);
-		
-		if (login) {
-			
-			((AWelcome)getActivity()).sendMessage(MessageFactory.setEngine(true));
-			((AWelcome)getActivity()).sendMessage(MessageFactory.setEngine(true));
-			
-			((TextView)view.findViewById(R.id.fins_message_TV)).setText(R.string.instruction_title);
-try {
-	if (Integer.parseInt(App.NRD) == 1) {
-		((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_2);
-		((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_3);
-		((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_4)));
-		((TextView) view.findViewById(R.id.finsInstructions4TV)).setVisibility(View.GONE);
-		((TextView) view.findViewById(R.id.fbullet4TV)).setVisibility(View.GONE);
-	} else {
-		((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_1);
-		((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_2);
-		((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_3)));
-		((TextView) view.findViewById(R.id.finsInstructions4TV)).setText(R.string.instruction_start_4);
-	}
-}catch (Exception e){
-	((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_1);
-	((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_2);
-	((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_3)));
-	((TextView) view.findViewById(R.id.finsInstructions4TV)).setText(R.string.instruction_start_4);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-}
-			((TextView)view.findViewById(R.id.fins_message_bottom_TV)).setVisibility(View.GONE);
-			
-			((ImageView)view.findViewById(R.id.ivDamages)).setOnClickListener(new OnClickListener() {
+        final View view = inflater.inflate(R.layout.f_instructions, container, false);
+        dlog.d("OnCreareView FInstruction");
+        // no red button init
+        preferences = this.getActivity().getSharedPreferences(App.COMMON_PREFERENCES, Context.MODE_PRIVATE);
 
-				@Override
-				public void onClick(View v) {
-					((ABase)getActivity()).pushFragment(FDamages.newInstance(true), FDamages.class.getName(), true);
-				}
-				
-			});
-			
-			((ImageView)view.findViewById(R.id.ivDirty)).setOnClickListener(new OnClickListener() {
+        App.NRD = preferences.getString("NRD", "-1");
+        if (App.NRD == "-1" || App.NRD == "") {
+            NoRedButton rd = new NoRedButton(this.getActivity());
+            HttpsConnector http = new HttpsConnector(this.getActivity());
+            http.Execute(rd);
+        }
 
-				@Override
-				public void onClick(View v) {
-					((ABase)getActivity()).pushFragment(FCleanliness.newInstance(), FCleanliness.class.getName(), true);
-				}
-				
-			});
-			
-		} else {
-			try {
-				App.setIsCloseable(true);
+        view.findViewById(R.id.llSelfClose).setVisibility(View.INVISIBLE);
 
-				((AGoodbye) this.getActivity()).sendMessage(MessageFactory.sendBeacon());
-				((AGoodbye) this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
-				((LinearLayout) view.findViewById(R.id.llSelfClose)).setVisibility(View.VISIBLE);
+        view.findViewById(R.id.finsNextIB).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dlog.d("FInstructions finsNextIB click : " + login);
+                if (login) {
+                    if (App.BannerName.getBundle("START") == null) {
+                        Intent i = new Intent(getActivity(), AMainOBC.class);
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(i);
+                        getActivity().finish();
+                    } else
+                        ((ABase) getActivity()).pushFragmentNoBack(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true, FInstructions.this);
+                } else {
+                    ((ABase) getActivity()).pushFragment(FGoodbye.newInstance(), FGoodbye.class.getName(), true);
+                }
+            }
+        });
 
-				new CountDownTimer(41000, 1000) {
-					@Override
-					public void onTick(long millisUntilFinished) {
-						((TextView) view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished / 1000) + " s");
-					}
+        view.findViewById(R.id.finsSOSB).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), ASOS.class));
+            }
+        });
 
-					@Override
-					public void onFinish() {
-					}
+        localHandler.removeMessages(MSG_CLOSE_FRAGMENT);
+        localHandler.sendEmptyMessageDelayed(MSG_CLOSE_FRAGMENT, 60000);
 
-				}.start();
+        Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 
-				((TextView) view.findViewById(R.id.fins_message_TV)).setText(R.string.instruction_title_close);
-				((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_close_1);
+        ((TextView) view.findViewById(R.id.fins_message_TV)).setTypeface(font);
 
-				// Instruction N.2 is removed and the following shifted up
+        fins_right_FL = (RelativeLayout) view.findViewById(R.id.fins_right_FL);
 
-				((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_close_3);
-				((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(R.string.instruction_close_4);
+        ((TextView) view.findViewById(R.id.finsInstructions1TV)).setTypeface(font);
+        ((TextView) view.findViewById(R.id.finsInstructions2TV)).setTypeface(font);
+        ((TextView) view.findViewById(R.id.finsInstructions3TV)).setTypeface(font);
 
-				((LinearLayout) view.findViewById(R.id.fins_fourth_LL)).setVisibility(View.GONE);
+        if (login) {
 
+            ((AWelcome) getActivity()).sendMessage(MessageFactory.setEngine(true));
+            ((AWelcome) getActivity()).sendMessage(MessageFactory.setEngine(true));
 
-				((TextView) view.findViewById(R.id.fins_message_bottom_TV)).setVisibility(View.VISIBLE);
-			}catch(Exception e){
-				dlog.e("Exception in FInstruction wtf login is: "+login,e);
-			}
-		}
+            ((TextView) view.findViewById(R.id.fins_message_TV)).setText(R.string.instruction_title);
+            try {
+                if (Integer.parseInt(App.NRD) == 1) {
+                    ((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_2);
+                    ((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_3);
+                    ((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_4)));
+                    view.findViewById(R.id.finsInstructions4TV).setVisibility(View.GONE);
+                    view.findViewById(R.id.fbullet4TV).setVisibility(View.GONE);
+                } else {
+                    ((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_1);
+                    ((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_2);
+                    ((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_3)));
+                    ((TextView) view.findViewById(R.id.finsInstructions4TV)).setText(R.string.instruction_start_4);
+                }
+            } catch (Exception e) {
+                ((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_start_1);
+                ((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_start_2);
+                ((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(Html.fromHtml(getString(R.string.instruction_start_3)));
+                ((TextView) view.findViewById(R.id.finsInstructions4TV)).setText(R.string.instruction_start_4);
 
-		if (App.currentTripInfo!=null && App.currentTripInfo.isMaintenance) {
-			fins_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
+            }
+            view.findViewById(R.id.fins_message_bottom_TV).setVisibility(View.GONE);
 
-		} else {
-			fins_right_FL.setBackgroundColor(getResources().getColor(R.color.background_green));
-		}
-		
-		return view;
-	}
+            view.findViewById(R.id.ivDamages).setOnClickListener(new OnClickListener() {
 
-	@Override
-	public boolean handleBackButton() {
-		
-		if (login) {
-			return super.handleBackButton();
-		} else {
-			return true;
-		}
-	}
+                @Override
+                public void onClick(View v) {
+                    ((ABase) getActivity()).pushFragment(FDamages.newInstance(true), FDamages.class.getName(), true);
+                }
 
-	@Override
-	public void onDestroy() {
-		fins_right_FL=null;
+            });
 
-		super.onDestroy();
-	}
+            view.findViewById(R.id.ivDirty).setOnClickListener(new OnClickListener() {
 
-	@Override
-	public void onPause() {
+                @Override
+                public void onClick(View v) {
+                    ((ABase) getActivity()).pushFragment(FCleanliness.newInstance(), FCleanliness.class.getName(), true);
+                }
 
-		localHandler.removeCallbacksAndMessages(null);
-		super.onPause();
-	}
+            });
+
+        } else {
+            try {
+                App.setIsCloseable(true);
+
+                ((AGoodbye) this.getActivity()).sendMessage(MessageFactory.sendBeacon());
+                ((AGoodbye) this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
+                view.findViewById(R.id.llSelfClose).setVisibility(View.VISIBLE);
+
+                new CountDownTimer(41000, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        ((TextView) view.findViewById(R.id.tvCountdown)).setText((millisUntilFinished / 1000) + " s");
+                    }
+
+                    @Override
+                    public void onFinish() {
+                    }
+
+                }.start();
+
+                ((TextView) view.findViewById(R.id.fins_message_TV)).setText(R.string.instruction_title_close);
+                ((TextView) view.findViewById(R.id.finsInstructions1TV)).setText(R.string.instruction_close_1);
+
+                // Instruction N.2 is removed and the following shifted up
+
+                ((TextView) view.findViewById(R.id.finsInstructions2TV)).setText(R.string.instruction_close_3);
+                ((TextView) view.findViewById(R.id.finsInstructions3TV)).setText(R.string.instruction_close_4);
+
+                view.findViewById(R.id.fins_fourth_LL).setVisibility(View.GONE);
+
+                view.findViewById(R.id.fins_message_bottom_TV).setVisibility(View.VISIBLE);
+            } catch (Exception e) {
+                dlog.e("Exception in FInstruction wtf login is: " + login, e);
+            }
+        }
+
+        if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
+            fins_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
+
+        } else {
+            fins_right_FL.setBackgroundColor(getResources().getColor(R.color.background_green));
+        }
+
+        return view;
+    }
+
+    @Override
+    public boolean handleBackButton() {
+
+        if (login) {
+            return super.handleBackButton();
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        fins_right_FL = null;
+
+        super.onDestroy();
+    }
+
+    @Override
+    public void onPause() {
+
+        localHandler.removeCallbacksAndMessages(null);
+        super.onPause();
+    }
 }

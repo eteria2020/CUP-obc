@@ -32,8 +32,7 @@ import java.nio.ByteBuffer;
 //  This class implements the state machine that parses the incoming buffer.
 //  Derived class should implement individual state machine actions.
 
-public abstract class DecoderBase implements IDecoder
-{
+public abstract class DecoderBase implements IDecoder {
     //  Where to store the read data.
     private byte[] readBuf;
     private int readPos;
@@ -49,8 +48,7 @@ public abstract class DecoderBase implements IDecoder
 
     boolean zeroCopy;
 
-    public DecoderBase(int bufsize)
-    {
+    public DecoderBase(int bufsize) {
         state = -1;
         toRead = 0;
         this.bufsize = bufsize;
@@ -62,8 +60,7 @@ public abstract class DecoderBase implements IDecoder
     }
 
     //  Returns a buffer to be filled with binary data.
-    public ByteBuffer getBuffer()
-    {
+    public ByteBuffer getBuffer() {
         //  If we are expected to read large message, we'll opt for zero-
         //  copy, i.e. we'll ask caller to fill the data directly to the
         //  message. Note that subsequent read(s) are non-blocking, thus
@@ -78,8 +75,7 @@ public abstract class DecoderBase implements IDecoder
             zeroCopy = true;
             b = ByteBuffer.wrap(readBuf);
             b.position(readPos);
-        }
-        else {
+        } else {
             zeroCopy = false;
             b = buf;
             b.clear();
@@ -91,8 +87,7 @@ public abstract class DecoderBase implements IDecoder
     //  get_buffer function. size_ argument specifies nemuber of bytes
     //  actually filled into the buffer. Function returns number of
     //  bytes actually processed.
-    public int processBuffer(ByteBuffer buf, int size)
-    {
+    public int processBuffer(ByteBuffer buf, int size) {
         //  Check if we had an error in previous attempt.
         if (state() < 0) {
             return -1;
@@ -144,31 +139,26 @@ public abstract class DecoderBase implements IDecoder
         }
     }
 
-    protected void nextStep(Msg msg, int state)
-    {
+    protected void nextStep(Msg msg, int state) {
         nextStep(msg.data(), msg.size(), state);
     }
 
-    protected void nextStep(byte[] buf, int toRead, int state)
-    {
+    protected void nextStep(byte[] buf, int toRead, int state) {
         readBuf = buf;
         readPos = 0;
         this.toRead = toRead;
         this.state = state;
     }
 
-    protected int state()
-    {
+    protected int state() {
         return state;
     }
 
-    protected void state(int state)
-    {
+    protected void state(int state) {
         this.state = state;
     }
 
-    protected void decodingError()
-    {
+    protected void decodingError() {
         state(-1);
     }
 
@@ -176,8 +166,7 @@ public abstract class DecoderBase implements IDecoder
     //  but cannot proceed with the next decoding step.
     //  False is returned if the decoder has encountered an error.
     @Override
-    public boolean stalled()
-    {
+    public boolean stalled() {
         //  Check whether there was decoding error.
         if (!next()) {
             return false;

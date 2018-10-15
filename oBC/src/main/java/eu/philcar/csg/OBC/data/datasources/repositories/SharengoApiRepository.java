@@ -1,11 +1,9 @@
 package eu.philcar.csg.OBC.data.datasources.repositories;
 
+import android.os.Build;
 import android.support.annotation.NonNull;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -13,6 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
 import eu.philcar.csg.OBC.data.datasources.SharengoDataSource;
 import eu.philcar.csg.OBC.data.model.Area;
@@ -68,19 +67,18 @@ public class SharengoApiRepository {
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void stopCustomer(){
+    public void stopCustomer() {
         if (customerDisposable != null)
             customerDisposable.dispose();
     }
 
+    public void getCustomer(int millidelay) {
+        needUpdateCustomer = false;
 
-    public void getCustomer(int millidelay){
-        needUpdateCustomer=false;
-
-        if(!RxUtil.isRunning(customerDisposable)) {
+        if (!RxUtil.isRunning(customerDisposable)) {
             Observable.just(1)
                     .delay(millidelay, TimeUnit.MILLISECONDS)
-                    .concatMap(i->mRemoteDataSource.getCustomer(mDataManager.getMaxCustomerLastupdate()))
+                    .concatMap(i -> mRemoteDataSource.getCustomer(mDataManager.getMaxCustomerLastupdate()))
                     .concatMap(n -> mDataManager.saveCustomer(n))
                     .subscribe(new Observer<Customer>() {
                         @Override
@@ -91,14 +89,14 @@ public class SharengoApiRepository {
                         @Override
                         public void onNext(@NonNull Customer ribot) {
                             //TODO schedule new call in case of >10000
-                            needUpdateCustomer=true;
+                            needUpdateCustomer = true;
 
                         }
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            if(e instanceof ErrorResponse)
-                                DLog.E("Error syncing getCustomer", ((ErrorResponse)e).error);
+                            if (e instanceof ErrorResponse)
+                                DLog.E("Error syncing getCustomer", ((ErrorResponse) e).error);
                             RxUtil.dispose(customerDisposable);
                         }
 
@@ -106,15 +104,14 @@ public class SharengoApiRepository {
                         public void onComplete() {
                             DLog.I("Synced successfully!");
                             RxUtil.dispose(customerDisposable);
-                            if(needUpdateCustomer)
+                            if (needUpdateCustomer)
                                 getCustomer(150);
                         }
                     });
-        }else{
+        } else {
             DLog.D("CustomerDisposable is running");
         }
     }
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                            //
@@ -122,18 +119,19 @@ public class SharengoApiRepository {
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void stopEmployee(){
+    public void stopEmployee() {
         if (employeeDisposable != null)
             employeeDisposable.dispose();
     }
 
-    public void getEmployee(){
+    public void getEmployee() {
 
-        if(!RxUtil.isRunning(employeeDisposable)) {
-            mRemoteDataSource.getBusinessEmployees()
-
+        if (!RxUtil.isRunning(employeeDisposable)) {
+            Observable.just(1)
+                    .delay(1000, TimeUnit.MILLISECONDS)
+                    .concatMap(e->mRemoteDataSource.getBusinessEmployees())
                     .concatMap(n -> mDataManager.saveEmployee(n))
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .subscribe(new Observer<BusinessEmployee>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
@@ -146,8 +144,8 @@ public class SharengoApiRepository {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            if(e instanceof ErrorResponse)
-                            DLog.E("Error syncing getEmployee", ((ErrorResponse)e).error);
+                            if (e instanceof ErrorResponse)
+                                DLog.E("Error syncing getEmployee", ((ErrorResponse) e).error);
                             RxUtil.dispose(employeeDisposable);
                         }
 
@@ -160,26 +158,23 @@ public class SharengoApiRepository {
         }
     }
 
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                            //
     //                                      CONFIG                                                //
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    public void stopConfig(){
+    public void stopConfig() {
         if (configDisposable != null)
             configDisposable.dispose();
     }
 
-    public void getConfig(){
+    public void getConfig() {
 
-        if(!RxUtil.isRunning(configDisposable)) {
+        if (!RxUtil.isRunning(configDisposable)) {
             mRemoteDataSource.getConfig(App.CarPlate)
                     .doOnNext(n -> mDataManager.saveConfig(n))
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .subscribe(new Observer<Config>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
@@ -192,7 +187,7 @@ public class SharengoApiRepository {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            if(e instanceof ErrorResponse)
+                            if (e instanceof ErrorResponse)
                                 DLog.E("Error syncing getConfig " + ((ErrorResponse) e).rawMessage, e);
                             RxUtil.dispose(configDisposable);
                         }
@@ -212,19 +207,18 @@ public class SharengoApiRepository {
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    public void stopModel(){
+    public void stopModel() {
         if (modelDisposable != null)
             modelDisposable.dispose();
     }
 
-    public void getModel(){
+    public void getModel() {
 
-        if(!RxUtil.isRunning(modelDisposable)) {
+        if (!RxUtil.isRunning(modelDisposable)) {
             mRemoteDataSource.getModel(App.CarPlate)
                     .concatMap(Observable::fromIterable)
                     .doOnNext(n -> mDataManager.saveModel(n))
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .subscribe(new Observer<ModelResponse>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
@@ -237,8 +231,8 @@ public class SharengoApiRepository {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            if(e instanceof ErrorResponse)
-                                DLog.E("Error syncing getModel", ((ErrorResponse)e).error);
+                            if (e instanceof ErrorResponse)
+                                DLog.E("Error syncing getModel", ((ErrorResponse) e).error);
                             RxUtil.dispose(modelDisposable);
                         }
 
@@ -257,22 +251,22 @@ public class SharengoApiRepository {
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    public void stopReservation(){
+    public void stopReservation() {
         if (reservationDisposable != null)
             reservationDisposable.dispose();
     }
-    public Observable<Reservation> getReservation(){
+
+    public Observable<Reservation> getReservation() {
 
         return mRemoteDataSource.getReservation(App.CarPlate)
                 .concatMap(reservations -> mDataManager.handleReservations(reservations))
                 .doOnSubscribe(n -> {
-                    reservationDisposable =n;
+                    reservationDisposable = n;
                 })
-                .doOnComplete(() ->{});
+                .doOnComplete(() -> {
+                });
 
     }
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                            //
@@ -280,23 +274,22 @@ public class SharengoApiRepository {
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void stopArea(){
+    public void stopArea() {
         if (areaDisposable != null)
             areaDisposable.dispose();
     }
 
+    public void getArea() {
 
-    public void getArea(){
-
-        if(!RxUtil.isRunning(areaDisposable)) {
+        if (!RxUtil.isRunning(areaDisposable)) {
             Observable.just(1)
                     .delay(3, TimeUnit.SECONDS)
-                    .concatMap(i-> mRemoteDataSource.getArea(App.AreaPolygonMD5))
-                    .filter(n->n.size()!=0)
+                    .concatMap(i -> mRemoteDataSource.getArea(App.AreaPolygonMD5))
+                    .filter(n -> n.size() != 0)
                     .concatMap(n -> mDataManager.saveArea(n))
                     //Emit single Area Response at time
                     .concatMap(Observable::fromIterable)
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .subscribe(new Observer<Area>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
@@ -318,9 +311,9 @@ public class SharengoApiRepository {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            if(e instanceof ErrorResponse)
-                                if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
-                                    DLog.E("Error inside getArea"+ ((ErrorResponse) e).rawMessage);
+                            if (e instanceof ErrorResponse)
+                                if (((ErrorResponse) e).errorType != ErrorResponse.ErrorType.EMPTY)
+                                    DLog.E("Error inside getArea" + ((ErrorResponse) e).rawMessage);
                             //RxUtil.dispose(areaDisposable);
                         }
 
@@ -334,56 +327,55 @@ public class SharengoApiRepository {
         }
     }
 
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                            //
     //                                      COMMANDS                                              //
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void stopCommand(){
+    public void stopCommand() {
         RxUtil.dispose(commandDisposable);
     }
 
-
     public Observable<ServerCommand> getCommands(String plate) {
 
-        return  mRemoteDataSource.getCommands(plate)
+        return mRemoteDataSource.getCommands(plate)
                 .flatMap(Observable::fromIterable)
                 .filter(command -> {
-                    if ((command.ttl<=0 || command.queued+command.ttl>System.currentTimeMillis()/1000) || command.command.equalsIgnoreCase("CLOSE_TRIP")) {
+                    if ((command.ttl <= 0 || command.queued + command.ttl > System.currentTimeMillis() / 1000) || command.command.equalsIgnoreCase("CLOSE_TRIP")) {
 
-                        DLog.D("Command accepted :"+command);
+                        DLog.D("Command accepted :" + command);
                         return true;
-                    }else {
-                        DLog.D("Command timeout :"+command);
+                    } else {
+                        DLog.D("Command timeout :" + command);
                         return false;
                     }
                 })
                 .doOnSubscribe(n -> {
                     //RxUtil.dispose(commandDisposable);
-                    commandDisposable = n;})
+                    commandDisposable = n;
+                })
                 .doOnError(e -> {
-                    if(e instanceof ErrorResponse)
-                        if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
-                            DLog.E("Error insiede GetCommand",e);
+                    if (e instanceof ErrorResponse)
+                        if (((ErrorResponse) e).errorType != ErrorResponse.ErrorType.EMPTY)
+                            DLog.E("Error insiede GetCommand", e);
                     //RxUtil.dispose(commandDisposable);
                 })
                 .doOnComplete(() -> {
                     RxUtil.dispose(commandDisposable);
                 });
 
-
     }
 
-    public void consumeReservation(final int reservation_id){
+    public void consumeReservation(final int reservation_id) {
 
         mRemoteDataSource.consumeReservation(reservation_id)
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<Reservation>() {
+                    Disposable disposable;
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        disposable = d;
                     }
 
                     @Override
@@ -395,18 +387,18 @@ public class SharengoApiRepository {
 
                     @Override
                     public void onError(Throwable e) {
+                        RxUtil.dispose(disposable);
 
                     }
 
                     @Override
                     public void onComplete() {
+                        RxUtil.dispose(disposable);
 
                     }
                 });
 
     }
-
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                            //
@@ -414,14 +406,15 @@ public class SharengoApiRepository {
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void getPois(){
+    public void getPois() {
         mRemoteDataSource.getPois(mDataManager.getMaxPoiLastupdate())
                 .concatMap(n -> mDataManager.savePoi(n))
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<Poi>() {
+                    Disposable disposable;
                     @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
+                    public void onSubscribe(Disposable d) {
+                        disposable = d;
                     }
 
                     @Override
@@ -430,15 +423,16 @@ public class SharengoApiRepository {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
+                        RxUtil.dispose(disposable);
                     }
 
                     @Override
                     public void onComplete() {
                         DLog.I("Synced successfully!");
+                        RxUtil.dispose(disposable);
                     }
                 });
     }
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                            //
@@ -448,18 +442,29 @@ public class SharengoApiRepository {
 
     public static boolean sendingEvents = false;
 
-    public void sendEvent(final Event event){
-        sendEvent(event,null);
+    public void sendEvent(final Event event) {
+        sendEvent(event, null);
     }
 
-    public void sendEvent(final Event event, final ObcService service){
+    public void sendEvent(final Event event, final ObcService service) {
         mDataManager.saveEvent(event)
-                .concatMap(e -> mRemoteDataSource.sendEvent(e,mDataManager))
+                /*.concatMap(event1 -> {
+                    if(BuildConfig.FLAVOR.equalsIgnoreCase("develop")) {
+                        event1.event = Events.EVT_SOS;
+                        event1.id_trip = 28121;
+                        event1.label = "SOS";
+                        event1.intval = 3;
+                    }
+
+                        return Observable.just(event1);
+                })*/
+                .concatMap(e -> mRemoteDataSource.sendEvent(e, mDataManager))
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(new Observer<EventResponse>() {
+                    Disposable disposable;
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        disposable = d;
                     }
 
                     @Override
@@ -469,19 +474,21 @@ public class SharengoApiRepository {
 
                     @Override
                     public void onError(Throwable e) {
-                        if(service!=null){
+                        if (service != null) {
                             service.sendMessage(MessageFactory.failedSOS());
                         }
+                        RxUtil.dispose(disposable);
                     }
 
                     @Override
                     public void onComplete() {
+                        RxUtil.dispose(disposable);
 
                     }
                 });
     }
 
-    public void sendEvents(final List<Event> event){
+    public void sendEvents(final List<Event> event) {
         try {
 
             Collections.sort(event, (o1, o2) -> {
@@ -497,22 +504,22 @@ public class SharengoApiRepository {
                 else
                     return 0;
             });
-        }catch (Exception e) {
+        } catch (Exception e) {
             DLog.E("sendEvents: Exception", e);
         }
 
-        if(!sendingEvents)
-            Observable.interval(30,TimeUnit.SECONDS)
+        if (!sendingEvents)
+            Observable.interval(30, TimeUnit.SECONDS)
                     .take(event.size())
-                    .concatMap(i->Observable.just(event.get(i.intValue())))
+                    .concatMap(i -> Observable.just(event.get(i.intValue())))
                     .concatMap(event1 -> {
-                        if(event1.id_trip==0)
+                        if (event1.id_trip == 0)
                             event1.id_trip = mDataManager.getTripIdFromEvent(event1);
                         return Observable.just(event1);
 
                     })
                     .concatMap(event1 -> {
-                        if(event1.label.equalsIgnoreCase("SOS") && event1.timestamp < System.currentTimeMillis() -1000*60*60){
+                        if (event1.label.equalsIgnoreCase("SOS") && event1.timestamp < System.currentTimeMillis() - 1000 * 60 * 60) {
                             event1.label = "SOS_EXPIRED";
                         }
                         return Observable.just(event1);
@@ -521,17 +528,20 @@ public class SharengoApiRepository {
             /*mDataManager.saveEvents(event)
                     .delay(10, TimeUnit.SECONDS)*/
 
-                    .concatMap(e -> mRemoteDataSource.sendEvent(e,mDataManager))
-                    .subscribeOn(Schedulers.newThread())
+                    .concatMap(e -> mRemoteDataSource.sendEvent(e, mDataManager))
+                    .subscribeOn(Schedulers.io())
                     .subscribe(new Observer<EventResponse>() {
+                        Disposable disposable;
                         @Override
                         public void onSubscribe(Disposable d) {
+                            disposable = d;
                             sendingEvents = true;
                         }
 
                         @Override
                         public void onNext(EventResponse eventResponse) {
                             DLog.D("Receiver Event response");
+                            RxUtil.dispose(disposable);
                         }
 
                         @Override
@@ -542,11 +552,11 @@ public class SharengoApiRepository {
                         @Override
                         public void onComplete() {
                             sendingEvents = false;
+                            RxUtil.dispose(disposable);
 
                         }
                     });
     }
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                            //
@@ -556,16 +566,16 @@ public class SharengoApiRepository {
     public Observable<TripResponse> openTrip(final Trip trip, final TripInfo tripInfo) {
 
         return mDataManager.saveTrip(trip)
-                .delay(1000,TimeUnit.MILLISECONDS)
+                .delay(1000, TimeUnit.MILLISECONDS)
                 .concatMap(n -> mRemoteDataSource.openTrip(n, mDataManager))
                 .doOnSubscribe(n -> {
                     //RxUtil.dispose(openTripDisposable);
                     //openTripDisposable = n;
                 })
                 .doOnError(e -> {
-                    if(e instanceof ErrorResponse)
-                        if(((ErrorResponse)e).errorType!= ErrorResponse.ErrorType.EMPTY)
-                            DLog.E("Error insiede openTrip",e);
+                    if (e instanceof ErrorResponse)
+                        if (((ErrorResponse) e).errorType != ErrorResponse.ErrorType.EMPTY)
+                            DLog.E("Error insiede openTrip", e);
                     //RxUtil.dispose(openTripDisposable);
                 })
                 .doOnComplete(() -> {
@@ -574,14 +584,14 @@ public class SharengoApiRepository {
 
     }
 
-    public Observable<TripResponse> updateServerTripData(Trip trip){
+    public Observable<TripResponse> updateServerTripData(Trip trip) {
         return mRemoteDataSource.updateTrip(trip)
                 .doOnSubscribe(n -> {
                     //RxUtil.dispose(openTripDisposable);
                     //openTripDisposable = n;
                 })
                 .doOnError(e -> {
-                    DLog.E("Error insiede updateTrip",e);
+                    DLog.E("Error insiede updateTrip", e);
                     //RxUtil.dispose(openTripDisposable);
                 })
                 .doOnComplete(() -> {
@@ -592,7 +602,7 @@ public class SharengoApiRepository {
     public Observable<TripResponse> closeTrip(final Trip trip) {
         return mDataManager.saveTrip(trip)
                 .concatMap(n -> {
-                    if(!n.begin_sent)
+                    if (!n.begin_sent)
                         return mRemoteDataSource.openTripPassive(n, mDataManager);
                     return Observable.just(n);
                 })
@@ -619,7 +629,7 @@ public class SharengoApiRepository {
                     //openTripDisposable = n;
                 })
                 .doOnError(e -> {
-                    DLog.E("Error insiede closeTrip",e);
+                    DLog.E("Error insiede closeTrip", e);
                     //RxUtil.dispose(openTripDisposable);
                 })
                 .doOnComplete(() -> {
@@ -629,17 +639,17 @@ public class SharengoApiRepository {
     }
 
     public Observable<Trip> closeTrips(final List<Trip> trip) {
-        return Observable.interval(30,TimeUnit.SECONDS)
+        return Observable.interval(30, TimeUnit.SECONDS)
                 .take(trip.size())
-                .concatMap(i->Observable.just(trip.get(i.intValue())))
+                .concatMap(i -> Observable.just(trip.get(i.intValue())))
                 .concatMap(mDataManager::saveTrip)
                 .concatMap(n -> {
-                    if(!n.begin_sent)
+                    if (!n.begin_sent)
                         return mRemoteDataSource.openTripPassive(n, mDataManager);
                     return Observable.just(n);
                 })
                 .concatMap(n -> {
-                    if(n.end_timestamp!=0)
+                    if (n.end_timestamp != 0)
                         return mRemoteDataSource.closeTripPassive(n, mDataManager);
                     return Observable.just(n);
                 })
@@ -648,7 +658,7 @@ public class SharengoApiRepository {
                     //openTripDisposable = n;
                 })
                 .doOnError(e -> {
-                    DLog.E("Error insiede closeTrips",e);
+                    DLog.E("Error insiede closeTrips", e);
                     //RxUtil.dispose(openTripDisposable);
                 })
                 .doOnComplete(() -> {

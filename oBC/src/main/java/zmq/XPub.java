@@ -22,13 +22,10 @@ package zmq;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-class XPub extends SocketBase
-{
-    public static class XPubSession extends SessionBase
-    {
+class XPub extends SocketBase {
+    public static class XPubSession extends SessionBase {
         public XPubSession(IOThread ioThread, boolean connect,
-                SocketBase socket, Options options, Address addr)
-        {
+                           SocketBase socket, Options options, Address addr) {
             super(ioThread, connect, socket, options, addr);
         }
 
@@ -56,21 +53,17 @@ class XPub extends SocketBase
     private static Mtrie.IMtrieHandler sendUnsubscription;
 
     static {
-        markAsMatching = new Mtrie.IMtrieHandler()
-        {
+        markAsMatching = new Mtrie.IMtrieHandler() {
             @Override
-            public void invoke(Pipe pipe, byte[] data, int size, Object arg)
-            {
+            public void invoke(Pipe pipe, byte[] data, int size, Object arg) {
                 XPub self = (XPub) arg;
                 self.dist.match(pipe);
             }
         };
 
-        sendUnsubscription = new Mtrie.IMtrieHandler()
-        {
+        sendUnsubscription = new Mtrie.IMtrieHandler() {
             @Override
-            public void invoke(Pipe pipe, byte[] data, int size, Object arg)
-            {
+            public void invoke(Pipe pipe, byte[] data, int size, Object arg) {
                 XPub self = (XPub) arg;
 
                 if (self.options.type != ZMQ.ZMQ_PUB) {
@@ -86,8 +79,7 @@ class XPub extends SocketBase
         };
     }
 
-    public XPub(Ctx parent, int tid, int sid)
-    {
+    public XPub(Ctx parent, int tid, int sid) {
         super(parent, tid, sid);
 
         options.type = ZMQ.ZMQ_XPUB;
@@ -101,8 +93,7 @@ class XPub extends SocketBase
     }
 
     @Override
-    protected void xattachPipe(Pipe pipe, boolean icanhasall)
-    {
+    protected void xattachPipe(Pipe pipe, boolean icanhasall) {
         assert (pipe != null);
         dist.attach(pipe);
 
@@ -118,8 +109,7 @@ class XPub extends SocketBase
     }
 
     @Override
-    protected void xreadActivated(Pipe pipe)
-    {
+    protected void xreadActivated(Pipe pipe) {
         //  There are some subscriptions waiting. Let's process them.
         Msg sub = null;
         while ((sub = pipe.read()) != null) {
@@ -130,8 +120,7 @@ class XPub extends SocketBase
                 boolean unique;
                 if (data[0] == 0) {
                     unique = subscriptions.rm(data, 1, pipe);
-                }
-                else {
+                } else {
                     unique = subscriptions.add(data, 1, pipe);
                 }
 
@@ -141,8 +130,7 @@ class XPub extends SocketBase
                     pendingData.add(Blob.createBlob(data, true));
                     pendingFlags.add(0);
                 }
-            }
-            else {
+            } else {
                 //  Process user message coming upstream from xsub socket
                 pendingData.add(Blob.createBlob(data, true));
                 pendingFlags.add(sub.flags());
@@ -151,14 +139,12 @@ class XPub extends SocketBase
     }
 
     @Override
-    protected void xwriteActivated(Pipe pipe)
-    {
+    protected void xwriteActivated(Pipe pipe) {
         dist.activated(pipe);
     }
 
     @Override
-    public boolean xsetsockopt(int option, Object optval)
-    {
+    public boolean xsetsockopt(int option, Object optval) {
         if (option != ZMQ.ZMQ_XPUB_VERBOSE) {
             return false;
         }
@@ -168,8 +154,7 @@ class XPub extends SocketBase
     }
 
     @Override
-    protected void xpipeTerminated(Pipe pipe)
-    {
+    protected void xpipeTerminated(Pipe pipe) {
         //  Remove the pipe from the trie. If there are topics that nobody
         //  is interested in anymore, send corresponding unsubscriptions
         //  upstream.
@@ -180,8 +165,7 @@ class XPub extends SocketBase
     }
 
     @Override
-    protected boolean xsend(Msg msg)
-    {
+    protected boolean xsend(Msg msg) {
         boolean msgMore = msg.hasMore();
 
         //  For the first part of multi-part message, contains the matching pipes.
@@ -208,14 +192,12 @@ class XPub extends SocketBase
     }
 
     @Override
-    protected boolean xhasOut()
-    {
+    protected boolean xhasOut() {
         return dist.hasOut();
     }
 
     @Override
-    protected Msg xrecv()
-    {
+    protected Msg xrecv() {
         //  If there is at least one
         if (pendingData.isEmpty()) {
             errno.set(ZError.EAGAIN);
@@ -230,8 +212,7 @@ class XPub extends SocketBase
     }
 
     @Override
-    protected boolean xhasIn()
-    {
+    protected boolean xhasIn() {
         return !pendingData.isEmpty();
     }
 }

@@ -54,7 +54,7 @@ public class Beacon {
     private Boolean charging;
     private String KeyStatus;
     private String gps_info;
-    private Boolean PPStatus =false;
+    private Boolean PPStatus = false;
     private Boolean noGPS;
     private int SOC;
     private int Speed;
@@ -534,16 +534,15 @@ public class Beacon {
         MotV = motV;
     }
 
-    public static Beacon handleUpdate(Beacon beacon ,Bundle b){
+    public static Beacon handleUpdate(Beacon beacon, Bundle b) {
         Gson gson = new Gson();
-        try{
-            Beacon received = gson.fromJson(gson.toJson(b),Beacon.class);
+        try {
+            Beacon received = gson.fromJson(gson.toJson(b), Beacon.class);
             return mergeObjects(beacon, received);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return beacon;
         }
     }
-
 
     public static <T> T mergeObjects(T first, T second) throws IllegalAccessException, InstantiationException {
         Class<?> clazz = first.getClass();

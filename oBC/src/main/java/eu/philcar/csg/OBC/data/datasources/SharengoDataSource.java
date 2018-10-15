@@ -6,7 +6,6 @@ import eu.philcar.csg.OBC.data.model.Area;
 import eu.philcar.csg.OBC.data.model.Config;
 import eu.philcar.csg.OBC.data.model.EventResponse;
 import eu.philcar.csg.OBC.data.model.ModelResponse;
-import eu.philcar.csg.OBC.data.model.ReservationResponse;
 import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.BusinessEmployee;
 import eu.philcar.csg.OBC.db.Customer;
@@ -29,7 +28,6 @@ public interface SharengoDataSource {
     Observable<List<BusinessEmployee>> getBusinessEmployees();
 
     Observable<Config> getConfig(String car_plate);
-
 
     Observable<List<Reservation>> getReservation(String car_plate);
 

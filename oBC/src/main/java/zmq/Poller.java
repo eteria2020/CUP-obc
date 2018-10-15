@@ -29,23 +29,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class Poller extends PollerBase implements Runnable
-{
-    private static class PollSet
-    {
+public class Poller extends PollerBase implements Runnable {
+    private static class PollSet {
         protected IPollEvents handler;
         protected SelectionKey key;
         protected int ops;
         protected boolean cancelled;
 
-        protected PollSet(IPollEvents handler)
-        {
+        protected PollSet(IPollEvents handler) {
             this.handler = handler;
             key = null;
             cancelled = false;
             ops = 0;
         }
     }
+
     //  This table stores data for registered descriptors.
     private final Map<SelectableChannel, PollSet> fdTable;
 
@@ -60,13 +58,11 @@ public class Poller extends PollerBase implements Runnable
     private Selector selector;
     private final String name;
 
-    public Poller()
-    {
+    public Poller() {
         this("poller");
     }
 
-    public Poller(String name)
-    {
+    public Poller(String name) {
         this.name = name;
         retired = false;
         stopping = false;
@@ -75,39 +71,33 @@ public class Poller extends PollerBase implements Runnable
         fdTable = new HashMap<SelectableChannel, PollSet>();
         try {
             selector = Selector.open();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ZError.IOException(e);
         }
     }
 
-    public void destroy()
-    {
+    public void destroy() {
         if (!stopped) {
             try {
                 worker.join();
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
             }
         }
 
         try {
             selector.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public final void addHandle(SelectableChannel fd, IPollEvents events)
-    {
+    public final void addHandle(SelectableChannel fd, IPollEvents events) {
         fdTable.put(fd, new PollSet(events));
 
         adjustLoad(1);
     }
 
-    public final void removeHandle(SelectableChannel handle)
-    {
+    public final void removeHandle(SelectableChannel handle) {
         fdTable.get(handle).cancelled = true;
         retired = true;
 
@@ -115,70 +105,58 @@ public class Poller extends PollerBase implements Runnable
         adjustLoad(-1);
     }
 
-    public final void setPollIn(SelectableChannel handle)
-    {
+    public final void setPollIn(SelectableChannel handle) {
         register(handle, SelectionKey.OP_READ, false);
     }
 
-    public final void resetPollOn(SelectableChannel handle)
-    {
+    public final void resetPollOn(SelectableChannel handle) {
         register(handle, SelectionKey.OP_READ, true);
     }
 
-    public final void setPollOut(SelectableChannel handle)
-    {
-        register(handle,  SelectionKey.OP_WRITE, false);
+    public final void setPollOut(SelectableChannel handle) {
+        register(handle, SelectionKey.OP_WRITE, false);
     }
 
-    public final void resetPollOut(SelectableChannel handle)
-    {
+    public final void resetPollOut(SelectableChannel handle) {
         register(handle, SelectionKey.OP_WRITE, true);
     }
 
-    public final void setPollConnect(SelectableChannel handle)
-    {
+    public final void setPollConnect(SelectableChannel handle) {
         register(handle, SelectionKey.OP_CONNECT, false);
     }
 
-    public final void setPollAccept(SelectableChannel handle)
-    {
+    public final void setPollAccept(SelectableChannel handle) {
         register(handle, SelectionKey.OP_ACCEPT, false);
     }
 
-    private final void register(SelectableChannel handle, int ops, boolean negate)
-    {
+    private final void register(SelectableChannel handle, int ops, boolean negate) {
         PollSet pollset = fdTable.get(handle);
 
         if (negate) {
             pollset.ops = pollset.ops & ~ops;
-        }
-        else {
+        } else {
             pollset.ops = pollset.ops | ops;
         }
 
         if (pollset.key != null) {
             pollset.key.interestOps(pollset.ops);
-        }
-        else {
+        } else {
             retired = true;
         }
     }
 
-    public void start()
-    {
+    public void start() {
         worker = new Thread(this, name);
         worker.start();
     }
 
-    public void stop()
-    {
+    public void stop() {
         stopping = true;
         selector.wakeup();
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
         int returnsImmediately = 0;
 
         while (!stopping) {
@@ -194,8 +172,7 @@ public class Poller extends PollerBase implements Runnable
                     if (pollset.key == null) {
                         try {
                             pollset.key = ch.register(selector, pollset.ops, pollset.handler);
-                        }
-                        catch (ClosedChannelException e) {
+                        } catch (ClosedChannelException e) {
                         }
                     }
 
@@ -214,8 +191,7 @@ public class Poller extends PollerBase implements Runnable
             long start = System.currentTimeMillis();
             try {
                 rc = selector.select(timeout);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new ZError.IOException(e);
             }
 
@@ -224,8 +200,7 @@ public class Poller extends PollerBase implements Runnable
                 if (timeout == 0 ||
                         System.currentTimeMillis() - start < timeout / 2) {
                     returnsImmediately++;
-                }
-                else {
+                } else {
                     returnsImmediately = 0;
                 }
 
@@ -245,18 +220,15 @@ public class Poller extends PollerBase implements Runnable
                 try {
                     if (key.isReadable()) {
                         evt.inEvent();
-                    }
-                    else if (key.isAcceptable()) {
+                    } else if (key.isAcceptable()) {
                         evt.acceptEvent();
-                    }
-                    else if (key.isConnectable()) {
+                    } else if (key.isConnectable()) {
                         evt.connectEvent();
                     }
                     if (key.isWritable()) {
                         evt.outEvent();
                     }
-                }
-                catch (CancelledKeyException e) {
+                } catch (CancelledKeyException e) {
                     // channel might have been closed
                 }
             }
@@ -265,21 +237,18 @@ public class Poller extends PollerBase implements Runnable
         stopped = true;
     }
 
-    private void rebuildSelector()
-    {
+    private void rebuildSelector() {
         Selector newSelector;
 
         try {
             newSelector = Selector.open();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ZError.IOException(e);
         }
 
         try {
             selector.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
         }
 
         selector = newSelector;

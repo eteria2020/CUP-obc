@@ -32,8 +32,7 @@ import java.nio.ByteBuffer;
 //  This class implements the state machine that parses the incoming buffer.
 //  Derived class should implement individual state machine actions.
 
-public class Decoder extends DecoderBase
-{
+public class Decoder extends DecoderBase {
     private static final int ONE_BYTE_SIZE_READY = 0;
     private static final int EIGHT_BYTE_SIZE_READY = 1;
     private static final int FLAGS_READY = 2;
@@ -44,8 +43,7 @@ public class Decoder extends DecoderBase
     private final long maxmsgsize;
     private IMsgSink msgSink;
 
-    public Decoder(int bufsize, long maxmsgsize)
-    {
+    public Decoder(int bufsize, long maxmsgsize) {
         super(bufsize);
         this.maxmsgsize = maxmsgsize;
         tmpbuf = new byte[8];
@@ -56,38 +54,34 @@ public class Decoder extends DecoderBase
 
     //  Set the receiver of decoded messages.
     @Override
-    public void setMsgSink(IMsgSink msgSink)
-    {
+    public void setMsgSink(IMsgSink msgSink) {
         this.msgSink = msgSink;
     }
 
     @Override
-    protected boolean next()
-    {
-        switch(state()) {
-        case ONE_BYTE_SIZE_READY:
-            return oneByteSizeReady();
-        case EIGHT_BYTE_SIZE_READY:
-            return eightByteSizeReady();
-        case FLAGS_READY:
-            return flagsReady();
-        case MESSAGE_READY:
-            return messageReady();
-        default:
-            return false;
+    protected boolean next() {
+        switch (state()) {
+            case ONE_BYTE_SIZE_READY:
+                return oneByteSizeReady();
+            case EIGHT_BYTE_SIZE_READY:
+                return eightByteSizeReady();
+            case FLAGS_READY:
+                return flagsReady();
+            case MESSAGE_READY:
+                return messageReady();
+            default:
+                return false;
         }
     }
 
-    private boolean oneByteSizeReady()
-    {
+    private boolean oneByteSizeReady() {
         //  First byte of size is read. If it is 0xff(-1 for java byte) read 8-byte size.
         //  Otherwise allocate the buffer for message data and read the
         //  message data into it.
         byte first = tmpbuf[0];
         if (first == -1) {
             nextStep(tmpbuf, 8, EIGHT_BYTE_SIZE_READY);
-        }
-        else {
+        } else {
             //  There has to be at least one byte (the flags) in the message).
             if (first == 0) {
                 decodingError();
@@ -106,8 +100,7 @@ public class Decoder extends DecoderBase
                 decodingError();
                 return false;
 
-            }
-            else {
+            } else {
                 inProgress = new Msg(size - 1);
             }
 
@@ -117,8 +110,7 @@ public class Decoder extends DecoderBase
 
     }
 
-    private boolean eightByteSizeReady()
-    {
+    private boolean eightByteSizeReady() {
         //  8-byte payload length is read. Allocate the buffer
         //  for message body and read the message data into it.
         final long payloadLength = ByteBuffer.wrap(tmpbuf).getLong();
@@ -152,8 +144,7 @@ public class Decoder extends DecoderBase
         return true;
     }
 
-    private boolean flagsReady()
-    {
+    private boolean flagsReady() {
         //  Store the flags from the wire into the message structure.
 
         int first = tmpbuf[0];
@@ -167,8 +158,7 @@ public class Decoder extends DecoderBase
 
     }
 
-    private boolean messageReady()
-    {
+    private boolean messageReady() {
         //  Message is completely read. Push it further and start reading
         //  new message. (inProgress is a 0-byte message after this point.)
 

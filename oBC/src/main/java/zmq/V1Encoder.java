@@ -23,8 +23,7 @@ import java.nio.ByteBuffer;
 
 // Encoder for 0MQ framing protocol. Converts messages into data stream.
 
-public class V1Encoder extends EncoderBase
-{
+public class V1Encoder extends EncoderBase {
     private static final int SIZE_READY = 0;
     private static final int MESSAGE_READY = 1;
 
@@ -32,45 +31,40 @@ public class V1Encoder extends EncoderBase
     private final byte[] tmpbuf;
     private IMsgSource msgSource;
 
-    public V1Encoder(int bufsize, IMsgSource session)
-    {
+    public V1Encoder(int bufsize, IMsgSource session) {
         super(bufsize);
         tmpbuf = new byte[9];
         msgSource = session;
 
         //  Write 0 bytes to the batch and go to messageReady state.
-        nextStep((byte[]) null, 0, MESSAGE_READY, true);
+        nextStep(null, 0, MESSAGE_READY, true);
     }
 
     @Override
-    public void setMsgSource(IMsgSource msgSource)
-    {
+    public void setMsgSource(IMsgSource msgSource) {
         this.msgSource = msgSource;
     }
 
     @Override
-    protected boolean next()
-    {
-        switch(state()) {
-        case SIZE_READY:
-            return sizeReady();
-        case MESSAGE_READY:
-            return messageReady();
-        default:
-            return false;
+    protected boolean next() {
+        switch (state()) {
+            case SIZE_READY:
+                return sizeReady();
+            case MESSAGE_READY:
+                return messageReady();
+            default:
+                return false;
         }
     }
 
-    private boolean sizeReady()
-    {
+    private boolean sizeReady() {
         //  Write message body into the buffer.
         nextStep(inProgress.data(), inProgress.size(),
                 MESSAGE_READY, !inProgress.hasMore());
         return true;
     }
 
-    private boolean messageReady()
-    {
+    private boolean messageReady() {
         //  Read new message. If there is none, return false.
         //  Note that new state is set only if write is successful. That way
         //  unsuccessful write will cause retry on the next state machine
@@ -103,8 +97,7 @@ public class V1Encoder extends EncoderBase
             b.position(1);
             b.putLong(size);
             nextStep(tmpbuf, 9, SIZE_READY, false);
-        }
-        else {
+        } else {
             tmpbuf[1] = (byte) (size);
             nextStep(tmpbuf, 2, SIZE_READY, false);
         }

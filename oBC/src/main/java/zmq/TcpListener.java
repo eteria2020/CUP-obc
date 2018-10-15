@@ -24,11 +24,10 @@ import java.net.Socket;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-public class TcpListener extends Own implements IPollEvents
-{
+public class TcpListener extends Own implements IPollEvents {
     private static boolean isWindows;
-    static
-    {
+
+    static {
         String os = System.getProperty("os.name").toLowerCase();
         isWindows = os.indexOf("win") >= 0;
     }
@@ -47,8 +46,7 @@ public class TcpListener extends Own implements IPollEvents
 
     private final IOObject ioObject;
 
-    public TcpListener(IOThread ioThread, SocketBase socket, final Options options)
-    {
+    public TcpListener(IOThread ioThread, SocketBase socket, final Options options) {
         super(ioThread, options);
 
         ioObject = new IOObject(ioThread);
@@ -58,14 +56,12 @@ public class TcpListener extends Own implements IPollEvents
     }
 
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         assert (handle == null);
     }
 
     @Override
-    protected void processPlug()
-    {
+    protected void processPlug() {
         //  Start polling for incoming connections.
         ioObject.setHandler(this);
         ioObject.addHandle(handle);
@@ -73,8 +69,7 @@ public class TcpListener extends Own implements IPollEvents
     }
 
     @Override
-    protected void processTerm(int linger)
-    {
+    protected void processTerm(int linger) {
         ioObject.setHandler(this);
         ioObject.removeHandle(handle);
         close();
@@ -82,16 +77,14 @@ public class TcpListener extends Own implements IPollEvents
     }
 
     @Override
-    public void acceptEvent()
-    {
+    public void acceptEvent() {
         SocketChannel fd = null;
 
         try {
             fd = accept();
             Utils.tuneTcpSocket(fd);
             Utils.tuneTcpKeepalives(fd, options.tcpKeepAlive, options.tcpKeepAliveCnt, options.tcpKeepAliveIdle, options.tcpKeepAliveIntvl);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             //  If connection was reset by the peer in the meantime, just ignore it.
             //  TODO: Handle specific errors like ENFILE/EMFILE etc.
             socket.eventAcceptFailed(endpoint, ZError.exccode(e));
@@ -102,8 +95,7 @@ public class TcpListener extends Own implements IPollEvents
         StreamEngine engine = null;
         try {
             engine = new StreamEngine(fd, options, endpoint);
-        }
-        catch (ZError.InstantiationException e) {
+        } catch (ZError.InstantiationException e) {
             socket.eventAcceptFailed(endpoint, ZError.EINVAL);
             return;
         }
@@ -113,7 +105,7 @@ public class TcpListener extends Own implements IPollEvents
 
         //  Create and launch a session object.
         SessionBase session = SessionBase.create(ioThread, false, socket,
-            options, new Address(fd.socket().getRemoteSocketAddress()));
+                options, new Address(fd.socket().getRemoteSocketAddress()));
         session.incSeqnum();
         launchChild(session);
         sendAttach(session, engine, false);
@@ -121,8 +113,7 @@ public class TcpListener extends Own implements IPollEvents
     }
 
     //  Close the listening socket.
-    private void close()
-    {
+    private void close() {
         if (handle == null) {
             return;
         }
@@ -130,21 +121,18 @@ public class TcpListener extends Own implements IPollEvents
         try {
             handle.close();
             socket.eventClosed(endpoint, handle);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             socket.eventCloseFailed(endpoint, ZError.exccode(e));
         }
         handle = null;
     }
 
-    public String getAddress()
-    {
+    public String getAddress() {
         return address.toString();
     }
 
     //  Set address to listen on.
-    public int setAddress(final String addr)
-    {
+    public int setAddress(final String addr) {
         address.resolve(addr, options.ipv4only > 0);
 
         try {
@@ -157,8 +145,7 @@ public class TcpListener extends Own implements IPollEvents
             if (address.getPort() == 0) {
                 address.updatePort(handle.socket().getLocalPort());
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             close();
             return ZError.EADDRINUSE;
         }
@@ -171,13 +158,11 @@ public class TcpListener extends Own implements IPollEvents
     //  newly created connection. The function may return retired_fd
     //  if the connection was dropped while waiting in the listen backlog
     //  or was denied because of accept filters.
-    private SocketChannel accept()
-    {
+    private SocketChannel accept() {
         Socket sock = null;
         try {
             sock = handle.socket().accept();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             return null;
         }
 
@@ -192,8 +177,7 @@ public class TcpListener extends Own implements IPollEvents
             if (!matched) {
                 try {
                     sock.close();
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                 }
                 return null;
             }
@@ -202,26 +186,22 @@ public class TcpListener extends Own implements IPollEvents
     }
 
     @Override
-    public void inEvent()
-    {
+    public void inEvent() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void outEvent()
-    {
+    public void outEvent() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void connectEvent()
-    {
+    public void connectEvent() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void timerEvent(int id)
-    {
+    public void timerEvent(int id) {
         throw new UnsupportedOperationException();
     }
 }

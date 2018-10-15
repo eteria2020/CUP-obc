@@ -93,7 +93,7 @@ class SKToolsNavigationUIManager {
 
         PRE_NAVIGATION,
 
-        POST_NAVIGATION;
+        POST_NAVIGATION
 
     }
 

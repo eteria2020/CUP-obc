@@ -2,6 +2,7 @@ package eu.philcar.csg.OBC.server;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -12,14 +13,11 @@ import java.util.List;
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.helpers.DLog;
 
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-
 public class NoRedButton implements RemoteEntityInterface {
     private SharedPreferences preferences;
     private Context context;
 
-    public  NoRedButton(Context c){
+    public NoRedButton(Context c) {
         this.context = c;
     }
 
@@ -49,7 +47,7 @@ public class NoRedButton implements RemoteEntityInterface {
         edit.putString("NRD", response);
         edit.apply();
 
-        DLog.I("NRD :"+ response);
+        DLog.I("NRD :" + response);
         return 0;
     }
 

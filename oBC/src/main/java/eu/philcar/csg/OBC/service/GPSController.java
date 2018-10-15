@@ -9,10 +9,10 @@ import android.support.annotation.NonNull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.injection.ApplicationContext;
 
-/**This class receiver all the location update and know if i'm moving or not
+/**
+ * This class receiver all the location update and know if i'm moving or not
  * Created by Fulvio on 08/08/2018.
  */
 @Singleton
@@ -20,7 +20,7 @@ public class GPSController {
 
     private final static int MSG_HAS_STOPPED = 1;
 
-    private final long MILLI_STOP_MOVING = 120*1000;
+    private final long MILLI_STOP_MOVING = 120 * 1000;
 
     private final Context mContext;
 
@@ -34,56 +34,51 @@ public class GPSController {
         this.mContext = mContext;
         lastLocation = new Location("default");
         moving = false;
-        localHandler  = new ResetHandler(this);
+        localHandler = new ResetHandler(this);
     }
 
-
-    public void onNewLocation(@NonNull Location newLocation){
-        if(lastLocation.distanceTo(newLocation)>100){
+    public void onNewLocation(@NonNull Location newLocation) {
+        if (lastLocation.distanceTo(newLocation) > 100) {
             updateLocation(newLocation);
         }
     }
 
-    private void updateLocation(Location location){
+    private void updateLocation(Location location) {
         lastLocation.set(location);
         moving = true;
         localHandler.removeMessages(MSG_HAS_STOPPED);
         localHandler.sendEmptyMessageDelayed(MSG_HAS_STOPPED, MILLI_STOP_MOVING);
     }
 
-    public void stopMoving(){
+    public void stopMoving() {
         moving = false;
     }
 
-    public static boolean isMoving(){
+    public static boolean isMoving() {
         return moving;
     }
 
+    static public class ResetHandler extends Handler {
 
+        GPSController controller;
 
-
-static public class ResetHandler extends Handler {
-
-
-     GPSController controller;
-
-    public ResetHandler(GPSController mContext) {
-        this.controller = mContext;
-    }
-
-    @Override
-    public void handleMessage(Message msg) {
-        switch (msg.what){
-            case MSG_HAS_STOPPED:
-                resetController();
-                break;
+        public ResetHandler(GPSController mContext) {
+            this.controller = mContext;
         }
-    }
 
-    private void resetController(){
-        controller.stopMoving();
-    }
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_HAS_STOPPED:
+                    resetController();
+                    break;
+            }
+        }
 
-}
+        private void resetController() {
+            controller.stopMoving();
+        }
+
+    }
 
 }

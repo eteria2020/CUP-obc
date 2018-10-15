@@ -1,9 +1,5 @@
 package eu.philcar.csg.OBC.data.model;
 
-import com.google.gson.Gson;
-
-import java.util.List;
-
 import eu.philcar.csg.OBC.data.datasources.base.BaseResponse;
 
 /**

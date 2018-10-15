@@ -1,25 +1,20 @@
 package eu.philcar.csg.OBC.service;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.List;
-
-import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 
 public class Security {
 
-
-    public static String getSignature(PackageInfo  p, PackageManager pm) {
-
+    public static String getSignature(PackageInfo p, PackageManager pm) {
 
         StringBuilder sb = new StringBuilder();
-
 
         final String strName = p.applicationInfo.loadLabel(pm).toString();
         final String strVendor = p.packageName;
@@ -28,7 +23,7 @@ public class Security {
 
         final Signature[] arrSignatures = p.signatures;
         for (final Signature sig : arrSignatures) {
-	        /*
+            /*
 	        * Get the X.509 certificate.
 	        */
             final byte[] rawCert = sig.toByteArray();
@@ -44,15 +39,12 @@ public class Security {
                 sb.append("Certificate issuer: " + x509Cert.getIssuerDN() + "\n");
                 sb.append("Certificate serial number: " + x509Cert.getSerialNumber() + "\n");
                 sb.append("\n");
-            }
-            catch (CertificateException e) {
+            } catch (CertificateException e) {
                 // e.printStackTrace();
             }
         }
 
-
         return sb.toString();
     }
-
 
 }

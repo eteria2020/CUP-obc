@@ -19,7 +19,6 @@ import io.reactivex.Observable;
 
 public interface SharengoPhpDataSource {
 
-
     Observable<List<Area>> getArea(String plate, String md5);
 
     Observable<List<ServerCommand>> getCommands(String plat);
@@ -40,9 +39,7 @@ public interface SharengoPhpDataSource {
 
     Observable<EventResponse> sendEvent(Event trip, DataManager dataManager);
 
-
     Observable<List<Reservation>> getReservation(String plate);
-
 
     Observable<Void> consumeReservation(int reservation_id);
 

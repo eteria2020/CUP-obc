@@ -5,8 +5,6 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import eu.philcar.csg.OBC.data.model.Area;
 
@@ -26,7 +24,7 @@ public class AreaAdapter extends TypeAdapter<Area> {
         out.name("costo_chiusura").value(value.getCosto_chiusura());
         out.name("coordinates").beginArray();
         for (Double coord : value.getCoordinates()) {
-            if(coord==0D)
+            if (coord == 0D)
                 out.value(0);
             else
                 out.value(coord);

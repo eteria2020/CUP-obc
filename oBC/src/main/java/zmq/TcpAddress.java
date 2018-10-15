@@ -25,44 +25,36 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
 
-public class TcpAddress implements Address.IZAddress
-{
-    public static class TcpAddressMask extends TcpAddress
-    {
-        public boolean matchAddress(SocketAddress addr)
-        {
+public class TcpAddress implements Address.IZAddress {
+    public static class TcpAddressMask extends TcpAddress {
+        public boolean matchAddress(SocketAddress addr) {
             return address.equals(addr);
         }
     }
 
     protected InetSocketAddress address;
 
-    public TcpAddress(String addr)
-    {
+    public TcpAddress(String addr) {
         resolve(addr, false);
     }
 
-    public TcpAddress()
-    {
+    public TcpAddress() {
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         if (address == null) {
             return "";
         }
 
         if (address.getAddress() instanceof Inet6Address) {
             return "tcp://[" + address.getAddress().getHostAddress() + "]:" + address.getPort();
-        }
-        else {
+        } else {
             return "tcp://" + address.getAddress().getHostAddress() + ":" + address.getPort();
         }
     }
 
-    public int getPort()
-    {
+    public int getPort() {
         if (address != null) {
             return address.getPort();
         }
@@ -70,14 +62,12 @@ public class TcpAddress implements Address.IZAddress
     }
 
     //Used after binding to ephemeral port to update ephemeral port (0) to actual port
-    protected void updatePort(int port)
-    {
+    protected void updatePort(int port) {
         address = new InetSocketAddress(address.getAddress(), port);
     }
 
     @Override
-    public void resolve(String name, boolean ipv4only)
-    {
+    public void resolve(String name, boolean ipv4only) {
         //  Find the ':' at end that separates address from the port number.
         int delimiter = name.lastIndexOf(':');
         if (delimiter < 0) {
@@ -90,7 +80,7 @@ public class TcpAddress implements Address.IZAddress
 
         //  Remove square brackets around the address, if any.
         if (addrStr.length() >= 2 && addrStr.charAt(0) == '[' &&
-              addrStr.charAt(addrStr.length() - 1) == ']') {
+                addrStr.charAt(addrStr.length() - 1) == ']') {
             addrStr = addrStr.substring(1, addrStr.length() - 1);
         }
 
@@ -99,8 +89,7 @@ public class TcpAddress implements Address.IZAddress
         if (portStr.equals("*") || portStr.equals("0")) {
             //  Resolve wildcard to 0 to allow autoselection of port
             port = 0;
-        }
-        else {
+        } else {
             //  Parse the port number (0 is not a valid port).
             port = Integer.parseInt(portStr);
             if (port == 0) {
@@ -121,8 +110,7 @@ public class TcpAddress implements Address.IZAddress
                 addrNet = ia;
                 break;
             }
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             throw new IllegalArgumentException(e);
         }
 
@@ -134,8 +122,7 @@ public class TcpAddress implements Address.IZAddress
     }
 
     @Override
-    public SocketAddress address()
-    {
+    public SocketAddress address() {
         return address;
     }
 }

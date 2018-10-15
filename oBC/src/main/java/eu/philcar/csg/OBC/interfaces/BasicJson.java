@@ -1,6 +1,5 @@
 package eu.philcar.csg.OBC.interfaces;
 
-
 import org.json.JSONObject;
 
 /**
@@ -11,7 +10,7 @@ public abstract class BasicJson {
 
     abstract public boolean isValid();
 
-    abstract public void  fromJson(String json);
+    abstract public void fromJson(String json);
 
     abstract public String toJson();
 

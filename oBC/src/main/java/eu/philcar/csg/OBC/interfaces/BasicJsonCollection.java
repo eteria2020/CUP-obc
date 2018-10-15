@@ -18,5 +18,4 @@ public interface BasicJsonCollection {
 
     BasicJson find(BasicJson unit);
 
-
 }

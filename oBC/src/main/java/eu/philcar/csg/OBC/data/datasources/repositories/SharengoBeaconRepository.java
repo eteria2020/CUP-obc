@@ -30,34 +30,27 @@ public class SharengoBeaconRepository extends BaseRepository {
         this.mRemoteDataSource = mRemoteDataSource;
     }
 
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                            //
     //                                      BEACON                                                //
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    public Observable<BeaconResponse> sendBeacon(String beacon){
+    public Observable<BeaconResponse> sendBeacon(String beacon) {
 
         //if(!RxUtil.isRunning(beaconDisposable)) {
-          return  mRemoteDataSource.sendBeacon(App.CarPlate,beacon)
-                    //.doOnNext(n -> mDataManager.saveArea(n))
-                  .doOnError(e -> {
-                      DLog.E("Error insiede sendBeacon",((ErrorResponse)e).error);
-                      //RxUtil.dispose(beaconDisposable);
-                  })
-                  .doOnComplete(() -> {
-                      //RxUtil.dispose(beaconDisposable);
+        return mRemoteDataSource.sendBeacon(App.CarPlate, beacon)
+                //.doOnNext(n -> mDataManager.saveArea(n))
+                .doOnError(e -> {
+                    DLog.E("Error insiede sendBeacon", ((ErrorResponse) e).error);
+                    //RxUtil.dispose(beaconDisposable);
+                })
+                .doOnComplete(() -> {
+                    //RxUtil.dispose(beaconDisposable);
 
-                  });
+                });
 
         //}
     }
-
-
-
-
 
 }

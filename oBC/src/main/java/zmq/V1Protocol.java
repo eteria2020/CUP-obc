@@ -19,10 +19,8 @@
 
 package zmq;
 
-class V1Protocol
-{
-    private V1Protocol()
-    {
+class V1Protocol {
+    private V1Protocol() {
     }
 
     public static final int VERSION = 1;

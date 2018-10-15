@@ -19,14 +19,11 @@
 
 package zmq;
 
-public class Dealer extends SocketBase
-{
-    public static class DealerSession extends SessionBase
-    {
+public class Dealer extends SocketBase {
+    public static class DealerSession extends SessionBase {
         public DealerSession(IOThread ioThread, boolean connect,
-            SocketBase socket, final Options options,
-            final Address addr)
-        {
+                             SocketBase socket, final Options options,
+                             final Address addr) {
             super(ioThread, connect, socket, options, addr);
         }
     }
@@ -42,8 +39,7 @@ public class Dealer extends SocketBase
     private Msg prefetchedMsg;
 
     //  Holds the prefetched message.
-    public Dealer(Ctx parent, int tid, int sid)
-    {
+    public Dealer(Ctx parent, int tid, int sid) {
         super(parent, tid, sid);
 
         prefetched = false;
@@ -61,27 +57,23 @@ public class Dealer extends SocketBase
     }
 
     @Override
-    protected void xattachPipe(Pipe pipe, boolean icanhasall)
-    {
+    protected void xattachPipe(Pipe pipe, boolean icanhasall) {
         assert (pipe != null);
         fq.attach(pipe);
         lb.attach(pipe);
     }
 
     @Override
-    protected boolean xsend(Msg msg)
-    {
+    protected boolean xsend(Msg msg) {
         return lb.send(msg, errno);
     }
 
     @Override
-    protected Msg xrecv()
-    {
+    protected Msg xrecv() {
         return xxrecv();
     }
 
-    private Msg xxrecv()
-    {
+    private Msg xxrecv() {
         Msg msg = null;
         //  If there is a prefetched message, return it.
         if (prefetched) {
@@ -105,8 +97,7 @@ public class Dealer extends SocketBase
     }
 
     @Override
-    protected boolean xhasIn()
-    {
+    protected boolean xhasIn() {
         //  We may already have a message pre-fetched.
         if (prefetched) {
             return true;
@@ -122,26 +113,22 @@ public class Dealer extends SocketBase
     }
 
     @Override
-    protected boolean xhasOut()
-    {
+    protected boolean xhasOut() {
         return lb.hasOut();
     }
 
     @Override
-    protected void xreadActivated(Pipe pipe)
-    {
+    protected void xreadActivated(Pipe pipe) {
         fq.activated(pipe);
     }
 
     @Override
-    protected void xwriteActivated(Pipe pipe)
-    {
+    protected void xwriteActivated(Pipe pipe) {
         lb.activated(pipe);
     }
 
     @Override
-    protected void xpipeTerminated(Pipe pipe)
-    {
+    protected void xpipeTerminated(Pipe pipe) {
         fq.terminated(pipe);
         lb.terminated(pipe);
     }

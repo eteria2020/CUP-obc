@@ -26,8 +26,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
 
-public class StreamEngine implements IEngine, IPollEvents, IMsgSink
-{
+public class StreamEngine implements IEngine, IPollEvents, IMsgSink {
     //  Size of the greeting message:
     //  Preamble (10 bytes) + version (1 byte) + socket type (1 byte).
     private static final int GREETING_SIZE = 12;
@@ -77,8 +76,7 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
 
     private IOObject ioObject;
 
-    public StreamEngine(SocketChannel handle, final Options options, final String endpoint)
-    {
+    public StreamEngine(SocketChannel handle, final Options options, final String endpoint) {
         this.handle = handle;
         inbuf = null;
         insize = 0;
@@ -107,14 +105,12 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
             if (this.options.rcvbuf != 0) {
                 this.handle.socket().setReceiveBufferSize(this.options.rcvbuf);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ZError.IOException(e);
         }
     }
 
-    private DecoderBase newDecoder(int size, long max, SessionBase session, int version)
-    {
+    private DecoderBase newDecoder(int size, long max, SessionBase session, int version) {
         if (options.decoder == null) {
             if (version == V1Protocol.VERSION) {
                 return new V1Decoder(size, max, session);
@@ -125,34 +121,27 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
         try {
             Constructor<? extends DecoderBase> dcon;
 
-            if (version == 0)  {
+            if (version == 0) {
                 dcon = options.decoder.getConstructor(int.class, long.class);
                 return dcon.newInstance(size, max);
-            }
-            else {
+            } else {
                 dcon = options.decoder.getConstructor(int.class, long.class, IMsgSink.class, int.class);
                 return dcon.newInstance(size, max, session, version);
             }
-        }
-        catch (SecurityException e) {
+        } catch (SecurityException e) {
             throw new ZError.InstantiationException(e);
-        }
-        catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException e) {
             throw new ZError.InstantiationException(e);
-        }
-        catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             throw new ZError.InstantiationException(e);
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             throw new ZError.InstantiationException(e);
-        }
-        catch (InstantiationException e) {
+        } catch (InstantiationException e) {
             throw new ZError.InstantiationException(e);
         }
     }
 
-    private EncoderBase newEncoder(int size, SessionBase session, int version)
-    {
+    private EncoderBase newEncoder(int size, SessionBase session, int version) {
         if (options.encoder == null) {
             if (version == V1Protocol.VERSION) {
                 return new V1Encoder(size, session);
@@ -166,45 +155,36 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
             if (version == 0) {
                 econ = options.encoder.getConstructor(int.class);
                 return econ.newInstance(size);
-            }
-            else {
+            } else {
                 econ = options.encoder.getConstructor(int.class, IMsgSource.class, int.class);
                 return econ.newInstance(size, session, version);
             }
-        }
-        catch (SecurityException e) {
+        } catch (SecurityException e) {
             throw new ZError.InstantiationException(e);
-        }
-        catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException e) {
             throw new ZError.InstantiationException(e);
-        }
-        catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             throw new ZError.InstantiationException(e);
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             throw new ZError.InstantiationException(e);
-        }
-        catch (InstantiationException e) {
+        } catch (InstantiationException e) {
             throw new ZError.InstantiationException(e);
         }
     }
 
-    public void destroy()
-    {
+    public void destroy() {
         assert (!plugged);
 
         if (handle != null) {
             try {
                 handle.close();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
             }
             handle = null;
         }
     }
 
-    public void plug(IOThread ioThread, SessionBase session)
-    {
+    public void plug(IOThread ioThread, SessionBase session) {
         assert (!plugged);
         plugged = true;
 
@@ -232,10 +212,8 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
         boolean custom = false;
         try {
             custom = options.encoder != null && options.encoder.getDeclaredField("RAW_ENCODER") != null;
-        }
-        catch (SecurityException e) {
-        }
-        catch (NoSuchFieldException e) {
+        } catch (SecurityException e) {
+        } catch (NoSuchFieldException e) {
         }
 
         if (!custom) {
@@ -249,8 +227,7 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
         inEvent();
     }
 
-    private void unplug()
-    {
+    private void unplug() {
         assert (plugged);
         plugged = false;
 
@@ -274,15 +251,13 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
     }
 
     @Override
-    public void terminate()
-    {
+    public void terminate() {
         unplug();
         destroy();
     }
 
     @Override
-    public void inEvent()
-    {
+    public void inEvent() {
         //  If still handshaking, receive and process the greeting message.
         if (handshaking) {
             if (!handshake()) {
@@ -315,8 +290,7 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
 
         if (processed == -1) {
             disconnection = true;
-        }
-        else {
+        } else {
             //  Stop polling for input if we got stuck.
             if (processed < insize) {
                 ioObject.resetPollIn(handle);
@@ -337,24 +311,22 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
             if (decoder.stalled()) {
                 ioObject.removeHandle(handle);
                 ioEnabled = false;
-            }
-            else {
+            } else {
                 error();
             }
         }
     }
 
     @Override
-    public void outEvent()
-    {
+    public void outEvent() {
         //  If write buffer is empty, try to read new data from the encoder.
         if (outsize == 0) {
             //  Even when we stop polling as soon as there is no
             //  data to send, the poller may invoke outEvent one
             //  more time due to 'speculative write' optimisation.
             if (encoder == null) {
-                 assert (handshaking);
-                 return;
+                assert (handshaking);
+                return;
             }
 
             outbuf = encoder.getData(null);
@@ -406,26 +378,22 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
     }
 
     @Override
-    public void connectEvent()
-    {
+    public void connectEvent() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void acceptEvent()
-    {
+    public void acceptEvent() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void timerEvent(int id)
-    {
+    public void timerEvent(int id) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void activateOut()
-    {
+    public void activateOut() {
         ioObject.setPollOut(handle);
 
         //  Speculative write: The assumption is that at the moment new message
@@ -436,8 +404,7 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
     }
 
     @Override
-    public void activateIn()
-    {
+    public void activateIn() {
         if (!ioEnabled) {
             //  There was an input error but the engine could not
             //  be terminated (due to the stalled decoder).
@@ -455,8 +422,7 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
         ioObject.inEvent();
     }
 
-    private boolean handshake()
-    {
+    private boolean handshake() {
         assert (handshaking);
 
         //  Receive the greeting.
@@ -542,17 +508,14 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
             if (options.type == ZMQ.ZMQ_PUB || options.type == ZMQ.ZMQ_XPUB) {
                 decoder.setMsgSink(this);
             }
-        }
-        else
-        if (greeting.get(versionPos) == 0) {
+        } else if (greeting.get(versionPos) == 0) {
             //  ZMTP/1.0 framing.
             encoder = newEncoder(Config.OUT_BATCH_SIZE.getValue(), null, 0);
             encoder.setMsgSource(session);
 
             decoder = newDecoder(Config.IN_BATCH_SIZE.getValue(), options.maxMsgSize, null, 0);
             decoder.setMsgSink(session);
-        }
-        else {
+        } else {
             //  v1 framing protocol.
             encoder = newEncoder(Config.OUT_BATCH_SIZE.getValue(), session, V1Protocol.VERSION);
 
@@ -571,8 +534,7 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
     }
 
     @Override
-    public int pushMsg(Msg msg)
-    {
+    public int pushMsg(Msg msg) {
         assert (options.type == ZMQ.ZMQ_PUB || options.type == ZMQ.ZMQ_XPUB);
 
         //  The first message is identity.
@@ -582,7 +544,7 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
 
         //  Inject the subscription message so that the ZMQ 2.x peer
         //  receives our messages.
-        msg = new Msg(new byte[] { 1 });
+        msg = new Msg(new byte[]{1});
         rc = session.pushMsg(msg);
         session.flush();
 
@@ -594,8 +556,7 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
         return rc;
     }
 
-    private void error()
-    {
+    private void error() {
         assert (session != null);
         socket.eventDisconnected(endpoint, handle);
         session.detach();
@@ -603,26 +564,22 @@ public class StreamEngine implements IEngine, IPollEvents, IMsgSink
         destroy();
     }
 
-    private int write(Transfer buf)
-    {
+    private int write(Transfer buf) {
         int nbytes;
         try {
             nbytes = buf.transferTo(handle);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             return -1;
         }
 
         return nbytes;
     }
 
-    private int read(ByteBuffer buf)
-    {
+    private int read(ByteBuffer buf) {
         int nbytes;
         try {
             nbytes = handle.read(buf);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             return -1;
         }
 

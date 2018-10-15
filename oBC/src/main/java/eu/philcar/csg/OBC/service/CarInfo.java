@@ -1,15 +1,15 @@
 package eu.philcar.csg.OBC.service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.text.format.DateFormat;
+import android.util.JsonWriter;
+
+import com.google.gson.Gson;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -22,6 +22,19 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import javax.inject.Inject;
+
 import eu.philcar.csg.OBC.App;
 import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
@@ -32,19 +45,6 @@ import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.helpers.UrlTools;
 import eu.philcar.csg.OBC.task.OdoController;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
-
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
-import android.text.format.DateFormat;
-import android.util.JsonWriter;
-
-import com.google.gson.Gson;
-
-import javax.inject.Inject;
 
 public class CarInfo {
 
@@ -62,9 +62,7 @@ public class CarInfo {
 
     public String VIN = "";
 
-
     private int speed = 0;
-
 
     public int batteryLevel = App.fuel_level;
     public int bmsSOC = App.fuel_level;
@@ -81,10 +79,7 @@ public class CarInfo {
     private Date lastBatterySafetyTx = new Date();
     private int outAmp = 0;
     private Long timestampCurrent = null;
-    public Long lastForceReady=System.currentTimeMillis();
-
-
-
+    public Long lastForceReady = System.currentTimeMillis();
 
     public float[] cellVoltageValue = new float[24];
     public float minVoltage = 2.6f;
@@ -92,7 +87,6 @@ public class CarInfo {
     public Boolean isCellLowVoltage = false;
     public Boolean Charging = false;
     public float currVoltage = App.max_voltage;
-
 
     private boolean ready = false;
     private boolean brakes = false;
@@ -109,7 +103,7 @@ public class CarInfo {
     public Location location = new Location("");
 
     public Location intGpsLocation = new Location(LocationManager.GPS_PROVIDER);
-    public Location extGpsLocation = new Location(LocationManager.GPS_PROVIDER){
+    public Location extGpsLocation = new Location(LocationManager.GPS_PROVIDER) {
         @Override
         public void setLatitude(double latitude) {
             super.setLatitude(latitude);
@@ -130,14 +124,12 @@ public class CarInfo {
     };
     public Location ntwkLocation = new Location(LocationManager.NETWORK_PROVIDER);
 
-
     private double longitude = 0;
     private double latitude = 0;
     public double accuracy = 0;
 
     public long lastLocationChange = 0;
     public long lastUpdate = 0;
-
 
     public long tripsOpened = 0;
     public long tripsToSend = 0;
@@ -148,17 +140,12 @@ public class CarInfo {
 
     private Beacon beacon;
 
-
     public ServiceLocationListener serviceLocationListener;
 
     private SimpleDateFormat log_sdf = new SimpleDateFormat("dd/MM/yyyy HH.mm.ss", Locale.ITALY);
 
-
     private boolean checkLastBatterySafety(boolean newBatterySafety) {
-        if(lastBatterySafetyTx.getTime()+1000*60*10<=System.currentTimeMillis()){
-            return true;
-        }else
-        return false;
+        return lastBatterySafetyTx.getTime() + 1000 * 60 * 10 <= System.currentTimeMillis();
     }
 
     private void setLastBatterySafety(boolean lastBatterySafety) {
@@ -189,20 +176,19 @@ public class CarInfo {
     }
 
     public void setBatterySafety(boolean newBatterySafety) {
-        if(newBatterySafety!=batterySafety){
-            if(newBatterySafety==lastBatterySafety){
-                if(checkLastBatterySafety(newBatterySafety)){
+        if (newBatterySafety != batterySafety) {
+            if (newBatterySafety == lastBatterySafety) {
+                if (checkLastBatterySafety(newBatterySafety)) {
                     dlog.d("setBatterySafety: set new BS to" + newBatterySafety);
-                    batterySafety=newBatterySafety;
+                    batterySafety = newBatterySafety;
                     beacon.setBatterySafety(batterySafety);
-                }else{
-                    dlog.d("setBatterySafety: wait to set new battery safety lastBStime"+lastBatterySafetyTx.toString());
+                } else {
+                    dlog.d("setBatterySafety: wait to set new battery safety lastBStime" + lastBatterySafetyTx.toString());
                 }
-            }else{
+            } else {
                 setLastBatterySafety(newBatterySafety);
             }
         }
-
 
         batterySafety = newBatterySafety;
         beacon.setBatterySafety(batterySafety);
@@ -214,28 +200,28 @@ public class CarInfo {
             this.batteryLevel=batteryLevel;
             return;
         }*/
-        if(batteryLevel>100)
-            batteryLevel=100;
-        dlog.i("setBatteryLevel: first "+this.batteryLevel +" target: "+batteryLevel);
+        if (batteryLevel > 100)
+            batteryLevel = 100;
+        dlog.i("setBatteryLevel: first " + this.batteryLevel + " target: " + batteryLevel);
 
-        if (this.batteryLevel - batteryLevel>= 5) {
+        if (this.batteryLevel - batteryLevel >= 5) {
             this.batteryLevel = (this.batteryLevel > batteryLevel ? this.batteryLevel - 5 : this.batteryLevel + 5);
         } else
             this.batteryLevel = (batteryLevel);
 
-        if(BuildConfig.FLAVOR.equals("develop"))
-        this.batteryLevel=99;//FOR DEVELOP PURPOSE
+        if (BuildConfig.FLAVOR.equals("develop"))
+            this.batteryLevel = 99;//FOR DEVELOP PURPOSE
 
         App.Instance.setBatteryLevel(this.batteryLevel);
         beacon.setSOC(this.batteryLevel);
-        dlog.i("setBatteryLevel: result "+this.batteryLevel);
+        dlog.i("setBatteryLevel: result " + this.batteryLevel);
     }
 
     private void setLocation(Location loc) {
 
         if (App.mockLocation != null) {
             location = App.mockLocation;
-            long a=loc.getTime();
+            long a = loc.getTime();
             setLongitude(App.mockLocation.getLongitude());
             setLatitude(App.mockLocation.getLatitude());
             accuracy = App.mockLocation.getAccuracy();
@@ -246,7 +232,7 @@ public class CarInfo {
         if (loc != null) {
 
             location.set(loc);
-            long a=loc.getTime();
+            long a = loc.getTime();
             String time = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS").format(location.getTime());
             if (getLongitude() != loc.getLongitude() || getLatitude() != loc.getLatitude()) {
                 lastLocationChange = System.nanoTime();
@@ -272,7 +258,7 @@ public class CarInfo {
 
         //Update all data in local bundle
         /*if(b.containsKey("SOC"))
-			b.putInt("SOC",batteryLevel); //replace the value read from the can with the calculated one*/
+            b.putInt("SOC",batteryLevel); //replace the value read from the can with the calculated one*/
         allData.putAll(b);
 
         //Scan receive budle element to update relevant local values and events
@@ -293,13 +279,11 @@ public class CarInfo {
                 int k = b.getInt(key);
                 setOutAmp(k);
 
-
             }
 
             if (key.equalsIgnoreCase("timestampAmp")) {
 
                 setTimestampCurrent(b.getLong(key));
-
 
             } else if (key.equalsIgnoreCase("SOC")) {
                 //batteryLevel = b.getInt(key);
@@ -319,7 +303,7 @@ public class CarInfo {
                 else
                     rangeKm = batteryLevel;
             } else if (key.equalsIgnoreCase("Speed")) {
-                setSpeed((int) Math.round(b.getFloat(key)));
+                setSpeed(Math.round(b.getFloat(key)));
             }
 /*			
 			else if (key.equalsIgnoreCase("RPM")) {
@@ -402,7 +386,6 @@ public class CarInfo {
                     DLog.W("Empty GPSBOX json");
                 }
 
-
             } else if (key.equalsIgnoreCase("CellInfo")) {
                 Bundle c = b.getBundle(key);
                 //this.cellVoltageValue[c.getInt("CellIndex")]=c.getFloat("CellVoltage");
@@ -431,7 +414,7 @@ public class CarInfo {
 		/*if(b.containsKey("SOC"))
 			b.putInt("SOC",batteryLevel); //replace the value read from the can with the calculated one*/
         allData.putAll(b);
-        beacon = Beacon.handleUpdate(beacon,b);
+        beacon = Beacon.handleUpdate(beacon, b);
         //Scan receive budle element to update relevant local values and events
 
         for (String key : b.keySet()) {
@@ -443,8 +426,8 @@ public class CarInfo {
                     setIsKeyOn(i);
                     eventRepository.eventKey(i);
 
-                    if(i==1&& App.currentTripInfo!=null && App.currentTripInfo.isOpen && App.pinChecked && App.getParkModeStarted()==null && !App.isClosing && System.currentTimeMillis()-lastForceReady>5000){        //Ask Rosco if good idea
-                        lastForceReady=System.currentTimeMillis();
+                    if (i == 1 && App.currentTripInfo != null && App.currentTripInfo.isOpen && App.pinChecked && App.getParkModeStarted() == null && !App.isClosing && System.currentTimeMillis() - lastForceReady > 5000) {        //Ask Rosco if good idea
+                        lastForceReady = System.currentTimeMillis();
                         serviceHandler.sendMessage(MessageFactory.setEngine(true));
                     }
 
@@ -457,8 +440,7 @@ public class CarInfo {
                     setOutAmp(i);
                 }
 
-
-            }else if (key.equalsIgnoreCase("batterySafety")) {
+            } else if (key.equalsIgnoreCase("batterySafety")) {
 
                 bo = b.getBoolean(key);
                 if (bo != isBatterySafety()) {
@@ -466,17 +448,15 @@ public class CarInfo {
                     setBatterySafety(bo);
                 }
 
-
-            }else if (key.equalsIgnoreCase("fakeCard")) {
+            } else if (key.equalsIgnoreCase("fakeCard")) {
 
                 s = b.getString(key);
 
                 if (s != null && !s.equalsIgnoreCase(getFakeCard())) {
                     hasChanged = true;
-                    if(setFakeCard(s))
+                    if (setFakeCard(s))
                         service.notifyCard(s, "OPEN", false, false);
                 }
-
 
             } else if (key.equalsIgnoreCase("timestampAmp")) {
                 l = b.getLong(key);
@@ -484,7 +464,6 @@ public class CarInfo {
                     hasChanged = true;
                     setTimestampCurrent(l);
                 }
-
 
             } else if (key.equalsIgnoreCase("SOC")) {
 
@@ -508,7 +487,7 @@ public class CarInfo {
                         rangeKm = batteryLevel;
                 }
             } else if (key.equalsIgnoreCase("Speed")) {
-                i = (int) Math.round(b.getFloat(key));
+                i = Math.round(b.getFloat(key));
                 if (i != getSpeed()) {
                     hasChanged = true;
                     setSpeed(i);
@@ -543,8 +522,8 @@ public class CarInfo {
                     setId(s);
                     eventRepository.CarPlateChange(App.CarPlate, getId());
                     App.Instance.setCarPlate(getId());
-                    if(App.canRestartZMQ) {
-                        App.canRestartZMQ=false;
+                    if (App.canRestartZMQ) {
+                        App.canRestartZMQ = false;
                         serviceHandler.sendMessage(MessageFactory.zmqRestart());
                         dlog.d("new vin restarting ZMQ");
                     }
@@ -636,7 +615,6 @@ public class CarInfo {
                     DLog.W("Empty GPSBOX json");
                 }
 
-
             } else if (key.equalsIgnoreCase("CellInfo")) {
                 //Bundle c=b.getBundle(key);
                 //this.cellVoltageValue[c.getInt("CellIndex")]=c.getFloat("CellVoltage");
@@ -659,7 +637,6 @@ public class CarInfo {
 
     public Boolean sendMail(String Url) {
 
-
         if (!App.hasNetworkConnection()) {
             dlog.e(" sendMail: nessuna connessione");
             return false;
@@ -667,7 +644,6 @@ public class CarInfo {
         StringBuilder builder = new StringBuilder();
         List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
         HttpResponse response = null;
-
 
         HttpClient client = new DefaultHttpClient();
         try {
@@ -680,7 +656,6 @@ public class CarInfo {
                 paramsList.add(new BasicNameValuePair("id", App.currentTripInfo.trip.remote_id + ""));
                 Url = UrlTools.buildQuery(Url.concat("?"), paramsList).toString();
             }
-
 
             HttpGet httpGet = new HttpGet(Url);
 
@@ -727,7 +702,6 @@ public class CarInfo {
         return false;
     }
 
-
     public void updateTrips() {
         Trips corse = App.Instance.getDbManager().getTripDao();
         if (corse != null) {
@@ -740,7 +714,6 @@ public class CarInfo {
         }
     }
 
-
     public String getGpsJson() {
 
         if (location == null)
@@ -748,7 +721,6 @@ public class CarInfo {
 
         StringWriter sw = new StringWriter();
         JsonWriter jw = new JsonWriter(sw);
-
 
         try {
             jw.beginObject();
@@ -777,7 +749,6 @@ public class CarInfo {
             DLog.E("Error creating  gps json:", e);
         }
 
-
         return sw.toString();
     }
 
@@ -793,7 +764,6 @@ public class CarInfo {
             } else if (value instanceof String) {
                 jw.name(key).value((String) value);
             }
-
 
         } catch (IOException e) {
             dlog.e("Exception while append json", e);
@@ -814,7 +784,6 @@ public class CarInfo {
                 jw.name(key).value((String) value);
             }
 
-
         } catch (IOException e) {
             dlog.e("Exception while append json", e);
         }
@@ -824,8 +793,6 @@ public class CarInfo {
     private double gpsRound(double value) {
         return Math.round(value * 100000D) / 100000D;
     }
-
-
 
     public String getJson(boolean longVersion) {
         StringWriter sw = new StringWriter();
@@ -844,7 +811,6 @@ public class CarInfo {
                         appendJson(jw, key, allData.get(key));
                 }
             }
-
 
             if (App.mockLocation != null) {
                 jw.name("lon").value(gpsRound(App.mockLocation.getLongitude()));
@@ -871,7 +837,6 @@ public class CarInfo {
                 jw.name("id_trip").value(App.currentTripInfo.trip.remote_id);
             }
 
-
             if (intGpsLocation != null) {
                 jw.name("int_lon").value(gpsRound(intGpsLocation.getLongitude()));
                 jw.name("int_lat").value(gpsRound(intGpsLocation.getLatitude()));
@@ -883,7 +848,6 @@ public class CarInfo {
                 jw.name("ext_lat").value(gpsRound(extGpsLocation.getLatitude()));
                 jw.name("ext_time").value(extGpsLocation.getTime());
             }
-
 
             jw.name("log_tx_time").value(log_sdf.format(new Date()));
 
@@ -915,9 +879,7 @@ public class CarInfo {
                 if (allData.containsKey("GPSBOX"))
                     jw.name("GPSBOX").value(allData.getString("GPSBOX"));
 
-
             }
-
 
             jw.endObject();
 
@@ -955,7 +917,6 @@ public class CarInfo {
                     beacon.setId_trip(App.currentTripInfo.trip.remote_id);
                 }
 
-
                 if (intGpsLocation != null) {
                     beacon.setInt_lon(gpsRound(intGpsLocation.getLongitude()));
                     beacon.setInt_lat(gpsRound(intGpsLocation.getLatitude()));
@@ -979,8 +940,8 @@ public class CarInfo {
 
                     beacon.setWlsize(App.whiteListSize);
 
-                    beacon.setOffLineTrips((int)tripsToSend);
-                    beacon.setOpenTrips((int)tripsOpened);
+                    beacon.setOffLineTrips((int) tripsToSend);
+                    beacon.setOpenTrips((int) tripsOpened);
 
                     if (App.mockLocation == null) {
                         String gpsInfo = getGpsJson();
@@ -992,14 +953,13 @@ public class CarInfo {
                     if (allData.containsKey("GPSBOX"))
                         beacon.setGPSBOX(allData.getString("GPSBOX"));
 
-
                 }
             } catch (Exception e) {
                 DLog.E("Error creating json:", e);
             }
 
-        }catch (Exception e){
-            dlog.e("Esception serializing beacon with gson",e);
+        } catch (Exception e) {
+            dlog.e("Esception serializing beacon with gson", e);
         }
         return gson.toJson(beacon);
     }
@@ -1020,7 +980,6 @@ public class CarInfo {
                     appendJson(jw, key, allData.get(key));
                 }
             }
-
 
             if (App.mockLocation != null) {
                 jw.name("lon").value(gpsRound(App.mockLocation.getLongitude()));
@@ -1044,7 +1003,6 @@ public class CarInfo {
                 jw.name("id_trip").value(App.currentTripInfo.trip.remote_id);
             }
 
-
             if (intGpsLocation != null) {
                 jw.name("int_lon").value(gpsRound(intGpsLocation.getLongitude()));
                 jw.name("int_lat").value(gpsRound(intGpsLocation.getLatitude()));
@@ -1056,7 +1014,6 @@ public class CarInfo {
                 jw.name("ext_lat").value(gpsRound(extGpsLocation.getLatitude()));
                 jw.name("ext_time").value(extGpsLocation.getTime());
             }
-
 
             jw.name("log_tx_time").value(log_sdf.format(new Date()));
 
@@ -1088,9 +1045,7 @@ public class CarInfo {
                 if (allData.containsKey("GPSBOX"))
                     jw.name("GPSBOX").value(allData.getString("GPSBOX"));
 
-
             }
-
 
             jw.endObject();
 
@@ -1103,7 +1058,6 @@ public class CarInfo {
         return jsonStr;
     }
 
-
     public Bundle getBundle() {
         Bundle b = new Bundle();
         try {
@@ -1113,7 +1067,6 @@ public class CarInfo {
         } catch (Exception e) {
             dlog.e("Exception while retrieving all data ", e);
         }
-
 
         return b;
     }
@@ -1194,7 +1147,7 @@ public class CarInfo {
         return keyStatus;
     }
 
-    public static boolean isKeyOn(){
+    public static boolean isKeyOn() {
         return CarInfo.getKeyStatus() == null || !CarInfo.getKeyStatus().equalsIgnoreCase("OFF");
     }
 
@@ -1299,10 +1252,9 @@ public class CarInfo {
 
     private class ServiceLocationListener implements LocationListener {
 
-
         public void onLocationChanged(Location loc) {
-            if(loc != null) {
-                OptimizeDistanceCalc.Controller(OdoController.RUNonChangGps,loc);
+            if (loc != null) {
+                OptimizeDistanceCalc.Controller(OdoController.RUNonChangGps, loc);
             }
 
             intGpsLocation = loc;

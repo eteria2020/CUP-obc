@@ -24,14 +24,12 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
 
-public class IpcAddress implements Address.IZAddress
-{
+public class IpcAddress implements Address.IZAddress {
     private String name;
     private InetSocketAddress address;
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         if (name == null) {
             return "";
         }
@@ -40,8 +38,7 @@ public class IpcAddress implements Address.IZAddress
     }
 
     @Override
-    public void resolve(String name, boolean ip4only)
-    {
+    public void resolve(String name, boolean ip4only) {
         this.name = name;
 
         int hash = name.hashCode();
@@ -53,15 +50,13 @@ public class IpcAddress implements Address.IZAddress
 
         try {
             address = new InetSocketAddress(InetAddress.getByName(null), hash);
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
     @Override
-    public SocketAddress address()
-    {
+    public SocketAddress address() {
         return address;
     }
 }

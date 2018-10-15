@@ -9,12 +9,13 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 public class HttpLogger implements HttpLoggingInterceptor.Logger {
     private DLog dlog = new DLog(HttpLogger.class);
+
     @Override
     public void log(String message) {
         dlog.d(message);
     }
 
-    public void  e(String message, Throwable e){
+    public void e(String message, Throwable e) {
         dlog.e(message, e);
     }
 }

@@ -21,14 +21,11 @@ package org.zeromq;
 
 import zmq.ZError;
 
-public class ZMQException extends RuntimeException
-{
-    public static class IOException extends RuntimeException
-    {
+public class ZMQException extends RuntimeException {
+    public static class IOException extends RuntimeException {
         private static final long serialVersionUID = 8440355423370109164L;
 
-        public IOException(java.io.IOException cause)
-        {
+        public IOException(java.io.IOException cause) {
             super(cause);
         }
     }
@@ -37,20 +34,17 @@ public class ZMQException extends RuntimeException
 
     private final int code;
 
-    public ZMQException(int errno)
-    {
+    public ZMQException(int errno) {
         super("Errno " + errno);
         code = errno;
     }
 
-    public int getErrorCode()
-    {
+    public int getErrorCode() {
         return code;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return super.toString() + " : " + ZError.toString(code);
     }
 }
