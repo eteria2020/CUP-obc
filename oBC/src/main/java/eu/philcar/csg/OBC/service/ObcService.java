@@ -215,6 +215,8 @@ public class ObcService extends Service implements OnTripCallback {
 
 	private ArrayList<Clients> clients = new ArrayList<Clients>();
 
+	private boolean ampError = false;
+
 	private boolean isStarted;
 	private boolean isStopRequested = false;
 
@@ -538,7 +540,7 @@ public class ObcService extends Service implements OnTripCallback {
 
 		//Send boot event
 		/*final Events eventi = App.Instance.dbManager.getEventiDao();
-        eventi.sendEvent(Events.EVT_SWBOOT, App.sw_Version);*/
+		eventi.sendEvent(Events.EVT_SWBOOT, App.sw_Version);*/
 		eventRepository.eventSwBoot(App.sw_Version);
 
 		//Start whitelist update
@@ -655,7 +657,7 @@ public class ObcService extends Service implements OnTripCallback {
 		virtualBMSUpdateScheduler.scheduleAtFixedRate(new Runnable() {
 
 			int canAmpAnomalies = 0, canCellAnomalies = 0, canBmsAnomalies = 0, canAllAnomalies = 0;
-			boolean bmsSocError = false, bmsCellError = false, ampError = false;
+			boolean bmsSocError = false, bmsCellError = false;
 
 			@Override
 			public void run() {
@@ -816,26 +818,13 @@ public class ObcService extends Service implements OnTripCallback {
 							carInfo.SOCR = Math.min(carInfo.virtualSOC, 0f);
 						}
 					}
-                    /*if (carInfo.bmsSOC >= 100 || carInfo.bmsSOC_GPRS >= 100) {
-                        if (!carInfo.Charging || (carInfo.currVoltage > App.getMax_voltage())) {
-                            //App.Instance.setMaxVoltage(carInfo.currVoltage > 85f || carInfo.currVoltage < 80f ? 83f : carInfo.currVoltage);
-                            dlog.i("virtualBMSUpdateScheduler: set maxVoltage to " + App.getMax_voltage() + "% bmsSOC: " + carInfo.bmsSOC + " % bmsSOC_GPRS: " + carInfo.bmsSOC_GPRS + "% currVoltage " + carInfo.currVoltage + "% Charging: " + carInfo.Charging);
-                            carInfo.Charging = true;
-                        }
-                    } else {
-                        carInfo.Charging = false;
-                    }*/
 
 					//set SOCR valued
 					dlog.i("virtualBMSUpdateScheduler: alarm state: amp: " + ampError + " cell: " + bmsCellError + " soc: " + bmsSocError);
 
 					carInfo.setBatteryLevel(Math.round(carInfo.SOCR));
 
-					//carInfo.batteryLevel=Math.min(carInfo.bmsSOC,carInfo.bmsSOC_GPRS); //PER VERSIONI NON -BMS SCOMMENTARE E COMMENTARE IF SOPRA
-
-
-					/*Message msg = MessageFactory.notifyCANDataUpdate(carInfo);
-                    sendAll(msg);*/
+					//
 
 				} catch (Exception e) {
 					dlog.e("virtualBMSUpdateScheduler error", e);
@@ -1073,7 +1062,7 @@ public class ObcService extends Service implements OnTripCallback {
 				restart3GCount = 0;
 				eventRepository.Reboot("No 3G Reboot");
 				dlog.cr("Eseguo reboot schedulato NO3G");
-				SystemControl.doReboot("NO3G");
+				SystemControl.doReboot(SystemControl.RebootCause.NO_3G);
 			} else {
 
 				App.Instance.setDNS();
@@ -1801,7 +1790,7 @@ public class ObcService extends Service implements OnTripCallback {
 				case "REBOOT":
 					dlog.d(ObcService.class.toString() + " executeServerCommands: Received reboot command");
 					obc_io.disableWatchdog();
-					SystemControl.doReboot("Admin Command");
+					SystemControl.doReboot(SystemControl.RebootCause.ADMIN);
 					break;
 				case "FORCE_REBOOT":
 					SystemControl.ForceReboot();
@@ -2377,8 +2366,8 @@ public class ObcService extends Service implements OnTripCallback {
 		public void onReceive(Context c, Intent i) {
 
 			if (App.currentTripInfo == null) {
-				Schedulers.shutdown();
-				Schedulers.start();
+//				Schedulers.shutdown();
+//				Schedulers.start();
 			}
 
 			sendBeacon();
@@ -2407,6 +2396,12 @@ public class ObcService extends Service implements OnTripCallback {
 			localHandler.sendMessageDelayed(MessageFactory.zmqRestart(), 10000);
 			App.canRestartZMQ = true;
 			//}
+
+			//CHECK FOR REBOOT BMS ERROR
+			if (App.currentTripInfo == null && (App.reservation == null || App.reservation.isMaintenance() || App.reservation.isLocal()) && ampError) {
+				SystemControl.doReboot(SystemControl.RebootCause.AMP);
+			}
+
 			if (App.currentTripInfo == null && SystemClock.elapsedRealtime() - App.AppScheduledReboot.getTime() > 24 * 60 * 60 * 1000 && !startedReboot) {
 				startedReboot = true;
 				if (App.reservation != null) {
@@ -2419,7 +2414,7 @@ public class ObcService extends Service implements OnTripCallback {
 				}
 				dlog.d("Excecuting scheduled reboot");
 				eventRepository.Reboot("Scheduled reboot");
-				SystemControl.doReboot("Reboot giornaliero");
+				SystemControl.doReboot(SystemControl.RebootCause.DAILY);
 			}
 			//SystemControl.ResycNTP();
 
@@ -2989,6 +2984,10 @@ public class ObcService extends Service implements OnTripCallback {
 	public int getCurrentValue() {
 
 		return (3500 - obc_io.getPackCurrentValue()) / 10;
+	}
+
+	public boolean getAmpError() {
+		return ampError;
 	}
 
 	public void startRemotePoiCheckCycle() {

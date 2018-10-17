@@ -19,8 +19,28 @@ import javax.inject.Inject;
 
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.helpers.DLog;
+import eu.philcar.csg.OBC.service.ObcService;
 
 public class SystemControl {
+
+	public enum RebootCause {
+		NO_3G(3*60*60*1000),
+		AMP(30*60*1000),
+		ADMIN(2*60*1000),
+		DAILY(24*60*60*1000, "Reboot giornaliero");
+
+		int timeout;
+		String label;
+
+		RebootCause(int timeout, String name) {
+			this.timeout = timeout;
+			this.label = name;
+		}
+		RebootCause(int timeout) {
+			this.timeout = timeout;
+		}
+	}
+
 
 	private static DLog dlog = new DLog(SystemControl.class);
 
@@ -156,7 +176,7 @@ public class SystemControl {
 
 	public static void emfileException(Throwable e) {
 
-		doReboot("EMFILE");
+//		doReboot("EMFILE");
 
 	}
 
@@ -326,6 +346,7 @@ public class SystemControl {
 		}
 	}
 
+	@Deprecated
 	public static void doReboot(String label) {
 		//If there is another reboot in progress not older than 6 hour : ignore
 
@@ -346,15 +367,42 @@ public class SystemControl {
 				DLog.D(SystemControl.class.toString() + " Last Reboot within 6 hour, wait");
 		}
 	}
+	public static void doReboot(RebootCause label) {
+		//check for last reboot time for label
+		if(System.currentTimeMillis() - App.Instance.getRebootTimeForLabel(label.name()) >0) {// se maggiore di 0 l'ultimo reboot non è nel futuro posso procedere nel reboot
+			if(System.currentTimeMillis() - App.Instance.getRebootTimeForLabel(label.name())> label.timeout){
+				dlog.cr("Eseguo reboot per " + label.label);
+				//Events.Reboot("No 3G Reboot");
+				Thread th = new Thread(new Reboot(2*60*1000));
+				th.start();
+			}
+		}else { //sono nel passato procedo aspettando 5 min
+			dlog.cr("Eseguo reboot per " + label.label);
+			Thread th = new Thread(new Reboot(5*60*1000));
+			th.start();
+		}
+
+
+	}
 
 	private static class Reboot implements Runnable {
+		long sleep;
+
+		public Reboot(long sleepMillis) {
+			this.sleep = sleepMillis;
+		}
+
+		public Reboot() {
+			this(50000);
+		}
+
 		@Override
 		public void run() {
 			try {
 
 				DLog.D(SystemControl.class.toString() + " begin reboot");
 
-				Thread.sleep(50000);
+				Thread.sleep(sleep);
 				if (App.currentTripInfo == null || !App.currentTripInfo.isOpen) {
 					//	Events.Reboot();
 					Runtime rt = Runtime.getRuntime();

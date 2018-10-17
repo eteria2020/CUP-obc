@@ -2659,4 +2659,13 @@ public class App extends MultiDexApplication {
 	public void setComponent(ApplicationComponent applicationComponent) {
 		mApplicationComponent = applicationComponent;
 	}
+
+	public long getRebootTimeForLabel(String label){
+		return preferences.getLong(label, 0);
+	}
+	public void setRebootTimeForLabel(String label){
+		Editor editor = preferences.edit();
+		editor.putLong(label, System.currentTimeMillis());
+		editor.apply();
+	}
 }
