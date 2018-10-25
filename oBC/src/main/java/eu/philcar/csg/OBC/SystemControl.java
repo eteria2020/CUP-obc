@@ -14,6 +14,8 @@ import android.os.Message;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -25,7 +27,7 @@ public class SystemControl {
 
 	public enum RebootCause {
 		NO_3G(3*60*60*1000),
-		AMP(30*60*1000),
+		AMP(45*60*1000),
 		ADMIN(2*60*1000),
 		DAILY(24*60*60*1000, "Reboot giornaliero");
 
@@ -40,6 +42,8 @@ public class SystemControl {
 			this.timeout = timeout;
 		}
 	}
+
+	private static Map<RebootCause, Thread> rebootMap = new HashMap<>();
 
 
 	private static DLog dlog = new DLog(SystemControl.class);
@@ -349,6 +353,8 @@ public class SystemControl {
 	@Deprecated
 	public static void doReboot(String label) {
 		//If there is another reboot in progress not older than 6 hour : ignore
+		if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+			return;
 
 		if (System.currentTimeMillis() - rebootInProgress > 21600000) {
 
@@ -367,33 +373,53 @@ public class SystemControl {
 				DLog.D(SystemControl.class.toString() + " Last Reboot within 6 hour, wait");
 		}
 	}
+
 	public static void doReboot(RebootCause label) {
 		//check for last reboot time for label
+		if( BuildConfig.FLAVOR.equalsIgnoreCase("develop") || (rebootMap!= null && rebootMap.containsKey(label)))
+			return;
 		if(System.currentTimeMillis() - App.Instance.getRebootTimeForLabel(label.name()) >0) {// se maggiore di 0 l'ultimo reboot non è nel futuro posso procedere nel reboot
 			if(System.currentTimeMillis() - App.Instance.getRebootTimeForLabel(label.name())> label.timeout){
 				dlog.cr("Eseguo reboot per " + label.label);
 				//Events.Reboot("No 3G Reboot");
-				Thread th = new Thread(new Reboot(2*60*1000));
+				Thread th = new Thread(new Reboot(2*60*1000, label.name()));
 				th.start();
+				try {
+					rebootMap.put(label, th);
+				}catch (Exception e){
+					dlog.e("Exception while saving reboot Thread",e);
+				}
 			}
 		}else { //sono nel passato procedo aspettando 5 min
 			dlog.cr("Eseguo reboot per " + label.label);
-			Thread th = new Thread(new Reboot(5*60*1000));
+			Thread th = new Thread(new Reboot(5*60*1000, label.name()));
 			th.start();
 		}
+	}
 
+	public static void cancelRebootCause(RebootCause cause){
+		try{
+			if(rebootMap != null && rebootMap.containsKey(cause)){
+				rebootMap.get(cause).interrupt();
+				rebootMap.remove(cause);
+			}
 
+		}catch (Exception e) {
+		    dlog.e("cancelRebootCause: Exception", e);
+		}
 	}
 
 	private static class Reboot implements Runnable {
 		long sleep;
+		String label;
 
-		public Reboot(long sleepMillis) {
+		public Reboot(long sleepMillis, String label) {
 			this.sleep = sleepMillis;
+			this.label = label;
 		}
 
 		public Reboot() {
-			this(50000);
+			this(50000, null);
 		}
 
 		@Override
@@ -408,13 +434,14 @@ public class SystemControl {
 					Runtime rt = Runtime.getRuntime();
 					rebootInProgress = System.currentTimeMillis();
 					App.Instance.persistRebootTime();
+					App.Instance.setRebootTimeForLabel(label);
 					rt.exec(new String[]{"/system/xbin/su", "-c", "reboot"});
 				} else {
 
 					DLog.D(SystemControl.class.toString() + " Abort reboot: Trip open!!! ");
 				}
 			} catch (IOException | InterruptedException e) {
-				DLog.E(SystemControl.class.toString() + " Reboot: ", e);
+				dlog.e("Reboot exception: ", e);
 			}
 
 		}

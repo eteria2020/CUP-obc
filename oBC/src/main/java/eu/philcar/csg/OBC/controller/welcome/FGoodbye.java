@@ -343,6 +343,7 @@ public class FGoodbye extends FBase {
 
 		//App.Instance.BannerName.clear();
 
+		dlog.i("Setup isBonusEnabled = " + App.currentTripInfo.isBonusEnabled);
 		if (App.currentTripInfo.isBonusEnabled) {
 			(view.findViewById(R.id.fgodTopTV)).setVisibility(View.GONE);
 			((TextView) view.findViewById(R.id.fgodInstructionTV)).setText(R.string.instruction_close_4);

@@ -675,12 +675,12 @@ public class ObcService extends Service implements OnTripCallback {
 
 					//check amp error
 					if (carInfo.getOutAmp() == 350 || carInfo.getOutAmp() == -1037) {
-						ampError = true;
+						setAmpError(true);
 						if (canAmpAnomalies++ == 3) {
 							eventRepository.CanAnomalies("350 Amp");
 						}
 					} else {
-						ampError = false;
+						setAmpError(false);
 
 						if (carInfo.bmsSOC == 0) {
 							bmsSocError = true;
@@ -717,8 +717,8 @@ public class ObcService extends Service implements OnTripCallback {
 							lowCellNumber = lowCellNumber.concat((i + 1) + " ");
 						}
 					}
-					if (!bmsCellError && !bmsSocError && !ampError) {
-						dlog.i("virtualBMSUpdateScheduler: reset count to 0" + bmsCellError + bmsSocError + ampError);
+					if (!bmsCellError && !bmsSocError && !isAmpError()) {
+						dlog.i("virtualBMSUpdateScheduler: reset count to 0" + bmsCellError + bmsSocError + isAmpError());
 						App.Instance.setBmsCountTo90(0);
 					}
 
@@ -742,13 +742,13 @@ public class ObcService extends Service implements OnTripCallback {
 						carInfo.virtualSOC = ((float) Math.round((100 - 90 * (App.getMax_voltage() - currVolt) / 9.5) * 10) / 10f);//DFD:HNLD
 
 					//SOCR calculation
-					if (ampError || bmsCellError || bmsSocError) {
+					if (isAmpError() || bmsCellError || bmsSocError) {
 
 						if (bmsCellError) {
 
 							if (bmsSocError) {
 								if (App.Instance.incrementBmsCountTo90() < 90) {
-									dlog.i("virtualBMSUpdateScheduler: all fault keep last valid value to 0 is " + App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + ampError);
+									dlog.i("virtualBMSUpdateScheduler: all fault keep last valid value to 0 is " + App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + isAmpError());
 									carInfo.SOCR = carInfo.batteryLevel;
 								} else {
 									obc_io.close();
@@ -759,7 +759,7 @@ public class ObcService extends Service implements OnTripCallback {
 							} else {
 
 								if (App.Instance.incrementBmsCountTo90() < 90) {
-									dlog.i("virtualBMSUpdateScheduler: bms cells fault using bms SOC to 0 is " + App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + ampError);
+									dlog.i("virtualBMSUpdateScheduler: bms cells fault using bms SOC to 0 is " + App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + isAmpError());
 									carInfo.SOCR = Math.min(carInfo.bmsSOC, carInfo.bmsSOC_GPRS);
 								} else {
 									obc_io.close();
@@ -771,7 +771,7 @@ public class ObcService extends Service implements OnTripCallback {
 
 						} else if (bmsSocError) {
 							if (App.Instance.incrementBmsCountTo90() < 90) {
-								dlog.i("virtualBMSUpdateScheduler: bms SOC fault using SOC2 to 0 is " + App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + ampError);
+								dlog.i("virtualBMSUpdateScheduler: bms SOC fault using SOC2 to 0 is " + App.getBmsCountTo90() + " times | error: " + bmsCellError + bmsSocError + isAmpError());
 								carInfo.SOCR = carInfo.virtualSOC;
 							} else {
 								obc_io.close();
@@ -820,11 +820,13 @@ public class ObcService extends Service implements OnTripCallback {
 					}
 
 					//set SOCR valued
-					dlog.i("virtualBMSUpdateScheduler: alarm state: amp: " + ampError + " cell: " + bmsCellError + " soc: " + bmsSocError);
+					dlog.i("virtualBMSUpdateScheduler: alarm state: amp: " + isAmpError() + " cell: " + bmsCellError + " soc: " + bmsSocError);
 
 					carInfo.setBatteryLevel(Math.round(carInfo.SOCR));
 
 					//
+					//CHECK FOR REBOOT BMS ERROR
+
 
 				} catch (Exception e) {
 					dlog.e("virtualBMSUpdateScheduler error", e);
@@ -2397,10 +2399,7 @@ public class ObcService extends Service implements OnTripCallback {
 			App.canRestartZMQ = true;
 			//}
 
-			//CHECK FOR REBOOT BMS ERROR
-			if (App.currentTripInfo == null && (App.reservation == null || App.reservation.isMaintenance() || App.reservation.isLocal()) && ampError) {
-				SystemControl.doReboot(SystemControl.RebootCause.AMP);
-			}
+
 
 			if (App.currentTripInfo == null && SystemClock.elapsedRealtime() - App.AppScheduledReboot.getTime() > 24 * 60 * 60 * 1000 && !startedReboot) {
 				startedReboot = true;
@@ -2986,9 +2985,7 @@ public class ObcService extends Service implements OnTripCallback {
 		return (3500 - obc_io.getPackCurrentValue()) / 10;
 	}
 
-	public boolean getAmpError() {
-		return ampError;
-	}
+
 
 	public void startRemotePoiCheckCycle() {
 
@@ -3015,6 +3012,7 @@ public class ObcService extends Service implements OnTripCallback {
 
 					for (Poi singlePoi : PoiList) {
 						if (App.getLastLocation().distanceTo(singlePoi.getLoc()) <= 90) {
+							dlog.i("tripPoiUpdateScheduler: found poi enabled to BONUS" + singlePoi.toString());
 							sendAll(MessageFactory.notifyTripPoiUpdate(1, singlePoi));
 							return;
 						}
@@ -3057,6 +3055,21 @@ public class ObcService extends Service implements OnTripCallback {
 		sendAll(MessageFactory.apiTripCallback(response));
             /*}
         },15000);*/
+	}
+
+	public boolean isAmpError() {
+		return ampError;
+	}
+
+	public void setAmpError(boolean ampError) {
+		if (App.currentTripInfo == null && (App.reservation == null || App.reservation.isMaintenance() || App.reservation.isLocal()) && ampError) {
+			SystemControl.doReboot(SystemControl.RebootCause.AMP);
+		}
+
+		if(!ampError && isAmpError())
+			SystemControl.cancelRebootCause(SystemControl.RebootCause.AMP);
+
+		this.ampError = ampError;
 	}
 
 	private static class DocumentControl extends AsyncTask<URL, Integer, Long> {

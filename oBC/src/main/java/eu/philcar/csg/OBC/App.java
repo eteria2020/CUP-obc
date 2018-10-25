@@ -32,6 +32,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
+import android.support.annotation.NonNull;
 import android.support.multidex.MultiDexApplication;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
@@ -2355,7 +2356,7 @@ public class App extends MultiDexApplication {
 			foregroundActivity = stato;
 	}
 
-	public static boolean isForegroundActivity(Activity activity) {
+	public static boolean isForegroundActivity(@NonNull Activity activity) {
 
 		return foregroundActivity != null && foregroundActivity.equals(activity.getClass().getName());
 	}
@@ -2666,6 +2667,6 @@ public class App extends MultiDexApplication {
 	public void setRebootTimeForLabel(String label){
 		Editor editor = preferences.edit();
 		editor.putLong(label, System.currentTimeMillis());
-		editor.apply();
+		editor.commit();
 	}
 }

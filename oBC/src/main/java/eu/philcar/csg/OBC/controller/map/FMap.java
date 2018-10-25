@@ -314,7 +314,10 @@ public class FMap extends FBase implements OnClickListener {
 				frame.addView(mapHolder);
 			}
 		}
-
+		if(tts!=null){
+			tts.shutdown();
+			tts = null;
+		}
 		tts = new ProTTS(getActivity());
 
 		//seen=false;
