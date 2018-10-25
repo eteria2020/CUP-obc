@@ -88,7 +88,6 @@
     <string name="error_parsing_missing_latitude">parameter-zemepisná šírka nenájdená</string>
     <string name="error_parsing_missing_geometry">parameter-geometria nenájdená</string>
     <string name="error_parsing_missing_addresse">parameter-adresa nenájdená</string>
-    <string name="app_name">OBC</string>
     <string name="new_damage">Nové poškodenia?</string>
     <string name="text_view_are_there_new_damages">Nové poškodenia?</string>
     <string name="no">Nie</string>
@@ -200,6 +199,5 @@
     <string name="maintenance_status_plug_insert">NEMOŽNÉ UKONĆIŤ NABÍJANIE: konektor je stále zasunutý</string>
     <string name="menu_rent_end_outside_park_area">MIMO ZÓNY - nemožné ukončiť jazdu: si mimo zóny parkovania. Vráť sa do zóny kde je povolené ukončiť jazdu.</string>
     <string name="menu_cancel_action">ZRUŠIŤ Stlač pre zrušenie</string>
-    <string name="app_name">OBC</string>
     <string name="app_name">OBC</string>
 </resources>

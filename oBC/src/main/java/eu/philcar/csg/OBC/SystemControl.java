@@ -429,7 +429,7 @@ public class SystemControl {
 				DLog.D(SystemControl.class.toString() + " begin reboot");
 
 				Thread.sleep(sleep);
-				if (App.currentTripInfo == null || !App.currentTripInfo.isOpen) {
+				if ((App.currentTripInfo == null || !App.currentTripInfo.isOpen) && (App.reservation == null || App.reservation.isMaintenance())) {
 					//	Events.Reboot();
 					Runtime rt = Runtime.getRuntime();
 					rebootInProgress = System.currentTimeMillis();
