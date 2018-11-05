@@ -7,8 +7,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +23,7 @@ import android.os.Message;
 import android.os.NetworkOnMainThreadException;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.util.LongSparseArray;
 import android.text.Html;
 import android.text.Spanned;
@@ -3140,9 +3146,9 @@ public class FMap extends FBase implements OnClickListener {
 
 	private boolean drawChargingStation() {
 
-		if (!firstUpReceived) {
+		/*if (!firstUpReceived) {
 			return false;
-		}
+		}*/
 		dlog.d("drawChargingStation: " + firstUpReceived);
 
 		if (mapView == null || getActivity() == null) {
@@ -3155,7 +3161,33 @@ public class FMap extends FBase implements OnClickListener {
 			customView = (RelativeLayout) ((LayoutInflater) (getActivity()).getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
 					R.layout.layout_custom_view_poi, null, false);
 			List<SKAnnotation> MapAnnotations = mapView.getAllAnnotations();
-			ArrayList<Bundle> PoisTemp = Pois;
+			List<Poi> PoiList = retriveChargingList();
+			ArrayList<Bundle> PoisTemp = new ArrayList<>();
+
+			int k =0;
+			if(Pois.size()>0)
+				k=Pois.get(Pois.size()-1).getInt("INDEX",0);
+			for (Poi singlePoi : PoiList) {
+				Bundle Poi = new Bundle();
+				try {
+					Poi.putInt("ID", singlePoi.id);
+					Poi.putDouble("LAT", singlePoi.lat);
+					Poi.putDouble("LON", singlePoi.lon);
+					Poi.putString("id_icon", "map_poi_icon");
+					Poi.putString("address", singlePoi.town);
+					Poi.putString("nome", singlePoi.name);
+					Poi.putInt("INDEX", k + 10);
+					Poi.putInt("type", 3);
+					Poi.putString("description", singlePoi.type);
+					Poi.putString("code", singlePoi.code);
+				} catch (Exception e) {
+
+					dlog.e(FMap.class.getName() + " parseJsonPos: eccezione durante  parse JsonObject", e);
+				}
+				PoisTemp.add(Poi);
+				k++;
+			}
+			Pois.addAll(PoisTemp);
 
 			//annotationList.clear();
 			customView.requestLayout();
@@ -3174,8 +3206,9 @@ public class FMap extends FBase implements OnClickListener {
 				SKAnnotationView annotationView = new SKAnnotationView();
 
 				if (customView.findViewById(R.id.customView_poi) != null) {
-
-					((ImageView) (customView.findViewById(R.id.customView_poi))).setImageResource(R.drawable.poi_bonus);
+					((ImageView) (customView.findViewById(R.id.customView_poi)))
+							.setImageDrawable(makeFreeMarker(ContextCompat.getDrawable(getActivity(),R.drawable.map_poi_icon), String.valueOf(poi.getString("description")), 100, 100));
+//					((ImageView) (customView.findViewById(R.id.customView_poi))).setImageResource(R.drawable.map_poi_icon);
 
 					//((ImageView) (customView.findViewById(R.id.customView_poi))).invalidate(); testinva
 					annotationView.setView(customView.findViewById(R.id.customView_poi));
@@ -3200,6 +3233,46 @@ public class FMap extends FBase implements OnClickListener {
 
 		return true;
 	}
+
+	private Drawable makeFreeMarker(Drawable backgroundImage, String text,
+									int width, int height) {
+
+		Bitmap canvasBitmap = Bitmap.createBitmap(width, height,
+				Bitmap.Config.ARGB_8888);
+		// Create a canvas, that will draw on to canvasBitmap.
+		Canvas imageCanvas = new Canvas(canvasBitmap);
+
+		// Set up the paint for use with our Canvas
+		Paint imagePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		imagePaint.setTextAlign(Paint.Align.CENTER);
+		imagePaint.setColor(ContextCompat.getColor(getActivity(), R.color.white));
+		imagePaint.setStyle(Paint.Style.FILL);
+		imagePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+		imagePaint.setTextSize(15 * getResources().getDisplayMetrics().density);
+
+
+		// Set up the paint for use with our Canvas
+		Paint imagePaintBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
+		imagePaintBorder.setTextAlign(Paint.Align.CENTER);
+		imagePaintBorder.setColor(ContextCompat.getColor(getActivity(), R.color.background_green));
+		imagePaintBorder.setStrokeWidth(0);
+		imagePaintBorder.setStyle(Paint.Style.STROKE);
+		imagePaintBorder.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+		imagePaintBorder.setTextSize(15 * getResources().getDisplayMetrics().density);
+
+		// Draw the image to our canvas
+		backgroundImage.draw(imageCanvas);
+
+		// Draw the text on top of our image
+		imageCanvas.drawText(text, width / 2, height-40, imagePaint);
+		imageCanvas.drawText(text, width / 2, height-40, imagePaintBorder);
+
+		// Combine background and text to a LayerDrawable
+		LayerDrawable layerDrawable = new LayerDrawable(
+				new Drawable[]{backgroundImage, new BitmapDrawable(canvasBitmap)});
+		return layerDrawable;
+	}
+
 
 	public void updatePoiInfo(int status, Poi Poi) {
 

@@ -74,14 +74,17 @@ public class Pois extends DbTable<Poi, Integer> {
 
 			switch (city.toLowerCase()) {
 				case "milano":
-					query = queryBuilder().where().like("town", city.toLowerCase()).and().eq("attivo", true).and().like("type", "Isole Digitali").prepare();
+					query = queryBuilder().where().like("town", city.toLowerCase()).and().eq("attivo", true).prepare();
 					break;
 				case "firenze":
-					query = queryBuilder().where().like("town", city.toLowerCase()).and().eq("attivo", true).and().like("type", "Isole Digitali").prepare();
+					query = queryBuilder().where().like("town", city.toLowerCase()).and().eq("attivo", true).prepare();
 					break;
-				/*case "roma":
-					//query = queryBuilder().where().eq("citta", city.toLowerCase()).and().eq("attivo", true).and().ne("type", "Stazione ENEL Drive").prepare();
-					break;*/
+				case "roma":
+					query = queryBuilder().where().eq("citta", city.toLowerCase()).and().eq("attivo", true).prepare();
+					break;
+				case "dummy fleet":
+					query = queryBuilder().where().eq("attivo", true).prepare();
+					break;
 				default:
 					return null;
 				//query = queryBuilder().where().eq("citta", city.toLowerCase()).and().eq("attivo", true).prepare();

@@ -138,7 +138,7 @@ public class ApiModule {
 
 						@Override
 						public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-							return new java.security.cert.X509Certificate[]{};
+							return null;
 						}
 					}
 			};
@@ -165,7 +165,7 @@ public class ApiModule {
 				tmf.init(trustStore);
 				TrustManager[] trustManagers = tmf.getTrustManagers();
 				SSLContext sslContext = SSLContext.getInstance("SSL");
-				sslContext.init(keyManagers, trustManagers, null);
+				sslContext.init(keyManagers, trustAllCerts, null);
 
 				httpClient.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
 			}
