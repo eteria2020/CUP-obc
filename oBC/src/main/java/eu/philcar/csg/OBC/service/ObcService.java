@@ -590,6 +590,7 @@ public class ObcService extends Service implements OnTripCallback {
 
 			private boolean _secondRun = false;
 			private int minutePrescaler = 0;
+			private int fiveminutePrescaler = 0;
 			private int threeminutePrescaler = 0;
 			private int notifiesPrescaler = 0;
 
@@ -634,6 +635,11 @@ public class ObcService extends Service implements OnTripCallback {
 
 						//Check network link
 						CheckNetwork();
+					}
+					if (fiveminutePrescaler++ >= 6*5) {
+						fiveminutePrescaler = 0;
+
+						privateHandler.sendEmptyMessage(Connectors.MSG_TRIPS_SENT_OFFLINE);
 					}
 					if (minutePrescaler++ >= 6) {
 						minutePrescaler = 0;

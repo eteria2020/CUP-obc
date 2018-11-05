@@ -2320,7 +2320,7 @@ public class FMap extends FBase implements OnClickListener {
 				firstLaunch = false;
 				try {
 					drawPOIS();
-					//drawChargingStation();
+					drawChargingStation();
 					drawPolyline();
 				} catch (OutOfMemoryError e) {
 					dlog.e("drawPois: out of memory ", e);
