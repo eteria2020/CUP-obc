@@ -44,10 +44,13 @@ android {
             resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
             resValue "string", "endpointSharengoZMQ", "tcp://core.sharengo.it:8001"
+            resValue "string", "maxLongitudeMargin", "18.53"
+            resValue "string", "maxLatitudeMargin",  "47.10"
+            resValue "string", "minLongitudeMargin", "6.63"
+            resValue "string", "minLatitudeMargin",  "36.64"
             minifyEnabled false
             debuggable false
             signingConfig signingConfigs.vmtest
-
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             multiDexKeepProguard file('multidex-proguard-rules.pro')
         }
@@ -57,9 +60,12 @@ android {
             resValue "string", "endpointSharengoBeacon", "http://api.localhost.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://api.localhost.it/api/"
             resValue "string", "endpointSharengoZMQ", "tcp://api.localhost.it:8001"
+            resValue "string", "maxLongitudeMargin", "18.53"
+            resValue "string", "maxLatitudeMargin",  "47.10"
+            resValue "string", "minLongitudeMargin", "6.63"
+            resValue "string", "minLatitudeMargin",  "36.64"
             signingConfig signingConfigs.vmtest
             debuggable true
-
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             multiDexKeepProguard file('multidex-proguard-rules.pro')
         }
@@ -69,9 +75,12 @@ android {
             resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
             resValue "string", "endpointSharengoZMQ", "tcp://core.sharengo.it:8001"
+            resValue "string", "maxLongitudeMargin", "18.53"
+            resValue "string", "maxLatitudeMargin",  "47.10"
+            resValue "string", "minLongitudeMargin", "6.63"
+            resValue "string", "minLatitudeMargin",  "36.64"
             signingConfig signingConfigs.vmtest
             debuggable true
-
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             multiDexKeepProguard file('multidex-proguard-rules.pro')
         }
@@ -81,9 +90,28 @@ android {
             resValue "string", "endpointSharengoBeacon", "http://corestage.sharengo.it:7600/"
             resValue "string", "endpointSharengoPhp", "http://corestage.sharengo.it/api/"
             resValue "string", "endpointSharengoZMQ", "tcp://corestage.sharengo.it:8001"
+            resValue "string", "maxLongitudeMargin", "18.53"
+            resValue "string", "maxLatitudeMargin",  "47.10"
+            resValue "string", "minLongitudeMargin", "6.63"
+            resValue "string", "minLatitudeMargin",  "36.64"
             signingConfig signingConfigs.vmtest
             debuggable true
-
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+            multiDexKeepProguard file('multidex-proguard-rules.pro')
+        }
+        slovakia {
+            resValue "string", "app_data_path", "/csg/"
+            resValue "string", "endpointSharengo", "https://api.sharengo.sk:8202/"
+            resValue "string", "endpointSharengoBeacon", "http://api.sharengo.sk:8203/"
+            resValue "string", "endpointSharengoPhp", "http://core.sharengo.sk/api/"
+            resValue "string", "endpointSharengoZMQ", "tcp://api.sharengo.sk:8204"
+            resValue "string", "maxLongitudeMargin", "23.00"
+            resValue "string", "maxLatitudeMargin",  "49.80"
+            resValue "string", "minLongitudeMargin", "16.22"
+            resValue "string", "minLatitudeMargin",  "47.45"
+            minifyEnabled false
+            debuggable false
+            signingConfig signingConfigs.vmtest
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             multiDexKeepProguard file('multidex-proguard-rules.pro')
         }

@@ -88,7 +88,7 @@ public class CarInfo {
 	public Boolean Charging = false;
 	public float currVoltage = App.max_voltage;
 
-	private boolean ready = false;
+	private static boolean ready = false;
 	private boolean brakes = false;
 	private boolean chargingPlug = false;
 	public double currentAmpere = App.currentAmp;
@@ -822,6 +822,7 @@ public class CarInfo {
 
 			jw.name("GPS").value(App.UseExternalGPS ? "EXT" : "INT");
 			jw.name("SOC").value(batteryLevel);
+			jw.name("km").value(App.km);
 			//jw.name("batterySafety").value(batterySafety);
 			jw.name("cputemp").value(App.getCpuTemp());
 
@@ -1174,7 +1175,7 @@ public class CarInfo {
 		beacon.setPPStatus(this.chargingPlug);
 	}
 
-	public boolean isReady() {
+	public static boolean isReady() {
 		return ready;
 	}
 

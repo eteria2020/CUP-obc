@@ -241,6 +241,8 @@ public class TripInfo {
 		// Getting DB
 		DbManager dbm = App.Instance.dbManager;
 		//HttpConnector http;
+		if(BuildConfig.BUILD_TYPE.equalsIgnoreCase("slovakia") && BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+			code = "RF000001";
 
 		Customers customers = dbm.getClientiDao();
 		Customer customer = customers.getClienteByCardCode(code);

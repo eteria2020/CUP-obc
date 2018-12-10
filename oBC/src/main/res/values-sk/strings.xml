@@ -200,4 +200,8 @@
     <string name="menu_rent_end_outside_park_area">MIMO ZÓNY - nemožné ukončiť jazdu: si mimo zóny parkovania. Vráť sa do zóny kde je povolené ukončiť jazdu.</string>
     <string name="menu_cancel_action">ZRUŠIŤ Stlač pre zrušenie</string>
     <string name="app_name">OBC</string>
+    <string name="navigation_distance">Distanza</string>
+    <string name="navigation_time">Arrivo in</string>
+    <string name="nafigation_eta">Ora di arrivo</string>
+    <string name="menu_damages">DANNI</string>
 </resources>

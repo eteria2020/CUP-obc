@@ -20,7 +20,7 @@ public class GPSController {
 
 	private final static int MSG_HAS_STOPPED = 1;
 
-	private final long MILLI_STOP_MOVING = 120 * 1000;
+	private final static long MILLI_STOP_MOVING = 60 * 1000;
 
 	private final Context mContext;
 
@@ -38,7 +38,7 @@ public class GPSController {
 	}
 
 	public void onNewLocation(@NonNull Location newLocation) {
-		if (lastLocation.distanceTo(newLocation) > 100) {
+		if (lastLocation.distanceTo(newLocation) > 70) {
 			updateLocation(newLocation);
 		}
 	}

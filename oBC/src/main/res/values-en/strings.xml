@@ -9,7 +9,7 @@
     <string name="are_you_drunk">Did you drink alcoholic drinks?</string>
 
     <string name="back_to_navigation">Back to navigation</string>
-    <string name="button_call">Apply for support call</string>
+    <string name="button_call">Support call</string>
     <string name="button_break">PARK or\nEND RENT</string>
     <string name="button_close">Close</string>
     <string name="button_navigator">SAT NAV</string>
@@ -18,16 +18,16 @@
     <string name="button_recharge">RECHARGE POINTS</string>
     <string name="button_search">FIND</string>
     <string name="button_home">MENU</string>
-    <string name="button_park">PARK RENT</string>
+    <string name="button_park">PAUSE RENT</string>
     <string name="button_end">END RENT</string>
 
     <string name="call_book">Book call or insert a new number</string>
     <string name="call_dealt_old">Call to customer assistance forwarded</string>
-    <string name="call_dealt">Request forwarded to the customer assistance, you\'ll be called on the entered number</string>
+    <string name="call_dealt">Support call sent to customer service, you\'ll be called back</string>
     <string name="car_cleanliness_inside"><b>Inside</b> Cleanliness</string>
     <string name="car_cleanliness_outside"><b>Outside</b> Cleanliness</string>
     <string name="car_cleanliness_state">Car Cleanliness</string>
-    <string name="change">Change number</string>
+    <string name="change">New number</string>
     <string name="checking_pin">Checking PIN</string>
     <string name="city">City</string>
     <string name="content_description">Easter Egg</string>
@@ -76,9 +76,9 @@
     <string name="instruction_start_1">Check that the big red button between the seats is lifted</string>
     <string name="instruction_start_2">Turn the key clockwise</string>
     <string name="instruction_start_3">Wait for the Ready sign on the instrument panel</string>
-    <string name="instruction_start_4">Press the D or R buttons</string>
+    <string name="instruction_start_4">Press the D or R button</string>
 
-    <string name="instruction_damages">Do you see damages on car?</string>
+    <string name="instruction_damages">Are there any damages?</string>
     <string name="instruction_dirty">Is it dirty?</string>
 
     <string name="priority_lanes_title">To start using the car</string>
@@ -109,18 +109,18 @@
 
     <string name="loading">Loading</string>
 
-    <string name="push_to_cancel">Push to\ncancel</string>
+    <string name="push_to_cancel">Tap to\ncancel</string>
 
-    <string name="goodbye_instructions">You have closed the trip, you can leave now. The doors will automatically close in: </string>
+    <string name="goodbye_instructions">You can exit the car. The doors will automatically close in the seconds shown below</string>
 
 
     <string name="menu_rent_end">End rent</string>
     <string name="menu_rent_end_off">End rent (not available)</string>
-    <string name="menu_rent_end_outside_park_area">End rent - Not available : you are outside the parking area. Go back inside authorized area before closing rent.</string>
+    <string name="menu_rent_end_outside_park_area">End rent - Not available : you are outside the parking area. Go back inside authorized area before ending rent.</string>
     <string name="menu_rent_end_shutdown_engine">End rent (switch off engine first)</string>
 
     <string name="inside_area">Inside</string>
-    <string name="outside_area">Outside</string>
+    <string name="outside_area">Out of area</string>
 
     <string name="menu_refuel">Refuel</string>
     <string name="menu_refuel_off">Refuel (not available)</string>
@@ -128,9 +128,9 @@
     <string name="menu_park_mode_started">To resume rent please use command OPEN DOORS on your phone or your card to get back in the car</string>
     <string name="menu_park_mode_resume">Resume rent</string>
     <string name="menu_park_mode_resume_shutdown_engine">Resume rent (switch off engine first)</string>
-    <string name="menu_park_mode_suspend">Suspend rent</string>
+    <string name="menu_park_mode_suspend">Pause Rent</string>
     <string name="menu_park_mode_suspend_off">Suspend rent (not available)</string>
-    <string name="menu_park_mode_suspend_instructions">You\'re parked. Now you can quit. Doors will close automatically at the time indicated on the right. After the break, please use command OPEN DOORS on your phone or your card to get back in the car</string>
+    <string name="menu_park_mode_suspend_instructions">Your rent session is now paused. You can exit the car, the doors will automatically close in the seconds shown on the right. To open the doors and start driving again, please either use the "OPEN DOORS" command on the Application or use your Share\'ngo card.</string>
     <string name="menu_park_mode_suspend_shutdown_engine">Suspend rent (switch off engine first)</string>
     <string name="milan">Milano</string>
     <string name="minutes_saved">Minutes saved&#58;</string>
@@ -161,7 +161,7 @@
     <string name="navigator_2d3d">2D//3D</string>
     <string name="navigator_zoom">Zoom</string>
     <string name="navigator_go">GO</string>
-    <string name="hint_navigator">Enter a few characters and click the button with the magnifying glass to choose the destination</string>
+    <string name="hint_navigator">Enter a few characters and click the search button to choose the destination</string>
 
 
     <string name="poi_bonus_title">CHARGING STATION</string>
@@ -195,9 +195,9 @@
     <string name="pin_wrong">Wrong <b>PIN</b>, try again</string>
     <string name="points_of_interest">Points of interest</string>
     <string name="pin_FAQ_Title">Where can I find the PIN?</string>
-    <string name="pin_FAQ_1">After you logged on sharengo.it you can find the PIN on the left column.</string>
-    <string name="pin_FAQ_2">After you logged on mobile.sharengo.it you just have to click on your name to find your PIN.</string>
-    <string name="pin_FAQ_3">After you logged on the App click on User Profile and scroll down until the PIN section.</string>
+    <string name="pin_FAQ_1">After logging in sharengo.it you will find the PIN section in the left column menu</string>
+    <string name="pin_FAQ_2">After logging in mobile.sharengo.it click on your name in the bottom left to find your PIN</string>
+    <string name="pin_FAQ_3">After logging in the Application you will find the PIN section in the right column menu </string>
 
     <string name="refuel_title">Recharge car</string>
     <string name="refueling_done">Refueling done!\nProceed to the next page to continue your trip</string>
@@ -211,12 +211,12 @@
     <string name="sos">SOS</string>
     <string name="plate">PLATE:</string>
 
-    <string name="text_view_are_there_new_damages">The car has new damages&#63;</string>
-    <string name="text_view_call_message">Request the call or enter a new number</string>
+    <string name="text_view_are_there_new_damages">Are there any new damages&#63;</string>
+    <string name="text_view_call_message">Click on "support call" to be called back or key in a new number </string>
     <string name="thank_for_choosing">Thank you for choosing</string>
     <string name="text_view_set_a_choice">Choose an option</string>
 
-    <string name="alert_20km">Attention please, the autonomy of the car, as you\'re using, it may now be less than 20 km away. Please take care of it.</string>
+    <string name="alert_20km">Please consider that your car’s distance to empty, which depends on your driving style, may now be less than 20 Km. Please keep that in mind.</string>
     <string name="alert_5km">Attention please,the autonomy of the car, as we are using, is about 5 km. We invite you to quit the trip to avoid penalties.</string>
     <string name="alert_warning_title">ATTENTION</string>
     <string name="alert_bonus">From this moment, if you will leave the car near a charging station shown on the map, you\'ll get five bonus minutes on your profile.</string>
@@ -233,24 +233,27 @@
     <string name="alert_bonus_park">From this moment you can earn 5 minutes bonus by leaving this car to be recharged in one of the car parks shown on the map</string>
     <string name="music_hint">Connect the AUX cable to listen to music from your phone</string>
     <string name="pin_business">You\'ve used the business pin!</string>
-    <string name="menu_rent_end_key_on">Please turn off the dashboard before ending the rent</string>
-    <string name="menu_park_mode_suspend_key_on">Please turn off the dashboard before pausing the rent</string>
+    <string name="menu_rent_end_key_on">Please turn off the car before ending the rent</string>
+    <string name="menu_park_mode_suspend_key_on">PPlease turn off the car before pausing the rent</string>
     <string name="button_video_tutorial">TUTORIAL</string>
-    <string name="button_assicurazione">ASSICURAZIONE</string>
-    <string name="button_libretto">LIBRETTO</string>
+    <string name="button_assicurazione">INSURANCE</string>
+    <string name="button_libretto">REGISTRATIONCARD</string>
     <!--<string name="endpointSharengo">https://api.sharengo.it:8123/</string>
     <string name="endpointSharengoBeacon">http://core.sharengo.it:7600/</string>
     <string name="endpointSharengoPhp">http://core.sharengo.it/api/</string>-->
-    <string name="maintenance_instruction"><![CDATA[<b> STACCAIL CAVO DI RICARICA: <b> per iniziare la corsa stacca il cavo di carica collegato alla presa e <u> mettilo nel baule dell\'auto <u> (il pulsante di apertura del baule è posto fra i sedili)]]></string>
-    <string name="maintenance_status_done">TERMINA RICARICA: Clicca su NEXT per continuare col noleggio</string>
-    <string name="maintenance_status_plug_insert">IMPOSSIBILE TERMINARE RICARCA: spina ancora inserita</string>
+    <string name="maintenance_instruction"><b>Unplug the charging cable -</b>to start driving unplug the charging cable and store it in the car trunk (trunk opening button is between the seats)</string>
+    <string name="maintenance_status_done">END CHARGING: Click on end charge to start driving</string>
+    <string name="maintenance_status_plug_insert">IMPOSSIBLE TO END CHARGING: cable still plugged in</string>
     <string name="maintenance_status_wait">Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.</string>
-    <string name="number_plus">+</string>
     <string name="call_error">Error while forwarding help request, try calling %s</string>
     <string name="menu_cancel_action">Cancel</string>
     <string name="menu_rent_end_instruction">The engine will stop in the time indicated, if you want to cancel click below</string>
     <string name="alert_area_box">Attention please, the vehicle is out of the operative area, it not possible close the trip</string>
     <string name="charging_alert_text">Prima di partire ricordati di mettere il cavo di carica nel baule</string>
+    <string name="navigation_distance">Distance</string>
+    <string name="navigation_time">Arriving in</string>
+    <string name="nafigation_eta">ETA</string>
+    <string name="menu_damages">DAMAGES</string>
 
 
 </resources>

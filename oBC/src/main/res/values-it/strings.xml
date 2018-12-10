@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="navigation_distance">Distanza</string>
+    <string name="navigation_time">Arrivo in</string>
+    <string name="nafigation_eta">Ora di arrivo</string>
+    <string name="menu_damages">DANNI</string>
+</resources>

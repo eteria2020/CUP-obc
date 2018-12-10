@@ -254,4 +254,8 @@
     <string name="menu_rent_end_instruction">Il motore si spegnerà nel tempo indicato, per annullare clicca quì sotto</string>
     <string name="alert_area_box">Veicolo fuori dall\'area  di servizio, rientra nell\'area per chiudere la corsa</string>
     <string name="charging_alert_text">Prima di partire ricordati di mettere il cavo di carica nel baule</string>
+    <string name="navigation_distance">Distanza</string>
+    <string name="navigation_time">Arrivo in</string>
+    <string name="nafigation_eta">Ora di arrivo</string>
+    <string name="menu_damages">DANNI</string>
 </resources>

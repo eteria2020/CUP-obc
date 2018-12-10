@@ -96,6 +96,9 @@ public class AGoodbye extends ABase {
 			serviceConnector.disconnect();
 		}
 		serviceConnector = null;
+		if(serviceHandler!=null){
+			serviceHandler.removeCallbacksAndMessages(null);
+		}
 		serviceHandler = null;
 		App.isClosing = false;
 	}

@@ -60,6 +60,7 @@ import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.map.FPdfViewer;
 import eu.philcar.csg.OBC.controller.map.FRadio;
@@ -860,6 +861,7 @@ public class ObcService extends Service implements OnTripCallback {
 
 		gpsCheckScheduler.scheduleAtFixedRate(new Runnable() {
 
+			final Context context = ObcService.this;
 			int intCount = 0, extCount = 0;
 			Location lastIntGpsLocation = new Location(LocationManager.GPS_PROVIDER);
 			Location lastExtGpsLocation = new Location(LocationManager.GPS_PROVIDER);
@@ -871,8 +873,14 @@ public class ObcService extends Service implements OnTripCallback {
 
 					if (!App.UseExternalGPS) {
 
-						if ((carInfo.intGpsLocation.getLongitude() >= 18.53 || carInfo.intGpsLocation.getLongitude() <= 6.63 || carInfo.intGpsLocation.getLatitude() >= 47.10 || carInfo.intGpsLocation.getLatitude() <= 36.64) ||
-								(carInfo.intGpsLocation.getLongitude() == 0 || carInfo.intGpsLocation.getLongitude() == 0 || carInfo.intGpsLocation.getLatitude() == 0 || carInfo.intGpsLocation.getLatitude() == 0)) {
+						if ((carInfo.intGpsLocation.getLongitude() >=     Float.parseFloat(context.getResources().getString(R.string.maxLongitudeMargin)) ||
+								carInfo.intGpsLocation.getLongitude() <=  Float.parseFloat(context.getResources().getString(R.string.minLongitudeMargin)) ||
+								carInfo.intGpsLocation.getLatitude() >=   Float.parseFloat(context.getResources().getString(R.string.maxLatitudeMargin)) ||
+								carInfo.intGpsLocation.getLatitude() <=   Float.parseFloat(context.getResources().getString(R.string.minLatitudeMargin)))||
+								(carInfo.intGpsLocation.getLongitude() == 0 ||
+								carInfo.intGpsLocation.getLongitude() == 0 ||
+								carInfo.intGpsLocation.getLatitude() == 0 ||
+								carInfo.intGpsLocation.getLatitude() == 0)) {
 							App.Instance.setUseExternalGps(true);
 							dlog.d("GpsCheckScheduler: setUseExternalGps(true) IntGpsLocation out from Italy or location 0.0");
 							sendBeacon();//update remoto per aggiornare int/ext
@@ -896,8 +904,14 @@ public class ObcService extends Service implements OnTripCallback {
 						}
 					} else {
 
-						if ((carInfo.extGpsLocation.getLongitude() >= 18.53 || carInfo.extGpsLocation.getLongitude() <= 6.63 || carInfo.extGpsLocation.getLatitude() >= 47.10 || carInfo.extGpsLocation.getLatitude() <= 36.64) ||
-								(carInfo.extGpsLocation.getLatitude() == 0 || carInfo.extGpsLocation.getLatitude() == 0 || carInfo.extGpsLocation.getLongitude() == 0 || carInfo.extGpsLocation.getLongitude() == 0)) {
+						if ((carInfo.extGpsLocation.getLongitude() >=    Float.parseFloat(context.getResources().getString(R.string.maxLongitudeMargin)) ||
+								carInfo.extGpsLocation.getLongitude() <= Float.parseFloat(context.getResources().getString(R.string.minLongitudeMargin)) ||
+								carInfo.extGpsLocation.getLatitude() >=  Float.parseFloat(context.getResources().getString(R.string.maxLatitudeMargin))  ||
+								carInfo.extGpsLocation.getLatitude() <=  Float.parseFloat(context.getResources().getString(R.string.minLatitudeMargin))) ||
+								(carInfo.extGpsLocation.getLatitude() == 0 ||
+								carInfo.extGpsLocation.getLatitude() == 0 ||
+								carInfo.extGpsLocation.getLongitude() == 0 ||
+								carInfo.extGpsLocation.getLongitude() == 0)) {
 							App.Instance.setUseExternalGps(false);
 							dlog.d("GpsCheckScheduler: setUseExternalGps(false) ExtGpsLocation out from Italy or location 0.0");
 							sendBeacon();
@@ -2173,14 +2187,14 @@ public class ObcService extends Service implements OnTripCallback {
 						stopRequestCloseTrip();
 						return;
 					}
-					boolean keyOff = !CarInfo.isKeyOn();
+					boolean readyOff = !CarInfo.isReady();
 					boolean isMoving = GPSController.isMoving();
-					if (!isMoving && (!App.checkKeyOff || keyOff)) {//closeTrip
+					if (!isMoving && readyOff) {//closeTrip
 						App.setIsCloseable(true);
 						localHandler.sendMessage(MessageFactory.scheduleSelfCloseTrip(1));
 						dlog.d("closeTripScheduler: sheduled close trip");
 					} else {
-						dlog.d("closeTripScheduler: unable to close trip is Moving : " + isMoving + "keyOff: " + keyOff);
+						dlog.d("closeTripScheduler: unable to close trip is Moving : " + isMoving + "readyOff: " + readyOff);
 					}
 
 				} catch (Exception e) {
@@ -2191,7 +2205,7 @@ public class ObcService extends Service implements OnTripCallback {
 
 			}
 
-		}, 100, 20, TimeUnit.SECONDS);
+		}, 2, 10, TimeUnit.SECONDS);
 
 		App.currentTripInfo.remoteCloseRequested = true;
 		dlog.d("closeTripScheduler: Started startRequestCloseTrip");
