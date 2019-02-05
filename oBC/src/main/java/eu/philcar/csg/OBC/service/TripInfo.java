@@ -67,7 +67,7 @@ import io.reactivex.schedulers.Schedulers;
  * This Class represents all information of a Trip
  *
  * @author massimo.belluz@bulweria.com
- */
+ *///TODO implement Singleton to handle all information about the currentTrip
 public class TripInfo {
 
 	public enum CloseType {

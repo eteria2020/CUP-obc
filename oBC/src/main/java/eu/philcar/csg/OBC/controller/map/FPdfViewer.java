@@ -42,6 +42,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -260,7 +264,21 @@ public class FPdfViewer extends FBase {
 			});
 
 			if (listOfFiles.length > 0) {
-				return listOfFiles;
+				ArrayList<File> res = new ArrayList(Arrays.asList(listOfFiles));
+				Collections.sort(res, new Comparator<File>() {
+					@Override
+					public int compare(File first, File second) {
+						if (first == null || second == null)
+							return 0;
+						String firstName = first.getName().replaceAll("[^?0-9]+", "");
+						String secondName = second.getName().replaceAll("[^?0-9]+", "");
+
+						int x = Integer.parseInt(firstName);
+						int y = Integer.parseInt(secondName);
+						return y-x;
+					}
+				});
+				return res.toArray(listOfFiles);
 
 			}
 		} else {

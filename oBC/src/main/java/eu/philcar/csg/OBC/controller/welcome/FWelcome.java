@@ -76,6 +76,8 @@ public class FWelcome extends FBase {
 	protected ImageButton fwelFrenchIB;
 	@BindView(R.id.fwelchineseIB)
 	protected ImageButton fwelChineseIB;
+	@BindView(R.id.fwelSlovakiaIB)
+	protected ImageButton fwelSlovakiaIB;
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm", Locale.getDefault());
 
 	private int logoTaps = 0;
@@ -100,7 +102,7 @@ public class FWelcome extends FBase {
 
 		unbinder = ButterKnife.bind(this, view);
 
-		dlog.d("OnCreareView FWelcome");
+		dlog.d("OnCreateView FWelcome");
 
 		view.findViewById(R.id.fwelItalianIB).setOnClickListener(new OnClickListener() {
 			@Override
@@ -205,6 +207,7 @@ public class FWelcome extends FBase {
 		} else {
 			fwcm_whole_RL.setBackgroundColor(getResources().getColor(R.color.background_green));
 		}
+
 
 		return view;
 	}

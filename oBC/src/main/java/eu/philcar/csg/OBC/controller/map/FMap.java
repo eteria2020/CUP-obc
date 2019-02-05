@@ -640,8 +640,10 @@ public class FMap extends FBase implements OnClickListener {
 //		}
 		updateBanner("CAR");
 
-		if (App.fuel_level != 0)
+		if (App.fuel_level != 0) {
 			tvRange.setText(App.fuel_level + " Km");
+			fmapRange.setVisibility(View.VISIBLE);
+		}
 		else
 			fmapRange.setVisibility(View.INVISIBLE);
 

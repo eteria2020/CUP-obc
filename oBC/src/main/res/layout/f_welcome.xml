@@ -118,6 +118,18 @@
 			android:background="@null"
 			android:visibility="gone" />
 
+		<ImageButton
+			android:id="@+id/fwelSlovakiaIB"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginLeft="16dp"
+			android:src="@drawable/ic_flag_of_slovakia"
+			android:background="@drawable/sel_button_white"
+
+			android:contentDescription="@string/content_description"
+			android:visibility="gone" />
+
 	</LinearLayout>
     <LinearLayout android:id="@+id/fwelBannerLL" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/fwel_logo_FL" android:layout_centerHorizontal="true" android:layout_marginTop="80dp" android:orientation="vertical"
 		android:visibility="gone">

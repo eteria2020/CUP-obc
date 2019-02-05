@@ -702,8 +702,8 @@ public class ObcService extends Service implements OnTripCallback {
 
 					//type of battery
 
-					carInfo.minVoltage = carInfo.cellVoltageValue[22] == 0 ? 2.8f : 2.5f;
-					carInfo.batteryType = carInfo.cellVoltageValue[22] == 0 ? "DFD" : "HNLD";
+					carInfo.minVoltage = carInfo.cellVoltageValue.length>20 ? 2.8f : 2.5f;
+					carInfo.batteryType = carInfo.cellVoltageValue.length>20 ? "DFD" : "HNLD";
 					//}
 					App.Instance.setMaxVoltage(carInfo.batteryType.equalsIgnoreCase("HNLD") ? 82 : 83);
 
@@ -2168,7 +2168,7 @@ public class ObcService extends Service implements OnTripCallback {
 		obc_io.setSecondaryGPS(10000);
 	}
 
-	void startRequestCloseTrip(String card_code) {
+	void startRequestCloseTrip(final String card_code) {
 
 		stopRequestCloseTrip();
 
@@ -2176,25 +2176,33 @@ public class ObcService extends Service implements OnTripCallback {
 
 		closeTripScheduler = Executors.newSingleThreadScheduledExecutor();
 
-		closeTripScheduler.scheduleAtFixedRate(new Runnable() {
+
+		final ScheduledFuture future = closeTripScheduler.scheduleAtFixedRate(new Runnable() {
 			/**
 			 * usato per chiudere la corsa appena la machcina è ferma
 			 */
+			int closeTries = 0;
+			int globalTries = 0;
 			@Override
 			public void run() {
 				try {
-					if (App.currentTripInfo == null || !App.currentTripInfo.isOpen) {
+					if (App.currentTripInfo == null || !App.currentTripInfo.isOpen || globalTries++>12) { //ci provo
 						stopRequestCloseTrip();
 						return;
 					}
-					boolean readyOff = !CarInfo.isReady();
-					boolean isMoving = GPSController.isMoving();
-					if (!isMoving && readyOff) {//closeTrip
-						App.setIsCloseable(true);
-						localHandler.sendMessage(MessageFactory.scheduleSelfCloseTrip(1));
-						dlog.d("closeTripScheduler: sheduled close trip");
+					boolean keyOff = !CarInfo.isKeyOn();
+					boolean isStop = !GPSController.isMoving();
+					if (isStop && keyOff) {//closeTrip
+						if(App.checkIsInsideParkingArea()) {
+							App.setIsCloseable(true);
+							notifyCard(card_code, "CLOSE", false, true);
+							dlog.d("closeTripScheduler: sheduled close trip");
+						}
+						if(closeTries++>3){
+							stopRequestCloseTrip();
+						}
 					} else {
-						dlog.d("closeTripScheduler: unable to close trip is Moving : " + isMoving + "readyOff: " + readyOff);
+						dlog.d("closeTripScheduler: unable to close trip is Stop : " + isStop + " keyOff: " + keyOff);
 					}
 
 				} catch (Exception e) {
@@ -2991,6 +2999,11 @@ public class ObcService extends Service implements OnTripCallback {
 		for (int i = 0; i < 24; i++) {
 			values[i] = obc_io.getCellVoltageValue(i);
 		}
+		if(values[22]==0) {
+			float[] tmp = new float[20];
+			System.arraycopy(values,0,tmp,0,20);
+			values = tmp;
+		}
 
 		return values;
 	}
@@ -3097,6 +3110,9 @@ public class ObcService extends Service implements OnTripCallback {
 		@Override
 		protected Long doInBackground(URL... urls) {
 
+			FPdfViewer P2 = new FPdfViewer().newInstance("LIBRETTO", false, true);
+			P2.control("ASSICURAZIONE");
+			P2.control("LIBRETTO");
 			return null;
 		}
 
@@ -3104,9 +3120,6 @@ public class ObcService extends Service implements OnTripCallback {
 		protected void onPostExecute(Long aLong) {
 
 			super.onPostExecute(aLong);
-			FPdfViewer P2 = new FPdfViewer().newInstance("LIBRETTO", false, true);
-			P2.control("ASSICURAZIONE");
-			P2.control("LIBRETTO");
 		}
 
 	}

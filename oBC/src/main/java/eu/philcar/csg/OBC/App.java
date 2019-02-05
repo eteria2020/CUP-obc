@@ -1896,10 +1896,8 @@ public class App extends MultiDexApplication {
 
 		ArrayList<double[]> polygons = App.AreaPolygons;
 
-		double[] aPolygon = null;
-		for (int i = 0; i < polygons.size(); i++) {
+		for (double[] aPolygon:polygons) {
 
-			aPolygon = polygons.get(i);
 			if (aPolygon != null && aPolygon.length > 0 && aPolygon.length % 2 == 0) {
 
 				if (GeoUtils.contains(latitude, longitude, aPolygon)) {
@@ -1918,6 +1916,20 @@ public class App extends MultiDexApplication {
 
 		DLog.I("checkParkArea: lat, lon " + latitude + ", " + longitude + " " + false);
 		return false;
+	}
+
+	public static boolean checkIsInsideParkingArea() {
+		boolean inside = true;
+//		if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+//			inside = false;
+		try {
+			Location loc = getLastLocation();
+			if (loc != null)
+				inside = checkParkArea(loc.getLatitude(), loc.getLongitude());
+		} catch (Exception e) {
+			DLog.E("Exception while checking inside area ", e);
+		}
+		return inside;
 	}
 
 	public void loadPreferences() {
