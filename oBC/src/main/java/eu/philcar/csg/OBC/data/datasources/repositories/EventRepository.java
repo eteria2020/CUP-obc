@@ -35,6 +35,7 @@ import static eu.philcar.csg.OBC.db.Events.EVT_PARK;
 import static eu.philcar.csg.OBC.db.Events.EVT_READY;
 import static eu.philcar.csg.OBC.db.Events.EVT_REBOOT;
 import static eu.philcar.csg.OBC.db.Events.EVT_REMOTE_CLOSE_TRIP;
+import static eu.philcar.csg.OBC.db.Events.EVT_REMOTE_PIN;
 import static eu.philcar.csg.OBC.db.Events.EVT_RFID;
 import static eu.philcar.csg.OBC.db.Events.EVT_SELFCLOSE;
 import static eu.philcar.csg.OBC.db.Events.EVT_SHUTDOWN;
@@ -89,6 +90,7 @@ public class EventRepository {
 		labels.put(EVT_MENU_CLICK, "MENU_CLICK");
 		labels.put(EVT_CAN_ANOMALIES, "CAN_ANOMALIES");
 		labels.put(EVT_REMOTE_CLOSE_TRIP, "EVT_REMOTE_CLOSE_TRIP");
+		labels.put(EVT_REMOTE_PIN, "REMOTE PIN ENTERED");
 	}
 
 	public void eventEngine(int state) {
@@ -126,6 +128,9 @@ public class EventRepository {
 
 	public void eventDmg(String number) {
 		generateEvent(EVT_SOS, 2, number);
+	}
+	public void eventPin(String pin) {
+		generateEvent(EVT_REMOTE_PIN, 0, pin);
 	}
 
 	public void eventCmd(String cmd) {
@@ -224,6 +229,9 @@ public class EventRepository {
 
 	public void Shutdown() {
 		generateEvent(EVT_SHUTDOWN, 0, "Shutting Down");
+	}
+	public void ShutdownAbort() {
+		generateEvent(EVT_SHUTDOWN, -1, "Shut Down Aborted");
 	}
 
 	public void StartShutdown() {

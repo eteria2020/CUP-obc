@@ -132,6 +132,19 @@
 			android:contentDescription="@string/content_description"
 			android:visibility="gone" />
 
+		<ImageButton
+			android:id="@+id/fwelNetherlandsIB"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/sel_button_flag_nl"
+			android:layout_margin="5dp"
+			android:layout_gravity="center_vertical"
+			android:scaleX="0.9"
+			android:scaleY="0.9"
+			android:background="@null"
+			android:contentDescription="@string/content_description"
+			android:visibility="gone" />
+
 	</LinearLayout>
     <LinearLayout android:id="@+id/fwelBannerLL" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/fwel_logo_FL" android:layout_centerHorizontal="true" android:layout_marginTop="80dp" android:orientation="vertical"
 		android:visibility="gone">

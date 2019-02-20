@@ -19,7 +19,7 @@ android {
         }
         stage {
         }
-        slovakia {
+        spegnimento {
         }
     }
     compileOptions {

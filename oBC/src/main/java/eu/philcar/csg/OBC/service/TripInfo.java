@@ -241,8 +241,7 @@ public class TripInfo {
 		// Getting DB
 		DbManager dbm = App.Instance.dbManager;
 		//HttpConnector http;
-		if(BuildConfig.BUILD_TYPE.equalsIgnoreCase("slovakia") && BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
-			code = "RF000001";
+
 
 		Customers customers = dbm.getClientiDao();
 		Customer customer = customers.getClienteByCardCode(code);
@@ -434,7 +433,7 @@ public class TripInfo {
 						dlog.d("handleCard: corsa non chiudibile");
 						return null;
 					}
-					if (service.checkParkArea() || closeType == CloseType.forced) {
+					if (service.checkParkArea() || closeType == CloseType.forced || !App.pinChecked) {
 
 						eventRepository.eventRfid(2, code);
 						CloseTrip(carInfo, obc_io, service);
@@ -1051,7 +1050,7 @@ public class TripInfo {
 			DbManager dbm = App.Instance.dbManager;
 			BusinessEmployees employees = dbm.getDipendentiDao();
 			BusinessEmployee employee = employees.getBusinessEmployee(customer.id);
-			if (BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+			if (BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
 				employee.isBusinessEnabled = true;
 			if (!customer.isCompanyPinEnabled() || employee == null || !employee.isBusinessEnabled() || !employee.isWithinTimeLimits()) {
 				dlog.e("CheckPin : can't open business trip");
@@ -1060,6 +1059,10 @@ public class TripInfo {
 		}
 
 		if (n_pin > 0) {
+
+			App.pinChecked = true;
+			App.Instance.persistPinChecked();
+
 			trip.n_pin = n_pin;
 			UpdateCorsa();
 			try {

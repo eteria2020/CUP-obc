@@ -1077,7 +1077,7 @@ public class FHome extends FBase implements OnClickListener {
 			if (!isClick) {
 
 				if (App.currentTripInfo != null && App.currentTripInfo.customer != null)
-					if (BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+					if (BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
 						paramsList.add(new BasicNameValuePair("id", "26740"));// App.currentTripInfo.customer.id + "")); //"3"));
 				paramsList.add(new BasicNameValuePair("id", App.currentTripInfo.customer.id + ""));// App.currentTripInfo.customer.id + "")); //"3"));
 

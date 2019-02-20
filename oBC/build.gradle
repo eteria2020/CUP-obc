@@ -39,76 +39,19 @@ android {
     }
     buildTypes {
         release {
-            resValue "string", "app_data_path", "/csg/"
-            resValue "string", "endpointSharengo", "https://api.sharengo.it:8123/"
-            resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
-            resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
-            resValue "string", "endpointSharengoZMQ", "tcp://core.sharengo.it:8001"
-            resValue "string", "maxLongitudeMargin", "18.53"
-            resValue "string", "maxLatitudeMargin",  "47.10"
-            resValue "string", "minLongitudeMargin", "6.63"
-            resValue "string", "minLatitudeMargin",  "36.64"
             minifyEnabled false
             debuggable false
             signingConfig signingConfigs.vmtest
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             multiDexKeepProguard file('multidex-proguard-rules.pro')
         }
-        vmtest {
-            resValue "string", "app_data_path", "/csg-vm/"
-            resValue "string", "endpointSharengo", "https://api.localhost.it:8123/"
-            resValue "string", "endpointSharengoBeacon", "http://api.localhost.it:7600/"
-            resValue "string", "endpointSharengoPhp", "http://api.localhost.it/api/"
-            resValue "string", "endpointSharengoZMQ", "tcp://api.localhost.it:8001"
-            resValue "string", "maxLongitudeMargin", "18.53"
-            resValue "string", "maxLatitudeMargin",  "47.10"
-            resValue "string", "minLongitudeMargin", "6.63"
-            resValue "string", "minLatitudeMargin",  "36.64"
-            signingConfig signingConfigs.vmtest
-            debuggable true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
-            multiDexKeepProguard file('multidex-proguard-rules.pro')
-        }
         debug {
-            resValue "string", "app_data_path", "/csg/"
-            resValue "string", "endpointSharengo", "https://api.sharengo.it:8123/"
-            resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
-            resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
-            resValue "string", "endpointSharengoZMQ", "tcp://core.sharengo.it:8001"
-            resValue "string", "maxLongitudeMargin", "18.53"
-            resValue "string", "maxLatitudeMargin",  "47.10"
-            resValue "string", "minLongitudeMargin", "6.63"
-            resValue "string", "minLatitudeMargin",  "36.64"
             signingConfig signingConfigs.vmtest
             debuggable true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             multiDexKeepProguard file('multidex-proguard-rules.pro')
         }
-        stage {
-            resValue "string", "app_data_path", "/csg-stage/"
-            resValue "string", "endpointSharengo", "https://corestage.sharengo.it:8123/"
-            resValue "string", "endpointSharengoBeacon", "http://corestage.sharengo.it:7600/"
-            resValue "string", "endpointSharengoPhp", "http://corestage.sharengo.it/api/"
-            resValue "string", "endpointSharengoZMQ", "tcp://corestage.sharengo.it:8001"
-            resValue "string", "maxLongitudeMargin", "18.53"
-            resValue "string", "maxLatitudeMargin",  "47.10"
-            resValue "string", "minLongitudeMargin", "6.63"
-            resValue "string", "minLatitudeMargin",  "36.64"
-            signingConfig signingConfigs.vmtest
-            debuggable true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
-            multiDexKeepProguard file('multidex-proguard-rules.pro')
-        }
-        slovakia {
-            resValue "string", "app_data_path", "/csg/"
-            resValue "string", "endpointSharengo", "https://api.sharengo.sk:8202/"
-            resValue "string", "endpointSharengoBeacon", "http://api.sharengo.sk:8203/"
-            resValue "string", "endpointSharengoPhp", "http://core.sharengo.sk/api/"
-            resValue "string", "endpointSharengoZMQ", "tcp://api.sharengo.sk:8204"
-            resValue "string", "maxLongitudeMargin", "23.00"
-            resValue "string", "maxLatitudeMargin",  "49.80"
-            resValue "string", "minLongitudeMargin", "16.22"
-            resValue "string", "minLatitudeMargin",  "47.45"
+        spegnimento {
             minifyEnabled false
             debuggable false
             signingConfig signingConfigs.vmtest
@@ -121,9 +64,65 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     productFlavors {
-        produzione {
+        slovakia {
+            resValue "string", "def_lang", "sk"
+            resValue "string", "app_data_path", "/csg/"
+            resValue "string", "endpointSharengo", "https://api.sharengo.sk:8202/"
+            resValue "string", "endpointSharengoBeacon", "http://api.sharengo.sk:8203/"
+            resValue "string", "endpointSharengoPhp", "http://core.sharengo.sk/api/"
+            resValue "string", "endpointSharengoZMQ", "tcp://api.sharengo.sk:8204"
+            resValue "string", "maxLongitudeMargin", "23.00"
+            resValue "string", "maxLatitudeMargin", "49.80"
+            resValue "string", "minLongitudeMargin", "16.22"
+            resValue "string", "minLatitudeMargin", "47.45"
         }
-        develop {
+        olanda {
+            resValue "string", "def_lang", "nl"
+            resValue "string", "app_data_path", "/csg/"
+            resValue "string", "endpointSharengo", "https://api.sharengo.nl:8133/"
+            resValue "string", "endpointSharengoBeacon", "http://api.sharengo.nl:7630/"
+            resValue "string", "endpointSharengoPhp", "http://api.sharengo.nl/api/"
+            resValue "string", "endpointSharengoZMQ", "tcp://api.sharengo.nl:8002"
+            resValue "string", "maxLongitudeMargin", "18.53"
+            resValue "string", "maxLatitudeMargin", "47.10"
+            resValue "string", "minLongitudeMargin", "6.63"
+            resValue "string", "minLatitudeMargin", "36.64"
+        }
+        italia {
+            resValue "string", "def_lang", "it"
+            resValue "string", "app_data_path", "/csg/"
+            resValue "string", "endpointSharengo", "https://api.sharengo.it:8123/"
+            resValue "string", "endpointSharengoBeacon", "http://core.sharengo.it:7600/"
+            resValue "string", "endpointSharengoPhp", "http://core.sharengo.it/api/"
+            resValue "string", "endpointSharengoZMQ", "tcp://core.sharengo.it:8001"
+            resValue "string", "maxLongitudeMargin", "18.53"
+            resValue "string", "maxLatitudeMargin", "47.10"
+            resValue "string", "minLongitudeMargin", "6.63"
+            resValue "string", "minLatitudeMargin", "36.64"
+        }
+        stage {
+            resValue "string", "def_lang", "it"
+            resValue "string", "app_data_path", "/csg-stage/"
+            resValue "string", "endpointSharengo", "https://corestage.sharengo.it:8123/"
+            resValue "string", "endpointSharengoBeacon", "http://corestage.sharengo.it:7600/"
+            resValue "string", "endpointSharengoPhp", "http://corestage.sharengo.it/api/"
+            resValue "string", "endpointSharengoZMQ", "tcp://corestage.sharengo.it:8001"
+            resValue "string", "maxLongitudeMargin", "18.53"
+            resValue "string", "maxLatitudeMargin", "47.10"
+            resValue "string", "minLongitudeMargin", "6.63"
+            resValue "string", "minLatitudeMargin", "36.64"
+        }
+        vmTest {
+            resValue "string", "def_lang", "it"
+            resValue "string", "app_data_path", "/csg-vm/"
+            resValue "string", "endpointSharengo", "https://sharengo.ddns.net:8123/"
+            resValue "string", "endpointSharengoBeacon", "http://sharengo.ddns.net:7600/"
+            resValue "string", "endpointSharengoPhp", "http://api.localhost.it/api/"
+            resValue "string", "endpointSharengoZMQ", "tcp://sharengo.ddns.net:8001"
+            resValue "string", "maxLongitudeMargin", "18.53"
+            resValue "string", "maxLatitudeMargin",  "47.10"
+            resValue "string", "minLongitudeMargin", "6.63"
+            resValue "string", "minLatitudeMargin",  "36.64"
         }
     }
 }

@@ -289,7 +289,7 @@ public class FGoodbye extends FBase {
 		} else if (Debug.IGNORE_HARDWARE) {
 			name = "Gino Panino";
 		}
-		if (BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+		if (BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
 			name = "Gino Panino cotto e rosa";
 		((TextView) view.findViewById(R.id.fgodGoodbyeTV)).setText(name);
 

@@ -60,6 +60,7 @@ import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
+import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.map.FPdfViewer;
@@ -192,6 +193,7 @@ public class ObcService extends Service implements OnTripCallback {
 	public static final int MSG_NAVIGATE_TO = 81;
 	public static final int MSG_CHECK_TIME = 82;
 	public static final int MSG_FAILED_SOS = 83;
+	public static final int MSG_RESTART_UI = 84;
 
 	public static final int MSG_DEBUG_CARD = 90;
 	public static final int MSG_DEBUG_CARD_OPEN = 91;
@@ -200,6 +202,7 @@ public class ObcService extends Service implements OnTripCallback {
 	public static final int MSG_CHECK_LOG_SIZE = 101;
 
 	public static final int MSG_API_TRIP_CALLBACK = 110;
+	public static final int MSG_CHECK_SPEGNIMENTO = 111;
 
 	public static final int SERVER_NOTIFY_RAW = 0;
 	public static final int SERVER_NOTIFY_RESERVATION = 1;
@@ -975,6 +978,8 @@ public class ObcService extends Service implements OnTripCallback {
 		if (App.hasNetworkConnection()) {
 			new DocumentControl().execute();
 		}
+
+		localHandler.sendEmptyMessageDelayed(MSG_CHECK_SPEGNIMENTO,30000);
 	}
 
 	public void sendMessage(Message msg) {
@@ -1216,9 +1221,9 @@ public class ObcService extends Service implements OnTripCallback {
 
 	}
 
-	private void sendAll(Message msg) {
+	public void sendAll(Message msg) {
 
-		Message myMsg;
+		Message myMsg = Message.obtain();
 		if (msg == null) {
 			dlog.e("sendAll, Message==null client: " + clients.size());
 			return;
@@ -1362,8 +1367,14 @@ public class ObcService extends Service implements OnTripCallback {
 			Message tripMsg = tripInfo.handleCard(id, event, carInfo, obc_io, this, screenLockTrip, forced ? TripInfo.CloseType.forced : TripInfo.CloseType.normal);
 			dlog.d("perf: end handleCard");
 			if (tripMsg != null) {
-				if (tripMsg.what == MSG_TRIP_END && App.reservation != null) {
-					setReservation(App.reservation);
+				if (tripMsg.what == MSG_TRIP_END){
+					if(App.reservation != null) {
+						setReservation(App.reservation);
+					}
+
+					Message myMsg = Message.obtain();
+					myMsg.copyFrom(tripMsg);
+					localHandler.sendMessageDelayed(myMsg,10000);
 				}
 				dlog.d("perf: sendAll " + tripMsg.what);
 				sendAll(tripMsg);
@@ -1677,7 +1688,7 @@ public class ObcService extends Service implements OnTripCallback {
 						boolean forced = (cmd.txtarg1 == null || cmd.txtarg1.isEmpty());
 						dlog.d(ObcService.class.toString() + " executeServerCommands: CLOSE_TRIP forced : " + forced);
 						localHandler.sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_NONE, 1));
-						if (cmd.txtarg2 != null && cmd.txtarg2.equalsIgnoreCase("null") && (cmd.txtarg1 == null || cmd.txtarg1.isEmpty())) {
+						if ((cmd.txtarg2 == null || cmd.txtarg2.equalsIgnoreCase("null")) && (cmd.txtarg1 == null || cmd.txtarg1.isEmpty())) {
 							long now = new Date().getTime() / 1000;
 							if ((cmd.ttl <= 0 || cmd.queued + cmd.ttl > now) || cmd.command.equalsIgnoreCase("CLOSE_TRIP"))
 								this.notifyCard(App.currentTripInfo.cardCode, "CLOSE", false, forced);
@@ -1807,7 +1818,7 @@ public class ObcService extends Service implements OnTripCallback {
 				case "SHUTDOWN":
 					dlog.d(ObcService.class.toString() + " executeServerCommands: Received shutdown command");
 					obc_io.disableWatchdog();
-					SystemControl.doShutdown();
+					SystemControl.doShutdown(60000);
 					break;
 				case "REBOOT":
 					dlog.d(ObcService.class.toString() + " executeServerCommands: Received reboot command");
@@ -2706,11 +2717,14 @@ public class ObcService extends Service implements OnTripCallback {
 							rmsg.arg1 = isVerified ? 1 : 0;
 						}
 						msg.replyTo.send(rmsg);
-					} catch (RemoteException e) {
+					} catch (Exception e) {
 						DLog.E("Error sending to client", e);
 					}
 					break;
 
+				case MSG_RESTART_UI:
+					checkAndRestartUI();
+					break;
 				case MSG_CAR_REMOTEUPDATECYCLE:
 					if (msg.arg1 == 1) {  //Start
 						startRemoteUpdateCycle();
@@ -2964,6 +2978,11 @@ public class ObcService extends Service implements OnTripCallback {
 
 				case MSG_FAILED_SOS:
 					sendAll(MessageFactory.failedSOS());
+					break;
+				case MSG_TRIP_END:
+				case MSG_CHECK_SPEGNIMENTO:
+					if(App.spegnimentoEnabled && (App.currentTripInfo==null || !App.currentTripInfo.isOpen) && (App.reservation== null || App.reservation.isMaintenance()) && !BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
+						//SystemControl.doShutdown(10*60*1000);//2 minuti
 					break;
 
 			}

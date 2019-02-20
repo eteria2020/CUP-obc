@@ -279,8 +279,6 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 
 			disableUI();
 
-			App.pinChecked = true;
-			App.Instance.persistPinChecked();
 			if (App.currentTripInfo.trip.n_pin != Customer.N_COMPANY_PIN) {
 				messageTV.setText(R.string.pin_right);
 			} else {

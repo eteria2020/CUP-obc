@@ -153,7 +153,7 @@
     <string name="navigator_slight_right">Slight right</string>
     <string name="navigator_stopover">Stopover</string>
     <string name="navigator_turn">turn</string>
-    <string name="navigator_turn_onto_it"></string>
+    <string name="navigator_turn_onto_it">turn onto</string>
     <string name="navigator_turn_onto_en">turn onto</string>
     <string name="navigator_uturn">You are going in the opposite direction. When possible, make a U-turn</string>
     <string name="navigator_range">Range</string>
@@ -234,7 +234,7 @@
     <string name="music_hint">Connect the AUX cable to listen to music from your phone</string>
     <string name="pin_business">You\'ve used the business pin!</string>
     <string name="menu_rent_end_key_on">Please turn off the car before ending the rent</string>
-    <string name="menu_park_mode_suspend_key_on">PPlease turn off the car before pausing the rent</string>
+    <string name="menu_park_mode_suspend_key_on">Please turn off the car before pausing the rent</string>
     <string name="button_video_tutorial">TUTORIAL</string>
     <string name="button_assicurazione">INSURANCE</string>
     <string name="button_libretto">REGISTRATIONCARD</string>

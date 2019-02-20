@@ -950,6 +950,8 @@ public class Hik_io implements LowLevelInterface {
 					b.putBoolean("batterySafety", Integer.parseInt(cData[0]) > 0);
 					if (cData.length > 1)
 						b.putString("fakeCard", cData[1]);
+					if (cData.length > 2)
+						b.putString("fakePin", cData[2]);
 				} catch (Exception e) {
 					dlog.e("Exception handling extra data inside Heartbeat", e);
 				}
@@ -1003,7 +1005,7 @@ public class Hik_io implements LowLevelInterface {
 			Bundle b = new Bundle();
 			b.putString("VIN", vin);
 			obcService.notifyCarInfo(b);
-			if (!BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+			if (!BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
 				dlog.i("onVinCodeChange(vinCode):" + vinCode);
 		}
 

@@ -56,6 +56,7 @@ public class Events extends DbTable<Event, Integer> {
 	public static final int EVT_MENU_CLICK = 30;
 	public static final int EVT_CAN_ANOMALIES = 31;
 	public static final int EVT_REMOTE_CLOSE_TRIP = 32;
+	public static final int EVT_REMOTE_PIN = 33;
 
 	private Map<Integer, String> labels = new HashMap<Integer, String>();
 
@@ -97,6 +98,7 @@ public class Events extends DbTable<Event, Integer> {
 		labels.put(EVT_MENU_CLICK, "MENU_CLICK");
 		labels.put(EVT_CAN_ANOMALIES, "CAN_ANOMALIES");
 		labels.put(EVT_REMOTE_CLOSE_TRIP, "EVT_REMOTE_CLOSE_TRIP");
+		labels.put(EVT_REMOTE_PIN, "REMOTE_PIN_ENTERED");
 
 	}
 

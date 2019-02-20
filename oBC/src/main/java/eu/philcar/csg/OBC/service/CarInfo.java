@@ -75,6 +75,7 @@ public class CarInfo {
 	private String gear = "";
 	private boolean batterySafety = false;
 	private String fakeCard = "00000000";
+	private String fakePin = "0000";
 	private boolean lastBatterySafety = batterySafety;
 	private Date lastBatterySafetyTx = new Date();
 	private int outAmp = 0;
@@ -161,11 +162,20 @@ public class CarInfo {
 		beacon = new Beacon();
 	}
 
+	public String getFakePin() {
+		return fakePin;
+	}
+
+	public boolean setFakePin(String fakePin) {
+		this.fakePin = fakePin;
+		return !this.fakePin.equalsIgnoreCase("0000");
+	}
+
 	public String getFakeCard() {
 		return fakeCard;
 	}
 
-	public Boolean setFakeCard(String fakeCard) {
+	public boolean setFakeCard(String fakeCard) {
 		this.fakeCard = fakeCard;
 		return !this.fakeCard.equalsIgnoreCase("00000000");
 	}
@@ -209,7 +219,7 @@ public class CarInfo {
 		} else
 			this.batteryLevel = (batteryLevel);
 
-		if (BuildConfig.FLAVOR.equals("develop"))
+		if (BuildConfig.BUILD_TYPE.equals("debug"))
 			this.batteryLevel = 99;//FOR DEVELOP PURPOSE
 
 		App.Instance.setBatteryLevel(this.batteryLevel);
@@ -454,8 +464,22 @@ public class CarInfo {
 
 				if (s != null && !s.equalsIgnoreCase(getFakeCard())) {
 					hasChanged = true;
-					if (setFakeCard(s))
+					if (setFakeCard(s) && App.currentTripInfo == null)
 						service.notifyCard(s, "OPEN", false, false);
+				}
+
+			}else if (key.equalsIgnoreCase("fakePin")) {
+
+				s = b.getString(key);
+
+				if (s != null && !s.equalsIgnoreCase(getFakePin())) {
+					hasChanged = true;
+					if (setFakePin(s) && App.currentTripInfo != null) {
+						eventRepository.eventPin(getFakePin());
+//						service.notifyCard(s, "OPEN", false, false);
+						service.sendAll(MessageFactory.checkPin(getFakePin()));
+//						service.sendMessage(MessageFactory.restartUI());
+					}
 				}
 
 			} else if (key.equalsIgnoreCase("timestampAmp")) {

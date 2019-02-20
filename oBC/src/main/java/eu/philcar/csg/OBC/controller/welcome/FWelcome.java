@@ -31,7 +31,6 @@ import butterknife.ButterKnife;
 import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
-import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
@@ -79,6 +78,8 @@ public class FWelcome extends FBase {
 	protected ImageButton fwelChineseIB;
 	@BindView(R.id.fwelSlovakiaIB)
 	protected ImageButton fwelSlovakiaIB;
+	@BindView(R.id.fwelNetherlandsIB)
+	protected ImageButton fwelNetherlandsIB;
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm", Locale.getDefault());
 
 	private int logoTaps = 0;
@@ -132,6 +133,22 @@ public class FWelcome extends FBase {
 			@Override
 			public void onClick(View v) {
 				((ABase) getActivity()).setChinseseLanguage();
+				nextPage();
+
+			}
+		});
+		view.findViewById(R.id.fwelNetherlandsIB).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((ABase) getActivity()).setNetherlandsLanguage();
+				nextPage();
+
+			}
+		});
+		view.findViewById(R.id.fwelSlovakiaIB).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((ABase) getActivity()).setSlovakLanguage();
 				nextPage();
 
 			}
@@ -276,7 +293,17 @@ public class FWelcome extends FBase {
 		fwelEnglishIB.setVisibility(View.VISIBLE);
 		//fwelFrenchIB.setVisibility(View.VISIBLE);
 
-		switch ()
+		switch (getString(R.string.def_lang)){
+			case "it":
+				fwelItalianIB.setVisibility(View.VISIBLE);
+				break;
+			case "nl":
+				fwelNetherlandsIB.setVisibility(View.VISIBLE);
+				break;
+			case "sk":
+				fwelSlovakiaIB.setVisibility(View.VISIBLE);
+				break;
+		}
 
 		bannerLL.setVisibility(View.INVISIBLE);
 		flagsLL.invalidate();

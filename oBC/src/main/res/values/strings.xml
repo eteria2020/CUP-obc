@@ -157,7 +157,7 @@
     <string name="navigator_stopover">Sosta lungo</string>
     <string name="navigator_turn">girare a</string>
     <string name="navigator_turn_onto_it">lungo</string>
-    <string name="navigator_turn_onto_en"></string>
+    <string name="navigator_turn_onto_en">turn onto</string>
     <string name="navigator_uturn">Appena possibile fare inversione</string>
     <string name="navigator_range">Autonomia</string>
     <string name="navigator_stop">Ferma navigatore</string>

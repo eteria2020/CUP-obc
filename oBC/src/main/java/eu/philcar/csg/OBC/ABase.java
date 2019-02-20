@@ -195,6 +195,48 @@ public abstract class ABase extends Activity implements ServiceClient {
 		SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
 	}
 
+	public void setSlovakLanguage() {
+		setBaseLanguage("sk");
+	}
+
+	public void setNetherlandsLanguage() {
+		setBaseLanguage("nl");
+	}
+
+	private void setBaseLanguage(String lang) {
+		saveLanguage(lang);
+		changeLanguage(lang);
+		SKMapsInitSettings initSettings = new SKMapsInitSettings();
+
+		initSettings.setConnectivityMode(SKMaps.CONNECTIVITY_MODE_OFFLINE);
+		initSettings.setMapsPath("/sdcard/SKMaps/");
+		initSettings.setMapResourcesPaths("/sdcard/SKMaps/", new SKMapViewStyle("/sdcard/SKMaps/daystyle/", "daystyle.json"));
+		initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
+
+		initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_LIGHT);
+
+		SKAdvisorSettings advisorSettings = new SKAdvisorSettings();
+		SKAdvisorSettings.SKAdvisorLanguage advisorLang = SKAdvisorSettings.SKAdvisorLanguage.LANGUAGE_EN;
+		try{
+			advisorLang = SKAdvisorSettings.SKAdvisorLanguage.forString(lang);
+		}catch (Exception e) {
+		    dlog.e( "setBaseLanguage: Exception", e);
+		}
+		advisorSettings.setLanguage(advisorLang);
+		advisorSettings.setAdvisorConfigPath("/sdcard/SKMaps/Advisor");
+		advisorSettings.setResourcePath("/sdcard/SKMaps/Advisor/Languages");
+		advisorSettings.setAdvisorVoice(advisorLang.getValue());
+		advisorSettings.setAdvisorType(SKAdvisorSettings.SKAdvisorType.TEXT_TO_SPEECH);
+		initSettings.setAdvisorSettings(advisorSettings);
+
+		SKMapViewStyle style = new SKMapViewStyle("/sdcard/skmaps/daystyle/", "daystyle.json");
+		initSettings.setCurrentMapViewStyle(style);
+
+		SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
+	}
+
+
+
 	/**
 	 * Use this method to push (and display) a new fragment (i.e., like [UINavigationController pushViewController:animated]).
 	 * Note that "fragment" must inherits from FBase.

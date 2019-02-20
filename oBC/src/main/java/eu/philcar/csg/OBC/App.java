@@ -511,6 +511,7 @@ public class App extends MultiDexApplication {
 	private static final String KEY_CallCenterNumer = "call_center_numer";
 	private static final String KEY_NewBatteryShutdownLevel = "new_battery_shutdown_level";
 	private static final String KEY_FullNode = "full_node";
+	private static final String KEY_SpegnimentoEnabled = "spegnimento_enabled";
 
 	public static final String KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
 
@@ -518,6 +519,7 @@ public class App extends MultiDexApplication {
 	public static CardRfidCollection openDoorsCards;
 
 	public static String callCenterNumer = "+390287317140";
+	public static boolean spegnimentoEnabled= false;
 
 	public static String CarPlate = "ND";
 	public static String Damages = "";
@@ -875,6 +877,14 @@ public class App extends MultiDexApplication {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putString(KEY_CallCenterNumer, callCenterNumer);
+			e.apply();
+		}
+	}
+
+	public void persistspegnimentoEnabled() {
+		if (this.preferences != null) {
+			Editor e = this.preferences.edit();
+			e.putBoolean(KEY_SpegnimentoEnabled, spegnimentoEnabled);
 			e.apply();
 		}
 	}
@@ -1777,6 +1787,9 @@ public class App extends MultiDexApplication {
 				} else if (key.equalsIgnoreCase("SosNumber")) {
 					callCenterNumer = jo.getString(key);
 					persistCallCenterNumer();
+				} else if (key.equalsIgnoreCase("Spegnimento")) {
+					spegnimentoEnabled = jo.getBoolean(key);
+					persistspegnimentoEnabled();
 				}
 			}
 			loadPreferences();
@@ -1976,6 +1989,7 @@ public class App extends MultiDexApplication {
 		ServerIP = preferences.getInt(KEY_ServerIP, 0);
 		timeZone = preferences.getString(KEY_TimeZone, "Europe/Rome");
 		callCenterNumer = preferences.getString(KEY_CallCenterNumer, "+390287317140");
+		spegnimentoEnabled = preferences.getBoolean(KEY_SpegnimentoEnabled, false);
 //		fullNode = preferences.getBoolean(KEY_FullNode,false);
 		saveLog = preferences.getBoolean(KEY_PersistLog, true);
 		checkKeyOff = preferences.getBoolean(KEY_CheckKeyOff, true);

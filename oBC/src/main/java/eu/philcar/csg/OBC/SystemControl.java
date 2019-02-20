@@ -304,10 +304,10 @@ public class SystemControl {
 
 	private static long shutdownInProgress = 0;
 
-	public static void doShutdown() {
+	public static void doShutdown(long time) {
 		//If there is another shutdown in progress not older than 60 sec : ignore
 		if (System.currentTimeMillis() - shutdownInProgress > 60000) {
-			Thread th = new Thread(new Shutdown(App.Instance.getApplicationContext()));
+			Thread th = new Thread(new Shutdown(App.Instance.getApplicationContext(), time));
 			th.start();
 		} else {
 			dlog.d("Shutdown already in progress");
@@ -318,9 +318,11 @@ public class SystemControl {
 
 		@Inject
 		EventRepository eventRepository;
+		long time;
 
-		public Shutdown(Context ctx) {
+		public Shutdown(Context ctx, long time) {
 			App.get(ctx).getComponent().inject(this);
+			this.time = time;
 		}
 
 		@Override
@@ -330,8 +332,13 @@ public class SystemControl {
 			eventRepository.Shutdown();
 			Runtime rt = Runtime.getRuntime();
 			try {
-				Thread.sleep(60000);
-				rt.exec(new String[]{"/system/xbin/su", "-c", "reboot -p"});
+				Thread.sleep(time);
+				if(App.spegnimentoEnabled && (App.currentTripInfo==null || !App.currentTripInfo.isOpen) && (App.reservation== null || App.reservation.isMaintenance()) && !BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
+					rt.exec(new String[]{"/system/xbin/su", "-c", "reboot -p"});
+				else {
+					shutdownInProgress = 0;
+					eventRepository.ShutdownAbort();
+				}
 			} catch (IOException | InterruptedException e) {
 				dlog.e("Shutdown", e);
 			}
@@ -353,7 +360,7 @@ public class SystemControl {
 	@Deprecated
 	public static void doReboot(String label) {
 		//If there is another reboot in progress not older than 6 hour : ignore
-		if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+		if(BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
 			return;
 
 		if (System.currentTimeMillis() - rebootInProgress > 21600000) {
@@ -376,7 +383,7 @@ public class SystemControl {
 
 	public static void doReboot(RebootCause label) {
 		//check for last reboot time for label
-		if( BuildConfig.FLAVOR.equalsIgnoreCase("develop") || (rebootMap!= null && rebootMap.containsKey(label)))
+		if( BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug") || (rebootMap!= null && rebootMap.containsKey(label)))
 			return;
 		if(System.currentTimeMillis() - App.Instance.getRebootTimeForLabel(label.name()) >0) {// se maggiore di 0 l'ultimo reboot non è nel futuro posso procedere nel reboot
 			if(System.currentTimeMillis() - App.Instance.getRebootTimeForLabel(label.name())> label.timeout){
