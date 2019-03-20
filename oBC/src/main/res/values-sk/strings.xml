@@ -91,7 +91,7 @@
     <string name="text_view_are_there_new_damages">Nové poškodenia?</string>
     <string name="no">Nie</string>
     <string name="no_results">Žiaden nájdený výsledok</string>
-    <string name="button_navigator">NAVIGÁTOR</string>
+    <string name="button_navigatormen">NAVIGÁTOR</string>
     <string name="minutes_saved">Získané minúty:</string>
     <string name="mu_distance_time">min</string>
     <string name="milan">Milano</string>
@@ -199,7 +199,7 @@
     <string name="navigation_distance">Distanza</string>
     <string name="navigation_time">Arrivo in</string>
     <string name="nafigation_eta">Ora di arrivo</string>
-    <string name="menu_damages">DANNI</string>
+    <string name="button_damages">ŠKODY</string>
     <string name="number_0">0</string>
     <string name="number_1">1</string>
     <string name="number_2">2</string>

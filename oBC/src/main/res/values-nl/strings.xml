@@ -19,7 +19,7 @@
     <string name="button_close">Sluiten</string>
     <string name="button_end">BEËINDIG</string>
     <string name="button_home">MENU</string>
-    <string name="button_navigator">NAVIGATIESYSTEEM</string>
+    <string name="button_navigatormen">NAVIGATIESYSTEEM</string>
     <string name="button_park">TUSSENSTOP</string>
     <string name="button_points">PUNTEN</string>
     <string name="button_radio">RADIO</string>
@@ -200,7 +200,7 @@
     <string name="button_assicurazione">INSURANCE</string>
     <string name="button_libretto">REGISTRATIONCARD</string>
     <string name="maintenance_instruction"><b>Unplug the charging cable -</b>to start driving unplug the charging cable and store it in the car trunk (trunk opening button is between the seats)</string>
-    <string name="maintenance_status_done">END CHARGING: Click on end charge to start driving</string>
+    <string name="maintenance_status_done">END CHARGING: Click on next to start driving</string>
     <string name="maintenance_status_plug_insert">IMPOSSIBLE TO END CHARGING: cable still plugged in</string>
     <string name="maintenance_status_wait">Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.</string>
     <string name="call_error">Error while forwarding help request, try calling %s</string>
@@ -211,5 +211,5 @@
     <string name="navigation_distance">Distance</string>
     <string name="navigation_time">Arriving in</string>
     <string name="nafigation_eta">ETA</string>
-    <string name="menu_damages">DAMAGES</string>
+    <string name="button_damages">DAMAGES</string>
 </resources>

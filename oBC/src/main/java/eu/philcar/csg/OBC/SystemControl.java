@@ -333,14 +333,18 @@ public class SystemControl {
 			Runtime rt = Runtime.getRuntime();
 			try {
 				Thread.sleep(time);
-				if(App.spegnimentoEnabled && (App.currentTripInfo==null || !App.currentTripInfo.isOpen) && (App.reservation== null || App.reservation.isMaintenance()) && !BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
+				if(App.spegnimentoEnabled && !App.spegnimentoDisabled && (App.currentTripInfo==null || !App.currentTripInfo.isOpen) && (App.reservation== null || App.reservation.isMaintenance()) && !BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug")) {
+
+					DLog.D(SystemControl.class.toString() + "Spegnimento Shutting down ");
 					rt.exec(new String[]{"/system/xbin/su", "-c", "reboot -p"});
+				}
 				else {
 					shutdownInProgress = 0;
 					eventRepository.ShutdownAbort();
+					DLog.D(SystemControl.class.toString() + "Spegnimento Aborted");
 				}
-			} catch (IOException | InterruptedException e) {
-				dlog.e("Shutdown", e);
+			} catch (Exception  e) {
+				dlog.e("Spegnimento Exception", e);
 			}
 
 		}

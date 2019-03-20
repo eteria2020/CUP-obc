@@ -3007,7 +3007,7 @@ public class FMap extends FBase implements OnClickListener {
 			App.BannerName.putBundle(type, Image);
 
 			//ricavo nome file
-			URL urlImg = new URL(Image.getString("URL"));
+			URL urlImg = new URL(Image.getString("URL").replace(" ", "%20"));
 			String extension = urlImg.getFile().substring(urlImg.getFile().lastIndexOf('.') + 1);
 			String filename = Image.getString("ID").concat(".").concat(extension);
 

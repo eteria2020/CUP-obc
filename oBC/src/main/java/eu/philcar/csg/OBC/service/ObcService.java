@@ -56,6 +56,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import ch.qos.logback.classic.spi.STEUtil;
 import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.AWelcome;
@@ -706,7 +707,7 @@ public class ObcService extends Service implements OnTripCallback {
 					//type of battery
 
 					carInfo.minVoltage = carInfo.cellVoltageValue.length>20 ? 2.8f : 2.5f;
-					carInfo.batteryType = carInfo.cellVoltageValue.length>20 ? "DFD" : "HNLD";
+					carInfo.batteryType = carInfo.cellVoltageValue.length>20 ? "HNLD" : "DFD" ;
 					//}
 					App.Instance.setMaxVoltage(carInfo.batteryType.equalsIgnoreCase("HNLD") ? 82 : 83);
 
@@ -1853,6 +1854,10 @@ public class ObcService extends Service implements OnTripCallback {
 					dlog.d(ObcService.class.toString() + " executeServerCommands: Received navigate_to command : " + cmd.txtarg1 + ":" + cmd.payload);
 					notifyNavigateTo(cmd.txtarg1, cmd.payload);
 					break;
+				case "DISABLE_SPEGNIMENTO":
+					App.spegnimentoDisabled = cmd.txtarg1.equalsIgnoreCase("true");
+					App.Instance.persistSpegnimentoDisabled();
+					break;
 
 			}
 
@@ -2410,7 +2415,7 @@ public class ObcService extends Service implements OnTripCallback {
 //				Schedulers.shutdown();
 //				Schedulers.start();
 			}
-
+			localHandler.sendEmptyMessage(MSG_CHECK_SPEGNIMENTO);
 			sendBeacon();
 
 			localHandler.sendMessage(MessageFactory.checkLogSize());
@@ -2983,8 +2988,25 @@ public class ObcService extends Service implements OnTripCallback {
 					localHandler.sendEmptyMessageDelayed(MSG_TRIP_SENDBEACON,10*60*1000);
 					localHandler.sendEmptyMessageDelayed(MSG_TRIP_SENDBEACON,5*60*1000);
 				case MSG_CHECK_SPEGNIMENTO:
-					if(App.spegnimentoEnabled && (App.currentTripInfo==null || !App.currentTripInfo.isOpen) && (App.reservation== null || App.reservation.isMaintenance()) && !BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
-						//SystemControl.doShutdown(10*60*1000);//2 minuti
+					try {
+						if (App.spegnimentoEnabled && !App.spegnimentoDisabled && Integer.parseInt(carInfo.getSdk_version().replaceAll("[^0-9]", "")) >= 477 && (App.currentTripInfo == null || !App.currentTripInfo.isOpen) && (App.reservation == null || App.reservation.isMaintenance()) && !BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug")) {
+							if (!apiRepository.isCustomerRunning()) {
+								long time = 20 * 60 * 1000;
+								sendBeacon();
+								localHandler.sendEmptyMessageDelayed(MSG_TRIP_SENDBEACON,time/4);
+								localHandler.sendEmptyMessageDelayed(MSG_TRIP_SENDBEACON,time/2);
+								SystemControl.doShutdown(time);//dovrebbe essere 10 minuti
+								dlog.d("Spegnimento: Spegnimento iniziato " + time);
+							} else {
+								localHandler.sendEmptyMessageDelayed(MSG_CHECK_SPEGNIMENTO, 2 * 60 * 1000);
+								dlog.d("Spegnimento: Spegnimento Rimandato per Whitelist");
+							}
+						} else {
+							dlog.d("Spegnimento: check condition FASLE");
+						}
+					}catch (Exception e) {
+					    dlog.e( "handleMessage: Exception", e);
+					}
 					break;
 
 			}
