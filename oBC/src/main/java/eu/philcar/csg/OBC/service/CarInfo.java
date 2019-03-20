@@ -49,6 +49,7 @@ import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 public class CarInfo {
 
 	private DLog dlog = new DLog(this.getClass());
+	public static CarInfo Shared ;
 
 	@Inject
 	EventRepository eventRepository;
@@ -156,6 +157,7 @@ public class CarInfo {
 
 	public CarInfo(Handler handler) {
 		App.Instance.getComponent().inject(this);
+		Shared = this;
 		serviceHandler = handler;
 		serviceLocationListener = new ServiceLocationListener();
 		allData = new Bundle();

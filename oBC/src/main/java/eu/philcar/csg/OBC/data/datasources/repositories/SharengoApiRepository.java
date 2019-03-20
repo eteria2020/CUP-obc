@@ -69,6 +69,10 @@ public class SharengoApiRepository {
 			customerDisposable.dispose();
 	}
 
+	public boolean isCustomerRunning() {
+		return RxUtil.isRunning(customerDisposable);
+	}
+
 	public void getCustomer(int millidelay) {
 		needUpdateCustomer = false;
 

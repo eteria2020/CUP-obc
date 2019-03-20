@@ -66,7 +66,7 @@ android {
     productFlavors {
         slovakia {
             resValue "string", "def_lang", "sk"
-            resValue "string", "app_data_path", "/csg/"
+            resValue "string", "app_data_path", "/csg-sk/"
             resValue "string", "endpointSharengo", "https://api.sharengo.sk:8202/"
             resValue "string", "endpointSharengoBeacon", "http://api.sharengo.sk:8203/"
             resValue "string", "endpointSharengoPhp", "http://core.sharengo.sk/api/"
@@ -78,7 +78,7 @@ android {
         }
         olanda {
             resValue "string", "def_lang", "nl"
-            resValue "string", "app_data_path", "/csg/"
+            resValue "string", "app_data_path", "/csg-nl/"
             resValue "string", "endpointSharengo", "https://api.sharengo.nl:8133/"
             resValue "string", "endpointSharengoBeacon", "http://api.sharengo.nl:7630/"
             resValue "string", "endpointSharengoPhp", "http://api.sharengo.nl/api/"

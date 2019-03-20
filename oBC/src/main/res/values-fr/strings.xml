@@ -21,7 +21,7 @@
     <string name="button_call">Postuler à l\'appel de soutien</string>
     <string name="button_break">PARKING\nou FIN A LOUER</string>
     <string name="button_close">Fermer</string>
-    <string name="button_navigator">NAVIGATOR</string>
+    <string name="button_navigatormen">NAVIGATOR</string>
     <string name="button_radio">RADIO</string>
     <string name="button_points">POINTS</string>
     <string name="button_recharge">POINTS DE RECHARGE</string>
@@ -239,7 +239,7 @@
     <string name="navigation_distance">Distanza</string>
     <string name="navigation_time">Arrivo in</string>
     <string name="nafigation_eta">Ora di arrivo</string>
-    <string name="menu_damages">DANNI</string>
+    <string name="button_damages">DANNI</string>
     <string name="music_hint">Connect the AUX cable to listen to music from your phone</string>
     <string name="pin_business">You\'ve used the business pin!</string>
 

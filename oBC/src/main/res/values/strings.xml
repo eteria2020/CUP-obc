@@ -12,7 +12,7 @@
     <string name="button_call">Prenota chiamata assistenza</string>
     <string name="button_break">SOSTA o\nTERMINA</string>
     <string name="button_close">Chiudi</string>
-    <string name="button_navigator">NAVIGATORE</string>
+    <string name="button_navigatormen">NAVIGATORE</string>
     <string name="button_radio">RADIO</string>
     <string name="button_points">PUNTI</string>
     <string name="button_recharge">PUNTO RICARICA</string>
@@ -249,7 +249,7 @@
 
     <string name="call_error">Si è verificato un errore inoltrando la richiesta al servizio clienti, per piacere prova a chiamare: %s</string>
 
-    <string name="menu_cancel_action"><b>ANNULLA</b> \n Permi per annullare</string>
+    <string name="menu_cancel_action"><b>ANNULLA</b> \n Premi per annullare</string>
 
     <string name="menu_rent_end_instruction">Il motore si spegnerà nel tempo indicato, per annullare clicca quì sotto</string>
     <string name="alert_area_box">Veicolo fuori dall\'area  di servizio, rientra nell\'area per chiudere la corsa</string>
@@ -257,5 +257,5 @@
     <string name="navigation_distance">Distanza</string>
     <string name="navigation_time">Arrivo in</string>
     <string name="nafigation_eta">Ora di arrivo</string>
-    <string name="menu_damages">DANNI</string>
+    <string name="button_damages">DANNI</string>
 </resources>

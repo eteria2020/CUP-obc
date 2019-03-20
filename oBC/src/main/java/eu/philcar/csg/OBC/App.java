@@ -165,7 +165,6 @@ public class App extends MultiDexApplication {
 
 	public App() {
 		Instance = this;
-		initSharengo();
 
 	}
 
@@ -388,7 +387,7 @@ public class App extends MultiDexApplication {
 
 			Port_UDP_Beacon = 7600;
 
-			APP_DATA_PATH = "/csg/";
+			APP_DATA_PATH = getString(R.string.app_data_path);;
 
 			/*URL_Area = "http://corecina.sharengo.it/api/zone/json.php?";
 			URL_Beacon = "http://corecina.sharengo.it/api/pushbeacon.php?";
@@ -512,6 +511,7 @@ public class App extends MultiDexApplication {
 	private static final String KEY_NewBatteryShutdownLevel = "new_battery_shutdown_level";
 	private static final String KEY_FullNode = "full_node";
 	private static final String KEY_SpegnimentoEnabled = "spegnimento_enabled";
+	private static final String KEY_SpegnimentoDisabled = "spegnimento_disabled";
 
 	public static final String KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
 
@@ -519,7 +519,10 @@ public class App extends MultiDexApplication {
 	public static CardRfidCollection openDoorsCards;
 
 	public static String callCenterNumer = "+390287317140";
+	//Enable spegnimento from configs
 	public static boolean spegnimentoEnabled= false;
+	//Disable spegnimento for specific cars
+	public static boolean spegnimentoDisabled= false;
 
 	public static String CarPlate = "ND";
 	public static String Damages = "";
@@ -888,6 +891,13 @@ public class App extends MultiDexApplication {
 			e.apply();
 		}
 	}
+	public void persistSpegnimentoDisabled() {
+		if (this.preferences != null) {
+			Editor e = this.preferences.edit();
+			e.putBoolean(KEY_SpegnimentoDisabled, spegnimentoDisabled);
+			e.apply();
+		}
+	}
 
 	public void persistFullNode() {
 		if (this.preferences != null) {
@@ -1219,6 +1229,7 @@ public class App extends MultiDexApplication {
 	public void onCreate() {
 		super.onCreate();
 		Fabric.with(this, new Crashlytics());
+		APP_DATA_PATH = getString(R.string.app_data_path);
 		getComponent().inject(this);
 
 		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
@@ -1990,6 +2001,7 @@ public class App extends MultiDexApplication {
 		timeZone = preferences.getString(KEY_TimeZone, "Europe/Rome");
 		callCenterNumer = preferences.getString(KEY_CallCenterNumer, "+390287317140");
 		spegnimentoEnabled = preferences.getBoolean(KEY_SpegnimentoEnabled, false);
+		spegnimentoDisabled = preferences.getBoolean(KEY_SpegnimentoDisabled, false);
 //		fullNode = preferences.getBoolean(KEY_FullNode,false);
 		saveLog = preferences.getBoolean(KEY_PersistLog, true);
 		checkKeyOff = preferences.getBoolean(KEY_CheckKeyOff, true);
