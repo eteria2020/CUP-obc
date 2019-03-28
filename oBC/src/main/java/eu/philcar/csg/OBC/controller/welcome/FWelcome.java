@@ -176,11 +176,11 @@ public class FWelcome extends FBase {
 
 		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 		((TextView) view.findViewById(R.id.fwel_welcome_TV)).setTypeface(font);
-
-		nameTV.setTypeface(font);
-		tvCarPlate.setTypeface(font);
-		tvFleet.setTypeface(font);
-		tvDateTime.setTypeface(font);
+//
+//		nameTV.setTypeface(font);
+//		tvCarPlate.setTypeface(font);
+//		tvFleet.setTypeface(font);
+//		tvDateTime.setTypeface(font);
 
 		tvFleet.setText(App.DefaultCity);
 		setCarPlate(App.CarPlate);

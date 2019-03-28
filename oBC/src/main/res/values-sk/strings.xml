@@ -40,7 +40,7 @@
     <string name="select_travel_path">Zvoľ itinerár</string>
     <string name="select_fuel_station">Zvoľ čerpaciu stanicu.</string>
     <string name="navigator_almost_there">Blížíš sa k cieľu.</string>
-    <string name="menu_park_mode_suspend_instructions">PARKUJEŠ - Teraz môžeš vystúpiť. Dvere sa zatvoria automaticky v čase zobrazenom vpravo. Po ukončení parkovania použi na telefóne príkaz OTVOR DVERE alebo použi svoju kartu na návrat do auta. </string>
+    <string name="menu_park_mode_suspend_instructions"> PARKUJEŠ - Teraz môžeš vystúpiť. Dvere sa zatvoria automaticky v čase zobrazenom vpravo. Pre ukončenie parkovania použi na telefóne príkaz OTVORIŤ DVERE alebo použi svoju kartu SHARE’NGO.</string>
     <string name="car_cleanliness_state">Signalizuje stav vozidla.</string>
     <string name="instruction_close_4_note">Keby si si to rozmyslel, nechaj zatvoriť dvere a otvor nový prenájom.</string>
     <string name="hint_address">Napíš adresu.</string>
@@ -130,7 +130,7 @@
     <string name="are_you_drunk">Pil si alkohol?</string>
     <string name="thank_for_choosing">Ďakujeme že si si vybral</string>
     <string name="navigator_turn">zaboč</string>
-    <string name="instruction_start_2">Otoč kľúč</string>
+    <string name="instruction_start_2">Otoč kľúč zapaľovania do druhej polohy</string>
     <string name="outside_area">Mimo zóny</string>
     <string name="number_invalid">Nesprávne číslo</string>
     <string name="navigation_stop">Zastaviť navigáciu</string>
