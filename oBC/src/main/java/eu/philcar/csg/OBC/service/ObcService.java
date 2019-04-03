@@ -2980,6 +2980,8 @@ public class ObcService extends Service implements OnTripCallback {
 					sendAll(MessageFactory.failedSOS());
 					break;
 				case MSG_TRIP_END:
+					localHandler.sendEmptyMessageDelayed(MSG_TRIP_SENDBEACON,10*60*1000);
+					localHandler.sendEmptyMessageDelayed(MSG_TRIP_SENDBEACON,5*60*1000);
 				case MSG_CHECK_SPEGNIMENTO:
 					if(App.spegnimentoEnabled && (App.currentTripInfo==null || !App.currentTripInfo.isOpen) && (App.reservation== null || App.reservation.isMaintenance()) && !BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
 						//SystemControl.doShutdown(10*60*1000);//2 minuti

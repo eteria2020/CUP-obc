@@ -367,6 +367,10 @@ public class TripInfo {
 				obc_io.setLcd(null, customer.info_display);
 			}
 		} else {  // se c'? una trip aperta...
+			if("OPEN".equalsIgnoreCase(event)){
+				dlog.d("handleCard: event OPEN trip already present");
+				return null;
+			}
 			dlog.d(TripInfo.class.toString() + " handleCard: Pending trips. Check condition...");
 			if (code.equalsIgnoreCase(cardCode)) {  //e la card ? dell'utente che ha aperto la trip  chiudi  o sospendi trip
 
@@ -415,7 +419,7 @@ public class TripInfo {
 
 						if (closeType == CloseType.forced) {   // Se ? una chiusura forzata chiudi la sosta e richiama ricorsivamente  questa funzione per chiudere anche la trip.
 							setParkMode(0, obc_io);
-							return handleCard(code, event, carInfo, obc_io, service, screenLock, closeType);
+							return handleCard(code, "CLOSE", carInfo, obc_io, service, screenLock, closeType);
 						} else {
 							service.getHandler().sendMessage(MessageFactory.startRemoteUpdateCycle());
 							service.getHandler().sendMessage(MessageFactory.RadioVolume(0));

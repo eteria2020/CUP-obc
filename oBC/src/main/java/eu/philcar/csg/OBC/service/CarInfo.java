@@ -464,8 +464,10 @@ public class CarInfo {
 
 				if (s != null && !s.equalsIgnoreCase(getFakeCard())) {
 					hasChanged = true;
-					if (setFakeCard(s) && App.currentTripInfo == null)
+					if (setFakeCard(s) && App.currentTripInfo == null) {
+						dlog.d("received fakeCard code" + s);
 						service.notifyCard(s, "OPEN", false, false);
+					}
 				}
 
 			}else if (key.equalsIgnoreCase("fakePin")) {
