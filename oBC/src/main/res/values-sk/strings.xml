@@ -16,7 +16,6 @@
     <string name="instruction_close_3">Zatiahni ručnú brzdu</string>
     <string name="error_parsing_invalid_type">Neplatný typ adresy</string>
     <string name="button_end">Koniec</string>
-    <string name="endpointSharengoZMQ"></string>
     <string name="plate">ŠPZ</string>
     <string name="pin_FAQ_1">Na stránke mobile.sharengo.it sa prihlás a v stĺpci po ľavej strane nájdeš PIN.</string>
     <string name="pin_FAQ_2">Na stránke mobile.sharengo.it sa prihlás, klikni na svoje meno a nájdeš PIN.</string>
@@ -122,9 +121,6 @@
     <string name="menu_rent_end_instruction">Motor sa vypne v určenom čase, ak to chceš zrušiť klikni sem dole</string>
     <string name="error_empty_address">Pole adresa nemôže byť prázdne</string>
     <string name="error_empty_city">Pole mesto nemôže byť prázdne</string>
-    <string name="endpointSharengo"></string>
-    <string name="endpointSharengoPhp"></string>
-    <string name="endpointSharengoBeacon"></string>
     <string name="pin_business">Použil si business pin</string>
     <string name="goodbye_instructions">Ukončil si jazdu, teraz môžeš vystúpiť, dvere sa zatvoria automaticky za:</string>
     <string name="are_you_drunk">Pil si alkohol?</string>
