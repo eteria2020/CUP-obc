@@ -77,9 +77,9 @@ public class DataManager { //TODO change to interface-type system like api does 
 
 	}
 
-	public void saveConfig(Config customer) {
+	public void saveConfig(Config config) {
 
-		App.Instance.setConfig(customer.getJson(), null);
+		App.Instance.setConfig(config.getJson(), null);
 
 	}
 

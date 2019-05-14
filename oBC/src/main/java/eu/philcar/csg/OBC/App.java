@@ -512,6 +512,7 @@ public class App extends MultiDexApplication {
 	private static final String KEY_FullNode = "full_node";
 	private static final String KEY_SpegnimentoEnabled = "spegnimento_enabled";
 	private static final String KEY_SpegnimentoDisabled = "spegnimento_disabled";
+	private static final String Key_VirtualSocEnabled = "virtual_soc_enabled";
 
 	public static final String KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
 
@@ -601,6 +602,7 @@ public class App extends MultiDexApplication {
 	public static int ServerIP = 0;
 	public static String timeZone;
 	public static Boolean fullNode = true;
+	public static boolean virtualSocEnabled =true;
 
 	private static boolean hasNetworkConnection = false;
 	private static boolean networkStable = true;
@@ -903,6 +905,14 @@ public class App extends MultiDexApplication {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putBoolean(KEY_FullNode, fullNode);
+			e.apply();
+		}
+	}
+
+	public void persistVirtualSocEnabled(){
+		if(this.preferences != null){
+			Editor e = this.preferences.edit();
+			e.putBoolean(Key_VirtualSocEnabled,virtualSocEnabled);
 			e.apply();
 		}
 	}
@@ -1801,6 +1811,9 @@ public class App extends MultiDexApplication {
 				} else if (key.equalsIgnoreCase("Spegnimento")) {
 					spegnimentoEnabled = jo.getBoolean(key);
 					persistspegnimentoEnabled();
+				} else if (key.equalsIgnoreCase("virtualSocEnabled")) {
+					virtualSocEnabled = jo.getBoolean(key);
+					persistVirtualSocEnabled();
 				}
 			}
 			loadPreferences();

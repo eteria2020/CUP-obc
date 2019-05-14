@@ -97,7 +97,7 @@ public class Events extends DbTable<Event, Integer> {
 		labels.put(EVT_OUTOFAREA, "AREA");
 		labels.put(EVT_MENU_CLICK, "MENU_CLICK");
 		labels.put(EVT_CAN_ANOMALIES, "CAN_ANOMALIES");
-		labels.put(EVT_REMOTE_CLOSE_TRIP, "EVT_REMOTE_CLOSE_TRIP");
+		labels.put(EVT_REMOTE_CLOSE_TRIP, "CHIUSURA CORSA APP");
 		labels.put(EVT_REMOTE_PIN, "REMOTE_PIN_ENTERED");
 
 	}

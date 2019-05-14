@@ -20,7 +20,7 @@ android {
         vmtest {
             keyAlias 'Sharengo.user'
             keyPassword 'Sharengo1'
-            storeFile file('D:/Mobile Workspace/Android Workspace/key/sharengo.keystore.jks')
+            storeFile file('C:/Workspace/Mobile App/key/sharengo.keystore.jks')
             storePassword 'Sharengo1'
         }
     }
@@ -83,10 +83,10 @@ android {
             resValue "string", "endpointSharengoBeacon", "http://api.sharengo.nl:7630/"
             resValue "string", "endpointSharengoPhp", "http://api.sharengo.nl/api/"
             resValue "string", "endpointSharengoZMQ", "tcp://api.sharengo.nl:8002"
-            resValue "string", "maxLongitudeMargin", "18.53"
-            resValue "string", "maxLatitudeMargin", "47.10"
-            resValue "string", "minLongitudeMargin", "6.63"
-            resValue "string", "minLatitudeMargin", "36.64"
+            resValue "string", "maxLongitudeMargin", "7.63"
+            resValue "string", "maxLatitudeMargin", "53.79"
+            resValue "string", "minLongitudeMargin", "2.90"
+            resValue "string", "minLatitudeMargin", "50.88"
         }
         italia {
             resValue "string", "def_lang", "it"
@@ -103,10 +103,10 @@ android {
         stage {
             resValue "string", "def_lang", "it"
             resValue "string", "app_data_path", "/csg-stage/"
-            resValue "string", "endpointSharengo", "https://corestage.sharengo.it:8123/"
-            resValue "string", "endpointSharengoBeacon", "http://corestage.sharengo.it:7600/"
-            resValue "string", "endpointSharengoPhp", "http://corestage.sharengo.it/api/"
-            resValue "string", "endpointSharengoZMQ", "tcp://corestage.sharengo.it:8001"
+            resValue "string", "endpointSharengo", "https://apitest.sharengo.it:8123/"
+            resValue "string", "endpointSharengoBeacon", "http://apitest.sharengo.it:7600/"
+            resValue "string", "endpointSharengoPhp", "http://apitest.sharengo.it/api/"
+            resValue "string", "endpointSharengoZMQ", "tcp://apitest.sharengo.it:8001"
             resValue "string", "maxLongitudeMargin", "18.53"
             resValue "string", "maxLatitudeMargin", "47.10"
             resValue "string", "minLongitudeMargin", "6.63"

@@ -235,6 +235,8 @@ public class ObcService extends Service implements OnTripCallback {
 	SharengoBeaconRepository beaconRepository;
 	@Inject
 	DataManager dataManager;
+	@Inject
+	GPSController gpsController;
 
 	//ENCAPSULATED OBJECTS
 
@@ -684,6 +686,12 @@ public class ObcService extends Service implements OnTripCallback {
 					carInfo.bmsSOC = getSOCValue();
 					carInfo.setOutAmp(getCurrentValue());
 
+					if(!App.virtualSocEnabled){
+						dlog.d("virtualBMSUpdateScheduler: disabled virtualSOC set " + carInfo.bmsSOC);
+						carInfo.setBatteryLevel(carInfo.bmsSOC);
+						return;
+					}
+
 					//check amp error
 					if (carInfo.getOutAmp() == 350 || carInfo.getOutAmp() == -1037) {
 						setAmpError(true);
@@ -946,7 +954,7 @@ public class ObcService extends Service implements OnTripCallback {
 
 		}, 40, 300, TimeUnit.SECONDS);
 
-		timeCheckFuture = timeCheckScheduler.scheduleAtFixedRate(timeCheckRunnable, 1, 10, TimeUnit.MINUTES);//360
+		timeCheckFuture = timeCheckScheduler.scheduleAtFixedRate(timeCheckRunnable, 0, 10, TimeUnit.MINUTES);//360
 
 		//Register receiver for battery data
 
@@ -1406,7 +1414,7 @@ public class ObcService extends Service implements OnTripCallback {
 		Bundle res = carInfo.betterHandleUpdate(b, this);
 
 		if (res.getBoolean("force")) {
-			dlog.i("forse beaconUpdate");
+			dlog.i("force beaconUpdate");
 			sendBeacon();
 		}
 		if (!res.getBoolean("changed"))
@@ -2188,7 +2196,7 @@ public class ObcService extends Service implements OnTripCallback {
 
 		stopRequestCloseTrip();
 
-		eventRepository.remoteTripClose(card_code);
+		eventRepository.remoteTripClose("RICEVUTA RICHIESTA card " +card_code);
 
 		closeTripScheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -2206,8 +2214,8 @@ public class ObcService extends Service implements OnTripCallback {
 						stopRequestCloseTrip();
 						return;
 					}
-					boolean keyOff = !CarInfo.isKeyOn();
-					boolean isStop = !GPSController.isMoving();
+					boolean keyOff = App.checkKeyOff && !CarInfo.isKeyOn();
+					boolean isStop = !gpsController.isMoving();
 					if (isStop && keyOff) {//closeTrip
 						if(App.checkIsInsideParkingArea()) {
 							App.setIsCloseable(true);
@@ -2216,6 +2224,7 @@ public class ObcService extends Service implements OnTripCallback {
 						}
 						if(closeTries++>3){
 							stopRequestCloseTrip();
+							eventRepository.remoteTripClose("ABORT CLOSE isStop: "+isStop +" keyOff: " +keyOff );
 						}
 					} else {
 						dlog.d("closeTripScheduler: unable to close trip is Stop : " + isStop + " keyOff: " + keyOff);
@@ -2988,7 +2997,7 @@ public class ObcService extends Service implements OnTripCallback {
 					localHandler.sendEmptyMessageDelayed(MSG_TRIP_SENDBEACON,10*60*1000);
 					localHandler.sendEmptyMessageDelayed(MSG_TRIP_SENDBEACON,5*60*1000);
 				case MSG_CHECK_SPEGNIMENTO:
-					try {
+					/*try {
 						if (App.spegnimentoEnabled && !App.spegnimentoDisabled && Integer.parseInt(carInfo.getSdk_version().replaceAll("[^0-9]", "")) >= 477 && (App.currentTripInfo == null || !App.currentTripInfo.isOpen) && (App.reservation == null || App.reservation.isMaintenance()) && !BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug")) {
 							if (!apiRepository.isCustomerRunning()) {
 								long time = 20 * 60 * 1000;
@@ -3004,9 +3013,29 @@ public class ObcService extends Service implements OnTripCallback {
 						} else {
 							dlog.d("Spegnimento: check condition FASLE");
 						}
+					}catch (NumberFormatException e) {
+						try{
+							if (App.spegnimentoEnabled && !App.spegnimentoDisabled && (App.currentTripInfo == null || !App.currentTripInfo.isOpen) && (App.reservation == null || App.reservation.isMaintenance()) && !BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug")) {
+								if (!apiRepository.isCustomerRunning()) {
+									long time = 20 * 60 * 1000;
+									sendBeacon();
+									localHandler.sendEmptyMessageDelayed(MSG_TRIP_SENDBEACON,time/4);
+									localHandler.sendEmptyMessageDelayed(MSG_TRIP_SENDBEACON,time/2);
+									SystemControl.doShutdown(time);//dovrebbe essere 10 minuti
+									dlog.d("Spegnimento: Spegnimento iniziato " + time);
+								} else {
+									localHandler.sendEmptyMessageDelayed(MSG_CHECK_SPEGNIMENTO, 2 * 60 * 1000);
+									dlog.d("Spegnimento: Spegnimento Rimandato per Whitelist");
+								}
+							} else {
+								dlog.d("Spegnimento: check condition FASLE");
+							}
+						}catch (Exception ex) {
+						dlog.e( "handleMessage: Exception", ex);
+						}
 					}catch (Exception e) {
-					    dlog.e( "handleMessage: Exception", e);
-					}
+						dlog.e( "handleMessage: Exception", e);
+					}*/
 					break;
 
 			}

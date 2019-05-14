@@ -25,7 +25,7 @@ public class GPSController {
 	private final Context mContext;
 
 	private Location lastLocation;
-	private static boolean moving = false;
+	private boolean moving = false;
 
 	private static Handler localHandler;
 
@@ -54,7 +54,7 @@ public class GPSController {
 		moving = false;
 	}
 
-	public static boolean isMoving() {
+	public boolean isMoving() {
 		return moving;
 	}
 

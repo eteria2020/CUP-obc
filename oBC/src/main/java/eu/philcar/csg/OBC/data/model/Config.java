@@ -20,6 +20,7 @@ public class Config extends BaseResponse {
 	private Boolean FullNode;
 	private String SosNumber;
 	private Boolean Spegnimento;
+	private Boolean VirtualSocEnabled;
 
 	public Config(String batteryAlarmSMSNumbers, String defaultCity, String useExternalGPS, String radioSetup, String watchdog, String newBatteryShutdownLevel, String fleetId, String serverIP, String timeZone, String openDoorsCards, Boolean fullNode, String sosNumber, Boolean spegnimento) {
 		BatteryAlarmSMSNumbers = batteryAlarmSMSNumbers;
