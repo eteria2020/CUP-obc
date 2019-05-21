@@ -17,11 +17,8 @@ repositories {
 
 android {
     signingConfigs {
-        vmtest {
-            keyAlias 'Sharengo.user'
-            keyPassword 'Sharengo1'
-            storeFile file('C:/Workspace/Mobile App/key/sharengo.keystore.jks')
-            storePassword 'Sharengo1'
+        prod {
+            storeFile file('C:/Workspace/OBC/obc/keystore/sharengo.keystore.jks')
         }
     }
     compileSdkVersion 26
@@ -41,20 +38,13 @@ android {
         release {
             minifyEnabled false
             debuggable false
-            signingConfig signingConfigs.vmtest
+            signingConfig signingConfigs.prod
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             multiDexKeepProguard file('multidex-proguard-rules.pro')
         }
         debug {
-            signingConfig signingConfigs.vmtest
+            signingConfig signingConfigs.prod
             debuggable true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
-            multiDexKeepProguard file('multidex-proguard-rules.pro')
-        }
-        spegnimento {
-            minifyEnabled false
-            debuggable false
-            signingConfig signingConfigs.vmtest
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             multiDexKeepProguard file('multidex-proguard-rules.pro')
         }
