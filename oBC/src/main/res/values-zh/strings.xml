@@ -21,7 +21,7 @@
     <string name="button_call">请求来电</string>
     <string name="button_break">停车 或 结束租赁</string>
     <string name="button_close">关闭</string>
-    <string name="button_navigator">导航</string>
+    <string name="button_navigatormen">导航</string>
     <string name="button_radio">广播</string>
     <string name="button_points">点</string>
     <string name="button_recharge">充电站</string>
@@ -240,5 +240,12 @@
     <string name="maintenance_status_done">TERMINA RICARICA: Clicca su termina ricarica per continuare col noleggio</string>
     <string name="maintenance_status_plug_insert">IMPOSSIBILE TERMINARE RICARCA: spina ancora inserita</string>
     <string name="maintenance_status_wait">Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.</string>
+    <string name="navigation_distance">Distanza</string>
+    <string name="navigation_time">Arrivo in</string>
+    <string name="nafigation_eta">Ora di arrivo</string>
+    <string name="button_damages">DANNI</string>
+    <string name="pin_business">You\'ve used the business pin!</string>
+    <string name="music_hint">Connect the AUX cable to listen to music from your phone</string>
+    <string name="other_trip_message">You already have an open trip.Please contact the call center for information</string>
 
 </resources>

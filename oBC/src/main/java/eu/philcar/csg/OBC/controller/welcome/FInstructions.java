@@ -120,13 +120,13 @@ public class FInstructions extends FBase {
 
 		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 
-		((TextView) view.findViewById(R.id.fins_message_TV)).setTypeface(font);
+//		((TextView) view.findViewById(R.id.fins_message_TV)).setTypeface(font);
 
 		fins_right_FL = (RelativeLayout) view.findViewById(R.id.fins_right_FL);
 
-		((TextView) view.findViewById(R.id.finsInstructions1TV)).setTypeface(font);
-		((TextView) view.findViewById(R.id.finsInstructions2TV)).setTypeface(font);
-		((TextView) view.findViewById(R.id.finsInstructions3TV)).setTypeface(font);
+//		((TextView) view.findViewById(R.id.finsInstructions1TV)).setTypeface(font);
+//		((TextView) view.findViewById(R.id.finsInstructions2TV)).setTypeface(font);
+//		((TextView) view.findViewById(R.id.finsInstructions3TV)).setTypeface(font);
 
 		if (login) {
 

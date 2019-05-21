@@ -226,6 +226,14 @@ public class AWelcome extends ABase {
 
 						break;
 
+					case ObcService.MSG_CUSTOMER_CHECKPIN:
+
+						String pin = (String) msg.obj;
+						if(App.currentTripInfo.CheckPin(pin, false)){
+							welcomeWeakReference.get().startActivity(new Intent(welcomeWeakReference.get(), AMainOBC.class));
+							welcomeWeakReference.get().finish();
+						}
+						break;
 					case ObcService.MSG_CAR_INFO:
 						if (msg.obj != null && msg.obj instanceof CarInfo) {
 							welcomeWeakReference.get().localCarInfo = (CarInfo) msg.obj;

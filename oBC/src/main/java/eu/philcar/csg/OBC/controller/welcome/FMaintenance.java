@@ -123,7 +123,7 @@ public class FMaintenance extends FBase {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		//App.Charging = true;
+		App.setCharging(true);
 		eventRepository.Maintenance("Show");
 		if (App.currentTripInfo.customer.isMaintainer()) askPin();
 		((AWelcome) getActivity()).sendMessage(MessageFactory.requestCarInfo());

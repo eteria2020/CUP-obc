@@ -49,6 +49,7 @@ import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 public class CarInfo {
 
 	private DLog dlog = new DLog(this.getClass());
+	public static CarInfo Shared ;
 
 	@Inject
 	EventRepository eventRepository;
@@ -75,6 +76,7 @@ public class CarInfo {
 	private String gear = "";
 	private boolean batterySafety = false;
 	private String fakeCard = "00000000";
+	private String fakePin = "0000";
 	private boolean lastBatterySafety = batterySafety;
 	private Date lastBatterySafetyTx = new Date();
 	private int outAmp = 0;
@@ -88,7 +90,7 @@ public class CarInfo {
 	public Boolean Charging = false;
 	public float currVoltage = App.max_voltage;
 
-	private boolean ready = false;
+	private static boolean ready = false;
 	private boolean brakes = false;
 	private boolean chargingPlug = false;
 	public double currentAmpere = App.currentAmp;
@@ -155,17 +157,27 @@ public class CarInfo {
 
 	public CarInfo(Handler handler) {
 		App.Instance.getComponent().inject(this);
+		Shared = this;
 		serviceHandler = handler;
 		serviceLocationListener = new ServiceLocationListener();
 		allData = new Bundle();
 		beacon = new Beacon();
 	}
 
+	public String getFakePin() {
+		return fakePin;
+	}
+
+	public boolean setFakePin(String fakePin) {
+		this.fakePin = fakePin;
+		return !this.fakePin.equalsIgnoreCase("0000");
+	}
+
 	public String getFakeCard() {
 		return fakeCard;
 	}
 
-	public Boolean setFakeCard(String fakeCard) {
+	public boolean setFakeCard(String fakeCard) {
 		this.fakeCard = fakeCard;
 		return !this.fakeCard.equalsIgnoreCase("00000000");
 	}
@@ -209,7 +221,7 @@ public class CarInfo {
 		} else
 			this.batteryLevel = (batteryLevel);
 
-		if (BuildConfig.FLAVOR.equals("develop"))
+		if (BuildConfig.BUILD_TYPE.equals("debug"))
 			this.batteryLevel = 99;//FOR DEVELOP PURPOSE
 
 		App.Instance.setBatteryLevel(this.batteryLevel);
@@ -454,8 +466,24 @@ public class CarInfo {
 
 				if (s != null && !s.equalsIgnoreCase(getFakeCard())) {
 					hasChanged = true;
-					if (setFakeCard(s))
+					if (setFakeCard(s) && App.currentTripInfo == null) {
+						dlog.d("received fakeCard code" + s);
 						service.notifyCard(s, "OPEN", false, false);
+					}
+				}
+
+			}else if (key.equalsIgnoreCase("fakePin")) {
+
+				s = b.getString(key);
+
+				if (s != null && !s.equalsIgnoreCase(getFakePin())) {
+					hasChanged = true;
+					if (setFakePin(s) && App.currentTripInfo != null) {
+						eventRepository.eventPin(getFakePin());
+//						service.notifyCard(s, "OPEN", false, false);
+						service.sendAll(MessageFactory.checkPin(getFakePin()));
+//						service.sendMessage(MessageFactory.restartUI());
+					}
 				}
 
 			} else if (key.equalsIgnoreCase("timestampAmp")) {
@@ -822,6 +850,7 @@ public class CarInfo {
 
 			jw.name("GPS").value(App.UseExternalGPS ? "EXT" : "INT");
 			jw.name("SOC").value(batteryLevel);
+			jw.name("km").value(App.km);
 			//jw.name("batterySafety").value(batterySafety);
 			jw.name("cputemp").value(App.getCpuTemp());
 
@@ -1174,7 +1203,7 @@ public class CarInfo {
 		beacon.setPPStatus(this.chargingPlug);
 	}
 
-	public boolean isReady() {
+	public static boolean isReady() {
 		return ready;
 	}
 

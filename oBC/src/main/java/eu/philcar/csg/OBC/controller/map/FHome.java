@@ -324,6 +324,12 @@ public class FHome extends FBase implements OnClickListener {
 		fmapAlarm.setVisibility(View.GONE);
 		fmapRange.setVisibility(View.GONE);
 
+
+		if (App.fuel_level != 0)
+			tvRange.setText(App.fuel_level + " Km");
+		else
+			fmapRange.setVisibility(View.INVISIBLE);
+
 		adIV = (ImageView) view.findViewById(R.id.fmapLeftBorderIV);
 		adIV.setOnClickListener(this);
 		//webViewBanner = (WebView) view.findViewById(R.id.WebViewBanner);
@@ -816,13 +822,14 @@ public class FHome extends FBase implements OnClickListener {
 				fmapAlarm.setVisibility(View.VISIBLE);
 				fmapRange.setVisibility(View.GONE);
 			} else {
-				if (alertFLMode == ALERT_SOC) {
-					localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
-					fmapAlarm.setVisibility(View.GONE);
-					fmapRange.setVisibility(View.VISIBLE);
-				}
+
+
+				localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
+				rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
+				fmapAlarm.setVisibility(View.GONE);
+				fmapRange.setVisibility(View.VISIBLE);
+				tvRange.setText((SOC >= 50 ? SOC : SOC - 10) + " Km");
 			}
-			tvRange.setText((SOC >= 50 ? SOC : SOC - 10) + " Km");
 
 		} catch (Exception e) {
 			dlog.e("Exception while handling carInfo", e);
@@ -1070,7 +1077,7 @@ public class FHome extends FBase implements OnClickListener {
 			if (!isClick) {
 
 				if (App.currentTripInfo != null && App.currentTripInfo.customer != null)
-					if (BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+					if (BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
 						paramsList.add(new BasicNameValuePair("id", "26740"));// App.currentTripInfo.customer.id + "")); //"3"));
 				paramsList.add(new BasicNameValuePair("id", App.currentTripInfo.customer.id + ""));// App.currentTripInfo.customer.id + "")); //"3"));
 

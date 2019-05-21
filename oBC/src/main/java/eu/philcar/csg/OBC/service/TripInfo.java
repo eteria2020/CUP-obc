@@ -67,7 +67,7 @@ import io.reactivex.schedulers.Schedulers;
  * This Class represents all information of a Trip
  *
  * @author massimo.belluz@bulweria.com
- */
+ *///TODO implement Singleton to handle all information about the currentTrip
 public class TripInfo {
 
 	public enum CloseType {
@@ -242,6 +242,7 @@ public class TripInfo {
 		DbManager dbm = App.Instance.dbManager;
 		//HttpConnector http;
 
+
 		Customers customers = dbm.getClientiDao();
 		Customer customer = customers.getClienteByCardCode(code);
 
@@ -366,6 +367,10 @@ public class TripInfo {
 				obc_io.setLcd(null, customer.info_display);
 			}
 		} else {  // se c'? una trip aperta...
+			if("OPEN".equalsIgnoreCase(event)){
+				dlog.d("handleCard: event OPEN trip already present");
+				return null;
+			}
 			dlog.d(TripInfo.class.toString() + " handleCard: Pending trips. Check condition...");
 			if (code.equalsIgnoreCase(cardCode)) {  //e la card ? dell'utente che ha aperto la trip  chiudi  o sospendi trip
 
@@ -414,7 +419,7 @@ public class TripInfo {
 
 						if (closeType == CloseType.forced) {   // Se ? una chiusura forzata chiudi la sosta e richiama ricorsivamente  questa funzione per chiudere anche la trip.
 							setParkMode(0, obc_io);
-							return handleCard(code, event, carInfo, obc_io, service, screenLock, closeType);
+							return handleCard(code, "CLOSE", carInfo, obc_io, service, screenLock, closeType);
 						} else {
 							service.getHandler().sendMessage(MessageFactory.startRemoteUpdateCycle());
 							service.getHandler().sendMessage(MessageFactory.RadioVolume(0));
@@ -432,7 +437,7 @@ public class TripInfo {
 						dlog.d("handleCard: corsa non chiudibile");
 						return null;
 					}
-					if (service.checkParkArea() || closeType == CloseType.forced) {
+					if (service.checkParkArea() || closeType == CloseType.forced || !App.pinChecked) {
 
 						eventRepository.eventRfid(2, code);
 						CloseTrip(carInfo, obc_io, service);
@@ -584,7 +589,7 @@ public class TripInfo {
 			App.BannerName.putBundle(type, Image);
 
 			//ricavo nome file
-			URL urlImg = new URL(Image.getString("URL"));
+			URL urlImg = new URL(Image.getString("URL").replace(" ", "%20"));
 			String extension = urlImg.getFile().substring(urlImg.getFile().lastIndexOf('.') + 1);
 			String filename = Image.getString("ID").concat(".").concat(extension);
 
@@ -1049,7 +1054,7 @@ public class TripInfo {
 			DbManager dbm = App.Instance.dbManager;
 			BusinessEmployees employees = dbm.getDipendentiDao();
 			BusinessEmployee employee = employees.getBusinessEmployee(customer.id);
-			if (BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+			if (BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
 				employee.isBusinessEnabled = true;
 			if (!customer.isCompanyPinEnabled() || employee == null || !employee.isBusinessEnabled() || !employee.isWithinTimeLimits()) {
 				dlog.e("CheckPin : can't open business trip");
@@ -1058,6 +1063,10 @@ public class TripInfo {
 		}
 
 		if (n_pin > 0) {
+
+			App.pinChecked = true;
+			App.Instance.persistPinChecked();
+
 			trip.n_pin = n_pin;
 			UpdateCorsa();
 			try {

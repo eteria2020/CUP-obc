@@ -76,6 +76,10 @@ public class FWelcome extends FBase {
 	protected ImageButton fwelFrenchIB;
 	@BindView(R.id.fwelchineseIB)
 	protected ImageButton fwelChineseIB;
+	@BindView(R.id.fwelSlovakiaIB)
+	protected ImageButton fwelSlovakiaIB;
+	@BindView(R.id.fwelNetherlandsIB)
+	protected ImageButton fwelNetherlandsIB;
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm", Locale.getDefault());
 
 	private int logoTaps = 0;
@@ -100,7 +104,7 @@ public class FWelcome extends FBase {
 
 		unbinder = ButterKnife.bind(this, view);
 
-		dlog.d("OnCreareView FWelcome");
+		dlog.d("OnCreateView FWelcome");
 
 		view.findViewById(R.id.fwelItalianIB).setOnClickListener(new OnClickListener() {
 			@Override
@@ -110,7 +114,6 @@ public class FWelcome extends FBase {
 
 			}
 		});
-
 		view.findViewById(R.id.fwelFrenchIB).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -119,7 +122,6 @@ public class FWelcome extends FBase {
 
 			}
 		});
-
 		view.findViewById(R.id.fwelEnglishIB).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -131,6 +133,22 @@ public class FWelcome extends FBase {
 			@Override
 			public void onClick(View v) {
 				((ABase) getActivity()).setChinseseLanguage();
+				nextPage();
+
+			}
+		});
+		view.findViewById(R.id.fwelNetherlandsIB).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((ABase) getActivity()).setNetherlandsLanguage();
+				nextPage();
+
+			}
+		});
+		view.findViewById(R.id.fwelSlovakiaIB).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((ABase) getActivity()).setSlovakLanguage();
 				nextPage();
 
 			}
@@ -156,25 +174,13 @@ public class FWelcome extends FBase {
 			}
 		});
 
-		/*welcomeLL = (LinearLayout)view.findViewById(R.id.fwelWelcomeLL);
-		bannerLL = (LinearLayout)view.findViewById(R.id.fwelBannerLL);
-		flagsLL = (LinearLayout)view.findViewById(R.id.fwelLanguageLL);
-		nameTV = (TextView)view.findViewById(R.id.fwel_name_TV);
-		fwelItalianIB = (ImageButton)view.findViewById(R.id.fwelItalianIB);
-		fwelEnglishIB = (ImageButton)view.findViewById(R.id.fwelEnglishIB);
-		fwelFrenchIB = (ImageButton)view.findViewById(R.id.fwelFrenchIB);
-		tvCarPlate = (TextView)view.findViewById(R.id.tvCarPlate);
-		tvDateTime = (TextView)view.findViewById(R.id.tvDateTime);
-		tvFleet = (TextView)view.findViewById(R.id.tvFleet);
-		fwcm_whole_RL=(RelativeLayout)view.findViewById(R.id.fwcm_whole_RL);*/
-
 		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 		((TextView) view.findViewById(R.id.fwel_welcome_TV)).setTypeface(font);
-
-		nameTV.setTypeface(font);
-		tvCarPlate.setTypeface(font);
-		tvFleet.setTypeface(font);
-		tvDateTime.setTypeface(font);
+//
+//		nameTV.setTypeface(font);
+//		tvCarPlate.setTypeface(font);
+//		tvFleet.setTypeface(font);
+//		tvDateTime.setTypeface(font);
 
 		tvFleet.setText(App.DefaultCity);
 		setCarPlate(App.CarPlate);
@@ -283,9 +289,21 @@ public class FWelcome extends FBase {
 
 		welcomeLL.setVisibility(View.VISIBLE);
 		flagsLL.setVisibility(View.VISIBLE);
-		fwelItalianIB.setVisibility(View.VISIBLE);
+//		fwelItalianIB.setVisibility(View.VISIBLE);
 		fwelEnglishIB.setVisibility(View.VISIBLE);
 		//fwelFrenchIB.setVisibility(View.VISIBLE);
+
+		switch (getString(R.string.def_lang)){
+			case "it":
+				fwelItalianIB.setVisibility(View.VISIBLE);
+				break;
+			case "nl":
+				fwelNetherlandsIB.setVisibility(View.VISIBLE);
+				break;
+			case "sk":
+				fwelSlovakiaIB.setVisibility(View.VISIBLE);
+				break;
+		}
 
 		bannerLL.setVisibility(View.INVISIBLE);
 		flagsLL.invalidate();

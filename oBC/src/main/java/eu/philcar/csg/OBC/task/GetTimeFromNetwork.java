@@ -31,6 +31,17 @@ public class GetTimeFromNetwork extends AsyncTask<CarInfo, Void, Void> { // The 
 		this.mContext = mContext;
 	}
 
+
+	@Override
+	protected Void doInBackground(CarInfo... carinfo) { // This will print the network time
+		try {
+			printTimes(carinfo[0]);
+		} catch (Exception e) {
+			dlog.e("Exception in printTime", e);
+		}
+		return null;
+	}
+
 	private void printTimes(CarInfo carInfo) {
 
 		Runtime rt = Runtime.getRuntime();
@@ -52,7 +63,7 @@ public class GetTimeFromNetwork extends AsyncTask<CarInfo, Void, Void> { // The 
 		}
 
 		try {
-			if (time != null) {
+			if (time != null && !(SystemClock.elapsedRealtime()>15*60*1000 && System.currentTimeMillis()<1234567890)) {
 				rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(time) + ";\n"}); //
 				rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time 0"});
 			} else
@@ -72,15 +83,4 @@ public class GetTimeFromNetwork extends AsyncTask<CarInfo, Void, Void> { // The 
 		}
 
 	}
-
-	@Override
-	protected Void doInBackground(CarInfo... carinfo) { // This will print the network time
-		try {
-			printTimes(carinfo[0]);
-		} catch (Exception e) {
-			dlog.e("Exception in printTime", e);
-		}
-		return null;
-	}
-
 }

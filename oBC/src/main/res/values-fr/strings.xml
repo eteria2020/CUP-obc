@@ -21,7 +21,7 @@
     <string name="button_call">Postuler à l\'appel de soutien</string>
     <string name="button_break">PARKING\nou FIN A LOUER</string>
     <string name="button_close">Fermer</string>
-    <string name="button_navigator">NAVIGATOR</string>
+    <string name="button_navigatormen">NAVIGATOR</string>
     <string name="button_radio">RADIO</string>
     <string name="button_points">POINTS</string>
     <string name="button_recharge">POINTS DE RECHARGE</string>
@@ -158,7 +158,7 @@
     <string name="navigator_slight_right">Tourner légèrement à droite</string>
     <string name="navigator_stopover">Escale</string>
     <string name="navigator_turn">tour</string>
-    <string name="navigator_turn_onto_it"></string>
+    <string name="navigator_turn_onto_it">turn onto</string>
     <string name="navigator_turn_onto_en">tourner sur</string>
     <string name="navigator_uturn">Vous allez dans la direction opposée. Lorsque cela est possible, faire un demi-tour</string>
     <string name="navigator_range">Gamme</string>
@@ -236,5 +236,11 @@
     <string name="maintenance_status_done">TERMINA RICARICA: Clicca su termina ricarica per continuare col noleggio</string>
     <string name="maintenance_status_plug_insert">IMPOSSIBILE TERMINARE RICARCA: spina ancora inserita</string>
     <string name="maintenance_status_wait">Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.</string>
+    <string name="navigation_distance">Distanza</string>
+    <string name="navigation_time">Arrivo in</string>
+    <string name="nafigation_eta">Ora di arrivo</string>
+    <string name="button_damages">DANNI</string>
+    <string name="music_hint">Connect the AUX cable to listen to music from your phone</string>
+    <string name="pin_business">You\'ve used the business pin!</string>
 
 </resources>

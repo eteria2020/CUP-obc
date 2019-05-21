@@ -165,7 +165,7 @@ public class ApiModule {
 				tmf.init(trustStore);
 				TrustManager[] trustManagers = tmf.getTrustManagers();
 				SSLContext sslContext = SSLContext.getInstance("SSL");
-				sslContext.init(keyManagers, trustManagers, null);
+				sslContext.init(keyManagers, trustAllCerts, null);
 
 				httpClient.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
 			}

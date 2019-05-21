@@ -32,6 +32,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
+import android.support.annotation.NonNull;
 import android.support.multidex.MultiDexApplication;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
@@ -164,7 +165,6 @@ public class App extends MultiDexApplication {
 
 	public App() {
 		Instance = this;
-		initSharengo();
 
 	}
 
@@ -387,7 +387,7 @@ public class App extends MultiDexApplication {
 
 			Port_UDP_Beacon = 7600;
 
-			APP_DATA_PATH = "/csg/";
+			APP_DATA_PATH = getString(R.string.app_data_path);;
 
 			/*URL_Area = "http://corecina.sharengo.it/api/zone/json.php?";
 			URL_Beacon = "http://corecina.sharengo.it/api/pushbeacon.php?";
@@ -510,6 +510,9 @@ public class App extends MultiDexApplication {
 	private static final String KEY_CallCenterNumer = "call_center_numer";
 	private static final String KEY_NewBatteryShutdownLevel = "new_battery_shutdown_level";
 	private static final String KEY_FullNode = "full_node";
+	private static final String KEY_SpegnimentoEnabled = "spegnimento_enabled";
+	private static final String KEY_SpegnimentoDisabled = "spegnimento_disabled";
+	private static final String Key_VirtualSocEnabled = "virtual_soc_enabled";
 
 	public static final String KEY_LastAdvertisementListDownloaded = "last_time_ads_list_downloaded";
 
@@ -517,6 +520,10 @@ public class App extends MultiDexApplication {
 	public static CardRfidCollection openDoorsCards;
 
 	public static String callCenterNumer = "+390287317140";
+	//Enable spegnimento from configs
+	public static boolean spegnimentoEnabled= false;
+	//Disable spegnimento for specific cars
+	public static boolean spegnimentoDisabled= false;
 
 	public static String CarPlate = "ND";
 	public static String Damages = "";
@@ -595,6 +602,7 @@ public class App extends MultiDexApplication {
 	public static int ServerIP = 0;
 	public static String timeZone;
 	public static Boolean fullNode = true;
+	public static boolean virtualSocEnabled =true;
 
 	private static boolean hasNetworkConnection = false;
 	private static boolean networkStable = true;
@@ -878,10 +886,33 @@ public class App extends MultiDexApplication {
 		}
 	}
 
+	public void persistspegnimentoEnabled() {
+		if (this.preferences != null) {
+			Editor e = this.preferences.edit();
+			e.putBoolean(KEY_SpegnimentoEnabled, spegnimentoEnabled);
+			e.apply();
+		}
+	}
+	public void persistSpegnimentoDisabled() {
+		if (this.preferences != null) {
+			Editor e = this.preferences.edit();
+			e.putBoolean(KEY_SpegnimentoDisabled, spegnimentoDisabled);
+			e.apply();
+		}
+	}
+
 	public void persistFullNode() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putBoolean(KEY_FullNode, fullNode);
+			e.apply();
+		}
+	}
+
+	public void persistVirtualSocEnabled(){
+		if(this.preferences != null){
+			Editor e = this.preferences.edit();
+			e.putBoolean(Key_VirtualSocEnabled,virtualSocEnabled);
 			e.apply();
 		}
 	}
@@ -1208,6 +1239,7 @@ public class App extends MultiDexApplication {
 	public void onCreate() {
 		super.onCreate();
 		Fabric.with(this, new Crashlytics());
+		APP_DATA_PATH = getString(R.string.app_data_path);
 		getComponent().inject(this);
 
 		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
@@ -1776,6 +1808,12 @@ public class App extends MultiDexApplication {
 				} else if (key.equalsIgnoreCase("SosNumber")) {
 					callCenterNumer = jo.getString(key);
 					persistCallCenterNumer();
+				} else if (key.equalsIgnoreCase("Spegnimento")) {
+					spegnimentoEnabled = jo.getBoolean(key);
+					persistspegnimentoEnabled();
+				} else if (key.equalsIgnoreCase("virtualSocEnabled")) {
+					virtualSocEnabled = jo.getBoolean(key);
+					persistVirtualSocEnabled();
 				}
 			}
 			loadPreferences();
@@ -1895,10 +1933,8 @@ public class App extends MultiDexApplication {
 
 		ArrayList<double[]> polygons = App.AreaPolygons;
 
-		double[] aPolygon = null;
-		for (int i = 0; i < polygons.size(); i++) {
+		for (double[] aPolygon:polygons) {
 
-			aPolygon = polygons.get(i);
 			if (aPolygon != null && aPolygon.length > 0 && aPolygon.length % 2 == 0) {
 
 				if (GeoUtils.contains(latitude, longitude, aPolygon)) {
@@ -1917,6 +1953,20 @@ public class App extends MultiDexApplication {
 
 		DLog.I("checkParkArea: lat, lon " + latitude + ", " + longitude + " " + false);
 		return false;
+	}
+
+	public static boolean checkIsInsideParkingArea() {
+		boolean inside = true;
+//		if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+//			inside = false;
+		try {
+			Location loc = getLastLocation();
+			if (loc != null)
+				inside = checkParkArea(loc.getLatitude(), loc.getLongitude());
+		} catch (Exception e) {
+			DLog.E("Exception while checking inside area ", e);
+		}
+		return inside;
 	}
 
 	public void loadPreferences() {
@@ -1963,6 +2013,8 @@ public class App extends MultiDexApplication {
 		ServerIP = preferences.getInt(KEY_ServerIP, 0);
 		timeZone = preferences.getString(KEY_TimeZone, "Europe/Rome");
 		callCenterNumer = preferences.getString(KEY_CallCenterNumer, "+390287317140");
+		spegnimentoEnabled = preferences.getBoolean(KEY_SpegnimentoEnabled, false);
+		spegnimentoDisabled = preferences.getBoolean(KEY_SpegnimentoDisabled, false);
 //		fullNode = preferences.getBoolean(KEY_FullNode,false);
 		saveLog = preferences.getBoolean(KEY_PersistLog, true);
 		checkKeyOff = preferences.getBoolean(KEY_CheckKeyOff, true);
@@ -2355,7 +2407,7 @@ public class App extends MultiDexApplication {
 			foregroundActivity = stato;
 	}
 
-	public static boolean isForegroundActivity(Activity activity) {
+	public static boolean isForegroundActivity(@NonNull Activity activity) {
 
 		return foregroundActivity != null && foregroundActivity.equals(activity.getClass().getName());
 	}
@@ -2658,5 +2710,14 @@ public class App extends MultiDexApplication {
 
 	public void setComponent(ApplicationComponent applicationComponent) {
 		mApplicationComponent = applicationComponent;
+	}
+
+	public long getRebootTimeForLabel(String label){
+		return preferences.getLong(label, 0);
+	}
+	public void setRebootTimeForLabel(String label){
+		Editor editor = preferences.edit();
+		editor.putLong(label, System.currentTimeMillis());
+		editor.commit();
 	}
 }

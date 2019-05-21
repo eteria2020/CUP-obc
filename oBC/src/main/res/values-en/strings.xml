@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="navigation_active_error">Please stop the navigation before going on home</string>
+
+    <string name="Acra_message">error report transmission</string>
+    <string name="address">Address</string>
+    <string name="housenumber">House number</string>
+    <string name="app_name">OBC</string>
+    <string name="are_you_drunk">Did you drink alcoholic drinks?</string>
+
+    <string name="back_to_navigation">Back to navigation</string>
+    <string name="button_call">Support call</string>
+    <string name="button_break">PARK or\nEND RENT</string>
+    <string name="button_close">Close</string>
+    <string name="button_navigatormen">SAT NAV</string>
+    <string name="button_radio">RADIO</string>
+    <string name="button_points">POINTS</string>
+    <string name="button_recharge">RECHARGE POINTS</string>
+    <string name="button_search">FIND</string>
+    <string name="button_home">MENU</string>
+    <string name="button_park">PAUSE RENT</string>
+    <string name="button_end">END RENT</string>
+
+    <string name="call_book">Book call or insert a new number</string>
+    <string name="call_dealt_old">Call to customer assistance forwarded</string>
+    <string name="call_dealt">Support call sent to customer service, you\'ll be called back</string>
+    <string name="car_cleanliness_inside"><b>Inside</b> Cleanliness</string>
+    <string name="car_cleanliness_outside"><b>Outside</b> Cleanliness</string>
+    <string name="car_cleanliness_state">Car Cleanliness</string>
+    <string name="change">New number</string>
+    <string name="checking_pin">Checking PIN</string>
+    <string name="city">City</string>
+    <string name="content_description">Easter Egg</string>
+
+    <string name="damage_observed">damage observed</string>
+    <string name="damages_observed">damages observed</string>
+
+    <string name="error_empty_address">Address cannot be empty</string>
+    <string name="error_empty_city">City cannot be empty</string>
+    <string name="error_http_code_failure">Failure with HTTP code</string>
+    <string name="error_malformed_url">Malformed URL in request</string>
+    <string name="error_parsing_invalid_type">Invalid type in address</string>
+    <string name="error_parsing_missing_addresse">address-parameter not found</string>
+    <string name="error_parsing_missing_geometry">geometry parameter not found</string>
+    <string name="error_parsing_missing_latitude">latitude parameter not found</string>
+    <string name="error_parsing_missing_location">location parameter not found</string>
+    <string name="error_parsing_missing_longitude">longitude parameter not found</string>
+    <string name="error_parsing_missing_results">results-parameter not found</string>
+    <string name="error_parsing_missing_status">status-parameter not found</string>
+    <string name="error_parsing_missing_types">types-parameter not found</string>
+    <string name="error_parsing_response_not_json">Server response is not a JSON</string>
+    <string name="error_parsing_result_not_json">one of the results is not a JSON</string>
+    <string name="error_unable_to_close_buffer_reader">Unable to close buffer reader after server response retrieval</string>
+    <string name="error_unable_to_get_request_response">Unable to get request response code</string>
+    <string name="error_unable_to_open_connection">Unable to open connection</string>
+    <string name="error_unable_to_read_message_content">Unable to read message content</string>
+    <string name="error_unable_to_read_server_response">Unable to read server response</string>
+
+    <string name="find_destination">Find destination</string>
+    <string name="fuel_station_list">Fuel station list</string>
+    <string name="fuel_stations">Fuel stations</string>
+    <string name="fuel_status_one_quarter">Fuel level over 25&#37;&#58; <b>refueling disabled</b></string>
+    <string name="fuel_status_pin_card">When done, click Forward</string>
+    <string name="fuel_status_show_pin">Show <b>PIN</b> at the fuel station</string>
+
+    <string name="go_to_map_or_back">Go to map or back to destinations</string>
+    <string name="goodbye">Goodbye</string>
+
+    <string name="search_title">Address search</string>
+    <string name="hint_housenumber">Type here a number</string>
+    <string name="hint_address">Type here an address</string>
+    <string name="hint_city">Type here a city</string>
+
+    <string name="instruction_title">Preparing to drive the vehicle</string>
+    <string name="instruction_title_close">How to leave the vehicle</string>
+    <string name="instruction_start_1">Check that the big red button between the seats is lifted</string>
+    <string name="instruction_start_2">Turn the key clockwise</string>
+    <string name="instruction_start_3">Wait for the Ready sign on the instrument panel</string>
+    <string name="instruction_start_4">Press the D or R button</string>
+
+    <string name="instruction_damages">Are there any damages?</string>
+    <string name="instruction_dirty">Is it dirty?</string>
+
+    <string name="priority_lanes_title">To start using the car</string>
+    <string name="attention">Attention:</string>
+    <string name="priority_lanes">This vehicle CAN\'T travel on priority lanes</string>
+
+
+
+    <string name="instruction_title_preclose">BEFORE PARKING OR CLOSING RENT:</string>
+    <string name="instruction_preclose_1">SHIFT IN TO NEUTRAL (N BUTTON)</string>
+    <string name="instruction_preclose_2">SWITCH OFF LIGHTS</string>
+    <string name="instruction_preclose_3">PULL HAND BRAKEO</string>
+    <string name="instruction_preclose_4">ROLL UP WINDOWS</string>
+    <string name="instruction_preclose_5">SWITCH OFF DASHBOARD TURING THE KEY (KEY REMAINS INSERTED)</string>
+
+
+    <string name="instruction_close_1">Collect your things.Have you switched off lights and rolled up windows?</string>
+    <string name="instruction_close_2">Press the N button on the dashboard</string>
+    <string name="instruction_close_3">Pull up the hand brake</string>
+    <string name="instruction_close_4">Leave the car.Doors will close automatically in the time shown in the right</string>
+    <string name="instruction_close_4_note">If you change your mind let the doors close, and then open a new rent session</string>
+    <string name="instruction_close_5">Be careful, a vehicle not closed correctly can mean additional costs and penalties</string>
+
+
+    <string name="bonus_message_poi">Congratulations\nIn the coming days, after paying this race, you will be awarded a bonus for having this car parked near a charging station!</string>
+
+    <string name="self_close_message">Closing doors</string>
+
+    <string name="loading">Loading</string>
+
+    <string name="push_to_cancel">Tap to\ncancel</string>
+
+    <string name="goodbye_instructions">You can exit the car. The doors will automatically close in the seconds shown below</string>
+
+
+    <string name="menu_rent_end">End rent</string>
+    <string name="menu_rent_end_off">End rent (not available)</string>
+    <string name="menu_rent_end_outside_park_area">End rent - Not available : you are outside the parking area. Go back inside authorized area before ending rent.</string>
+    <string name="menu_rent_end_shutdown_engine">End rent (switch off engine first)</string>
+
+    <string name="inside_area">Inside</string>
+    <string name="outside_area">Out of area</string>
+
+    <string name="menu_refuel">Refuel</string>
+    <string name="menu_refuel_off">Refuel (not available)</string>
+    <string name="menu_refuel_shutdown_engine">Refuel (switch off engine first)</string>
+    <string name="menu_park_mode_started">To resume rent please use command OPEN DOORS on your phone or your card to get back in the car</string>
+    <string name="menu_park_mode_resume">Resume rent</string>
+    <string name="menu_park_mode_resume_shutdown_engine">Resume rent (switch off engine first)</string>
+    <string name="menu_park_mode_suspend">Pause Rent</string>
+    <string name="menu_park_mode_suspend_off">Suspend rent (not available)</string>
+    <string name="menu_park_mode_suspend_instructions">Your rent session is now paused. You can exit the car, the doors will automatically close in the seconds shown on the right. To open the doors and start driving again, please either use the "OPEN DOORS" command on the Application or use your Share\'ngo card.</string>
+    <string name="menu_park_mode_suspend_shutdown_engine">Suspend rent (switch off engine first)</string>
+    <string name="milan">Milano</string>
+    <string name="minutes_saved">Minutes saved&#58;</string>
+    <string name="mu_distance_kilometers">Km</string>
+    <string name="mu_distance_meters">m</string>
+    <string name="mu_distance_time">min</string>
+
+    <string name="navigation_start">Start Navigation</string>
+    <string name="navigation_stop">Stop Navigation</string>
+    <string name="navigator_almost_there">You are almost there</string>
+    <string name="navigator_continue">Continue</string>
+    <string name="navigator_continue_onto">Continue onto</string>
+    <string name="navigator_finish">Finish</string>
+    <string name="navigator_get_ready_to">Get ready to</string>
+    <string name="navigator_left">left</string>
+    <string name="navigator_right">right</string>
+    <string name="navigator_sharp_left">Sharp left</string>
+    <string name="navigator_sharp_right">Sharp right</string>
+    <string name="navigator_slight_left">Slight left</string>
+    <string name="navigator_slight_right">Slight right</string>
+    <string name="navigator_stopover">Stopover</string>
+    <string name="navigator_turn">turn</string>
+    <string name="navigator_turn_onto_it">turn onto</string>
+    <string name="navigator_turn_onto_en">turn onto</string>
+    <string name="navigator_uturn">You are going in the opposite direction. When possible, make a U-turn</string>
+    <string name="navigator_range">Range</string>
+    <string name="navigator_stop">Stop navigation</string>
+    <string name="navigator_2d3d">2D//3D</string>
+    <string name="navigator_zoom">Zoom</string>
+    <string name="navigator_go">GO</string>
+    <string name="hint_navigator">Enter a few characters and click the search button to choose the destination</string>
+
+
+    <string name="poi_bonus_title">CHARGING STATION</string>
+    <string name="poi_bonus_body">Park your car nearby to get a five minutes BONUS on your profile </string>
+
+    <string name="new_damage">New damages&#63;</string>
+    <string name="new_damage2">Where&#63;</string>
+    <string name="no">No</string>
+    <string name="no_results">No results found</string>
+    <string name="gotoCity"> Go to center of the city </string>
+    <string name="gotoStreet">Go to center of the road</string>
+
+    <string name="number_0">0</string>
+    <string name="number_1">1</string>
+    <string name="number_2">2</string>
+    <string name="number_3">3</string>
+    <string name="number_4">4</string>
+    <string name="number_5">5</string>
+    <string name="number_6">6</string>
+    <string name="number_7">7</string>
+    <string name="number_8">8</string>
+    <string name="number_9">9</string>
+    <string name="number_invalid">Number not valid</string>
+    <string name="number_type_new">Type new number</string>
+
+    <string name="pin">PIN&#58;</string>
+    <string name="pin_card">Card <b>PIN</b></string>
+    <string name="pin_message">Enter the 4 digit pin in order to proceed</string>
+    <string name="pin_right">Right <b>PIN</b></string>
+    <string name="pin_type">Type <b>PIN</b></string>
+    <string name="pin_wrong">Wrong <b>PIN</b>, try again</string>
+    <string name="points_of_interest">Points of interest</string>
+    <string name="pin_FAQ_Title">Where can I find the PIN?</string>
+    <string name="pin_FAQ_1">After logging in sharengo.it you will find the PIN section in the left column menu</string>
+    <string name="pin_FAQ_2">After logging in mobile.sharengo.it click on your name in the bottom left to find your PIN</string>
+    <string name="pin_FAQ_3">After logging in the Application you will find the PIN section in the right column menu </string>
+
+    <string name="refuel_title">Recharge car</string>
+    <string name="refueling_done">Refueling done!\nProceed to the next page to continue your trip</string>
+    <string name="refuel_customer">Please unplug the cable from the charging station and put it in the bag in the trunk</string>
+
+    <string name="search">Search</string>
+    <string name="select_a_destination">Select a destination</string>
+    <string name="select_fuel_station">Select fuel station</string>
+    <string name="select_travel_path">Select travel path</string>
+    <string name="show_pin">Show <b>PIN</b></string>
+    <string name="sos">SOS</string>
+    <string name="plate">PLATE:</string>
+
+    <string name="text_view_are_there_new_damages">Are there any new damages&#63;</string>
+    <string name="text_view_call_message">Click on "support call" to be called back or key in a new number </string>
+    <string name="thank_for_choosing">Thank you for choosing</string>
+    <string name="text_view_set_a_choice">Choose an option</string>
+
+    <string name="alert_20km">Please consider that your car’s distance to empty, which depends on your driving style, may now be less than 20 Km. Please keep that in mind.</string>
+    <string name="alert_5km">Attention please,the autonomy of the car, as we are using, is about 5 km. We invite you to quit the trip to avoid penalties.</string>
+    <string name="alert_warning_title">ATTENTION</string>
+    <string name="alert_bonus">From this moment, if you will leave the car near a charging station shown on the map, you\'ll get five bonus minutes on your profile.</string>
+    <string name="alert_bonus_title">BONUS</string>
+
+    <string name="welcome">Welcome</string>
+
+    <string name="yes">Yes</string>
+
+    <string name="menu_rent_end_time_startup_app">End rent - Not available : the App is still in startup, please wait.</string>
+    <string name="other_trip_message">You already have an open trip.Please contact the call center for information</string>
+    <string name="alert_area">Attention please, the vehicle is out of the operative area, it won\'t be possible close the trip</string>
+    <string name="alert_key">Remember to turn off the dashboard by turning the key before leaving the car</string>
+    <string name="alert_bonus_park">From this moment you can earn 5 minutes bonus by leaving this car to be recharged in one of the car parks shown on the map</string>
+    <string name="music_hint">Connect the AUX cable to listen to music from your phone</string>
+    <string name="pin_business">You\'ve used the business pin!</string>
+    <string name="menu_rent_end_key_on">Please turn off the car before ending the rent</string>
+    <string name="menu_park_mode_suspend_key_on">Please turn off the car before pausing the rent</string>
+    <string name="button_video_tutorial">TUTORIAL</string>
+    <string name="button_assicurazione">INSURANCE</string>
+    <string name="button_libretto">REGISTRATIONCARD</string>
+    <!--<string name="endpointSharengo">https://api.sharengo.it:8123/</string>
+    <string name="endpointSharengoBeacon">http://core.sharengo.it:7600/</string>
+    <string name="endpointSharengoPhp">http://core.sharengo.it/api/</string>-->
+    <string name="maintenance_instruction"><b>Unplug the charging cable -</b>to start driving unplug the charging cable and store it in the car trunk (trunk opening button is between the seats)</string>
+    <string name="maintenance_status_done">END CHARGING: Click on next to start driving</string>
+    <string name="maintenance_status_plug_insert">IMPOSSIBLE TO END CHARGING: cable still plugged in</string>
+    <string name="maintenance_status_wait">Attedere prego stiamo caricando le informazioni della macchina per effettuare la procedura di stacco.</string>
+    <string name="call_error">Error while forwarding help request, try calling %s</string>
+    <string name="menu_cancel_action">Cancel</string>
+    <string name="menu_rent_end_instruction">The engine will stop in the time indicated, if you want to cancel click below</string>
+    <string name="alert_area_box">Attention please, the vehicle is out of the operative area, it not possible close the trip</string>
+    <string name="charging_alert_text">Prima di partire ricordati di mettere il cavo di carica nel baule</string>
+    <string name="navigation_distance">Distance</string>
+    <string name="navigation_time">Arriving in</string>
+    <string name="nafigation_eta">ETA</string>
+    <string name="button_damages">DAMAGES</string>
+
+
+</resources>

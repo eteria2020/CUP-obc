@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="navigation_active_error">Si prega di fermare la navigazione prima di andare sulla home</string>
     <string name="other_trip_message">Risulta una corsa già aperta, contatta il servizio clienti per maggiori informazioni</string>
     <string name="Acra_message">Invio report errore</string>
@@ -12,7 +13,7 @@
     <string name="button_call">Prenota chiamata assistenza</string>
     <string name="button_break">SOSTA o\nTERMINA</string>
     <string name="button_close">Chiudi</string>
-    <string name="button_navigator">NAVIGATORE</string>
+    <string name="button_navigatormen">NAVIGATORE</string>
     <string name="button_radio">RADIO</string>
     <string name="button_points">PUNTI</string>
     <string name="button_recharge">PUNTO RICARICA</string>
@@ -157,7 +158,7 @@
     <string name="navigator_stopover">Sosta lungo</string>
     <string name="navigator_turn">girare a</string>
     <string name="navigator_turn_onto_it">lungo</string>
-    <string name="navigator_turn_onto_en"></string>
+    <string name="navigator_turn_onto_en">turn onto</string>
     <string name="navigator_uturn">Appena possibile fare inversione</string>
     <string name="navigator_range">Autonomia</string>
     <string name="navigator_stop">Ferma navigatore</string>
@@ -249,8 +250,13 @@
 
     <string name="call_error">Si è verificato un errore inoltrando la richiesta al servizio clienti, per piacere prova a chiamare: %s</string>
 
-    <string name="menu_cancel_action"><b>ANNULLA</b> \n Permi per annullare</string>
+    <string name="menu_cancel_action"><b>ANNULLA</b> \n Premi per annullare</string>
 
     <string name="menu_rent_end_instruction">Il motore si spegnerà nel tempo indicato, per annullare clicca quì sotto</string>
     <string name="alert_area_box">Veicolo fuori dall\'area  di servizio, rientra nell\'area per chiudere la corsa</string>
+    <string name="charging_alert_text">Prima di partire ricordati di mettere il cavo di carica nel baule</string>
+    <string name="navigation_distance">Distanza</string>
+    <string name="navigation_time">Arrivo in</string>
+    <string name="nafigation_eta">Ora di arrivo</string>
+    <string name="button_damages">DANNI</string>
 </resources>

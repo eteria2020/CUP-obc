@@ -138,6 +138,9 @@ public class MessageFactory {
 		msg.obj = pin;
 		return msg;
 	}
+	public static Message restartUI() {
+		return Message.obtain(null, ObcService.MSG_RESTART_UI);
+	}
 
 	public static Message notifyCard(String id, String event) {
 

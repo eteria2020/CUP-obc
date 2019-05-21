@@ -81,7 +81,7 @@ public class Hik_io implements LowLevelInterface {
 	private Context context;
 
 	private ObcService obcService;
-	private ObcParser obcParser;
+//	private ObcParser obcParser;
 	private boolean displayStatus = true;
 	private byte[][] ledStatuses = new byte[4][2];
 
@@ -106,7 +106,7 @@ public class Hik_io implements LowLevelInterface {
 		context = service;
 
 		obcService = service;
-		obcParser = new ObcParser(obcService);
+//		obcParser = new ObcParser(obcService);
 
 		ledStatuses[LeaseInfoItaly.LED_INDEX_LED1][0] = LeaseInfoItaly.LED_INDEX_LED1;
 		ledStatuses[LeaseInfoItaly.LED_INDEX_LED2][0] = LeaseInfoItaly.LED_INDEX_LED2;
@@ -921,7 +921,7 @@ public class Hik_io implements LowLevelInterface {
 			String Hex = Integer.toHexString(cardID);
 			dlog.i("onLeaseReportCard : " + cardID + ", hex=" + Hex);
 			dlog.i("perf: onLeaseReportCard");
-			obcService.notifyCard(Hex, "OPEN", false);
+			obcService.notifyCard(Hex, "OPEN RFID", false);
 
 		}
 
@@ -950,6 +950,8 @@ public class Hik_io implements LowLevelInterface {
 					b.putBoolean("batterySafety", Integer.parseInt(cData[0]) > 0);
 					if (cData.length > 1)
 						b.putString("fakeCard", cData[1]);
+					if (cData.length > 2)
+						b.putString("fakePin", cData[2]);
 				} catch (Exception e) {
 					dlog.e("Exception handling extra data inside Heartbeat", e);
 				}
@@ -1003,7 +1005,7 @@ public class Hik_io implements LowLevelInterface {
 			Bundle b = new Bundle();
 			b.putString("VIN", vin);
 			obcService.notifyCarInfo(b);
-			if (!BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
+			if (!BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
 				dlog.i("onVinCodeChange(vinCode):" + vinCode);
 		}
 

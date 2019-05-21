@@ -69,6 +69,10 @@ public class SharengoApiRepository {
 			customerDisposable.dispose();
 	}
 
+	public boolean isCustomerRunning() {
+		return RxUtil.isRunning(customerDisposable);
+	}
+
 	public void getCustomer(int millidelay) {
 		needUpdateCustomer = false;
 
@@ -519,7 +523,7 @@ public class SharengoApiRepository {
 
 					})
 					.concatMap(event1 -> {
-						if (event1.label.equalsIgnoreCase("SOS") && event1.timestamp < System.currentTimeMillis() - 1000 * 60 * 60) {
+						if (event1.label.equalsIgnoreCase("SOS") && event1.timestamp < System.currentTimeMillis() - 1000 * 60 * 10) {
 							event1.label = "SOS_EXPIRED";
 						}
 						return Observable.just(event1);

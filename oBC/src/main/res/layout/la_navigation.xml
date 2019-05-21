@@ -68,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Distanza"
+                android:text="@string/navigation_distance"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#000"
                 android:textSize="16sp" />
@@ -99,7 +99,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Arrivo in"
+                android:text="@string/navigation_time"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#000"
                 android:textSize="16sp" />
@@ -130,7 +130,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Ora di arrivo"
+                android:text="@string/nafigation_eta"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#000"
                 android:textSize="16sp" />

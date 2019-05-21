@@ -1,15 +1,21 @@
 apply plugin: 'com.android.library'
 
 android {
+    signingConfigs {
+        vmtest {
+            keyAlias 'Sharengo.user'
+            keyPassword 'Sharengo1'
+            storeFile file('C:/Workspace/Mobile App/key/sharengo.keystore.jks')
+            storePassword 'Sharengo1'
+        }
+    }
     compileSdkVersion 19
     buildToolsVersion '26.0.2'
-
     defaultConfig {
-        ndk{
+        ndk {
             abiFilters "armeabi-v7a"// add your required cpu architecture
         }
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -18,6 +24,8 @@ android {
         vmtest {
         }
         stage {
+        }
+        spegnimento {
         }
     }
     compileOptions {

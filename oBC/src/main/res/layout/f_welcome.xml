@@ -76,33 +76,35 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/fwel_bottom_V"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="58dp"
+        android:layout_marginBottom="30dp"
         android:orientation="horizontal" android:visibility="visible">
         
         <ImageButton android:id="@+id/fwelItalianIB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:src="@drawable/sel_button_ita"
+			android:layout_margin="5dp"
+			android:scaleX="0.9"
+			android:scaleY="0.9"
+            android:src="@drawable/sel_button_flag_ita"
             android:contentDescription="@string/content_description"
+			android:visibility="gone"
             android:background="@null" />
 
 		<ImageButton android:id="@+id/fwelEnglishIB"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginStart="16dp"
-			android:layout_marginLeft="16dp"
-			android:src="@drawable/sel_button_eng"
+			android:layout_margin="5dp"
+			android:scaleX="0.9"
+			android:scaleY="0.9"
+			android:src="@drawable/sel_button_flag_eng"
 			android:contentDescription="@string/content_description"
 			android:background="@null" />
 
 		<ImageButton android:id="@+id/fwelFrenchIB"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginStart="16dp"
-			android:layout_marginLeft="16dp"
 			android:src="@drawable/sel_button_fr"
+			android:layout_margin="5dp"
 			android:contentDescription="@string/content_description"
 			android:background="@null"
 			android:visibility="gone" />
@@ -111,11 +113,36 @@
 			android:id="@+id/fwelchineseIB"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginStart="16dp"
-			android:layout_marginLeft="16dp"
 			android:src="@drawable/sel_button_zh"
+			android:layout_margin="5dp"
 			android:contentDescription="@string/content_description"
 			android:background="@null"
+			android:visibility="gone" />
+
+		<ImageButton
+			android:id="@+id/fwelSlovakiaIB"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/sel_button_flag_sk"
+			android:layout_margin="5dp"
+			android:layout_gravity="center_vertical"
+			android:scaleX="0.9"
+			android:scaleY="0.9"
+			android:background="@null"
+			android:contentDescription="@string/content_description"
+			android:visibility="gone" />
+
+		<ImageButton
+			android:id="@+id/fwelNetherlandsIB"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/sel_button_flag_nl"
+			android:layout_margin="5dp"
+			android:layout_gravity="center_vertical"
+			android:scaleX="0.9"
+			android:scaleY="0.9"
+			android:background="@null"
+			android:contentDescription="@string/content_description"
 			android:visibility="gone" />
 
 	</LinearLayout>

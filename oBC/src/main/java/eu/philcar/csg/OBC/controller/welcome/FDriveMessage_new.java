@@ -439,7 +439,7 @@ public class FDriveMessage_new extends FBase {
 				Image.putString("ID",jsonObject.getString("ID"));
 				Image.putString("URL",jsonObject.getString("URL"));
 				//ricavo nome file
-				URL urlImg = new URL(Image.getString("URL"));
+				URL urlImg = new URL(Image.getString("URL").replace(" ", "%20"));
 				String extension = urlImg.getFile().substring(urlImg.getFile().lastIndexOf('.') + 1);
 				String filename = Image.getString("ID").concat(".").concat(extension);
 
@@ -536,7 +536,7 @@ public class FDriveMessage_new extends FBase {
 
 		for (Bundle Image : startImages) {    //-- start loop download and save image
 			try {
-				URL url = new URL(Image.getString("URL"));
+				URL url = new URL(Image.getString("URL").replace(" ", "%20"));
 				String extension = url.getFile().substring(url.getFile().lastIndexOf('.') + 1);
 				String filename = Image.getString("ID").concat(".").concat(extension);
 				Log.i("Local filename:", "" + filename);

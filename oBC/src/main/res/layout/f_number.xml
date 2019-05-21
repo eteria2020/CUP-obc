@@ -176,7 +176,7 @@
 						android:layout_height="wrap_content"
 						android:layout_weight="1"
 						android:background="@drawable/sel_button_pin"
-						android:text="@string/number_plus"
+						android:text="+"
 						android:textColor="@color/black"
 						android:textSize="68sp"
 						android:textStyle="bold" />
