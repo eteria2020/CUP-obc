@@ -524,7 +524,7 @@ public class ObcService extends Service implements OnTripCallback {
 			dlog.d("Restarting from open trip. Acquiring lock");
 			obc_io.setLed(null, LowLevelInterface.ID_LED_BLUE, LowLevelInterface.ID_LED_ON);
 			startRemoteUpdateCycle();
-			startRemotePoiCheckCycle();
+			//startRemotePoiCheckCycle();
 		} else {
 			setDisplayStatus(false, 15);
 
@@ -2742,7 +2742,7 @@ public class ObcService extends Service implements OnTripCallback {
 				case MSG_CAR_REMOTEUPDATECYCLE:
 					if (msg.arg1 == 1) {  //Start
 						startRemoteUpdateCycle();
-						startRemotePoiCheckCycle();
+						//startRemotePoiCheckCycle();
 					} else {             //Stop
 						stopRemoteUpdateCycle();
 						stopRemotePoiCheckCycle();
