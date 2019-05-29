@@ -56,12 +56,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import ch.qos.logback.classic.spi.STEUtil;
 import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.AWelcome;
 import eu.philcar.csg.OBC.App;
-import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.SystemControl;
 import eu.philcar.csg.OBC.controller.map.FPdfViewer;
@@ -100,7 +98,7 @@ import eu.philcar.csg.OBC.server.UploaderLog;
 import eu.philcar.csg.OBC.server.ZmqRequester;
 import eu.philcar.csg.OBC.server.ZmqSubscriber;
 import eu.philcar.csg.OBC.task.GetTimeFromNetwork;
-import eu.philcar.csg.OBC.task.OldLogCleamup;
+import eu.philcar.csg.OBC.task.OldLogCleanup;
 import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -1130,6 +1128,9 @@ public class ObcService extends Service implements OnTripCallback {
 		}
 	}
 
+	/**
+	 * manda un beacon con i dati di classe
+	 */
 	public void sendBeacon() {
 
 		if (!App.hasNetworkConnection()) {
@@ -1175,7 +1176,11 @@ public class ObcService extends Service implements OnTripCallback {
 
 	}
 
-	public void sendBeacon(final CarInfo carinfo) {
+	/**
+	 * mada un beacon con i dati presi sul momento da carInfo
+	 * @param carInfo
+	 */
+	public void sendBeacon(final CarInfo carInfo) {
 
 		if (!App.hasNetworkConnection()) {
 			dlog.w("No connection. Beacon aborted");
@@ -1183,12 +1188,12 @@ public class ObcService extends Service implements OnTripCallback {
 		}
 
 //        String msg = carInfo.getJson(true);
-		if (carinfo != null) {
+		if (carInfo != null) {
 			//dlog.d("Sending beacon : " + carinfo.);
 			//udpServer.sendBeacon(msg);
 			Observable.just(1).delay(1500, TimeUnit.MILLISECONDS)
 					.concatMap(i ->
-							beaconRepository.sendBeacon(carinfo.getJson(true)))
+							beaconRepository.sendBeacon(carInfo.getJson(true)))
 					.subscribeOn(Schedulers.io())
 					.observeOn(Schedulers.computation())
 					.subscribe(new Observer<BeaconResponse>() {
@@ -1230,6 +1235,10 @@ public class ObcService extends Service implements OnTripCallback {
 
 	}
 
+	/**
+	 * invia un msg a tutti i client connessi attraverso ServiceConnector
+	 * @param msg messaggio da inviare
+	 */
 	public void sendAll(Message msg) {
 
 		Message myMsg = Message.obtain();
@@ -1407,7 +1416,7 @@ public class ObcService extends Service implements OnTripCallback {
 		}
 
 		if (carInfo == null) {
-			carInfo = new CarInfo(localHandler);
+			carInfo = new CarInfo(localHandler);// carinfo inizilizzata nel costruttore non arriverà mai a questo punto
 			dlog.d("CarInfo created");
 		}
 
@@ -1487,7 +1496,7 @@ public class ObcService extends Service implements OnTripCallback {
 		}
 
 		if (carInfo == null) {
-			carInfo = new CarInfo(localHandler);
+			carInfo = new CarInfo(localHandler);// carinfo inizilizzata nel costruttore non arriverà mai a questo punto
 			dlog.d("CarInfo created");
 		}
 
@@ -2925,7 +2934,7 @@ public class ObcService extends Service implements OnTripCallback {
 					break;
 
 				case MSG_CHECK_LOG_SIZE:
-					new OldLogCleamup().execute();
+					new OldLogCleanup().execute();
 					//new LogCleanup().execute();
 					break;
 

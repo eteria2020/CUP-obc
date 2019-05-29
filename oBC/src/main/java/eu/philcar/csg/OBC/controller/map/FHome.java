@@ -1006,6 +1006,7 @@ public class FHome extends FBase implements OnClickListener {
 					break;
 				case MSG_OPEN_ALERT_AREA:
 					alertFLMode = ALERT_AREA;
+					dlog.cr("DISPLAY ALERT AREA");
 					localHandler.removeMessages(MSG_OPEN_ALERT_AREA);
 					rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
 					((rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_orangealertbox);

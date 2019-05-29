@@ -18,7 +18,7 @@ import eu.philcar.csg.OBC.helpers.Logs;
  * Created by Fulvio on 21/09/2017.
  */
 
-public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
+public class OldLogCleanup extends AsyncTask<Void, Void, Boolean> {
 	private DLog dlog = new DLog(this.getClass());
 	private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH", Locale.getDefault());
 	private Logs logs = new Logs();
