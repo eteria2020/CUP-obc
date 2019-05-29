@@ -324,7 +324,6 @@ public class FHome extends FBase implements OnClickListener {
 		fmapAlarm.setVisibility(View.GONE);
 		fmapRange.setVisibility(View.GONE);
 
-
 		if (App.fuel_level != 0)
 			tvRange.setText(App.fuel_level + " Km");
 		else
@@ -822,7 +821,6 @@ public class FHome extends FBase implements OnClickListener {
 				fmapAlarm.setVisibility(View.VISIBLE);
 				fmapRange.setVisibility(View.GONE);
 			} else {
-
 
 				localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
 				rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);

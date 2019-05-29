@@ -275,7 +275,7 @@ public class FPdfViewer extends FBase {
 
 						int x = Integer.parseInt(firstName);
 						int y = Integer.parseInt(secondName);
-						return y-x;
+						return y - x;
 					}
 				});
 				return res.toArray(listOfFiles);

@@ -88,7 +88,7 @@ public class ProTTS implements TextToSpeech.OnInitListener {
 				Thread.currentThread().setName("ProTTS");
 
 				try {
-                   /* if(playing.size()>0){
+				   /* if(playing.size()>0){
                         for(String s : playing){
                             if(s.compareTo(text)==0){
                                 dlog.d("waitToPlayTTS: already in queue");

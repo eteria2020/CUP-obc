@@ -49,7 +49,7 @@ import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 public class CarInfo {
 
 	private DLog dlog = new DLog(this.getClass());
-	public static CarInfo Shared ;
+	public static CarInfo Shared;
 
 	@Inject
 	EventRepository eventRepository;
@@ -269,7 +269,7 @@ public class CarInfo {
 		List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
 
 		//Update all data in local bundle
-        /*if(b.containsKey("SOC"))
+		/*if(b.containsKey("SOC"))
             b.putInt("SOC",batteryLevel); //replace the value read from the can with the calculated one*/
 		allData.putAll(b);
 
@@ -472,7 +472,7 @@ public class CarInfo {
 					}
 				}
 
-			}else if (key.equalsIgnoreCase("fakePin")) {
+			} else if (key.equalsIgnoreCase("fakePin")) {
 
 				s = b.getString(key);
 

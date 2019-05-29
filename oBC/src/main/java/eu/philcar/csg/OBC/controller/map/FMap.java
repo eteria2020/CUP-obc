@@ -320,7 +320,7 @@ public class FMap extends FBase implements OnClickListener {
 				frame.addView(mapHolder);
 			}
 		}
-		if(tts!=null){
+		if (tts != null) {
 			tts.shutdown();
 			tts = null;
 		}
@@ -643,8 +643,7 @@ public class FMap extends FBase implements OnClickListener {
 		if (App.fuel_level != 0) {
 			tvRange.setText(App.fuel_level + " Km");
 			fmapRange.setVisibility(View.VISIBLE);
-		}
-		else
+		} else
 			fmapRange.setVisibility(View.INVISIBLE);
 
 		if (!SystemControl.hasNetworkConnection(getActivity(), eventRepository)) {
@@ -1527,7 +1526,7 @@ public class FMap extends FBase implements OnClickListener {
 
 	private void startRouteNavigation() {
 		try {
-    	/*
+		/*
         if (TrackElementsActivity.selectedTrackElement != null) {
             mapView.clearTrackElement(TrackElementsActivity.selectedTrackElement);
         }
@@ -3166,9 +3165,9 @@ public class FMap extends FBase implements OnClickListener {
 			List<Poi> PoiList = retriveChargingList();
 			ArrayList<Bundle> PoisTemp = new ArrayList<>();
 
-			int k =0;
-			if(Pois.size()>0)
-				k=Pois.get(Pois.size()-1).getInt("INDEX",0);
+			int k = 0;
+			if (Pois.size() > 0)
+				k = Pois.get(Pois.size() - 1).getInt("INDEX", 0);
 			for (Poi singlePoi : PoiList) {
 				Bundle Poi = new Bundle();
 				try {
@@ -3209,7 +3208,7 @@ public class FMap extends FBase implements OnClickListener {
 
 				if (customView.findViewById(R.id.customView_poi) != null) {
 					((ImageView) (customView.findViewById(R.id.customView_poi)))
-							.setImageDrawable(makeFreeMarker(ContextCompat.getDrawable(getActivity(),R.drawable.map_poi_icon), String.valueOf(poi.getString("description")), 100, 100));
+							.setImageDrawable(makeFreeMarker(ContextCompat.getDrawable(getActivity(), R.drawable.map_poi_icon), String.valueOf(poi.getString("description")), 100, 100));
 //					((ImageView) (customView.findViewById(R.id.customView_poi))).setImageResource(R.drawable.map_poi_icon);
 
 					//((ImageView) (customView.findViewById(R.id.customView_poi))).invalidate(); testinva
@@ -3252,7 +3251,6 @@ public class FMap extends FBase implements OnClickListener {
 		imagePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 		imagePaint.setTextSize(15 * getResources().getDisplayMetrics().density);
 
-
 		// Set up the paint for use with our Canvas
 		Paint imagePaintBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
 		imagePaintBorder.setTextAlign(Paint.Align.CENTER);
@@ -3266,15 +3264,14 @@ public class FMap extends FBase implements OnClickListener {
 		backgroundImage.draw(imageCanvas);
 
 		// Draw the text on top of our image
-		imageCanvas.drawText(text, width / 2, height-40, imagePaint);
-		imageCanvas.drawText(text, width / 2, height-40, imagePaintBorder);
+		imageCanvas.drawText(text, width / 2, height - 40, imagePaint);
+		imageCanvas.drawText(text, width / 2, height - 40, imagePaintBorder);
 
 		// Combine background and text to a LayerDrawable
 		LayerDrawable layerDrawable = new LayerDrawable(
 				new Drawable[]{backgroundImage, new BitmapDrawable(canvasBitmap)});
 		return layerDrawable;
 	}
-
 
 	public void updatePoiInfo(int status, Poi Poi) {
 

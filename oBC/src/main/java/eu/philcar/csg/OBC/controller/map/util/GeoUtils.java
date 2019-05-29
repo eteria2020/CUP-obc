@@ -86,7 +86,7 @@ public class GeoUtils {
 		return Math.abs(dist);
 	}
 	/*
-    public static boolean isPointInPolygon(double pointLat, double pointLng, double[] closedPolygon) { 
+	public static boolean isPointInPolygon(double pointLat, double pointLng, double[] closedPolygon) {
 
     	int crossings = 0;
     	

@@ -452,7 +452,7 @@ public class SharengoApiRepository {
 	public void sendEvent(final Event event, final ObcService service) {
 		mDataManager.saveEvent(event)
 				/*.concatMap(event1 -> {
-                    if(BuildConfig.FLAVOR.equalsIgnoreCase("develop")) {
+					if(BuildConfig.FLAVOR.equalsIgnoreCase("develop")) {
                         event1.event = Events.EVT_SOS;
                         event1.id_trip = 28121;
                         event1.label = "SOS";

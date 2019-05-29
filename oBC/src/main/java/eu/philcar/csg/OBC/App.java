@@ -387,7 +387,8 @@ public class App extends MultiDexApplication {
 
 			Port_UDP_Beacon = 7600;
 
-			APP_DATA_PATH = getString(R.string.app_data_path);;
+			APP_DATA_PATH = getString(R.string.app_data_path);
+			;
 
 			/*URL_Area = "http://corecina.sharengo.it/api/zone/json.php?";
 			URL_Beacon = "http://corecina.sharengo.it/api/pushbeacon.php?";
@@ -521,9 +522,9 @@ public class App extends MultiDexApplication {
 
 	public static String callCenterNumer = "+390287317140";
 	//Enable spegnimento from configs
-	public static boolean spegnimentoEnabled= false;
+	public static boolean spegnimentoEnabled = false;
 	//Disable spegnimento for specific cars
-	public static boolean spegnimentoDisabled= false;
+	public static boolean spegnimentoDisabled = false;
 
 	public static String CarPlate = "ND";
 	public static String Damages = "";
@@ -602,7 +603,7 @@ public class App extends MultiDexApplication {
 	public static int ServerIP = 0;
 	public static String timeZone;
 	public static Boolean fullNode = true;
-	public static boolean virtualSocEnabled =true;
+	public static boolean virtualSocEnabled = true;
 
 	private static boolean hasNetworkConnection = false;
 	private static boolean networkStable = true;
@@ -893,6 +894,7 @@ public class App extends MultiDexApplication {
 			e.apply();
 		}
 	}
+
 	public void persistSpegnimentoDisabled() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
@@ -909,10 +911,10 @@ public class App extends MultiDexApplication {
 		}
 	}
 
-	public void persistVirtualSocEnabled(){
-		if(this.preferences != null){
+	public void persistVirtualSocEnabled() {
+		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
-			e.putBoolean(Key_VirtualSocEnabled,virtualSocEnabled);
+			e.putBoolean(Key_VirtualSocEnabled, virtualSocEnabled);
 			e.apply();
 		}
 	}
@@ -1933,7 +1935,7 @@ public class App extends MultiDexApplication {
 
 		ArrayList<double[]> polygons = App.AreaPolygons;
 
-		for (double[] aPolygon:polygons) {
+		for (double[] aPolygon : polygons) {
 
 			if (aPolygon != null && aPolygon.length > 0 && aPolygon.length % 2 == 0) {
 
@@ -2712,10 +2714,11 @@ public class App extends MultiDexApplication {
 		mApplicationComponent = applicationComponent;
 	}
 
-	public long getRebootTimeForLabel(String label){
+	public long getRebootTimeForLabel(String label) {
 		return preferences.getLong(label, 0);
 	}
-	public void setRebootTimeForLabel(String label){
+
+	public void setRebootTimeForLabel(String label) {
 		Editor editor = preferences.edit();
 		editor.putLong(label, System.currentTimeMillis());
 		editor.commit();

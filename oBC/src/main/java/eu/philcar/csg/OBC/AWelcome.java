@@ -229,7 +229,7 @@ public class AWelcome extends ABase {
 					case ObcService.MSG_CUSTOMER_CHECKPIN:
 
 						String pin = (String) msg.obj;
-						if(App.currentTripInfo.CheckPin(pin, false)){
+						if (App.currentTripInfo.CheckPin(pin, false)) {
 							welcomeWeakReference.get().startActivity(new Intent(welcomeWeakReference.get(), AMainOBC.class));
 							welcomeWeakReference.get().finish();
 						}

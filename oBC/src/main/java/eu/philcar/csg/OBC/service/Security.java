@@ -24,7 +24,7 @@ public class Security {
 		final Signature[] arrSignatures = p.signatures;
 		for (final Signature sig : arrSignatures) {
 			/*
-	        * Get the X.509 certificate.
+			* Get the X.509 certificate.
 	        */
 			final byte[] rawCert = sig.toByteArray();
 			InputStream certStream = new ByteArrayInputStream(rawCert);

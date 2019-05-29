@@ -81,7 +81,7 @@ public class Hik_io implements LowLevelInterface {
 	private Context context;
 
 	private ObcService obcService;
-//	private ObcParser obcParser;
+	//	private ObcParser obcParser;
 	private boolean displayStatus = true;
 	private byte[][] ledStatuses = new byte[4][2];
 
@@ -1081,7 +1081,7 @@ public class Hik_io implements LowLevelInterface {
 			super.onMotorWorkStatusChange(motorWorkStatus);
 
 	            /*
-	            Bundle b = new Bundle();
+				Bundle b = new Bundle();
 	            b.putString("MotorWorkStatus", getWorkStatusName(motorWorkStatus));		
 				obcService.notifyCarInfo(b);
 				

@@ -31,7 +31,6 @@ public class GetTimeFromNetwork extends AsyncTask<CarInfo, Void, Void> { // The 
 		this.mContext = mContext;
 	}
 
-
 	@Override
 	protected Void doInBackground(CarInfo... carinfo) { // This will print the network time
 		try {
@@ -63,7 +62,7 @@ public class GetTimeFromNetwork extends AsyncTask<CarInfo, Void, Void> { // The 
 		}
 
 		try {
-			if (time != null && !(SystemClock.elapsedRealtime()>15*60*1000 && System.currentTimeMillis()<1234567890)) {
+			if (time != null && !(SystemClock.elapsedRealtime() > 15 * 60 * 1000 && System.currentTimeMillis() < 1234567890)) {
 				rt.exec(new String[]{"/system/xbin/su", "-c", "date -s " + sdf.format(time) + ";\n"}); //
 				rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time 0"});
 			} else

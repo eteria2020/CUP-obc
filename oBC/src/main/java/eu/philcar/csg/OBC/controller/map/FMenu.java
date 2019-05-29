@@ -132,7 +132,6 @@ public class FMenu extends FBase implements OnClickListener {
 //		cancelTV.setTypeface(font);
 //		sosB.setTypeface(font);
 
-
 		sosB.setOnClickListener(this);
 		ivDamages.setOnClickListener(this);
 		ivDamages.setVisibility(View.VISIBLE);

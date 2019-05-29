@@ -129,6 +129,7 @@ public class EventRepository {
 	public void eventDmg(String number) {
 		generateEvent(EVT_SOS, 2, number);
 	}
+
 	public void eventPin(String pin) {
 		generateEvent(EVT_REMOTE_PIN, 0, pin);
 	}
@@ -230,6 +231,7 @@ public class EventRepository {
 	public void Shutdown() {
 		generateEvent(EVT_SHUTDOWN, 0, "Shutting Down");
 	}
+
 	public void ShutdownAbort() {
 		generateEvent(EVT_SHUTDOWN, -1, "Shut Down Aborted");
 	}

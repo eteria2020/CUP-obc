@@ -281,7 +281,7 @@ public class SharengoPhpRepository {
 					.concatMap(i -> Observable.just(event.get(i.intValue())))
 					.concatMap(mDataManager::saveEvent)
 			/*mDataManager.saveEvents(event)
-                    .delay(10, TimeUnit.SECONDS)*/
+					.delay(10, TimeUnit.SECONDS)*/
 					.concatMap(e -> mRemoteDataSource.sendEvent(e, mDataManager))
 					.subscribeOn(Schedulers.newThread())
 					.subscribe(new Observer<EventResponse>() {

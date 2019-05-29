@@ -242,7 +242,6 @@ public class TripInfo {
 		DbManager dbm = App.Instance.dbManager;
 		//HttpConnector http;
 
-
 		Customers customers = dbm.getClientiDao();
 		Customer customer = customers.getClienteByCardCode(code);
 
@@ -367,7 +366,7 @@ public class TripInfo {
 				obc_io.setLcd(null, customer.info_display);
 			}
 		} else {  // se c'? una trip aperta...
-			if("OPEN".equalsIgnoreCase(event)){
+			if ("OPEN".equalsIgnoreCase(event)) {
 				dlog.d("handleCard: event OPEN trip already present");
 				return null;
 			}
@@ -1209,7 +1208,7 @@ public class TripInfo {
 				//CloseCorsa(carInfo);
 
 				//.... inva la corsa incapsulandola in un oggeto tripinfo separato per evitare modifiche
-                /*TripInfo tripInfo =  new TripInfo(mContext);
+				/*TripInfo tripInfo =  new TripInfo(mContext);
                 tripInfo.trip = trip;
                 TripsConnector cc = new TripsConnector(tripInfo);
 

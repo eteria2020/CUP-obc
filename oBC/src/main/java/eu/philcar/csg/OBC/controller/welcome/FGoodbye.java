@@ -126,7 +126,7 @@ public class FGoodbye extends FBase {
 		super.onCreate(savedInstanceState);
 		closingTripid = App.currentTripInfo.trip.id;
 		App.Instance.getComponent().inject(this);
-        /*if(App.first_UP_End && App.hasNetworkConnection){
+		/*if(App.first_UP_End && App.hasNetworkConnection){
 			App.first_UP_End=false;
 
 			new Thread(new Runnable() {

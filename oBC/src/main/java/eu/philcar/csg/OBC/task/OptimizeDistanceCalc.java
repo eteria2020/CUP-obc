@@ -84,7 +84,7 @@ public class OptimizeDistanceCalc extends FBase implements View.OnClickListener 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-      /*  super.onCreate(savedInstanceState);
+	  /*  super.onCreate(savedInstanceState);
         setContentView(R.layout.a_odc);
 
         Backb = (ImageButton) findViewById(R.id.Backb);

@@ -111,7 +111,7 @@ public class ApiModule {
 	@Provides
 	@Singleton
 	OkHttpClient provideOkHttpClientTrusted(Context context) {
-        /*HttpLogger logger = new HttpLogger();
+		/*HttpLogger logger = new HttpLogger();
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(logger){
 
         };

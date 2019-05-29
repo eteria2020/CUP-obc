@@ -217,10 +217,10 @@ public abstract class ABase extends Activity implements ServiceClient {
 
 		SKAdvisorSettings advisorSettings = new SKAdvisorSettings();
 		SKAdvisorSettings.SKAdvisorLanguage advisorLang = SKAdvisorSettings.SKAdvisorLanguage.LANGUAGE_EN;
-		try{
+		try {
 			advisorLang = SKAdvisorSettings.SKAdvisorLanguage.forString(lang);
-		}catch (Exception e) {
-		    dlog.e( "setBaseLanguage: Exception", e);
+		} catch (Exception e) {
+			dlog.e("setBaseLanguage: Exception", e);
 		}
 		advisorSettings.setLanguage(advisorLang);
 		advisorSettings.setAdvisorConfigPath("/sdcard/SKMaps/Advisor");
@@ -234,8 +234,6 @@ public abstract class ABase extends Activity implements ServiceClient {
 
 		SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
 	}
-
-
 
 	/**
 	 * Use this method to push (and display) a new fragment (i.e., like [UINavigationController pushViewController:animated]).

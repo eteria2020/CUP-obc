@@ -293,7 +293,7 @@ public class FWelcome extends FBase {
 		fwelEnglishIB.setVisibility(View.VISIBLE);
 		//fwelFrenchIB.setVisibility(View.VISIBLE);
 
-		switch (getString(R.string.def_lang)){
+		switch (getString(R.string.def_lang)) {
 			case "it":
 				fwelItalianIB.setVisibility(View.VISIBLE);
 				break;
