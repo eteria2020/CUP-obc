@@ -18,7 +18,10 @@ repositories {
 android {
     signingConfigs {
         prod {
-            storeFile file('C:/Workspace/OBC/obc/keystore/sharengo.keystore.jks')
+            storeFile file('../keystore/sharengo.keystore.jks')
+            storePassword 'Sharengo1'
+            keyAlias = 'Sharengo.user'
+            keyPassword 'Sharengo1'
         }
     }
     compileSdkVersion 26
@@ -65,6 +68,18 @@ android {
             resValue "string", "maxLatitudeMargin", "49.80"
             resValue "string", "minLongitudeMargin", "16.22"
             resValue "string", "minLatitudeMargin", "47.45"
+        }
+        slovenia {
+            resValue "string", "def_lang", "sl"
+            resValue "string", "app_data_path", "/csg-sl/"
+            resValue "string", "endpointSharengo", "https://api.sharengo.si:8324/"
+            resValue "string", "endpointSharengoBeacon", "http://core.sharengo.si:8325/"
+            resValue "string", "endpointSharengoPhp", "http://core.sharengo.si/api/"
+            resValue "string", "endpointSharengoZMQ", "tcp://core.sharengo.si:8326"
+            resValue "string", "maxLongitudeMargin", "16.72"
+            resValue "string", "maxLatitudeMargin", "46.92"
+            resValue "string", "minLongitudeMargin", "13.17"
+            resValue "string", "minLatitudeMargin", "45.39"
         }
         olanda {
             resValue "string", "def_lang", "nl"

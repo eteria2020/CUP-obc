@@ -2,8 +2,8 @@ package eu.philcar.csg.OBC.controller.map;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+//import android.graphics.Bitmap;
+//import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,7 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.File;
+//import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -31,13 +31,14 @@ import eu.philcar.csg.OBC.controller.FBase;
 public class FDriving extends FBase implements OnClickListener {
 
 	public static FDriving newInstance() {
-		FDriving fd = new FDriving();
-		return fd;
+//		FDriving fd = new FDriving();
+		return new FDriving();
 	}
 
-	private Button sosB;
+//	private Button sosB;
 	private ImageButton cancelIB;
-	private ImageView parkingStatusIV, parkingDirectionIV, adIV;
+//	private ImageView parkingStatusIV, parkingDirectionIV, adIV;
+	private ImageView parkingStatusIV, parkingDirectionIV;
 	private TextView dayTV, timeTV;
 	LinearLayout fdri_top_LL;
 
@@ -65,10 +66,10 @@ public class FDriving extends FBase implements OnClickListener {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+		Button sosB;
 		View view = inflater.inflate(R.layout.f_driving, container, false);
 
-		adIV = (ImageView) view.findViewById(R.id.fdriLeftBorderIV);
+//		adIV = (ImageView) view.findViewById(R.id.fdriLeftBorderIV);
 
 		sosB = (Button) view.findViewById(R.id.fdriSOSB);
 
@@ -130,6 +131,7 @@ public class FDriving extends FBase implements OnClickListener {
 		parkingDirectionIV.setRotation(rotationAngle);
 	}
 
+/*
 	public void updateAd(File theFile) {
 
 		if (theFile != null && theFile.exists()) {
@@ -156,6 +158,7 @@ public class FDriving extends FBase implements OnClickListener {
 			}
 		}
 	}
+*/
 
 	@Override
 	public void onClick(View v) {

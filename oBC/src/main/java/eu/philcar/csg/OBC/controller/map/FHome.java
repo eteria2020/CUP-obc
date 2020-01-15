@@ -81,8 +81,7 @@ public class FHome extends FBase implements OnClickListener {
 	EventRepository eventRepository;
 
 	public static FHome newInstance() {
-		FHome fm = new FHome();
-		return fm;
+		return new FHome();
 	}
 
 	private final static int MSG_OPEN_ALERT_AREA = 7;
@@ -91,19 +90,20 @@ public class FHome extends FBase implements OnClickListener {
 
 	private View rootView;
 
-	private boolean seenA = false, seenB = false;
+//	private boolean seenA = false, seenB = false;
 	private TextView no3gtxt, alertTV;
 	private View no3gwarning;
 	private RelativeLayout rlBody;
 	private LinearLayout fmap_top_LL;
-	public static FHome Instance;
+//	public static FHome Instance;
 	private Animation alertAnimation;
 	private static boolean animToggle = true, animFull = false;
 	private TextView dayTV, timeTV, tvRange;
 	private FrameLayout fmapAlarm, fmapRange;
 	private CarInfo localCarInfo;
-	private ImageView parkingStatusIV, adIV, no3gIV; // parkingDirectionIV,
+	private ImageView parkingStatusIV, adIV, no3gIV;//,parkingDirectionIV;
 	// private View  outsideAreaWarning;
+
 
 	public static Boolean firstRun = true;
 	public static CountDownTimer timer_2min, timer_5sec;
@@ -113,12 +113,12 @@ public class FHome extends FBase implements OnClickListener {
 	private List<String> animQueue = new ArrayList<String>();
 	private boolean lastInsideArea = true;
 	private static int statusAlertSOC = 0, lastInside = 0;//0 none played | 1 played 20km | 2 player 5km  //0:no anim 1:anim3g 2:animArea 3:animBoth
-	private static Boolean RequestBanner = false;
-	private long updateArea = 0;
-	private int alertFLMode = 0;
-	private static final int NO_ALERT = 0;
-	private static final int ALERT_SOC = 1;
-	private static final int ALERT_AREA = 2;
+//	private static Boolean RequestBanner = false;
+//	private long updateArea = 0;
+//	private int alertFLMode = 0;
+//	private static final int NO_ALERT = 0;
+//	private static final int ALERT_SOC = 1;
+//	private static final int ALERT_AREA = 2;
 
 	private static Boolean handleClick = false;
 
@@ -126,7 +126,7 @@ public class FHome extends FBase implements OnClickListener {
 	private AudioPlayer player;
 
 	public FHome() {
-		Instance = this;
+//		Instance = this;
 
 	}
 
@@ -223,7 +223,7 @@ public class FHome extends FBase implements OnClickListener {
 
 			@Override
 			public void onAnimationStart(Animation animator) {
-				dlog.d(FMap.class.toString() + "StartAnimation: alertAnimation");
+				dlog.d("FHome.onAnimationStart();alertAnimation");
 				index = 0;
 
 				playing = animQueue.get(0);
@@ -262,7 +262,7 @@ public class FHome extends FBase implements OnClickListener {
 
 			@Override
 			public void onAnimationEnd(Animation animation) {
-				dlog.d(FMap.class.toString() + "EndAnimation: alertAnimation");
+				dlog.d( "FHome.EndAnimation();alertAnimation");
 
 			}
 
@@ -281,7 +281,7 @@ public class FHome extends FBase implements OnClickListener {
 
 					playing = animQueue.get(index);
 
-					dlog.d("onAnimationRepeat:repeat anim " + playing);
+					dlog.d("FHome.onAnimationRepeat();repeat anim " + playing);
 
 					switch (playing) {
 
@@ -311,9 +311,15 @@ public class FHome extends FBase implements OnClickListener {
 
 					}
 
-					animFull = !animFull;
-				} else
-					animFull = !animFull;
+//					animFull = !animFull;
+				}
+/*
+				else{
+					animFull = true;
+				}
+*/
+
+				animFull = !animFull;
 			}
 
 		});
@@ -388,7 +394,7 @@ public class FHome extends FBase implements OnClickListener {
 								});
 
 						} catch (Exception e) {
-							dlog.e("runOnUiThread: eccezione ", e);
+							dlog.e("FHome.runOnUiThread();", e);
 						}
 						timer_2min.start();
 						started = false;
@@ -436,7 +442,7 @@ public class FHome extends FBase implements OnClickListener {
 		};
 
 		if (firstRun) {
-			firstRun = !firstRun;
+			firstRun = false;
 			timer_2min.cancel();
 			timer_2min.start();
 		}
@@ -451,7 +457,7 @@ public class FHome extends FBase implements OnClickListener {
 		try {
 			getActivity().registerReceiver(this.ConnectivityChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
 		} catch (Exception e) {
-			dlog.e("onResume: Exception while registering receiver ", e);
+			dlog.e("FHome.onResume();", e);
 		}
 
 		//initWebViewBanner();
@@ -462,13 +468,13 @@ public class FHome extends FBase implements OnClickListener {
 		super.onPause();
 		//actualAnim=0;
 		//lastInside=1;
-		seenA = false;
-		seenB = false;
+//		seenA = false;
+//		seenB = false;
 		lastInsideArea = true;
 		try {
 			getActivity().unregisterReceiver(this.ConnectivityChangeReceiver);
 		} catch (Exception e) {
-			dlog.e("onPause: Exception while unresisting receiver ", e);
+			dlog.e("FHome.onPause();Exception while unresisting receiver ", e);
 		}
 
 	}
@@ -528,23 +534,23 @@ public class FHome extends FBase implements OnClickListener {
 		switch (v.getId()) {
 
 			case R.id.fmapVideo://SOS
-				dlog.cr("MENU CLICK VIDEO");
+				dlog.cr("FHome.onClick();MENU CLICK VIDEO");
 				((ABase) getActivity()).pushBackFragment(FVideo.newInstance(), FVideo.class.getName(), true);
 				break;
 
 			case R.id.fmapSOSB://SOS
-				dlog.cr("MENU CLICK SOS");
+				dlog.cr("FHome.onClick();MENU CLICK SOS");
 				startActivity(new Intent(getActivity(), ASOS.class));
 				break;
 
 			case R.id.fmapSearchB://Search
-				dlog.cr("MENU CLICK MAP");
+				dlog.cr("FHome.onClick();MENU CLICK MAP");
 				((ABase) getActivity()).pushBackFragment(FMap.newInstance(), FMap.class.getName(), true);
 
 				break;
 
 			case R.id.fmapDamagesIB://Search
-				dlog.cr("MENU CLICK DAMAGES");
+				dlog.cr("FHome.onClick();MENU CLICK DAMAGES");
 				//((ABase) getActivity()).pushFragment(OptimizeDistanceCalc.newInstance(), OptimizeDistanceCalc.class.getName(), true);
 
 				((ABase) getActivity()).pushFragment(FDamages.newInstance(false), FDamages.class.getName(), true);
@@ -552,12 +558,12 @@ public class FHome extends FBase implements OnClickListener {
 				break;
 
 			case R.id.fmapRadioB://Radio
-				dlog.cr("MENU CLICK RADIO");
+				dlog.cr("FHome.onClick();MENU CLICK RADIO");
 				((ABase) getActivity()).pushFragment(FRadio.newInstance(), FRadio.class.getName(), true);
 				break;
 
 			case R.id.fmapCloseTriplB://End Trip
-				dlog.cr("MENU CLICK END RENT");
+				dlog.cr("FHome.onClick();MENU CLICK END RENT");
 				//((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_END_RENT), FMenu.class.getName(), true);
 				if (((AMainOBC) getActivity()).checkisInsideParkingArea()) {
 					if (App.checkKeyOff && !CarInfo.isKeyOn()) {
@@ -566,12 +572,12 @@ public class FHome extends FBase implements OnClickListener {
 						((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_END_RENT), FMenu.class.getName(), true);
 				} else {
 					localHandler.sendEmptyMessage(MSG_OPEN_ALERT_AREA);
-					dlog.i("Open Alert Area");
+					dlog.i("FHome.onClick();Open Alert Area");
 				}
 				break;
 
 			case R.id.fmapParkB://End Trip
-				dlog.cr("MENU CLICK PARK RENT");
+				dlog.cr("FHome.onClick();MENU CLICK PARK RENT");
 				((ABase) getActivity()).pushFragment(FMenu.newInstance(FMenu.REQUEST_PARK), FMenu.class.getName(), true);
 				break;
 
@@ -592,13 +598,13 @@ public class FHome extends FBase implements OnClickListener {
 			//   break;
 
 			case R.id.fmapAssicurazione:
-				dlog.cr("MENU CLICK ASSICURAZIONE");
+				dlog.cr("FHome.onClick();MENU CLICK ASSICURAZIONE");
 				((ABase) getActivity()).pushFragment(FPdfViewer.newInstance("ASSICURAZIONE"), FPdfViewer.class.getName(), true);
 				//startActivity(new Intent(getActivity(), FPdfViewer.class)); //pushfragment usare
 
 				break;
 			case R.id.fmapLibretto:
-				dlog.cr("MENU CLICK LIBRETTO");
+				dlog.cr("FHome.onClick();MENU CLICK LIBRETTO");
 				((ABase) getActivity()).pushFragment(FPdfViewer.newInstance("LIBRETTO"), FPdfViewer.class.getName(), true);
 				//startActivity(new Intent(getActivity(), FPdfViewer.class)); //pushfragment usare
 
@@ -612,12 +618,16 @@ public class FHome extends FBase implements OnClickListener {
 								adIV.setColorFilter(R.color.overlay_click);
 								timer_2min.cancel();
 								handleClick = true;
-								dlog.d(" Banner: Click su banner ");
+								dlog.d("FHome.onClick();Banner: Click su banner ");
 								new Thread(new Runnable() {
 									@Override
 									public void run() {
 
-										loadBanner(App.BannerName.getBundle("CAR").getString("CLICK"), "CAR", true);
+										Bundle bundle = App.BannerName.getBundle("CAR");
+										if (bundle!=null) {
+											loadBanner(bundle.getString("CLICK"), "CAR", true);
+										}
+//										loadBanner(App.BannerName.getBundle("CAR").getString("CLICK"), "CAR", true);
 										getActivity().runOnUiThread(new Runnable() {
 											@Override
 											public void run() {
@@ -637,7 +647,7 @@ public class FHome extends FBase implements OnClickListener {
 						}
 					}
 				} catch (Exception e) {
-					dlog.e("Exception while clicking on banner", e);
+					dlog.e("FHome.onClick();Exception while clicking on banner ", e);
 				}
 				break;
 			case R.id.fmapAlertCloseBTN:
@@ -654,7 +664,7 @@ public class FHome extends FBase implements OnClickListener {
 		if (activity != null && activity.checkisInsideParkingArea()) {
 			eventRepository.menuclick("END RENT");
 			resetBanner();
-			dlog.d("Banner: end rent stopping update, start countdown");
+			dlog.d("FHome.closeTrip();Banner: end rent stopping update, start countdown");
 			//((AMainOBC)getActivity()).sendMessage(MessageFactory.setEngine(false));
 
 			Intent i = new Intent(getActivity(), AGoodbye.class);
@@ -671,7 +681,7 @@ public class FHome extends FBase implements OnClickListener {
 			FHome.timer_2min.cancel();
 			FHome.timer_5sec.cancel();
 		} catch (Exception e) {
-			dlog.e("Exeption while park", e);
+			dlog.e("FHome.closeTrip();Exeption while park", e);
 		}
 		FHome.firstRun = true;
 	}
@@ -696,7 +706,7 @@ public class FHome extends FBase implements OnClickListener {
 			lastInside = 0;
 
 		} else {
-			updateArea = 0;
+//			updateArea = 0;
 			if (!animQueue.contains("area")) {
 				animQueue.add("area");
 			}
@@ -727,18 +737,18 @@ public class FHome extends FBase implements OnClickListener {
 
 	private void updateCloseButton(boolean isInsideParkArea) {
 		if (lastInsideArea != isInsideParkArea) {
-			Button closeTripBtn = ((Button) rootView.findViewById(R.id.fmapCloseTriplB));
+			Button closeTripBtn = (Button) rootView.findViewById(R.id.fmapCloseTriplB);
 			if (closeTripBtn == null) {
-				dlog.i("updateCloseTripButton: button not found");
+				dlog.i("FHome.updateCloseTripButton();button not found");
 				return;
 			}
 			if (isInsideParkArea) {
-				dlog.i("updateCloseTripButton: enabling Button");
+				dlog.i("FHome.updateCloseTripButton();enabling Button");
 				closeTripBtn.setEnabled(true);
 				closeTripBtn.setAlpha(1);
 
 			} else {
-				dlog.i("updateCloseTripButton: disabling Button");
+				dlog.i("FHome.updateCloseTripButton();disabling Button");
 				//closeTripBtn.setEnabled(false);
 				closeTripBtn.setAlpha(0.5f);
 
@@ -773,9 +783,9 @@ public class FHome extends FBase implements OnClickListener {
 				if (SOC < 15) {
 
 					if (statusAlertSOC <= 1) {
-						dlog.cr("Display popup 5km");
+						dlog.cr("FHome.updateCarInfo();Display popup 5km");
 						statusAlertSOC = 2;
-						alertFLMode = ALERT_SOC;
+//						alertFLMode = ALERT_SOC;
 						eventRepository.eventSoc(SOC, "Popup 5km");
 						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
 						rootView.findViewById(R.id.ivDamages).setBackgroundResource(R.drawable.outofcharge);
@@ -791,10 +801,10 @@ public class FHome extends FBase implements OnClickListener {
 					}
 				} else if (SOC <= 30) {
 					if (statusAlertSOC <= 0) {
-						dlog.cr("Display popup 20km");
+						dlog.cr("FHome.updateCarInfo();Display popup 20km");
 
 						statusAlertSOC = 1;
-						alertFLMode = ALERT_SOC;
+//						alertFLMode = ALERT_SOC;
 						eventRepository.eventSoc(SOC, "Popup 20km");
 						rootView.findViewById(R.id.ivDamages).setBackgroundResource(R.drawable.almostoutofcharge);
 						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
@@ -832,7 +842,7 @@ public class FHome extends FBase implements OnClickListener {
 			}
 
 		} catch (Exception e) {
-			dlog.e("Exception while handling carInfo", e);
+			dlog.e("FHome.updateCarInfo();Exception while handling carInfo", e);
 		}
 	}
 
@@ -844,10 +854,10 @@ public class FHome extends FBase implements OnClickListener {
 
 		if (status > 0) {
 			if (!animQueue.contains("bonus")) {
-				if (App.DefaultCity.toLowerCase().equals("milano")) {
+/*				if (App.DefaultCity.toLowerCase().equals("milano")) {
 					// AMainOBC.player.reqSystem = true;
+				}*/
 
-				}
 				animQueue.add("bonus");
 			}
 			if (no3gwarning.getAnimation() == null)
@@ -984,14 +994,14 @@ public class FHome extends FBase implements OnClickListener {
 					}
 					break;
 				case MSG_CLOSE_SOC_ALERT:
-					alertFLMode = NO_ALERT;
+//					alertFLMode = NO_ALERT;
 					localHandler.removeMessages(MSG_CLOSE_SOC_ALERT);
 					//dlog.cr("Chiusura alert SOC");
 					rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.GONE);
 					//rootView.findViewById(R.id.fmapAlertSOCFL).invalidate(); testinva
 					break;
 				case MSG_OPEN_SOC_ALERT:
-					alertFLMode = ALERT_SOC;
+//					alertFLMode = ALERT_SOC;
 					localHandler.removeMessages(MSG_OPEN_SOC_ALERT);
 					if (localCarInfo != null && localCarInfo.batteryLevel <= 15) {
 						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
@@ -1005,7 +1015,7 @@ public class FHome extends FBase implements OnClickListener {
 					}
 					break;
 				case MSG_OPEN_ALERT_AREA:
-					alertFLMode = ALERT_AREA;
+//					alertFLMode = ALERT_AREA;
 					localHandler.removeMessages(MSG_OPEN_ALERT_AREA);
 					rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
 					((rootView.findViewById(R.id.fmapAlertSOCFL))).setBackgroundResource(R.drawable.sha_orangealertbox);
@@ -1034,8 +1044,11 @@ public class FHome extends FBase implements OnClickListener {
 
 	private void refreshConnectionStatus() {
 		try {
-			if (getActivity() == null && getActivity() == null)
+			//if (getActivity() == null && getActivity() == null)
+			if (getActivity() == null) {
 				return;
+			}
+
 			boolean status = App.hasNetworkConnection();
 
 			if (status) {
@@ -1051,7 +1064,7 @@ public class FHome extends FBase implements OnClickListener {
 					no3gwarning.startAnimation(alertAnimation);
 			}
 		} catch (Exception e) {
-			dlog.e("Exception while refreshing ConnectionStatus", e);
+			dlog.e("FHome.refreshConnectionStatus();", e);
 		}
 	}
 
@@ -1062,13 +1075,20 @@ public class FHome extends FBase implements OnClickListener {
 	private void loadBanner(String Url, String type, Boolean isClick) {
 		try {
 
+			//for countries outside Italy use local banners
+			if (!App.Instance.getDefaultLang().equals("it")) {
+				dlog.e(" loadBanner: get LOCAL banner");
+				App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+				return;
+			}
+
 			File outDir = new File(App.getBannerImagesFolder());
 			if (!outDir.isDirectory()) {
 				outDir.mkdir();
 			}
 
 			if (!App.hasNetworkConnection()) {
-				dlog.e(FHome.class.toString() + " loadBanner: nessuna connessione");
+				dlog.e("FHome.loadBanner();nessuna connessione");
 				App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
 				return;
 			}
@@ -1099,7 +1119,7 @@ public class FHome extends FBase implements OnClickListener {
 				HttpGet httpGet = new HttpGet(Url);
 
 				HttpResponse response = client.execute(httpGet);
-				DLog.I(FHome.class.toString() + " loadBanner: Url richiesta " + Url);
+				DLog.I("FHome.loadBanner();Url richiesta " + Url);
 				StatusLine statusLine = response.getStatusLine();
 				int statusCode = statusLine.getStatusCode();
 				if (statusCode == 200) {
@@ -1117,23 +1137,23 @@ public class FHome extends FBase implements OnClickListener {
 					reader.close();
 				} else {
 
-					dlog.e(" loadBanner: Failed to connect " + String.valueOf(statusCode));
+					dlog.e("FHome.loadBanner();Failed to connect " + statusCode);
 					App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
 					return;
 				}
 			} catch (Exception e) {
-				dlog.e(" loadBanner: eccezione in connessione ", e);
+				dlog.e("FHome.loadBanner();eccezione in connessione ", e);
 				App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
 				return;
 			}
 			String jsonStr = builder.toString();
 			if (jsonStr.compareTo("") == 0) {
-				dlog.e(" loadBanner: nessuna connessione");
+				dlog.e("FHome.loadBanner();nessuna connessione");
 				App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
 				return;
 			}
 
-			DLog.I(FHome.class.toString() + " loadBanner: risposta " + jsonStr);
+			DLog.I("FHome.loadBanner();risposta " + jsonStr);
 			File file = new File(outDir, "placeholder.lol");
 
 			try {
@@ -1165,11 +1185,11 @@ public class FHome extends FBase implements OnClickListener {
 				if (file.exists()) {
 					Image.putString(("FILENAME"), filename);
 					App.BannerName.putBundle(type, Image);
-					dlog.i(FHome.class.toString() + " loadBanner: file già esistente: " + filename);
+					dlog.i("FHome.loadBanner();file già esistente: " + filename);
 					return;
 				}
 
-				dlog.i(FHome.class.toString() + " loadBanner: file mancante inizio download a url: " + urlImg.toString());
+				dlog.i("FHome.loadBanner();file mancante inizio download a url: " + urlImg.toString());
 				HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
 				urlConnection.setRequestMethod("GET");
 				urlConnection.setDoOutput(true);
@@ -1192,18 +1212,20 @@ public class FHome extends FBase implements OnClickListener {
 				inputStream.close();
 				Image.putString(("FILENAME"), filename);
 				App.BannerName.putBundle(type, Image);
-				dlog.i(FHome.class.toString() + " loadBanner: File scaricato e creato " + filename);
+				dlog.i("FHome.loadBanner();File scaricato e creato " + filename);
 				urlConnection.disconnect();
 
 			} catch (Exception e) {
-				if (file.exists()) file.delete();
-				dlog.e(FHome.class.toString() + " loadBanner: eccezione in creazione e download file ", e);
+				if (file.exists()){
+					file.delete();
+				}
+				dlog.e("FHome.loadBanner();eccezione in creazione e download file ", e);
 
 				e.printStackTrace();
 			}
 
 		} catch (Exception e) {
-			dlog.e("loadBanner: Exception", e);
+			dlog.e("FHome.loadBanner();", e);
 		}
 	}
 
@@ -1219,19 +1241,19 @@ public class FHome extends FBase implements OnClickListener {
 				ImageV = new File(App.getBannerImagesFolder(), Banner.getString("FILENAME", "placeholder.lol"));
 
 				try {
-					if (ImageV != null && ImageV.exists()) {
-						dlog.i(FHome.class.toString() + " updateBanner: file trovato imposto immagine " + ImageV.getName());
+					if (ImageV.exists()) {
+						dlog.i( "FHome.updateBanner();file trovato imposto immagine " + ImageV.getName());
 						Bitmap myBitmap = BitmapFactory.decodeFile(ImageV.getAbsolutePath());
 						if (myBitmap == null) {
 
-							dlog.e(FHome.class.toString() + " updateBanner: file corrotto, elimino e visualizzo offline ");
+							dlog.e("FHome.updateBanner();file corrotto, elimino e visualizzo offline ");
 							ImageV.delete();
 							//initWebBanner(Banner.getString("URL",null));
 							// webViewBanner.setVisibility(View.INVISIBLE);
 							adIV.setImageResource(R.drawable.car_banner_offline);
 							adIV.setVisibility(View.VISIBLE);
 							if (!started) {
-								started = !started;
+								started = true;
 								timer_2min.cancel();
 								timer_2min.start();
 							}
@@ -1244,7 +1266,7 @@ public class FHome extends FBase implements OnClickListener {
 
 					}
 				} catch (Exception e) {
-					dlog.e(FHome.class.toString() + " updateBanner: eccezione in caricamento file visualizzo offline ", e);
+					dlog.e("FHome.updateBanner();eccezione in caricamento file visualizzo offline ", e);
 					e.printStackTrace();
 					//initWebBanner(Banner.getString("URL",null));
 					// webViewBanner.setVisibility(View.INVISIBLE);
@@ -1252,7 +1274,7 @@ public class FHome extends FBase implements OnClickListener {
 					adIV.setVisibility(View.VISIBLE);
 				}
 			} else {
-				dlog.e(FHome.class.toString() + " updateBanner: Bundle null, visualizzo offline");
+				dlog.e("FHome.updateBanner();Bundle null, visualizzo offline");
 				//initWebBanner(Banner.getString("URL",null));
 				//webViewBanner.setVisibility(View.INVISIBLE);
 				adIV.setImageResource(R.drawable.car_banner_offline);
@@ -1261,16 +1283,16 @@ public class FHome extends FBase implements OnClickListener {
 
 			try {
 				if (!started && timer_2min != null) {
-					started = !started;
+					started = true;
 					timer_2min.cancel();
 					timer_2min.start();
 				}
 			} catch (Exception e) {
-				dlog.e("Exception trying to start timer", e);
+				dlog.e("FHome.updateBanner();Exception trying to start timer", e);
 			}
 
 		} catch (Exception e) {
-			dlog.e("Exception updating Banner");
+			dlog.e("FHome.updateBanner();Exception updating Banner");
 		}
 	}
 
@@ -1281,10 +1303,10 @@ public class FHome extends FBase implements OnClickListener {
 				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM, LowLevelInterface.AUDIO_LEVEL_ALERT);
 			}
 			tts.speak(text);
-			dlog.d("queueTTS: leggo " + text);
+			dlog.d("FHome.queueTTS();leggo " + text);
 
 		} catch (Exception e) {
-			dlog.e("queueTTS exception while start speak", e);
+			dlog.e("FHome.queueTTS();exception while start speak", e);
 		}
 
 	}
@@ -1296,11 +1318,11 @@ public class FHome extends FBase implements OnClickListener {
 				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM, LowLevelInterface.AUDIO_LEVEL_ALERT);
 			}
 			player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/" + resID));
-			dlog.d("playAlertAdvice: play " + name);
+			dlog.d("FHome.playAlertAdvice();playAlertAdvice: play " + name);
 			dlog.cr("Riproduco avviso vocale: play " + name);
 
 		} catch (Exception e) {
-			dlog.e("playAlertAdvice exception while start speak", e);
+			dlog.e("FHome.playAlertAdvice();playAlertAdvice exception while start speak", e);
 		}
 
 	}

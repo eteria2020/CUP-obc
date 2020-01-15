@@ -24,14 +24,14 @@ import eu.philcar.csg.OBC.helpers.Encryption;
 public class ZmqRequester {
 	private DLog dlog = new DLog(this.getClass());
 
-	private ZMQ.Context zmqContext;
+//	private ZMQ.Context zmqContext;
 	private ZMQ.Socket zmqSocket;
 	private int counter = 0;
 	private ExecutorService executor;
 
 	private class Request {
 
-		public Request(RemoteEntityInterface entity, Handler handler, Message msg) {
+		private Request(RemoteEntityInterface entity, Handler handler, Message msg) {
 			this((String) null, handler, msg);
 			this.entity = entity;
 			if (entity != null) {
@@ -39,7 +39,7 @@ public class ZmqRequester {
 			}
 		}
 
-		public Request(String payload, Handler handler, Message msg) {
+		private Request(String payload, Handler handler, Message msg) {
 			this.payload = payload;
 			this.msg = msg;
 			this.handler = handler;
@@ -61,10 +61,11 @@ public class ZmqRequester {
 
 	public ZmqRequester() {
 
-		requests = new HashMap<String, Request>();
+		requests = new HashMap<>();
 		executor = Executors.newCachedThreadPool();
 
-		zmqContext = ZMQ.context(1);
+//		zmqContext = ZMQ.context(1);
+		ZMQ.Context zmqContext = ZMQ.context(1);
 		zmqSocket = zmqContext.socket(ZMQ.REQ);
 		zmqSocket.setIdentity(App.CarPlate.getBytes());
 		zmqSocket.setLinger(5000);
@@ -134,19 +135,20 @@ public class ZmqRequester {
 
 	private void Start() {
 
-		dlog.d("Starting thread");
+		dlog.d("ZmqReuester.Restart();Starting thread");
 		zmqRunnable = new ZmqRunnable();
 		zmqThread = new Thread(zmqRunnable);
 		zmqThread.start();
 	}
 
 	public void Restart() {
-		dlog.d("Restarting thread");
+		dlog.d("ZmqReuester.Restart();thread");
 		if (zmqThread != null && zmqRunnable != null) {
 			zmqRunnable.zmqStop(zmqThread);
 			try {
 				zmqThread.join(5000);
 			} catch (InterruptedException e) {
+				DLog.E("ZmqReuester.Restart();", e);
 			}
 
 		}
@@ -159,7 +161,7 @@ public class ZmqRequester {
 
 	private void handleZmqMessage(String sid, String payload) {
 
-		dlog.d("Received ZMQ message sid: '" + sid + "' with payload : '" + payload + "'");
+		dlog.d("ZmqReuester.Restart();Received ZMQ message sid: '" + sid + "' with payload : '" + payload + "'");
 
 		if (requests == null)
 			return;
@@ -197,7 +199,7 @@ public class ZmqRequester {
 	private class ZmqRunnable implements Runnable {
 		private ZMQ.Context context;
 
-		public void zmqStop(final Thread th) {
+		private void zmqStop(final Thread th) {
 
 			Thread t = new Thread() {
 				public void run() {
@@ -220,12 +222,13 @@ public class ZmqRequester {
 				try {
 					sid = zmqSocket.recvStr();
 				} catch (ZMQException e) {
-					if (e != null && e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
+					if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
 						break;
 					}
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e1) {
+						DLog.E("ZmqRequester.ZmqRunnable.run();", e1);
 					}
 				}
 				if (zmqSocket.hasReceiveMore()) {
@@ -240,7 +243,7 @@ public class ZmqRequester {
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();
 					}
-					Log.d("ZMQ", str);
+					DLog.D("ZmqRequester.run();" + str);
 				}
 			}
 			zmqSocket.close();

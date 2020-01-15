@@ -43,7 +43,7 @@ import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.AGoodbye;
 import eu.philcar.csg.OBC.AMainOBC;
 import eu.philcar.csg.OBC.App;
-import eu.philcar.csg.OBC.BuildConfig;
+//import eu.philcar.csg.OBC.BuildConfig;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
@@ -66,7 +66,7 @@ public class FGoodbye extends FBase {
 	private static Boolean handleClick = false;
 	private static CountDownTimer timer_5sec, selfclose = null;
 	private static Boolean RequestBanner = false;
-	private static boolean played = false;
+//	private static boolean played = false;
 	private DLog dlog = new DLog(this.getClass());
 	//private WebView webViewBanner;
 	private ImageView adIV;
@@ -289,8 +289,8 @@ public class FGoodbye extends FBase {
 		} else if (Debug.IGNORE_HARDWARE) {
 			name = "Gino Panino";
 		}
-		if (BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
-			name = "Gino Panino cotto e rosa";
+/*		if (BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
+			name = "Gino Panino cotto e rosa";*/
 		((TextView) view.findViewById(R.id.fgodGoodbyeTV)).setText(name);
 
 		((AGoodbye) this.getActivity()).sendMessage(MessageFactory.scheduleSelfCloseTrip(40));
@@ -403,6 +403,13 @@ public class FGoodbye extends FBase {
 
 	public void loadBanner(String Url, String type, Boolean isClick) {
 
+		//for countries outside Italy use local banners
+		if (!App.Instance.getDefaultLang().equals("it")) {
+			dlog.e(" loadBanner: get LOCAL banner");
+			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+			return;
+		}
+
 		File outDir = new File(App.getBannerImagesFolder());
 		if (outDir.mkdir()) {
 			dlog.d("Banner directory created");
@@ -458,8 +465,7 @@ public class FGoodbye extends FBase {
 				reader.close();
 				content.close();
 			} else {
-
-				dlog.e(" loadBanner: Failed to connect " + String.valueOf(statusCode));
+				dlog.e(" loadBanner: Failed to connect " + statusCode);
 				App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
 				return;
 			}
@@ -526,8 +532,8 @@ public class FGoodbye extends FBase {
 			}
 			FileOutputStream fileOutput = new FileOutputStream(file);
 			InputStream inputStream = urlConnection.getInputStream();
-			int totalSize = urlConnection.getContentLength();
-			int downloadedSize = 0;
+//			int totalSize = urlConnection.getContentLength();
+//			int downloadedSize = 0;
 			byte[] buffer = new byte[1024];
 			int bufferLength = 0;
 			while ((bufferLength = inputStream.read(buffer)) > 0) {
@@ -543,7 +549,9 @@ public class FGoodbye extends FBase {
 			inputStream.close();
 
 		} catch (Exception e) {
-			if (file.exists()) file.delete();
+			if (file.exists()) {
+				file.delete();
+			}
 			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
 			dlog.e(" loadBanner: eccezione in creazione e download file ", e);
 
@@ -560,7 +568,7 @@ public class FGoodbye extends FBase {
 				ImageV = new File(App.getBannerImagesFolder(), Banner.getString("FILENAME", ""));
 
 				try {
-					if (ImageV != null && ImageV.exists()) {
+					if (ImageV.exists()) {
 						dlog.i(FGoodbye.class.toString() + " updateBanner: file trovato imposto immagine " + ImageV.getName());
 						Bitmap myBitmap = BitmapFactory.decodeFile(ImageV.getAbsolutePath());
 						if (myBitmap == null) {
@@ -578,7 +586,7 @@ public class FGoodbye extends FBase {
 						adIV.setImageBitmap(myBitmap);
 						adIV.setVisibility(View.VISIBLE);
 						adIV.invalidate();
-						return;
+//						return;
 
 					}
 				} catch (Exception e) {
@@ -588,18 +596,18 @@ public class FGoodbye extends FBase {
 					//webViewBanner.setVisibility(View.INVISIBLE);
 					adIV.setImageResource(R.drawable.offline_goodbye);
 					adIV.setVisibility(View.VISIBLE);
-					return;
+//					return;
 				}
 			} else {
-				dlog.e(FGoodbye.class.toString() + " updateBanner: Bundle null, visualizzo offline");
+				dlog.e("FGoodbye.updateBanner();Bundle null, visualizzo offline");
 				//initWebBanner(Banner.getString("URL",null));
 				//webViewBanner.setVisibility(View.INVISIBLE);
 				adIV.setImageResource(R.drawable.offline_goodbye);
 				adIV.setVisibility(View.VISIBLE);
-				return;
+//				return;
 			}
 		} catch (Exception e) {
-
+			dlog.e("FGoodbye.updateBanner();", e);
 		}
 
 	}
@@ -622,7 +630,7 @@ public class FGoodbye extends FBase {
 			timer_5sec.cancel();
 			handleClick = null;
 			RequestBanner = null;
-			played = false;
+//			played = false;
 			if (selfclose != null)
 				selfclose.cancel();
 

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="navigation_active_error">Prosimo izklopite navigacijo, preden greste domov</string>
+
+    <string name="Acra_message">prenos poročila o napaki</string>
+    <string name="address">Naslov</string>
+    <string name="housenumber">Hišna številka</string>
+    <string name="app_name">vgrajeni polnilnik OBC</string>
+    <string name="are_you_drunk">Ali ste pili alkohol?</string>
+
+    <string name="back_to_navigation">Nazaj na navigacijo</string>
+    <string name="button_call">Klicanje podpore</string>
+    <string name="button_break">PAUSE ali\END TRIP</string>
+    <string name="button_close">Zapri</string>
+    <string name="button_navigatormen">NAVI</string>
+    <string name="button_radio">RADIO</string>
+    <string name="button_points">TOČKE</string>
+    <string name="button_recharge">POLNILNE POSTAJE</string>
+    <string name="button_search">NAJDI</string>
+    <string name="button_home">MENI</string>
+    <string name="button_park">PAUSE TRIP</string>
+    <string name="button_end">END TRIP</string>
+
+    <string name="call_book">Rezervirajte ali vnesite novo številko</string>
+    <string name="call_dealt_old">Klic posredovan v center za pomoč strankam</string>
+    <string name="call_dealt">Klic za podporo poslan službi za stranke, poklicali\vas bodo nazaj</string>
+    <string name="car_cleanliness_inside"><b>Notranjost</b> Čistoča</string>
+    <string name="car_cleanliness_outside"><b>Zunanjost</b> Čistoča</string>
+    <string name="car_cleanliness_state">Vozilo Čistoča</string>
+    <string name="change">Nova številka</string>
+    <string name="checking_pin">Preverjanje PIN-a</string>
+    <string name="city">Mesto</string>
+    <string name="content_description">Velikonočno jajce</string>
+
+    <string name="damage_observed">opažena škoda</string>
+    <string name="damages_observed">opažena škoda</string>
+
+    <string name="error_empty_address">Ime ne more biti prazno</string>
+    <string name="error_empty_city">Mesto ne more biti prazno</string>
+    <string name="error_http_code_failure">Napaka kode HTTP</string>
+    <string name="error_malformed_url">Nepravilnost zahtevanega URL</string>
+    <string name="error_parsing_invalid_type">Neveljavna vrsta naslova</string>
+    <string name="error_parsing_missing_addresse">parameter naslova ni najden</string>
+    <string name="error_parsing_missing_geometry">parameter geometrije ni najden</string>
+    <string name="error_parsing_missing_latitude">parameter zemljepisne širine ni najden</string>
+    <string name="error_parsing_missing_location">parameter lokacije ni najden</string>
+    <string name="error_parsing_missing_longitude">parameter zemljepisne dolžine ni najden</string>
+    <string name="error_parsing_missing_results">parameter rezultatov ni najden</string>
+    <string name="error_parsing_missing_status">parameter stanja ni najden</string>
+    <string name="error_parsing_missing_types">parameter vrst ni najden</string>
+    <string name="error_parsing_response_not_json">Odziv strežnika ni JSON</string>
+    <string name="error_parsing_result_not_json">eden od rezultatov ni JSON</string>
+    <string name="error_unable_to_close_buffer_reader">Po iskanju odziva strežnika ni mogoče zapreti bralnika medpomnilnika</string>
+    <string name="error_unable_to_get_request_response">Zahtevane kode odziva ni mogoče dobiti</string>
+    <string name="error_unable_to_open_connection">Povezave ni mogoče odpreti</string>
+    <string name="error_unable_to_read_message_content">Vsebine sporočila ni mogoče prebrati</string>
+    <string name="error_unable_to_read_server_response">Odziva strežnika ni mogoče prebrati</string>
+
+    <string name="find_destination">Poišči kraj</string>
+    <string name="fuel_station_list">Seznam polnilnih postaj</string>
+    <string name="fuel_stations">Polnilne postaje</string>
+    <string name="fuel_status_one_quarter">Raven napolnjenosti več kot 25 %: <b>polnjenje onemogočeno</b></string>
+    <string name="fuel_status_pin_card">Ko končate, kliknite ‘posreduj’</string>
+    <string name="fuel_status_show_pin">Pokažite<b>PIN</b> na polnilni postaji</string>
+
+    <string name="go_to_map_or_back">Pojdite na zemljevid ali nazaj</string>
+    <string name="goodbye">Nasvidenje</string>
+
+    <string name="search_title">Iskanje naslova</string>
+    <string name="hint_housenumber">Vnesite hišno številko</string>
+    <string name="hint_address">Vnesite naslov</string>
+    <string name="hint_city">Vnesite mesto</string>
+
+    <string name="instruction_title">Hitra navodila za uporabo</string>
+    <string name="instruction_title_close">Kako zapustiti vozilo</string>
+    <string name="instruction_start_1">Nastavite si sedež in se pripnite</string>
+    <string name="instruction_start_2">Obrnite ključ v smeri urinega kazalca</string>
+    <string name="instruction_start_3">Počakajte na znak ‘READY’ na števcu</string>
+    <string name="instruction_start_4">Pritisnite gumb D ali gumb R</string>
+
+    <string name="instruction_damages">Ali ste opazili kakšno poškodbo?</string>
+    <string name="instruction_dirty">Ali je vozilo umazano?</string>
+
+    <string name="priority_lanes_title">Za začetek uporabe avtomobila</string>
+    <string name="attention">Pozor:</string>
+    <string name="priority_lanes">S tem vozilom NE smete voziti po prednostnih voznih pasovih</string>
+
+    <string name="instruction_title_preclose">PRED PARKIRANJEM ALI ZAKLJUČKOM NAJEMA:</string>
+    <string name="instruction_preclose_1">PRESTAVITE V NEVTRALNI POLOŽAJ (GUMB N)</string>
+    <string name="instruction_preclose_2">UGASNITE LUČI</string>
+    <string name="instruction_preclose_3">POTEGNITE ROČNO ZAVORO</string>
+    <string name="instruction_preclose_4">ZAPRITE OKNA</string>
+    <string name="instruction_preclose_5">IZKLOPITE ARMATURNO PLOŠČO, TAKO DA OBRNETE KLJUČ (KLJUČ OSTANE VSTAVLJEN)</string>
+
+
+    <string name="instruction_close_1">Vzemite svoje stvari. Ste ugasnili luči in zaprli okna?</string>
+    <string name="instruction_close_2">Pritisnite gumb N na armaturni plošči</string>
+    <string name="instruction_close_3">Potegnite ročno zavoro</string>
+    <string name="instruction_close_4">Zapustite vozilo. Vrata se samodejno zaprejo v času, ki je prikazan na desni</string>
+    <string name="instruction_close_4_note">Če si premislite, pustite, da se vrata zaprejo, nato vozilo nanovo najemite</string>
+    <string name="instruction_close_5">Bodite pozorni; če vozilo ni pravilno zaprto, imate lahko dodatne stroške in kazni</string>
+
+    <string name="bonus_message_poi">Čestitamo\nV prihodnjih dneh, ko boste plačali to vožnjo, boste prejeli bonus, ker ste vozilo parkirali v bližini polnilne postaje!</string>
+
+    <string name="self_close_message">Zaključevanje najema</string>
+
+    <string name="loading">Nalaganje</string>
+
+    <string name="push_to_cancel">Pritisnite \nza preklic</string>
+
+    <string name="goodbye_instructions">Lahko izstopite iz vozila. Vrata se bodo samodejno zaklenila v naslednjih sekundah, ki so prikazane spodaj</string>
+    <string name="goodbye_cancel">Prekliči</string>
+    <string name="goodbye_back_to_trip">Kliknite tukaj, če želite nadaljevati vožnjo</string>
+
+    <string name="menu_rent_end">Konec najema</string>
+    <string name="menu_rent_end_off">Konec najema (ni na voljo)</string>
+    <string name="menu_rent_end_outside_park_area">Konec najema - Ni na voljo: ste izven območja delovanja. Vrnite se na območje delovanja, preden lahko zaključite najem.</string>
+    <string name="menu_rent_end_shutdown_engine">Konec najema (najprej izklopite vozilo, tako da zavrtite ključ v nasportni smeri urinega kazalca)</string>
+
+    <string name="inside_area">Znotraj območja delovanja</string>
+    <string name="outside_area">Izven območja delovanja</string>
+
+    <string name="menu_refuel">Polnjenje</string>
+    <string name="menu_refuel_off">Polnjenje (ni na voljo)</string>
+    <string name="menu_refuel_shutdown_engine">Polnjenje (najprej izklopite vozilo, tako da zavrtite ključ v nasportni smeri urinega kazalca)</string>
+    <string name="menu_park_mode_started">Če želite nadaljevati z najemom, uporabite ukaz UNLOCK DOORS na telefonu ali uporabite SHARENGO RFID kartico za odklep vozila</string>
+    <string name="menu_park_mode_resume">Nadaljevanje najema</string>
+    <string name="menu_park_mode_resume_shutdown_engine">Nadaljevanje najema (najprej izklopite vozilo, tako da zavrtite ključ v nasportni smeri urinega kazalca)</string>
+    <string name="menu_park_mode_suspend">PAUSE TRIP</string>
+    <string name="menu_park_mode_suspend_off">PAUSE TRIP (ni na voljo)</string>
+    <string name="menu_park_mode_suspend_instructions">Lahko izstopite iz vozila, vrata se bodo samodejno zaklenila v naslednjih sekundah, ki so prikazane na desni. Ko boste želeli nadaljevati vožnjo, uporabite ukaz &quot;UNLOCK DOORS&quot; na telefonu ali uporabite SHARENGO RFID kartico za odklep vozila.</string>
+    <string name="menu_park_mode_suspend_shutdown_engine">PAUSE TRIP (najprej izklopite vozilo, tako da zavrtite ključ v nasportni smeri urinega kazalca)</string>
+    <string name="milan">Milano</string>
+    <string name="minutes_saved">Shranjene minute:</string>
+    <string name="mu_distance_kilometers">Km</string>
+    <string name="mu_distance_meters">m</string>
+    <string name="mu_distance_time">min.</string>
+
+    <string name="navigation_start">Vklopite ‘navigacija’</string>
+    <string name="navigation_stop">Izklopite ‘navigacija’</string>
+    <string name="navigator_almost_there">Skoraj ste prispeli</string>
+    <string name="navigator_continue">Nadaljujte</string>
+    <string name="navigator_continue_onto">Nadaljujte na</string>
+    <string name="navigator_finish">Zaključek</string>
+    <string name="navigator_get_ready_to">Pripravite se, da</string>
+    <string name="navigator_left">levo</string>
+    <string name="navigator_right">desno</string>
+    <string name="navigator_sharp_left">Ostro v levo</string>
+    <string name="navigator_sharp_right">Ostro v desno</string>
+    <string name="navigator_slight_left">Rahlo v levo</string>
+    <string name="navigator_slight_right">Rahlo v desno</string>
+    <string name="navigator_stopover">Postanek</string>
+    <string name="navigator_turn">zavijte</string>
+    <string name="navigator_turn_onto_it">zavijte na</string>
+    <string name="navigator_turn_onto_en">zavijte na</string>
+    <string name="navigator_uturn">Greste v nasprotno smer. Ko bo mogoče, polkrožno obrnite</string>
+    <string name="navigator_range">Domet</string>
+    <string name="navigator_stop">Izklopite navigacijo</string>
+    <string name="navigator_2d3d">2D//3D</string>
+    <string name="navigator_zoom">Povečava</string>
+    <string name="navigator_go">POTRDI</string>
+    <string name="hint_navigator">Vnesite nekaj znakov in kliknite gumb za iskanje, da izberete cilj</string>
+
+
+    <string name="poi_bonus_title">POLNILNA POSTAJA</string>
+    <string name="poi_bonus_body">Parkirajte vozilo na polnilni postaji, ga priklopite in označite čas prihoda z uro, da boste na svojem profilu prejeli pet minut BONUSA</string>
+
+    <string name="new_damage">Nova poškodba?</string>
+    <string name="new_damage2">Kje?</string>
+    <string name="no">Ne</string>
+    <string name="no_results">Ni zadetkov</string>
+    <string name="gotoCity">Pojdite v središče mesta</string>
+    <string name="gotoStreet">Pojdite na ulico</string>
+
+    <string name="number_0">0</string>
+    <string name="number_1">1</string>
+    <string name="number_2">2</string>
+    <string name="number_3">3</string>
+    <string name="number_4">4</string>
+    <string name="number_5">5</string>
+    <string name="number_6">6</string>
+    <string name="number_7">7</string>
+    <string name="number_8">8</string>
+    <string name="number_9">9</string>
+    <string name="number_invalid">Številka ni veljavna</string>
+    <string name="number_type_new">Vnesite novo številko</string>
+
+    <string name="pin">PIN:</string>
+    <string name="pin_card">Kartica<b>PIN</b></string>
+    <string name="pin_message">Za nadaljevanje vnesite svojo PIN kodo</string>
+    <string name="pin_right">Pravilen<b>PIN</b></string>
+    <string name="pin_type">Vnesite<b>PIN</b></string>
+    <string name="pin_wrong">Napačen<b>PIN</b>, poskusite znova</string>
+    <string name="points_of_interest">Priljubljene točke</string>
+    <string name="pin_FAQ_Title">Kje lahko najdem PIN?</string>
+    <string name="pin_FAQ_1">Po prijavi v sharengo.si boste v meniju v levem stolpcu našli razdelek PIN</string>
+    <string name="pin_FAQ_2">Po prijavi v mobile.sharengo.si kliknite svoje ime spodaj levo in poiščite svoj PIN</string>
+    <string name="pin_FAQ_3">Po prijavi v aplikacijo boste v  desnem stolpcu menija našli  PIN</string>
+
+    <string name="refuel_title">Napolnite vozilo</string>
+    <string name="refueling_done">Polnjenje je končano!\nZa nadaljevanje poti pojdite na naslednjo stran</string>
+    <string name="refuel_customer">Prosimo odklopite kabel iz polnilne postaje in ga dajte v prtljažnik</string>
+
+    <string name="search">Iskanje</string>
+    <string name="select_a_destination">Izberite namembni kraj</string>
+    <string name="select_fuel_station">Izberite polnilno postajo</string>
+    <string name="select_travel_path">Izberite pot potovanja</string>
+    <string name="show_pin">Pokažite<b>PIN</b></string>
+    <string name="sos">SOS</string>
+    <string name="plate">REG. ŠT.:</string>
+
+    <string name="text_view_are_there_new_damages">Ali so kakšne nove poškodbe na vozilu?</string>
+    <string name="text_view_call_message">Kliknite &quot;podporni klic&quot;, da vas kontaktiramo, ali vnesite novo številko</string>
+    <string name="thank_for_choosing">Hvala za izbiro</string>
+    <string name="text_view_set_a_choice">Izberite možnost</string>
+
+    <string name="alert_20km">Domet vozila, ki ga uporabljate je manj kot 20km.</string>
+    <string name="alert_5km">Pozor. Domet vozila z dosedanjim načinom vožnje je še 5 kilometrov. Priporočamo, da vožnjo končate, oz. zamenjate vozilo.</string>
+    <string name="alert_warning_title">POZOR</string>
+    <string name="alert_bonus">Od tega trenutka dalje si lahko prislužite 5 dodatnih minut tako da vozilo parkirate in priklopite na polnilnem mestu in z uro označite čas parkiranja vozila. Polnilna mesta so prikazana na zemljevidu.</string>
+    <string name="alert_bonus_title">BONUS</string>
+
+    <string name="welcome">Dobrodošli</string>
+
+    <string name="yes">Da</string>
+
+    <string name="menu_rent_end_time_startup_app">Konec najema - Ni na voljo: aplikacija je še vedno v zagonu, prosimo počakajte.</string>
+    <string name="other_trip_message">Imate že odprt najem. Za informacije se obrnite na center za podporo strankam 080 4448.</string>
+    <string name="alert_area">Pozor. Vozilo je izven območja delovanja. Zaključek vožnje ne bo mogoč.</string>
+    <string name="alert_key">Ne pozabite izklopiti vozila, tako da obrnete ključ preden izstopite iz vozila</string>
+    <string name="alert_bonus_park">Od tega trenutka lahko pridobite 5 minut bonusa, če to vozilo pustite na enem od parkirišč, prikazanih na zemljevidu, da bo napolnjeno</string>
+    <string name="music_hint">Za poslušanje glasbe z vašega telefona priključite kabel AUX</string>
+    <string name="pin_business">Uporabili\ ste poslovni PIN!</string>
+    <string name="menu_rent_end_key_on">Pred koncem najema prosimo izklopite vozilo</string>
+    <string name="menu_park_mode_suspend_key_on">Pred prekinitvijo najema prosimo izklopite vozilo</string>
+    <string name="button_video_tutorial">TUTORIAL</string>
+    <string name="button_assicurazione">ZAVAROVALNA POLICA</string>
+    <string name="button_libretto">PROMETNO DOVOLJENJE</string>
+    <string name="maintenance_instruction"><b>Odklopite polnilni kabel  -</b>pred začetkom vožnje odklopite polnilni kabel in ga shranite v prtljažnik avtomobila (gumb za odpiranje prtljažnika je med sedežema)</string>
+    <string name="maintenance_status_done">KONEC POLNJENJA: Za začetek vožnje kliknite ‘naprej’</string>
+    <string name="maintenance_status_plug_insert">POLNENJA NI MOŽNO ZAKLJUČITI: polnilni kabel je še vedno priključen</string>
+    <string name="maintenance_status_wait">Počakajte, prenašamo podatke o vozilu za izvedbo postopka odklopa.</string>
+    <string name="call_error">Napaka pri posredovanju zahteve za pomoč, poskusite poklicati čez % s</string>
+    <string name="menu_cancel_action">Preklic</string>
+    <string name="menu_rent_end_instruction">Motor se bo ustavi v času, ki je naveden; za preklic kliknite spodaj</string>
+    <string name="alert_area_box">Pozor. Vozilo je izven območja delovanja. Zaključek vožnje ne bo mogoč.</string>
+    <string name="charging_alert_text">Pred odhodom ne pozabite pospraviti polnilnega kabla v prtljažnik</string>
+    <string name="navigation_distance">Razdalja</string>
+    <string name="navigation_time">Prihod v</string>
+    <string name="nafigation_eta">Predviden čas prihoda ETA</string>
+    <string name="button_damages">POŠKODBE</string>
+
+</resources>

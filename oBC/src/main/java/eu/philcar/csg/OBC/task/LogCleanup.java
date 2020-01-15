@@ -25,17 +25,17 @@ public class LogCleanup extends AsyncTask<Void, Void, Boolean> {
 	protected Boolean doInBackground(Void... params) {
 
 		try {
-			dlog.d("CheckLogSize ~ Start cleaning log");
+			dlog.d("LogCleanup.doInBackground();Start cleaning log");
 			long logsize = FileTools.getFileSize(new File(App.getAppLogPath()));
 
-			dlog.d("CheckLogSize ~ Log directory weight: " + logsize);
+			dlog.d("LogCleanup.doInBackground();Log directory weight: " + logsize);
 			if (logsize < 2147483648L) {
-				dlog.d("CheckLogSize ~ No need to operate");
+				dlog.d("LogCleanup.doInBackground();No need to operate");
 				return false;
 			}
 
 			File logRoot = new File(App.getAppLogPath());
-			File logsFile[] = logRoot.listFiles();
+			File[] logsFile = logRoot.listFiles();
 			logs = new Logs();
 			if (logsFile.length == 0) {
 				dlog.d("CheckLogSize ~ Root folder Empty");
@@ -48,7 +48,7 @@ public class LogCleanup extends AsyncTask<Void, Void, Boolean> {
 						String fileType = name.substring(name.lastIndexOf(".") + 1);
 						if (fileType.equalsIgnoreCase("tmp")) {
 							boolean succes = logFile.delete();
-							dlog.d("Found .tmp file, deleting" + succes);
+							dlog.d("LogCleanup.doInBackground();Found .tmp file, deleting" + succes);
 							continue;
 						}
 						Log log = new Log();
@@ -58,24 +58,24 @@ public class LogCleanup extends AsyncTask<Void, Void, Boolean> {
 						log.setFile(logFile);
 						log.setIndex(Integer.parseInt(id));
 						logs.addLog(log);
-						log = null;
+//						log = null;
 					} catch (Exception e) {
-						dlog.e("Found a file that should not be here, what to do?", e);
+						dlog.e("LogCleanup.doInBackground();Found a file that should not be here, what to do?", e);
 						String fileType = name.substring(name.lastIndexOf(".") + 1);
 						if (fileType.equalsIgnoreCase("tmp")) {
 							boolean succes = logFile.delete();
 
-							dlog.d("Found .tmp file, deleting" + succes);
+							dlog.d("LogCleanup.doInBackground();Found .tmp file, deleting" + succes);
 						}
 					}
 				}
 			}
 
 			logs.removeFromBottom(30);
-			dlog.d("CheckLogSize ~ Let's delete some trash");
+			dlog.d("LogCleanup.doInBackground();Let's delete some trash");
 			return true;
 		} catch (Exception e) {
-			dlog.e("CheckLogSize ~ An Exception occurs", e);
+			dlog.e("LogCleanup.doInBackground();An Exception occurs", e);
 			return false;
 		} finally {
 			logs = null;
@@ -92,7 +92,7 @@ public class LogCleanup extends AsyncTask<Void, Void, Boolean> {
 	protected void onPostExecute(Boolean aBoolean) {
 		super.onPostExecute(aBoolean);
 		logs = null;
-		dlog.i("LogCleanup ~ finished with result: " + aBoolean);
+		dlog.i("LogCleanup.onPostExecute();finished with result: " + aBoolean);
 	}
 
 	@Override

@@ -65,8 +65,8 @@ public class Trip extends DbRecord<TripResponse> {
 	@DatabaseField
 	public double end_lat;
 
-	@DatabaseField
-	public Date recharge_time;
+/*	@DatabaseField
+	public Date recharge_time;*/
 
 	@DatabaseField
 	public int recharge; //initially unused now used to store server result to deny trip if rebooted
@@ -96,7 +96,7 @@ public class Trip extends DbRecord<TripResponse> {
 	public int n_pin;
 
 	@DatabaseField
-	public int id_parent;
+	private int id_parent;
 
 		/*@DatabaseField
 		public int done_cleanliness;*/
@@ -194,8 +194,7 @@ public class Trip extends DbRecord<TripResponse> {
 				if (tripResponse.getResult() > 0) {
 					end_sent = true;
 				} else {
-					switch (tripResponse.getResult()) {
-
+/*					switch (tripResponse.getResult()) {
 						case -3:
 							warning = "NO_MATCH";
 							begin_sent = false;
@@ -206,6 +205,16 @@ public class Trip extends DbRecord<TripResponse> {
 						default:
 							warning = "FAIL";
 							end_sent = false;
+					}*/
+
+					if(tripResponse.getResult()==-3){
+						warning = "NO_MATCH";
+						begin_sent = false;
+						end_sent = false;
+						dataManager.updateBeginSentDone(this);
+					} else {
+						warning = "FAIL";
+						end_sent = false;
 					}
 				}
 

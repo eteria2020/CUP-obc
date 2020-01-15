@@ -1,7 +1,7 @@
 package eu.philcar.csg.OBC.controller.map;
 
 import android.graphics.Color;
-import android.graphics.Typeface;
+//import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -41,7 +41,7 @@ public class FRadio extends FBase {
 	private View rootView;
 
 	private int volume = 0;
-	private int savedVolume = 60;
+//	private int savedVolume = 60;
 	private double fmFreq = 0;
 	private double amFreq = 0;
 	private final int MSG_CLOSE = 1;
@@ -64,17 +64,17 @@ public class FRadio extends FBase {
 		dlog.d("OnCreareView FRadio");
 		rootView = view;
 
-		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
+//		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 
 		RadioButton[0] = view.findViewById(R.id.lRadioButton1);
 		RadioButton[1] = view.findViewById(R.id.lRadioButton2);
 		RadioButton[2] = view.findViewById(R.id.lRadioButton3);
 		RadioButton[3] = view.findViewById(R.id.lRadioButton4);
 
-		tvVolume = (TextView) view.findViewById(R.id.tvVolume);
-		tvFrequency = (TextView) view.findViewById(R.id.tvFrequency);
-		tvBand = (TextView) view.findViewById(R.id.tvBand);
-		tvChannelName = (TextView) view.findViewById(R.id.tvChannelName);
+		tvVolume = view.findViewById(R.id.tvVolume);
+		tvFrequency =  view.findViewById(R.id.tvFrequency);
+		tvBand =  view.findViewById(R.id.tvBand);
+		tvChannelName =  view.findViewById(R.id.tvChannelName);
 
 		view.findViewById(R.id.btnMax).setOnClickListener(new View.OnClickListener() {
 
@@ -297,6 +297,19 @@ public class FRadio extends FBase {
 		this.band = (band.equalsIgnoreCase("AM") ? Bands.AM : Bands.FM);
 
 		tvChannelName.setText("");
+		for(View radioButton: RadioButton){
+			RadioSetup.RadioChannel ch = (RadioSetup.RadioChannel) radioButton.getTag();
+			if (ch != null)
+				dlog.d("Radio: Select channel button  : " + ch.frequency + " " + freq + " +/- " + Math.abs(ch.frequency - freq));
+			if (ch != null && ch.band.equalsIgnoreCase(band) && Math.abs(ch.frequency - freq) < 0.05d) {
+				radioButton.setBackgroundResource(R.drawable.sha_roundedbox_selected);
+				tvChannelName.setText(ch.name);
+			} else {
+				radioButton.setBackgroundResource(R.drawable.sha_roundedbox);
+			}
+		}
+
+/*
 		for (int i = 0; i < RadioButton.length; i++) {
 			RadioSetup.RadioChannel ch = (RadioSetup.RadioChannel) RadioButton[i].getTag();
 			if (ch != null)
@@ -308,6 +321,7 @@ public class FRadio extends FBase {
 				RadioButton[i].setBackgroundResource(R.drawable.sha_roundedbox);
 			}
 		}
+*/
 
 		if (band.equalsIgnoreCase("FM"))
 			fmFreq = freq;
@@ -365,7 +379,6 @@ public class FRadio extends FBase {
 			case ObcService.MSG_RADIO_SEEK_STATUS:
 				dlog.d("RadioSeekStatus: " + msg.arg1);
 				break;
-
 		}
 
 		msg.recycle();

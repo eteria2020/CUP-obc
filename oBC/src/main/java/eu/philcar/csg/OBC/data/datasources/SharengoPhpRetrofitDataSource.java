@@ -11,7 +11,7 @@ import eu.philcar.csg.OBC.data.model.TripResponse;
 import eu.philcar.csg.OBC.db.Event;
 import eu.philcar.csg.OBC.db.Poi;
 import eu.philcar.csg.OBC.db.Trip;
-import eu.philcar.csg.OBC.helpers.DLog;
+//import eu.philcar.csg.OBC.helpers.DLog;
 import eu.philcar.csg.OBC.server.ServerCommand;
 import eu.philcar.csg.OBC.service.DataManager;
 import eu.philcar.csg.OBC.service.Reservation;
@@ -24,7 +24,7 @@ import io.reactivex.Observable;
 public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implements SharengoPhpDataSource {
 
 	private final SharengoPhpApi mSharengoPhpApi;
-	private DLog dlog = new DLog(this.getClass());
+//	private DLog dlog = new DLog(this.getClass());
 
 	public SharengoPhpRetrofitDataSource(SharengoPhpApi mSharengoPhpApi) {
 		this.mSharengoPhpApi = mSharengoPhpApi;
@@ -32,8 +32,8 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
 
 	/***
 	 *
-	 * @param plate
-	 * @param md5
+	 * @param plate car plate
+	 * @param md5 md5 encryption
 	 * @return all the area downloaded to be interpretated
 	 */
 	@Override
@@ -43,7 +43,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
 	}
 
 	/**
-	 * @param plate
+	 * @param plate car plate
 	 * @return a list of command to be excecuted
 	 */
 	@Override
@@ -55,9 +55,9 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
 	/**
 	 * open trip and handle all the database operation to save the result of the opening
 	 *
-	 * @param trip
-	 * @param dataManager
-	 * @return
+	 * @param trip trip
+	 * @param dataManager data manager
+	 * @return observable
 	 */
 	@Override
 	public Observable<TripResponse> openTrip(final Trip trip, final DataManager dataManager) {
@@ -79,9 +79,9 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
 	/**
 	 * open trip wothout blocking the chain, it return the Trip not the TripResponse
 	 *
-	 * @param trip
-	 * @param dataManager
-	 * @return
+	 * @param trip trip
+	 * @param dataManager data manager
+	 * @return observable
 	 */
 	@Override
 	public Observable<Trip> openTripPassive(final Trip trip, final DataManager dataManager) {
@@ -92,9 +92,9 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
 	/**
 	 * open trip wothout blocking the chain, it return the Trip not the TripResponse
 	 *
-	 * @param trip
-	 * @param dataManager
-	 * @return
+	 * @param trip trip
+	 * @param dataManager data manager
+	 * @return observable
 	 */
 	@Override
 	public Observable<Trip> closeTripPassive(final Trip trip, final DataManager dataManager) {
@@ -106,7 +106,7 @@ public class SharengoPhpRetrofitDataSource extends BaseRetrofitDataSource implem
 	 * update Trip for Pin Result
 	 *
 	 * @param trip
-	 * @return
+	 * @return observable
 	 */
 	@Override
 	public Observable<TripResponse> updateTrip(final Trip trip) {

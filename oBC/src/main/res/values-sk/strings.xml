@@ -123,6 +123,8 @@
     <string name="error_empty_city">Pole mesto nemôže byť prázdne</string>
     <string name="pin_business">Použil si business pin</string>
     <string name="goodbye_instructions">Ukončil si jazdu, teraz môžeš vystúpiť, dvere sa zatvoria automaticky za:</string>
+    <string name="goodbye_cancel">Zrušiť</string>
+    <string name="goodbye_back_to_trip">Kliknutím sem sa vrátite na cestu</string>
     <string name="are_you_drunk">Pil si alkohol?</string>
     <string name="thank_for_choosing">Ďakujeme že si si vybral</string>
     <string name="navigator_turn">zaboč</string>

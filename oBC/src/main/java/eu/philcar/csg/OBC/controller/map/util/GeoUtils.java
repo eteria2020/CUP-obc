@@ -7,11 +7,11 @@ public class GeoUtils {
 	/**
 	 * Computes the distance from A to B in meters
 	 *
-	 * @param firstPodouble
-	 * @param secondPodouble
-	 * @return
+	 * @param firstPodouble first poition
+	 * @param secondPodouble secon position
+	 * @return distance
 	 */
-	public static final double harvesineDistance(Location firstPodouble, Location secondPodouble) {
+	public static double harvesineDistance(Location firstPodouble, Location secondPodouble) {
 
 		double dLat = Math.toRadians(firstPodouble.getLatitude() - secondPodouble.getLatitude());
 		double dLon = Math.toRadians(firstPodouble.getLongitude() - secondPodouble.getLongitude());
@@ -24,7 +24,7 @@ public class GeoUtils {
 	}
 
 	//Compute the dot product AB ⋅ BC
-	public static double dot(Location A, Location B, Location C) {
+/*	public static double dot(Location A, Location B, Location C) {
 
 		double AB[] = new double[2];
 		double BC[] = new double[2];
@@ -34,29 +34,33 @@ public class GeoUtils {
 		BC[0] = C.getLatitude() - B.getLatitude();
 		BC[1] = C.getLongitude() - B.getLongitude();
 
-		double dot = AB[0] * BC[0] + AB[1] * BC[1];
+//		double dot = AB[0] * BC[0] + AB[1] * BC[1];
 
-		return dot;
-	}
+		return AB[0] * BC[0] + AB[1] * BC[1];
+	}*/
 
-	//Compute the cross product AB x AC
-	public static double cross(Location A, Location B, Location C) {
 
-		double AB[] = new double[2];
-		double AC[] = new double[2];
+
+	/**
+	 * Compute the cross product AB x AC
+	 */
+/*	public static double cross(Location A, Location B, Location C) {
+
+		double[] AB = new double[2];
+		double[] AC = new double[2];
 
 		AB[0] = B.getLatitude() - A.getLatitude();
 		AB[1] = B.getLongitude() - A.getLongitude();
 		AC[0] = C.getLatitude() - A.getLatitude();
 		AC[1] = C.getLongitude() - A.getLongitude();
 
-		double cross = AB[0] * AC[1] - AB[1] * AC[0];
+//		double cross = AB[0] * AC[1] - AB[1] * AC[0];
 
-		return cross;
-	}
+		return AB[0] * AC[1] - AB[1] * AC[0];
+	}*/
 
 	// Compute the distance from A to B in meters
-	public static double distance(Location A, Location B) {
+/*	public static double distance(Location A, Location B) {
 
 		double d1 = A.getLatitude() - B.getLatitude();
 		double d2 = A.getLongitude() - B.getLongitude();
@@ -64,10 +68,11 @@ public class GeoUtils {
 		double angle = Math.sqrt(d1 * d1 + d2 * d2);
 
 		return 27840853 * angle / 365;
-	}
+	}*/
 
 	//Compute the distance from AB to C
 	//if isSegment is true, AB is a segment, not a line.
+/*
 	public static double linePodoubleDist(Location A, Location B, Location C, boolean isSegment) {
 
 		double dist = cross(A, B, C) / distance(A, B);
@@ -85,6 +90,8 @@ public class GeoUtils {
 
 		return Math.abs(dist);
 	}
+*/
+
 	/*
     public static boolean isPointInPolygon(double pointLat, double pointLng, double[] closedPolygon) { 
 
@@ -185,6 +192,7 @@ public class GeoUtils {
         return (blue >= red);
     }*/
 
+/*
 	public static double[] getClosestPointOnPolygon(double pY, double pX, double[] polygon) {
 
 		double minDist = 0, fTo = 0.0, x = 0.0, y = 0.0, dist;
@@ -250,8 +258,9 @@ public class GeoUtils {
 
 		return new double[]{x, y};
 	}
+*/
 
-	public static double bearing(double startLat, double startLng, double endLat, double endLng) {
+/*	public static double bearing(double startLat, double startLng, double endLat, double endLng) {
 
 		double lat1 = Math.toRadians(startLat);
 		double lat2 = Math.toRadians(endLat);
@@ -263,5 +272,5 @@ public class GeoUtils {
 		double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lng2 - lng1);
 
 		return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
-	}
+	}*/
 }

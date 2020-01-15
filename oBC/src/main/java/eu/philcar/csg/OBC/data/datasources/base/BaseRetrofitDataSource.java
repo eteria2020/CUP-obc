@@ -58,18 +58,26 @@ public abstract class BaseRetrofitDataSource {
 				}
 			} else {
 				Response<T> retrofitResponse = r.response();
-				if (!retrofitResponse.isSuccessful()) {
-					int code = retrofitResponse.code();
-					String message = "";
-					try {
-						message = retrofitResponse.errorBody().string();
-					} catch (IOException e) {
-						e.printStackTrace();
+
+				if(retrofitResponse!=null) {
+					if (!retrofitResponse.isSuccessful()) {
+						int code = retrofitResponse.code();
+						String message = "";
+						try {
+							message = retrofitResponse.errorBody().string();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						ErrorResponse errorResponse = new ErrorResponse(ErrorResponse.ErrorType.HTTP);
+						errorResponse.httpStatus = code;
+						errorResponse.rawMessage = message;
+						return Observable.error(errorResponse);
+					} else {
+						DLog.E("BaseRetrofitDataSource.handleRetrofitRequest();retrofitResponse fail");
 					}
-					ErrorResponse errorResponse = new ErrorResponse(ErrorResponse.ErrorType.HTTP);
-					errorResponse.httpStatus = code;
-					errorResponse.rawMessage = message;
-					return Observable.error(errorResponse);
+
+				} else {
+					DLog.E("BaseRetrofitDataSource.handleRetrofitRequest();retrofitResponse null");
 				}
 			}
 
@@ -104,18 +112,25 @@ public abstract class BaseRetrofitDataSource {
 						}
 					} else {
 						Response<SharengoResponse<T>> retrofitResponse = r.response();
-						if (!retrofitResponse.isSuccessful()) {
-							int code = retrofitResponse.code();
-							String message = "";
-							try {
-								message = retrofitResponse.errorBody().string();
-							} catch (IOException e) {
-								e.printStackTrace();
+
+						if(retrofitResponse!=null) {
+							if (!retrofitResponse.isSuccessful()) {
+								int code = retrofitResponse.code();
+								String message = "";
+								try {
+									message = retrofitResponse.errorBody().string();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+								ErrorResponse errorResponse = new ErrorResponse(ErrorResponse.ErrorType.HTTP);
+								errorResponse.httpStatus = code;
+								errorResponse.rawMessage = message;
+								return Observable.error(errorResponse);
+							} else {
+								DLog.E("BaseRetrofitDataSource.handleSharengoRetrofitRequest();retrofitResponse fail");
 							}
-							ErrorResponse errorResponse = new ErrorResponse(ErrorResponse.ErrorType.HTTP);
-							errorResponse.httpStatus = code;
-							errorResponse.rawMessage = message;
-							return Observable.error(errorResponse);
+						} else {
+							DLog.E("BaseRetrofitDataSource.handleSharengoRetrofitRequest();retrofitResponse null");
 						}
 					}
 
@@ -140,29 +155,29 @@ public abstract class BaseRetrofitDataSource {
 			ErrorResponse er = (ErrorResponse) e;
 			switch (er.errorType) {
 				case HTTP:
-					DLog.E("Retrofit Exception HTTP " + er.rawMessage, er.error);
+					DLog.E("BaseRetrofitDataSource.handleErorResponse();Exception HTTP " + er.rawMessage, er.error);
 					break;
 				case EMPTY:
-					DLog.D("Retrofit Response EMPTY ");
+					DLog.D("BaseRetrofitDataSource.handleErorResponse();Response EMPTY ");
 					break;
 				case CUSTOM:
-					DLog.E("Retrofit Exception CUSTOM ", er.error);
+					DLog.E("BaseRetrofitDataSource.handleErorResponse(); Exception CUSTOM ", er.error);
 					break;
 				case CONVERSION:
-					DLog.E("Retrofit Exception CONVERSION ", er.error);
+					DLog.E("BaseRetrofitDataSource.handleErorResponse();Exception CONVERSION ", er.error);
 					break;
 				case NO_NETWORK:
-					DLog.E("Retrofit Exception NO_NETWORK ");
+					DLog.E("BaseRetrofitDataSource.handleErorResponse();Exception NO_NETWORK ");
 					break;
 				case UNEXPECTED:
-					DLog.E("Retrofit Exception UNEXPECTED ", er.error);
+					DLog.E("BaseRetrofitDataSource.handleErorResponse();Retrofit Exception UNEXPECTED ", er.error);
 					if (er.error instanceof SocketException) { //controllare nel caso che sea tipo emfile (too many open file)
-						DLog.D("qui farei un EMFILE REBOOT ");
+						DLog.D("BaseRetrofitDataSource.handleErorResponse();qui farei un EMFILE REBOOT ");
 						//SystemControl.emfileException(er.error);
 					}
 					break;
 				case SERVER_TIMEOUT:
-					DLog.E("Retrofit Exception SERVER_TIMEOUT ", er.error);
+					DLog.E("BaseRetrofitDataSource.handleErorResponse();Retrofit Exception SERVER_TIMEOUT ", er.error);
 					break;
 				default:
 					break;

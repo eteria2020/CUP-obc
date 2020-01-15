@@ -17,7 +17,7 @@ public class AdminsConnector implements RemoteEntityInterface {
 
 	private DLog dlog = new DLog(this.getClass());
 
-	public List<String> AdminsList = new ArrayList<String>();
+	public List<String> AdminsList = new ArrayList<>();
 
 	public static AdminsConnector GetDownloadConnector() {
 		return new AdminsConnector();
@@ -25,9 +25,9 @@ public class AdminsConnector implements RemoteEntityInterface {
 
 	private String carPlate = null;
 
-	public void setCarPlate(String plate) {
+/*	public void setCarPlate(String plate) {
 		this.carPlate = plate;
-	}
+	}*/
 
 	public int MsgId() {
 		return Connectors.MSG_DN_ADMINS;
@@ -62,7 +62,7 @@ public class AdminsConnector implements RemoteEntityInterface {
 
 			try {
 				JSONObject jobj = jArray.getJSONObject(i);
-				int id = jobj.getInt("id");
+//				int id = jobj.getInt("id");
 				String card = jobj.getString("card");
 				AdminsList.add(card);
 
@@ -91,7 +91,7 @@ public class AdminsConnector implements RemoteEntityInterface {
 		ArrayList<NameValuePair> list = null;
 
 		if (carPlate != null) {
-			list = new ArrayList<NameValuePair>();
+			list = new ArrayList<>();
 			list.add(new BasicNameValuePair("car_plate", carPlate));
 		}
 

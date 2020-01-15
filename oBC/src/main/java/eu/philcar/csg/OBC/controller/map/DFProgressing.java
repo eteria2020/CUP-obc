@@ -61,12 +61,12 @@ public class DFProgressing extends DialogFragment {
 		updateMessage();
 	}
 
-	public void appenMessage(String message) {
+/*	public void appenMessage(String message) {
 		if (message != null) {
 			messageStr += message;
 		}
 		updateMessage();
-	}
+	}*/
 
 	private void updateMessage() {
 

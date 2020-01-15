@@ -64,14 +64,14 @@ public class SharengoApiRepository {
 	//                                                                                            //
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void stopCustomer() {
+/*	public void stopCustomer() {
 		if (customerDisposable != null)
 			customerDisposable.dispose();
-	}
+	}*/
 
-	public boolean isCustomerRunning() {
+/*	public boolean isCustomerRunning() {
 		return RxUtil.isRunning(customerDisposable);
-	}
+	}*/
 
 	public void getCustomer(int millidelay) {
 		needUpdateCustomer = false;
@@ -97,20 +97,20 @@ public class SharengoApiRepository {
 						@Override
 						public void onError(@NonNull Throwable e) {
 							if (e instanceof ErrorResponse)
-								DLog.E("Error syncing getCustomer", ((ErrorResponse) e).error);
+								DLog.E("SharengoApiRepository.getCustomer.onError();", ((ErrorResponse) e).error);
 							RxUtil.dispose(customerDisposable);
 						}
 
 						@Override
 						public void onComplete() {
-							DLog.I("Synced successfully!");
+							DLog.I("SharengoApiRepository.getCustomer.onComplete()");
 							RxUtil.dispose(customerDisposable);
 							if (needUpdateCustomer)
 								getCustomer(150);
 						}
 					});
 		} else {
-			DLog.D("CustomerDisposable is running");
+			DLog.D("SharengoApiRepository.getCustomer();running");
 		}
 	}
 
@@ -120,10 +120,10 @@ public class SharengoApiRepository {
 	//                                                                                            //
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void stopEmployee() {
+/*	public void stopEmployee() {
 		if (employeeDisposable != null)
 			employeeDisposable.dispose();
-	}
+	}*/
 
 	public void getEmployee() {
 
@@ -146,13 +146,13 @@ public class SharengoApiRepository {
 						@Override
 						public void onError(@NonNull Throwable e) {
 							if (e instanceof ErrorResponse)
-								DLog.E("Error syncing getEmployee", ((ErrorResponse) e).error);
+								DLog.E("SharengoApiRepository.getEmployee.onError();", ((ErrorResponse) e).error);
 							RxUtil.dispose(employeeDisposable);
 						}
 
 						@Override
 						public void onComplete() {
-							DLog.I("Synced successfully!");
+							DLog.I("SharengoApiRepository.getEmployee.onComplete()");
 							RxUtil.dispose(employeeDisposable);
 						}
 					});
@@ -165,10 +165,10 @@ public class SharengoApiRepository {
 	//                                                                                            //
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void stopConfig() {
+/*	public void stopConfig() {
 		if (configDisposable != null)
 			configDisposable.dispose();
-	}
+	}*/
 
 	public void getConfig() {
 
@@ -189,13 +189,13 @@ public class SharengoApiRepository {
 						@Override
 						public void onError(@NonNull Throwable e) {
 							if (e instanceof ErrorResponse)
-								DLog.E("Error syncing getConfig " + ((ErrorResponse) e).rawMessage, e);
+								DLog.E("SharengoApiRepository.getConfig.onError();" + ((ErrorResponse) e).rawMessage, e);
 							RxUtil.dispose(configDisposable);
 						}
 
 						@Override
 						public void onComplete() {
-							DLog.I("Synced successfully!");
+							DLog.I("SharengoApiRepository.getConfig.onComplete()");
 							RxUtil.dispose(configDisposable);
 						}
 					});
@@ -208,10 +208,10 @@ public class SharengoApiRepository {
 	//                                                                                            //
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void stopModel() {
+/*	public void stopModel() {
 		if (modelDisposable != null)
 			modelDisposable.dispose();
-	}
+	}*/
 
 	public void getModel() {
 
@@ -233,13 +233,13 @@ public class SharengoApiRepository {
 						@Override
 						public void onError(@NonNull Throwable e) {
 							if (e instanceof ErrorResponse)
-								DLog.E("Error syncing getModel", ((ErrorResponse) e).error);
+								DLog.E("SharengoApiRepository.getModel.onError();", ((ErrorResponse) e).error);
 							RxUtil.dispose(modelDisposable);
 						}
 
 						@Override
 						public void onComplete() {
-							DLog.I("Synced successfully!");
+							DLog.I("SharengoApiRepository.getModel.onComplete()");
 							RxUtil.dispose(modelDisposable);
 						}
 					});
@@ -252,10 +252,10 @@ public class SharengoApiRepository {
 	//                                                                                            //
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void stopReservation() {
+/*	public void stopReservation() {
 		if (reservationDisposable != null)
 			reservationDisposable.dispose();
-	}
+	}*/
 
 	public Observable<Reservation> getReservation() {
 
@@ -300,7 +300,7 @@ public class SharengoApiRepository {
 
 						/**
 						 * here I have to parse the response and crate a sort of envelop for the map
-						 * @param area
+						 * @param area Area
 						 */
 						@Override
 						public void onNext(@NonNull Area area) {
@@ -314,13 +314,13 @@ public class SharengoApiRepository {
 						public void onError(@NonNull Throwable e) {
 							if (e instanceof ErrorResponse)
 								if (((ErrorResponse) e).errorType != ErrorResponse.ErrorType.EMPTY)
-									DLog.E("Error inside getArea" + ((ErrorResponse) e).rawMessage);
+									DLog.E("SharengoApiRepository.getArea.onError();" + ((ErrorResponse) e).rawMessage);
 							//RxUtil.dispose(areaDisposable);
 						}
 
 						@Override
 						public void onComplete() {
-							DLog.I("Synced successfully!");
+							DLog.I("SharengoApiRepository.getArea.onComplete();");
 							//RxUtil.dispose(areaDisposable);
 							App.Instance.initAreaPolygon();
 						}
@@ -334,9 +334,9 @@ public class SharengoApiRepository {
 	//                                                                                            //
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void stopCommand() {
-		RxUtil.dispose(commandDisposable);
-	}
+//	public void stopCommand() {
+//		RxUtil.dispose(commandDisposable);
+//	}
 
 	public Observable<ServerCommand> getCommands(String plate) {
 
@@ -345,10 +345,10 @@ public class SharengoApiRepository {
 				.filter(command -> {
 					if ((command.ttl <= 0 || command.queued + command.ttl > System.currentTimeMillis() / 1000) || command.command.equalsIgnoreCase("CLOSE_TRIP")) {
 
-						DLog.D("Command accepted :" + command);
+						DLog.D("SharengoApiRepository.getCommands();accepted :" + command);
 						return true;
 					} else {
-						DLog.D("Command timeout :" + command);
+						DLog.D("SharengoApiRepository.getCommands();timeout :" + command);
 						return false;
 					}
 				})
@@ -359,7 +359,7 @@ public class SharengoApiRepository {
 				.doOnError(e -> {
 					if (e instanceof ErrorResponse)
 						if (((ErrorResponse) e).errorType != ErrorResponse.ErrorType.EMPTY)
-							DLog.E("Error insiede GetCommand", e);
+							DLog.E("SharengoApiRepository.getCommands.doOnError();", e);
 					//RxUtil.dispose(commandDisposable);
 				})
 				.doOnComplete(() -> {
@@ -431,7 +431,7 @@ public class SharengoApiRepository {
 
 					@Override
 					public void onComplete() {
-						DLog.I("Synced successfully!");
+						DLog.I("SharengoApiRepository.getCommands.onComplete()");
 						RxUtil.dispose(disposable);
 					}
 				});
@@ -509,16 +509,17 @@ public class SharengoApiRepository {
 					return 0;
 			});
 		} catch (Exception e) {
-			DLog.E("sendEvents: Exception", e);
+			DLog.E("SharengoApiRepository.sendEvents();", e);
 		}
 
-		if (!sendingEvents)
+		if (!sendingEvents) {
 			Observable.interval(30, TimeUnit.SECONDS)
 					.take(event.size())
 					.concatMap(i -> Observable.just(event.get(i.intValue())))
 					.concatMap(event1 -> {
-						if (event1.id_trip == 0)
+						if (event1.id_trip == 0) {
 							event1.id_trip = mDataManager.getTripIdFromEvent(event1);
+						}
 						return Observable.just(event1);
 
 					})
@@ -529,8 +530,8 @@ public class SharengoApiRepository {
 						return Observable.just(event1);
 					})//check is sos expired
 					.concatMap(mDataManager::saveEvent)
-            /*mDataManager.saveEvents(event)
-                    .delay(10, TimeUnit.SECONDS)*/
+					/*mDataManager.saveEvents(event)
+                            .delay(10, TimeUnit.SECONDS)*/
 
 					.concatMap(e -> mRemoteDataSource.sendEvent(e, mDataManager))
 					.subscribeOn(Schedulers.io())
@@ -545,7 +546,7 @@ public class SharengoApiRepository {
 
 						@Override
 						public void onNext(EventResponse eventResponse) {
-							DLog.D("Receiver Event response");
+							DLog.D("SharengoApiRepository.sendEvents();Receiver Event response");
 							RxUtil.dispose(disposable);
 						}
 
@@ -558,9 +559,10 @@ public class SharengoApiRepository {
 						public void onComplete() {
 							sendingEvents = false;
 							RxUtil.dispose(disposable);
-
 						}
 					});
+
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -580,7 +582,7 @@ public class SharengoApiRepository {
 				.doOnError(e -> {
 					if (e instanceof ErrorResponse)
 						if (((ErrorResponse) e).errorType != ErrorResponse.ErrorType.EMPTY)
-							DLog.E("Error insiede openTrip", e);
+							DLog.E("SharengoApiRepository.openTrip();Error insiede openTrip", e);
 					//RxUtil.dispose(openTripDisposable);
 				})
 				.doOnComplete(() -> {
@@ -596,7 +598,7 @@ public class SharengoApiRepository {
 					//openTripDisposable = n;
 				})
 				.doOnError(e -> {
-					DLog.E("Error insiede updateTrip", e);
+					DLog.E("SharengoApiRepository.updateServerTripData();Error insiede updateTrip", e);
 					//RxUtil.dispose(openTripDisposable);
 				})
 				.doOnComplete(() -> {
@@ -634,7 +636,7 @@ public class SharengoApiRepository {
 					//openTripDisposable = n;
 				})
 				.doOnError(e -> {
-					DLog.E("Error insiede closeTrip", e);
+					DLog.E("SharengoApiRepository.closeTrip();Error insiede closeTrip", e);
 					//RxUtil.dispose(openTripDisposable);
 				})
 				.doOnComplete(() -> {
@@ -663,7 +665,7 @@ public class SharengoApiRepository {
 					//openTripDisposable = n;
 				})
 				.doOnError(e -> {
-					DLog.E("Error insiede closeTrips", e);
+					DLog.E("SharengoApiRepository.closeTrips();Error insiede closeTrips", e);
 					//RxUtil.dispose(openTripDisposable);
 				})
 				.doOnComplete(() -> {

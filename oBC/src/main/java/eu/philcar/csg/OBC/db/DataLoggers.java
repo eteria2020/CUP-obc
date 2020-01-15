@@ -1,14 +1,14 @@
 package eu.philcar.csg.OBC.db;
 
-import android.util.Log;
+//import android.util.Log;
 
-import com.j256.ormlite.stmt.DeleteBuilder;
+//import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 
-import org.json.JSONObject;
+//import org.json.JSONObject;
 
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+/*import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
@@ -19,14 +19,14 @@ import static eu.philcar.csg.OBC.service.ObcService.Data.SOC;
 import static eu.philcar.csg.OBC.service.ObcService.Data.TIME;
 import static eu.philcar.csg.OBC.service.ObcService.Data.V_BATTERY;
 import static eu.philcar.csg.OBC.service.ObcService.Data.V_MAX_CELL;
-import static eu.philcar.csg.OBC.service.ObcService.Data.V_MIN_CELL;
+import static eu.philcar.csg.OBC.service.ObcService.Data.V_MIN_CELL;*/
 
 /**
  * Created by Fulvio on 01/10/2018.
  */
 
 public class DataLoggers extends DbTable<DataLogger, Integer> {
-	private static final String TAG = DataLoggers.class.getSimpleName();
+//	private static final String TAG = DataLoggers.class.getSimpleName();
 
 	public DataLoggers(ConnectionSource connectionSource, Class dataClass)
 			throws SQLException {
@@ -38,7 +38,7 @@ public class DataLoggers extends DbTable<DataLogger, Integer> {
 		return DataLogger.class;
 	}
 
-	public DataLogger saveLog(JSONObject json) {
+/*	public DataLogger saveLog(JSONObject json) {
 
 		DataLogger log = buildLogFromJson(json);
 		try {
@@ -48,9 +48,9 @@ public class DataLoggers extends DbTable<DataLogger, Integer> {
 			Log.e(TAG, "saveLog: Exception", e);
 		}
 		return log;
-	}
+	}*/
 
-	private DataLogger buildLogFromJson(JSONObject json) {
+/*	private DataLogger buildLogFromJson(JSONObject json) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault());
 		DataLogger log = new DataLogger();
 		try {
@@ -66,9 +66,9 @@ public class DataLoggers extends DbTable<DataLogger, Integer> {
 			Log.e(TAG, "saveLog: Exception", e);
 		}
 		return log;
-	}
+	}*/
 
-	public void removeOldLog(Date date) {
+/*	public void removeOldLog(Date date) {
 		try {
 			DeleteBuilder<DataLogger, Integer> deleteBuilder = deleteBuilder();
 			deleteBuilder.where().le("time", date);
@@ -76,5 +76,5 @@ public class DataLoggers extends DbTable<DataLogger, Integer> {
 		} catch (Exception e) {
 			Log.e(TAG, "removeOldLog: Exception", e);
 		}
-	}
+	}*/
 }

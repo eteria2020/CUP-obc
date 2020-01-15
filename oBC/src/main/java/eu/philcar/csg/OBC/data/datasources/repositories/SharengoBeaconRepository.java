@@ -42,7 +42,7 @@ public class SharengoBeaconRepository extends BaseRepository {
 		return mRemoteDataSource.sendBeacon(App.CarPlate, beacon)
 				//.doOnNext(n -> mDataManager.saveArea(n))
 				.doOnError(e -> {
-					DLog.E("Error insiede sendBeacon", ((ErrorResponse) e).error);
+					DLog.E("SharengoBeaconRepository.sendBeacon();Error insiede sendBeacon", ((ErrorResponse) e).error);
 					//RxUtil.dispose(beaconDisposable);
 				})
 				.doOnComplete(() -> {

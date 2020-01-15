@@ -203,7 +203,7 @@
                         android:id="@+id/cancelIB"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Annulla"
+                        android:text="@string/goodbye_cancel"
                         android:textStyle="bold"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
@@ -220,7 +220,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_marginEnd="8dp"
                         android:layout_toStartOf="@id/cancelActionIB"
-                        android:text="Clicca qui per tornare alla corsa"
+                        android:text="@string/goodbye_back_to_trip"
                         android:textColor="@color/text_primary"
                         android:textSize="21sp" />
 

@@ -19,7 +19,7 @@ import eu.philcar.csg.OBC.injection.ApplicationContext;
 @Singleton
 public class DbManager extends OrmLiteSqliteOpenHelper {
 
-	public static final String DB_NAME = "sharengo.db";
+	private static final String DB_NAME = "sharengo.db";
 
 	private static final int DATABASE_VERSION = 5;
 	private static DbManager instance = null;
@@ -179,10 +179,10 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public Customers getClientiDao() {
 		try {
-			Customers c = getDao(Customer.class);
+//			Customers c = getDao(Customer.class);
 
 			//c.setAutoCommit(true);
-			return c;
+			return getDao(Customer.class);
 		} catch (Exception e) {
 
 			DLog.E("Error getting dao clienti", e);
@@ -193,9 +193,9 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public BusinessEmployees getDipendentiDao() {
 		try {
-			BusinessEmployees b = getDao(BusinessEmployee.class);
+//			BusinessEmployees b = getDao(BusinessEmployee.class);
 			//b.setAutoCommit(true);
-			return b;
+			return getDao(BusinessEmployee.class);
 		} catch (Exception e) {
 
 			DLog.E("Error getting dao dipendenti", e);
@@ -205,9 +205,9 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public Trips getTripDao() {
 		try {
-			Trips c = getDao(Trip.class);
+//			Trips c = getDao(Trip.class);
 			//c.setAutoCommit(true);
-			return c;
+			return getDao(Trip.class);
 		} catch (Exception e) {
 
 			DLog.E("Error getting dao corse", e);
@@ -218,9 +218,9 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public Events getEventiDao() {
 		try {
-			Events c = getDao(Event.class);
+//			Events c = getDao(Event.class);
 			//c.setAutoCommit(true);
-			return c;
+			return getDao(Event.class);
 		} catch (Exception e) {
 
 			DLog.E("Error getting dao eventi", e);
@@ -231,9 +231,9 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	public Pois getPoisDao() {
 		try {
-			Pois c = getDao(Poi.class);
+//			Pois c = getDao(Poi.class);
 			//c.setAutoCommit(true);
-			return c;
+			return getDao(Poi.class);
 		} catch (Exception e) {
 
 			DLog.E("Error getting dao pois", e);
@@ -242,17 +242,17 @@ public class DbManager extends OrmLiteSqliteOpenHelper {
 
 	}
 
-	public DataLoggers getDataLoggersDao() {
+/*	public DataLoggers getDataLoggersDao() {
 		try {
-			DataLoggers c = getDao(DataLogger.class);
+//			DataLoggers c = getDao(DataLogger.class);
 			//c.setAutoCommit(true);
-			return c;
+			return getDao(DataLogger.class);
 		} catch (Exception e) {
 
 			DLog.E("Error getting dao DataLoggers", e);
 			return null;
 		}
 
-	}
+	}*/
 
 }

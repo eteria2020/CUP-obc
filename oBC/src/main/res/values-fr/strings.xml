@@ -118,7 +118,8 @@
     <string name="push_to_cancel">Appuyez sur\npour annuler</string>
 
     <string name="goodbye_instructions">Tu peux partir. Les portes se ferment automatiquement l\'heure indiquée dans le right.\n\nIf vous changez d\'avis de laisser les portes se ferment, puis ouvrez une nouvelle session de loyer</string>
-
+    <string name="goodbye_cancel">Annuler</string>
+    <string name="goodbye_back_to_trip">Cliquez ici pour retourner au voyage</string>
 
     <string name="menu_rent_end">Fin louer</string>
     <string name="menu_rent_end_off">Fin louer (indisponible)</string>

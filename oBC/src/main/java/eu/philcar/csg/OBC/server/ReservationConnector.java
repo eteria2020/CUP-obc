@@ -28,9 +28,9 @@ public class ReservationConnector implements RemoteEntityInterface {
 		this.targa = targa;
 	}
 
-	public void setConsumed(int id) {
+/*	public void setConsumed(int id) {
 		consumed = id;
-	}
+	}*/
 
 	public int MsgId() {
 		return ObcService.MSG_SERVER_RESERVATION;
@@ -51,10 +51,12 @@ public class ReservationConnector implements RemoteEntityInterface {
 
 		reservation = Reservation.createFromString(responseBody);
 
-		if (reservation != null)
-			dlog.d("Received reservation: " + reservation.toString());
-		else
-			dlog.d("Received null reservation");
+		if (reservation != null){
+			dlog.d("ReservationConnector.DecodeJson();Received reservation: " + reservation.toString());
+		}
+		else{
+			dlog.d("ReservationConnector.DecodeJson();Received null reservation");
+		}
 
 		return MsgId();
 
@@ -75,12 +77,12 @@ public class ReservationConnector implements RemoteEntityInterface {
 		ArrayList<NameValuePair> list = null;
 
 		if (targa != null) {
-			list = new ArrayList<NameValuePair>();
+			list = new ArrayList<>();
 			list.add(new BasicNameValuePair("car_plate", targa));
 		}
 
 		if (consumed > 0) {
-			list = new ArrayList<NameValuePair>();
+			list = new ArrayList<>();
 			list.add(new BasicNameValuePair("consumed", "" + consumed));
 		}
 

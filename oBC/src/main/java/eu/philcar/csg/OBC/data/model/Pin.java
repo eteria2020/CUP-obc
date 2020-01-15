@@ -17,7 +17,7 @@ public class Pin extends BaseResponse {
 		this.company = company;
 	}
 
-	public String getPrimary() {
+/*	public String getPrimary() {
 		return primary;
 	}
 
@@ -39,6 +39,6 @@ public class Pin extends BaseResponse {
 
 	public void setCompany(String company) {
 		this.company = company;
-	}
+	}*/
 
 }

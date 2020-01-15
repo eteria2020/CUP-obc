@@ -639,6 +639,13 @@ public class FDriveMessage_new extends FBase {
 
 	public void loadBanner(String Url, String type, Boolean isClick) {
 
+		//for countries outside Italy use local banners
+		if (!App.Instance.getDefaultLang().equals("it")) {
+			dlog.e(" loadBanner: get LOCAL banner");
+			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+			return;
+		}
+
 		File outDir = new File(App.getBannerImagesFolder());
 		if (!outDir.isDirectory()) {
 			outDir.mkdir();
@@ -647,7 +654,6 @@ public class FDriveMessage_new extends FBase {
 		if (!App.hasNetworkConnection()) {
 			dlog.e(" loadBanner: nessuna connessione");
 			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
-
 			return;
 		}
 		StringBuilder builder = new StringBuilder();

@@ -4,7 +4,7 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
+//import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,12 +15,13 @@ import android.support.v4.util.LongSparseArray;
 import android.view.View;
 
 import java.io.File;
-import java.io.FilenameFilter;
+//import java.io.FilenameFilter;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -51,16 +52,16 @@ public class AMainOBC extends ABase implements LocationListener {
 
 	public final static int MSG_UPDATE_TIME = 10;
 	public final static int MSG_UPDATE_DATE = 11;
-	private final static int MIN_MOVE_TOL = 1; // meters
-	private static final int AD_TIME = 10000;
+//	private final static int MIN_MOVE_TOL = 1; // meters
+//	private static final int AD_TIME = 10000;
 	public static AudioPlayer player;
 	public boolean firstUpPoi = true;
 	Handler timerHandler = new Handler();
 	Handler fragmentHandler = null;
 	Runnable timerRunnable = new Runnable() {
 
-		SimpleDateFormat day = new SimpleDateFormat("dd/MM/yyyy");
-		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+		SimpleDateFormat day = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+		SimpleDateFormat time = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
 		@Override
 		public void run() {
@@ -88,17 +89,17 @@ public class AMainOBC extends ABase implements LocationListener {
 	private POI selectedPOI;
 	private FuelStation selectedFS;
 	private Location currentPosition, endingPosition;
-	private String currentRouting;
+//	private String currentRouting;
 	private Date lastUpdate = new Date();
-	private File[] theAds;
-	private int adPosition;
-	private long lastTimeAdChanged;
-	private LocationManager locationManager;
+//	private File[] theAds;
+//	private int adPosition;
+//	private long lastTimeAdChanged;
+//	private LocationManager locationManager;
 	private boolean isInsideParkingArea = true;
 	private boolean lastIsInsideParkingArea = isInsideParkingArea;
 	private long lastIsInsideParkingAreaTs = System.currentTimeMillis();
 	private float rotationToParkingArea = 0.0f;
-	private int bearing = 0;
+//	private int bearing = 0;
 	private MainOBCServiceHandler serviceHandler = new MainOBCServiceHandler(new WeakReference<AMainOBC>(this));
 
 	public void setInsideParkingArea(boolean insideParkingArea) {
@@ -109,19 +110,19 @@ public class AMainOBC extends ABase implements LocationListener {
 		this.isInsideParkingArea = insideParkingArea;
 	}
 
-	public boolean getisInsideParkingArea() {
+/*	public boolean getisInsideParkingArea() {
 		return isInsideParkingArea;
-	}
+	}*/
 
 	public boolean checkisInsideParkingArea() {
-		Boolean inside = true;
+		boolean inside = true;
 //		if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
 //			inside = false;
 		try {
 			if (App.getLastLocation() != null)
 				inside = App.checkParkArea(App.getLastLocation().getLatitude(), App.getLastLocation().getLongitude());
 		} catch (Exception e) {
-			dlog.e("Exception while checking inside area ", e);
+			dlog.e("AMainOBC.checkisInsideParkingArea();Exception while checking inside area ", e);
 		}
 		return inside;
 	}
@@ -130,7 +131,7 @@ public class AMainOBC extends ABase implements LocationListener {
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		dlog.d("AMainOBC onCreate");
+		dlog.d("AMainOBC.onCreate();");
 		player = new AudioPlayer(this);
 		tts = new ProTTS(this);
 
@@ -144,7 +145,7 @@ public class AMainOBC extends ABase implements LocationListener {
 		// Fragment
 		if (savedInstanceState == null) {
 
-			fuelStations = new LongSparseArray<AMainOBC.FuelStation>();
+			fuelStations = new LongSparseArray<>();
 			pois = new LongSparseArray<AMainOBC.POI>();
 			currentPosition = null; //new LatLong(45.464189, 9.191181);
 
@@ -248,15 +249,15 @@ public class AMainOBC extends ABase implements LocationListener {
 			adsFolder.mkdirs();
 		}
 
-		theAds = adsFolder.listFiles(new FilenameFilter() {
+/*		theAds = adsFolder.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String filename) {
 				return filename.contains(".png");
 			}
-		});
+		});*/
 
-		adPosition = 0;
-		lastTimeAdChanged = System.currentTimeMillis();
+//		adPosition = 0;
+//		lastTimeAdChanged = System.currentTimeMillis();
 	}
 
 	@Override
@@ -281,7 +282,7 @@ public class AMainOBC extends ABase implements LocationListener {
 
 		fuelStations.clear();
 
-		SortedMap<Integer, FuelStation> map = new TreeMap<Integer, FuelStation>();
+		SortedMap<Integer, FuelStation> map = new TreeMap<>();
 
 		List<Poi> list;
 		if (Debug.IGNORE_HARDWARE) {
@@ -365,12 +366,12 @@ public class AMainOBC extends ABase implements LocationListener {
 		this.endingPosition = endingPosition;
 	}
 
-	public String getCurrentRouting() {
+/*	public String getCurrentRouting() {
 		return this.currentRouting;
-	}
+	}*/
 
 	public void setCurrentRouting(String currentRouting) {
-		this.currentRouting = currentRouting;
+//		this.currentRouting = currentRouting;
 	}
 
 	@Override
@@ -387,7 +388,7 @@ public class AMainOBC extends ABase implements LocationListener {
 				fMap.onActivityLocationChanged(location);
 			}
 		}
-		//dlog.d("onLocationChanged: lastUpdate "+ (new Date().getTime() - lastUpdate.getTime()) );
+		//dlog.d("AMainOBC.onLocationChanged(); lastUpdate "+ (new Date().getTime() - lastUpdate.getTime()) );
 
 		//Attenzione il codice commentato sotto per qualche motivo impedisce l'aggiornamento corretto della posizione!!!
 		/*if (previousPosition != null && GeoUtils.harvesineDistance(previousPosition, location) < MIN_MOVE_TOL) {
@@ -396,10 +397,10 @@ public class AMainOBC extends ABase implements LocationListener {
 		}*/
 
 		if (System.currentTimeMillis() - lastUpdate.getTime() < 5000) {
-			return;
+//			return;
 		} else {
 			lastUpdate = new Date();
-			//dlog.d("onLocationChanged: lastUpdate "+ (new Date().getTime() - lastUpdate.getTime()) );
+			//dlog.d("AMainOBC.onLocationChanged();lastUpdate "+ (new Date().getTime() - lastUpdate.getTime()) );
 
 			currentPosition = location;
 
@@ -471,10 +472,10 @@ public class AMainOBC extends ABase implements LocationListener {
 				setAudioSystem(LowLevelInterface.AUDIO_SYSTEM, LowLevelInterface.AUDIO_LEVEL_ALERT);
 			}
 			tts.speak(text);
-			dlog.d("queueTTS: leggo " + text);
+			dlog.d("AMainOBC.queueTTS();leggo " + text);
 
 		} catch (Exception e) {
-			dlog.e("queueTTS exception while start speak", e);
+			dlog.e("AMainOBC.queueTTS();exception while start speak", e);
 		}
 
 	}
@@ -486,10 +487,10 @@ public class AMainOBC extends ABase implements LocationListener {
 				setAudioSystem(LowLevelInterface.AUDIO_SYSTEM, LowLevelInterface.AUDIO_LEVEL_ALERT);
 			}
 			player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/" + resID));
-			dlog.d("playAlertAdvice: play " + name);
+			dlog.d("AMainOBC.playAlertAdvice();play " + name);
 
 		} catch (Exception e) {
-			dlog.e("playAlertAdvice exception while start speak", e);
+			dlog.e("AMainOBC.playAlertAdvice();exception while start speak", e);
 		}
 
 	}
@@ -500,7 +501,7 @@ public class AMainOBC extends ABase implements LocationListener {
 	}
 
 	public void setAudioSystem(int mode, int volume) {
-		dlog.d("setAudioSystem " + mode + " TTSreqSystem is: " + ProTTS.reqSystem + " AudioPlayerReqSystem is: " + AudioPlayer.reqSystem);
+		dlog.d("AMainOBC.getActivityUID();" + mode + " TTSreqSystem is: " + ProTTS.reqSystem + " AudioPlayerReqSystem is: " + AudioPlayer.reqSystem);
 		this.sendMessage(MessageFactory.AudioChannel(mode, volume));
 	}
 
@@ -545,16 +546,16 @@ public class AMainOBC extends ABase implements LocationListener {
 				}
 			}
 		} catch (Exception e) {
-			dlog.e("Exception performing onclick on callout", e);
+			dlog.e("AMainOBC.calloutShowCode();", e);
 		}
 
 	}
 
-	public void setGPS(boolean status) {
+/*	public void setGPS(boolean status) {
 		Intent intent = new Intent("android.location.GPS_ENABLED_CHANGE");
 		intent.putExtra("enabled", status);
 		sendBroadcast(intent);
-	}
+	}*/
 
 	public static class POI {
 
@@ -563,7 +564,7 @@ public class AMainOBC extends ABase implements LocationListener {
 		public int distance, time;
 		public Location location;
 
-		public POI(long id, String title, String address, String description, int distance, int time, Location location) {
+		private POI(long id, String title, String address, String description, int distance, int time, Location location) {
 			this.id = id;
 			this.title = title;
 			this.address = address;
@@ -576,7 +577,7 @@ public class AMainOBC extends ABase implements LocationListener {
 
 	public static class FuelStation extends POI {
 
-		public FuelStation(long id, String title, String address, String description, int distance, int time, Location location) {
+		private FuelStation(long id, String title, String address, String description, int distance, int time, Location location) {
 			super(id, title, address, description, distance, time, location);
 		}
 	}
@@ -596,7 +597,7 @@ public class AMainOBC extends ABase implements LocationListener {
 
 		private final WeakReference<AMainOBC> mainOBCWeakReference;
 
-		public MainOBCServiceHandler(WeakReference<AMainOBC> mainOBCWeakReference) {
+		private MainOBCServiceHandler(WeakReference<AMainOBC> mainOBCWeakReference) {
 			this.mainOBCWeakReference = mainOBCWeakReference;
 		}
 
@@ -604,7 +605,7 @@ public class AMainOBC extends ABase implements LocationListener {
 		public void handleMessage(Message msg) {
 			FMenu fMenu;
 			FMap fMap;
-			FPark fPark;
+//			FPark fPark;
 			FHome fHome;
 
 			// Random random = new Random();
@@ -626,9 +627,9 @@ public class AMainOBC extends ABase implements LocationListener {
 			//onLocationChanged(l);
 
 			if (!App.isForegroundActivity(mainOBCWeakReference.get())) {
-				DLog.W(AMainOBC.class.getName() + " MSG to non foreground activity");
+				DLog.W("AMainOBC.MainOBCServiceHandler();MSG to non foreground activity");
 				if (App.currentTripInfo == null) {
-					DLog.W(AMainOBC.class.getName() + " no trip found kill activity");
+					DLog.W("AMainOBC.MainOBCServiceHandler();no trip found kill activity");
 
 					mainOBCWeakReference.get().finish();
 				}
@@ -638,20 +639,19 @@ public class AMainOBC extends ABase implements LocationListener {
 			switch (msg.what) {
 
 				case ObcService.MSG_CLIENT_REGISTER:
-					DLog.E(AMainOBC.class.getName() + ": MSG_CLIENT_REGISTER");
+					DLog.I("AMainOBC.MainOBCServiceHandler();MSG_CLIENT_REGISTER");
 					break;
 
 				case ObcService.MSG_CMD_TIMEOUT:
-					DLog.E(AMainOBC.class.getName() + ": MSG_CMD_TIMEOUT");
+					DLog.I("AMainOBC.MainOBCServiceHandler();MSG_CMD_TIMEOUT");
 					break;
 
 				case ObcService.MSG_PING:
-					DLog.D(AMainOBC.class.getName() + ": MSG_PING");
+					DLog.I("AMainOBC.MainOBCServiceHandler();MSG_PING");
 					break;
 
 				case ObcService.MSG_IO_RFID:
-
-					DLog.E(AMainOBC.class.getName() + ": MSG_IO_RFID");
+					DLog.I("AMainOBC.MainOBCServiceHandler();MSG_IO_RFID");
 					break;
 
 				case ObcService.MSG_CAR_UPDATE:
@@ -728,11 +728,11 @@ public class AMainOBC extends ABase implements LocationListener {
 					if (fragmentMap != null) {
 						fragmentMap.stopRouteNavigation();
 					}
-
+/*
 					FSearch fragmentSearch = (FSearch) mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FSearch.class.getName());
 					if (fragmentSearch != null) {
 						//fragmentSearch.shutdownSearch();
-					}
+					}*/
 
 					if (mainOBCWeakReference.get().serviceConnector.isConnected()) {
 						mainOBCWeakReference.get().serviceConnector.unregister();
@@ -746,7 +746,7 @@ public class AMainOBC extends ABase implements LocationListener {
 					break;
 
 				case ObcService.MSG_CAR_LOCATION:
-					if (msg.obj != null && msg.obj instanceof Location) {
+					if (msg.obj instanceof Location) {
 						mainOBCWeakReference.get().onLocationChanged((Location) msg.obj);
 					}
 					break;
@@ -766,7 +766,7 @@ public class AMainOBC extends ABase implements LocationListener {
 
 				case ObcService.MSG_NAVIGATE_TO:
 
-					if (msg.obj != null && (msg.obj instanceof Location)) {
+					if (msg.obj instanceof Location) {
 						mainOBCWeakReference.get().navigateTo((Location) msg.obj);
 					}
 
@@ -789,7 +789,6 @@ public class AMainOBC extends ABase implements LocationListener {
 									break;
 							}
 						}
-
 					}
 
 					fMenu = (FMenu) mainOBCWeakReference.get().getFragmentManager().findFragmentByTag(FMenu.class.getName());

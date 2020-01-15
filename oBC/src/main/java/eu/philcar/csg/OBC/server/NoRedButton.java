@@ -44,10 +44,10 @@ public class NoRedButton implements RemoteEntityInterface {
 
 		preferences = context.getSharedPreferences(App.COMMON_PREFERENCES, Context.MODE_PRIVATE);
 		Editor edit = preferences.edit();
-		edit.putString("NRD", response);
+		edit.putString("NRB", response);
 		edit.apply();
 
-		DLog.I("NRD :" + response);
+		DLog.I("NRB :" + response);
 		return 0;
 	}
 

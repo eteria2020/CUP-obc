@@ -17,15 +17,15 @@ public class MessageFactory {
 
 	public static final int LED_ON = LeaseInfoItaly.LED_STATUS_LIGHT_ON;
 	public static final int LED_OFF = LeaseInfoItaly.LED_STATUS_LIGHT_OFF;
-	public static final int LED_FLASH = LeaseInfoItaly.LED_STATUS_LIGHT_FLASH;
+//	public static final int LED_FLASH = LeaseInfoItaly.LED_STATUS_LIGHT_FLASH;
 
-	public static Message stopService() {
+/*	public static Message stopService() {
 		return Message.obtain(null, ObcService.MSG_SERVICE_STOP);
-	}
+	}*/
 
-	public static Message ping() {
+/*	public static Message ping() {
 		return Message.obtain(null, ObcService.MSG_PING);
-	}
+	}*/
 
 	public static Message setPlate(String plate) {
 		Message msg = Message.obtain(null, ObcService.MSG_IO_PLATE);
@@ -100,25 +100,25 @@ public class MessageFactory {
 		return msg;
 	}
 
-	public static Message requestDisplay(boolean on) {
+/*	public static Message requestDisplay(boolean on) {
 		Message msg = Message.obtain(null, ObcService.MSG_IO_LCD);
 		msg.arg1 = 10 + (on ? 1 : 0);
 		return msg;
-	}
+	}*/
 
-	public static Message resetAdminCards() {
-		Message msg = Message.obtain(null, ObcService.MSG_IO_RESETADMINS);
-		return msg;
-	}
+/*	public static Message resetAdminCards() {
+//		Message msg = Message.obtain(null, ObcService.MSG_IO_RESETADMINS);
+		return Message.obtain(null, ObcService.MSG_IO_RESETADMINS);
+	}*/
 
-	public static Message requestInfo() {
-		Message msg = Message.obtain(null, ObcService.MSG_IO_GETSTATUS);
-		return msg;
-	}
+/*	public static Message requestInfo() {
+//		Message msg = Message.obtain(null, ObcService.MSG_IO_GETSTATUS);
+		return Message.obtain(null, ObcService.MSG_IO_GETSTATUS);
+	}*/
 
 	public static Message requestCarInfo() {
-		Message msg = Message.obtain(null, ObcService.MSG_CAR_INFO);
-		return msg;
+//		Message msg = Message.obtain(null, ObcService.MSG_CAR_INFO);
+		return Message.obtain(null, ObcService.MSG_CAR_INFO);
 	}
 
 	public static Message requestCallCenterCallSOS(String cellulare) {
@@ -138,9 +138,10 @@ public class MessageFactory {
 		msg.obj = pin;
 		return msg;
 	}
-	public static Message restartUI() {
+
+/*	public static Message restartUI() {
 		return Message.obtain(null, ObcService.MSG_RESTART_UI);
-	}
+	}*/
 
 	public static Message notifyCard(String id, String event) {
 
@@ -182,23 +183,23 @@ public class MessageFactory {
 	}
 
 	public static Message notifyTripParkModeCardBegin() {
-		Message msg = Message.obtain(null, ObcService.MSG_TRIP_PARK_CARD_BEGIN);
-		return msg;
+//		Message msg = Message.obtain(null, ObcService.MSG_TRIP_PARK_CARD_BEGIN);
+		return Message.obtain(null, ObcService.MSG_TRIP_PARK_CARD_BEGIN);
 	}
 
 	public static Message notifyTripParkModeCardEnd() {
-		Message msg = Message.obtain(null, ObcService.MSG_TRIP_PARK_CARD_END);
-		return msg;
+//		Message msg = Message.obtain(null, ObcService.MSG_TRIP_PARK_CARD_END);
+		return Message.obtain(null, ObcService.MSG_TRIP_PARK_CARD_END);
 	}
 
 	public static Message requestCarUpdate() {
-		Message msg = Message.obtain(null, ObcService.MSG_CAR_UPDATE);
-		return msg;
+//		Message msg = Message.obtain(null, ObcService.MSG_CAR_UPDATE);
+		return Message.obtain(null, ObcService.MSG_CAR_UPDATE);
 	}
 
 	public static Message selfCloseTrip() {
-		Message msg = Message.obtain(null, ObcService.MSG_TRIP_SELFCLOSE);
-		return msg;
+//		Message msg = Message.obtain(null, ObcService.MSG_TRIP_SELFCLOSE);
+		return Message.obtain(null, ObcService.MSG_TRIP_SELFCLOSE);
 	}
 
 	public static Message startRemoteUpdateCycle() {
@@ -220,8 +221,8 @@ public class MessageFactory {
 	}
 
 	public static Message forceCloseTrip() {
-		Message msg = Message.obtain(null, ObcService.MSG_TRIP_CLOSE_FORCED);
-		return msg;
+//		Message msg = Message.obtain(null, ObcService.MSG_TRIP_CLOSE_FORCED);
+		return Message.obtain(null, ObcService.MSG_TRIP_CLOSE_FORCED);
 	}
 
 	public static Message notifyCarInfoUpdate(CarInfo carInfo) {
@@ -281,23 +282,23 @@ public class MessageFactory {
 	}
 
 	public static Message zmqRestart() {
-		Message msg = Message.obtain(null, ObcService.MSG_ZMQ_RESTART);
-		return msg;
+//		Message msg = Message.obtain(null, ObcService.MSG_ZMQ_RESTART);
+		return Message.obtain(null, ObcService.MSG_ZMQ_RESTART);
 	}
 
 	public static Message checkLogSize() {
-		Message msg = Message.obtain(null, ObcService.MSG_CHECK_LOG_SIZE);
-		return msg;
+//		Message msg = Message.obtain(null, ObcService.MSG_CHECK_LOG_SIZE);
+		return Message.obtain(null, ObcService.MSG_CHECK_LOG_SIZE);
 	}
 
 	public static Message sendBeacon() {
-		Message msg = Message.obtain(null, ObcService.MSG_TRIP_SENDBEACON);
-		return msg;
+//		Message msg = Message.obtain(null, ObcService.MSG_TRIP_SENDBEACON);
+		return  Message.obtain(null, ObcService.MSG_TRIP_SENDBEACON);
 	}
 
 	public static Message sendEndCharging() {
-		Message msg = Message.obtain(null, ObcService.MSG_CAR_END_CHARGING);
-		return msg;
+//		Message msg = Message.obtain(null, ObcService.MSG_CAR_END_CHARGING);
+		return Message.obtain(null, ObcService.MSG_CAR_END_CHARGING);
 	}
 
 	public static Message sendLocationChange(Location location) {
@@ -319,13 +320,13 @@ public class MessageFactory {
 	}
 
 	public static Message sendTimeCheck() {
-		Message msg = Message.obtain(null, ObcService.MSG_CHECK_TIME);
-		return msg;
+//		Message msg = Message.obtain(null, ObcService.MSG_CHECK_TIME);
+		return Message.obtain(null, ObcService.MSG_CHECK_TIME);
 	}
 
 	public static Message failedSOS() {
-		Message msg = Message.obtain(null, ObcService.MSG_FAILED_SOS);
-		return msg;
+//		Message msg = Message.obtain(null, ObcService.MSG_FAILED_SOS);
+		return Message.obtain(null, ObcService.MSG_FAILED_SOS);
 	}
 
 }

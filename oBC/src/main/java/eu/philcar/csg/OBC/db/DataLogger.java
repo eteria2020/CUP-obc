@@ -26,15 +26,15 @@ public class DataLogger extends DbRecord<ServerResponse> implements CustomOp {
 	@DatabaseField
 	public int soc; //
 	@DatabaseField
-	public float v_min_cell; //
+	float v_min_cell; //
 	@DatabaseField
-	public float v_max_cell; //
+	float v_max_cell; //
 	@DatabaseField
-	public int ampere; //
+	int ampere; //
 	@DatabaseField
-	public float v_battery; //
+	float v_battery; //
 	@DatabaseField
-	public long km_from_trip_beg; //
+	long km_from_trip_beg; //
 
 	@Override
 	public void onDbWrite() {

@@ -5,7 +5,7 @@ android {
         vmtest {
             keyAlias 'Sharengo.user'
             keyPassword 'Sharengo1'
-            storeFile file('C:/Workspace/Mobile App/key/sharengo.keystore.jks')
+            storeFile file('keystore/sharengo.keystore.jks')
             storePassword 'Sharengo1'
         }
     }

@@ -43,9 +43,7 @@ import eu.philcar.csg.OBC.service.Reservation;
 public class FWelcome extends FBase {
 
 	public static FWelcome newInstance() {
-
-		FWelcome fw = new FWelcome();
-		return fw;
+		return new FWelcome();
 	}
 
 	@Inject
@@ -78,12 +76,14 @@ public class FWelcome extends FBase {
 	protected ImageButton fwelChineseIB;
 	@BindView(R.id.fwelSlovakiaIB)
 	protected ImageButton fwelSlovakiaIB;
+	@BindView(R.id.fwelSloveniaIB)
+	protected ImageButton fwelSloveniaIB;
 	@BindView(R.id.fwelNetherlandsIB)
 	protected ImageButton fwelNetherlandsIB;
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm", Locale.getDefault());
 
 	private int logoTaps = 0;
-	private boolean isMaintenance = false;
+//	private boolean isMaintenance = false;
 	public static FWelcome Instance;
 
 	public FWelcome() {
@@ -111,7 +111,6 @@ public class FWelcome extends FBase {
 			public void onClick(View v) {
 				((ABase) getActivity()).setItalianLanguage();
 				nextPage();
-
 			}
 		});
 		view.findViewById(R.id.fwelFrenchIB).setOnClickListener(new OnClickListener() {
@@ -119,7 +118,6 @@ public class FWelcome extends FBase {
 			public void onClick(View v) {
 				((ABase) getActivity()).setFrenchLanguage();
 				nextPage();
-
 			}
 		});
 		view.findViewById(R.id.fwelEnglishIB).setOnClickListener(new OnClickListener() {
@@ -134,7 +132,6 @@ public class FWelcome extends FBase {
 			public void onClick(View v) {
 				((ABase) getActivity()).setChinseseLanguage();
 				nextPage();
-
 			}
 		});
 		view.findViewById(R.id.fwelNetherlandsIB).setOnClickListener(new OnClickListener() {
@@ -142,7 +139,6 @@ public class FWelcome extends FBase {
 			public void onClick(View v) {
 				((ABase) getActivity()).setNetherlandsLanguage();
 				nextPage();
-
 			}
 		});
 		view.findViewById(R.id.fwelSlovakiaIB).setOnClickListener(new OnClickListener() {
@@ -150,7 +146,13 @@ public class FWelcome extends FBase {
 			public void onClick(View v) {
 				((ABase) getActivity()).setSlovakLanguage();
 				nextPage();
-
+			}
+		});
+		view.findViewById(R.id.fwelSloveniaIB).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((ABase) getActivity()).setSlovenianLanguage();
+				nextPage();
 			}
 		});
 
@@ -300,6 +302,9 @@ public class FWelcome extends FBase {
 			case "nl":
 				fwelNetherlandsIB.setVisibility(View.VISIBLE);
 				break;
+			case "sl":
+				fwelSloveniaIB.setVisibility(View.VISIBLE);
+				break;
 			case "sk":
 				fwelSlovakiaIB.setVisibility(View.VISIBLE);
 				break;
@@ -329,7 +334,7 @@ public class FWelcome extends FBase {
 	}
 
 	public void setMaintenance(boolean v) {
-		isMaintenance = v;
+//		isMaintenance = v;
 	}
 
 	public void resetUI() {
@@ -356,6 +361,15 @@ public class FWelcome extends FBase {
 	private Handler localHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
+
+			if(msg.what==0) {
+				if (tvDateTime != null) {
+					tvDateTime.setText(sdf.format(new Date()));
+				}
+				this.sendEmptyMessageDelayed(0, 1000);
+			}
+
+/*
 			switch (msg.what) {
 				case 0:
 					if (tvDateTime != null) tvDateTime.setText(sdf.format(new Date()));
@@ -363,6 +377,7 @@ public class FWelcome extends FBase {
 					break;
 
 			}
+*/
 		}
 	};
 

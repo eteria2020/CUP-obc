@@ -12,16 +12,16 @@ import eu.philcar.csg.OBC.ABase;
 import eu.philcar.csg.OBC.ASOS;
 import eu.philcar.csg.OBC.R;
 import eu.philcar.csg.OBC.controller.FBase;
-import eu.philcar.csg.OBC.helpers.DLog;
+//import eu.philcar.csg.OBC.helpers.DLog;
 
 public class FChargingAlert extends FBase {
 
-	private DLog dlog = new DLog(this.getClass());
+//	private DLog dlog = new DLog(this.getClass());
 
 	public static FChargingAlert newInstance() {
 
-		FChargingAlert fp = new FChargingAlert();
-		return fp;
+//		FChargingAlert fp = new FChargingAlert();
+		return new FChargingAlert();
 	}
 
 	@Override
@@ -35,13 +35,11 @@ public class FChargingAlert extends FBase {
 
 	@OnClick(R.id.fChargingAlertBtnNext)
 	protected void nextPage(View v) {
-
 		((ABase) getActivity()).pushFragment(FPin.newInstance(), FPin.class.getName(), true);
 	}
 
 	@OnClick(R.id.fChargingAlertBtnSOS)
 	protected void sosPage(View view) {
-
 		startActivity(new Intent(getActivity(), ASOS.class));
 	}
 

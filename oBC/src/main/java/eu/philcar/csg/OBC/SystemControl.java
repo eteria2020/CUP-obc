@@ -21,15 +21,15 @@ import javax.inject.Inject;
 
 import eu.philcar.csg.OBC.data.datasources.repositories.EventRepository;
 import eu.philcar.csg.OBC.helpers.DLog;
-import eu.philcar.csg.OBC.service.ObcService;
+//import eu.philcar.csg.OBC.service.ObcService;
 
 public class SystemControl {
 
 	public enum RebootCause {
-		NO_3G(3*60*60*1000),
-		AMP(45*60*1000),
-		ADMIN(2*60*1000),
-		DAILY(24*60*60*1000, "Reboot giornaliero");
+		NO_3G(3 * 60 * 60 * 1000),
+		AMP(45 * 60 * 1000),
+		ADMIN(2 * 60 * 1000),
+		DAILY(24 * 60 * 60 * 1000, "Reboot giornaliero");
 
 		int timeout;
 		String label;
@@ -48,7 +48,7 @@ public class SystemControl {
 
 	private static DLog dlog = new DLog(SystemControl.class);
 
-	public static int InsertAPN(Context ctx, String name) {
+/*	public static int InsertAPN(Context ctx, String name) {
 
 		//Set the URIs and variables
 		int id = -1;
@@ -142,9 +142,10 @@ public class SystemControl {
 		}
 
 		return id;
-	}
+	}*/
 
 	//Takes the ID of the new record generated in InsertAPN and sets that particular record the default preferred APN configuration
+/*
 	public static boolean SetPreferredAPN(Context ctx, int id) {
 
 		//If the id is -1, that means the record was found in the APN table before insertion, thus, no action required
@@ -171,6 +172,7 @@ public class SystemControl {
 		}
 		return res;
 	}
+*/
 
 	public static void Reset3G(Context ctx) {
 
@@ -178,16 +180,16 @@ public class SystemControl {
 		th.start();
 	}
 
-	public static void emfileException(Throwable e) {
+/*	public static void emfileException(Throwable e) {
 
 //		doReboot("EMFILE");
 
-	}
+	}*/
 
-	public static void ResycNTP() {
+/*	public static void ResycNTP() {
 		Thread th = new Thread(new RestartNTP());
 		th.start();
-	}
+	}*/
 
 	private static int countFailedTests = 0;
 
@@ -210,55 +212,55 @@ public class SystemControl {
 		return ok;
 	}
 
-	public static void TestActiveNetworkConnection(Message msg, Context ctx, Handler hnd) {
+/*	public static void TestActiveNetworkConnection(Message msg, Context ctx, Handler hnd) {
 		Thread th = new Thread(new TestConnection(msg, ctx, hnd));
 		th.start();
-	}
+	}*/
 
 	private static class Restart3G implements Runnable {
 
 		@Override
 		public void run() {
-			dlog.d("Begin restart 3G");
-			dlog.cr("Inizio restart No3g mod aereo");
+			dlog.d("SystemControl.Restart3G();Begin restart 3G");
+			dlog.cr("SystemControl.Restart3G();Inizio restart No3g mod aereo");
 			Runtime rt = Runtime.getRuntime();
 			try {
 				rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global airplane_mode_on 1"});
 				Thread.sleep(2000);
 				rt.exec(new String[]{"/system/xbin/su", "-c", "am broadcast -a android.intent.action.AIRPLANE_MODE --ez state true"});
-				dlog.d("...Disabled 3G");
+				dlog.d("SystemControl.Restart3G();Disabled 3G");
 				Thread.sleep(15000);
 				rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global airplane_mode_on 0"});
 				Thread.sleep(2000);
 				rt.exec(new String[]{"/system/xbin/su", "-c", "am broadcast -a android.intent.action.AIRPLANE_MODE --ez state true"});
-				dlog.d("...Enabled 3G");
-				dlog.cr("Fine restart No3g mod aereo");
+				dlog.d("SystemControl.Restart3G();Enabled 3G");
+				dlog.cr("SystemControl.Restart3G();Fine restart No3g mod aereo");
 			} catch (IOException | InterruptedException e) {
-				dlog.e("Restarting 3G", e);
+				dlog.e("SystemControl.Restart3G();Restarting 3G", e);
 			}
 
 		}
 
 	}
 
-	private static class RestartNTP implements Runnable {
+/*	private static class RestartNTP implements Runnable {
 
 		@Override
 		public void run() {
-			dlog.d("Begin restarting NTP");
+			dlog.d("SystemControl.RestartNTP();Begin restarting NTP");
 			Runtime rt = Runtime.getRuntime();
 			try {
 				rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time 0"});
 				Thread.sleep(2000);
 				rt.exec(new String[]{"/system/xbin/su", "-c", "settings put global auto_time 1"});
-				dlog.d("...Restarted NTP");
+				dlog.d("SystemControl.RestartNTP();Restarted NTP");
 			} catch (IOException | InterruptedException e) {
-				dlog.e("Restarting NTP", e);
+				dlog.e("SystemControl.RestartNTP();Restarting NTP", e);
 			}
 
 		}
 
-	}
+	}*/
 
 	public static class TestConnection implements Runnable {
 
@@ -310,7 +312,7 @@ public class SystemControl {
 			Thread th = new Thread(new Shutdown(App.Instance.getApplicationContext(), time));
 			th.start();
 		} else {
-			dlog.d("Shutdown already in progress");
+			dlog.d("SystemControl.doShutdown();Shutdown already in progress");
 		}
 	}
 
@@ -327,7 +329,7 @@ public class SystemControl {
 
 		@Override
 		public void run() {
-			DLog.D(SystemControl.class.toString() + " Begin shutdown ");
+			DLog.D("SystemControl.Shutdown.run();Begin shutdown ");
 			shutdownInProgress = System.currentTimeMillis();
 			eventRepository.Shutdown();
 			Runtime rt = Runtime.getRuntime();
@@ -335,16 +337,16 @@ public class SystemControl {
 				Thread.sleep(time);
 				if(App.spegnimentoEnabled && !App.spegnimentoDisabled && (App.currentTripInfo==null || !App.currentTripInfo.isOpen) && (App.reservation== null || App.reservation.isMaintenance()) && !BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug")) {
 
-					DLog.D(SystemControl.class.toString() + "Spegnimento Shutting down ");
+					DLog.D("SystemControl.Shutdown.run(); Shutting down ");
 					rt.exec(new String[]{"/system/xbin/su", "-c", "reboot -p"});
 				}
 				else {
 					shutdownInProgress = 0;
 					eventRepository.ShutdownAbort();
-					DLog.D(SystemControl.class.toString() + "Spegnimento Aborted");
+					DLog.D("SystemControl.Shutdown.run();Spegnimento Aborted");
 				}
 			} catch (Exception  e) {
-				dlog.e("Spegnimento Exception", e);
+				dlog.e("SystemControl.Shutdown.run();Spegnimento Exception", e);
 			}
 
 		}
@@ -364,12 +366,13 @@ public class SystemControl {
 	@Deprecated
 	public static void doReboot(String label) {
 		//If there is another reboot in progress not older than 6 hour : ignore
-		if(BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
+		if(BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug")){
 			return;
+		}
 
 		if (System.currentTimeMillis() - rebootInProgress > 21600000) {
 
-			dlog.cr("Eseguo reboot per " + label);
+			dlog.cr("SystemControl.Shutdown.doReboot();" + label);
 			//Events.Reboot("No 3G Reboot");
 			Thread th = new Thread(new Reboot());
 			th.start();
@@ -377,32 +380,36 @@ public class SystemControl {
 			if (System.currentTimeMillis() - rebootInProgress < 0 && System.currentTimeMillis() - App.AppStartupTime.getTime() > 3600000) { //if time is 01/01/2000 reboot every hour
 
 				//Events.Reboot("No 3G Reboot");
-				dlog.cr("Eseguo reboot per " + label);
+				dlog.cr("SystemControl.Shutdown.doReboot();Eseguo reboot per " + label);
 				Thread th = new Thread(new Reboot());
 				th.start();
-			} else
-				DLog.D(SystemControl.class.toString() + " Last Reboot within 6 hour, wait");
+			} else{
+				DLog.D("SystemControl.Shutdown.doReboot();Last Reboot within 6 hour, wait");
+			}
+
 		}
 	}
 
 	public static void doReboot(RebootCause label) {
 		//check for last reboot time for label
-		if( BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug") || (rebootMap!= null && rebootMap.containsKey(label)))
+		if( BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug") || (rebootMap!= null && rebootMap.containsKey(label))){
 			return;
+		}
+
 		if(System.currentTimeMillis() - App.Instance.getRebootTimeForLabel(label.name()) >0) {// se maggiore di 0 l'ultimo reboot non è nel futuro posso procedere nel reboot
 			if(System.currentTimeMillis() - App.Instance.getRebootTimeForLabel(label.name())> label.timeout){
-				dlog.cr("Eseguo reboot per " + label.label);
+				dlog.cr("SystemControl.Shutdown.doReboot();Eseguo reboot per " + label.label);
 				//Events.Reboot("No 3G Reboot");
-				Thread th = new Thread(new Reboot(2*60*1000, label.name()));
+				Thread th = new Thread(new Reboot(2 * 60 * 1000, label.name()));
 				th.start();
 				try {
 					rebootMap.put(label, th);
 				}catch (Exception e){
-					dlog.e("Exception while saving reboot Thread",e);
+					dlog.e("SystemControl.Shutdown.doReboot();Exception while saving reboot Thread",e);
 				}
 			}
 		}else { //sono nel passato procedo aspettando 5 min
-			dlog.cr("Eseguo reboot per " + label.label);
+			dlog.cr("SystemControl.Shutdown.doReboot();Eseguo reboot per " + label.label);
 			Thread th = new Thread(new Reboot(5*60*1000, label.name()));
 			th.start();
 		}
@@ -416,7 +423,7 @@ public class SystemControl {
 			}
 
 		}catch (Exception e) {
-		    dlog.e("cancelRebootCause: Exception", e);
+		    dlog.e("SystemControl.cancelRebootCause();Exception", e);
 		}
 	}
 
@@ -424,12 +431,12 @@ public class SystemControl {
 		long sleep;
 		String label;
 
-		public Reboot(long sleepMillis, String label) {
+		private Reboot(long sleepMillis, String label) {
 			this.sleep = sleepMillis;
 			this.label = label;
 		}
 
-		public Reboot() {
+		private Reboot() {
 			this(50000, null);
 		}
 
@@ -437,7 +444,7 @@ public class SystemControl {
 		public void run() {
 			try {
 
-				DLog.D(SystemControl.class.toString() + " begin reboot");
+				DLog.D("SystemControl.Reboot.run();begin reboot");
 
 				Thread.sleep(sleep);
 				if ((App.currentTripInfo == null || !App.currentTripInfo.isOpen) && (App.reservation == null || App.reservation.isMaintenance())) {
@@ -449,13 +456,11 @@ public class SystemControl {
 					rt.exec(new String[]{"/system/xbin/su", "-c", "reboot"});
 				} else {
 
-					DLog.D(SystemControl.class.toString() + " Abort reboot: Trip open!!! ");
+					DLog.D("SystemControl.Reboot.run();Abort reboot: Trip open!!! ");
 				}
 			} catch (IOException | InterruptedException e) {
-				dlog.e("Reboot exception: ", e);
+				dlog.e("SystemControl.Reboot.run();", e);
 			}
-
 		}
 	}
-
 }

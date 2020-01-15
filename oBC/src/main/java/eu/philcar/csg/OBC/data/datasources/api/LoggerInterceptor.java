@@ -15,7 +15,7 @@ import okio.Buffer;
  */
 
 public class LoggerInterceptor implements Interceptor {
-	HttpLogger logger = new HttpLogger();
+	private HttpLogger logger = new HttpLogger();
 
 	@SuppressLint("DefaultLocale")
 	@Override
@@ -38,20 +38,20 @@ public class LoggerInterceptor implements Interceptor {
 					url = url.substring(0, request.url().toString().lastIndexOf('?'));
 			}
 
-			logger.log(String.format("--> %s request %s %s: %s", request.method(), url, params, requestBuffer.readUtf8()));
+			logger.log(String.format("LoggerInterceptor.intercept();-->;%s request %s %s: %s", request.method(), url, params, requestBuffer.readUtf8()));
 		} catch (Exception e) {
-			logger.e("Exception writing log " + request.url(), e);
+			logger.e("LoggerInterceptor.intercept();-->;" + request.url(), e);
 		}
 
 		Response response = chain.proceed(request);
 
 		long t2 = System.nanoTime();
 		try {
-			logger.log(String.format("<-- %s response %s for %s in %.1fms Body ",
+			logger.log(String.format("LoggerInterceptor.intercept();<-- %s response %s for %s in %.1fms Body ",
 					response.request().method(), response.code(), response.request().url(), (t2 - t1) / 1e6d));
 
 		} catch (Exception e) {
-			logger.e("Exception writing log " + request.url(), e);
+			logger.e("LoggerInterceptor.intercept();Exception writing log " + request.url(), e);
 		}
 		return response;
 	}

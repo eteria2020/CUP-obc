@@ -3,10 +3,10 @@ package eu.philcar.csg.OBC.db;
 import com.j256.ormlite.support.ConnectionSource;
 
 import java.sql.SQLException;
-import java.util.Collection;
+//import java.util.Collection;
 
 import eu.philcar.csg.OBC.helpers.DLog;
-import io.reactivex.Observable;
+//import io.reactivex.Observable;
 
 public class BusinessEmployees extends DbTable<BusinessEmployee, Integer> {
 
@@ -37,7 +37,7 @@ public class BusinessEmployees extends DbTable<BusinessEmployee, Integer> {
 		return null;
 	}
 
-	public Observable<BusinessEmployee> setEmployee(final Collection<BusinessEmployee> customers) {
+/*	public Observable<BusinessEmployee> setEmployee(final Collection<BusinessEmployee> customers) {
 		return Observable.create(emitter -> {
 			if (emitter.isDisposed()) return;
 
@@ -52,5 +52,5 @@ public class BusinessEmployees extends DbTable<BusinessEmployee, Integer> {
 				emitter.onError(e);
 			}
 		});
-	}
+	}*/
 }

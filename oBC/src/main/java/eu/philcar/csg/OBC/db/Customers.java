@@ -1,18 +1,18 @@
 package eu.philcar.csg.OBC.db;
 
-import android.content.Context;
-import android.os.Handler;
-
-import com.j256.ormlite.stmt.PreparedQuery;
+//import android.content.Context;
+//import android.os.Handler;
+//
+//import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.support.ConnectionSource;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
+//import java.util.Collection;
 import java.util.List;
 
 import eu.philcar.csg.OBC.helpers.DLog;
-import io.reactivex.Observable;
+//import io.reactivex.Observable;
 
 public class Customers extends DbTable<Customer, Integer> {
 
@@ -36,22 +36,22 @@ public class Customers extends DbTable<Customer, Integer> {
 		}
 	}
 
-	public boolean isPresent(int id, double timestamp) {
-
-		try {
-
-			PreparedQuery<Customer> query = queryBuilder().setCountOf(true).where().eq("id", id).and().eq("update_timestamp", timestamp).prepare();
-			long c = this.countOf(query);
-
-			return c > 0;
-
-		} catch (SQLException e) {
-			DLog.E("isPresent fail:", e);
-
-		}
-
-		return false;
-	}
+//	public boolean isPresent(int id, double timestamp) {
+//
+//		try {
+//
+//			PreparedQuery<Customer> query = queryBuilder().setCountOf(true).where().eq("id", id).and().eq("update_timestamp", timestamp).prepare();
+//			long c = this.countOf(query);
+//
+//			return c > 0;
+//
+//		} catch (SQLException e) {
+//			DLog.E("isPresent fail:", e);
+//
+//		}
+//
+//		return false;
+//	}
 
 	public long mostRecentTimestamp() {
 		long max = 0;
@@ -104,7 +104,7 @@ public class Customers extends DbTable<Customer, Integer> {
 			if (list == null)
 				return null;
 
-			List<String> codes = new ArrayList<String>();
+			List<String> codes = new ArrayList<>();
 
 			for (Customer c : list) {
 				codes.add(c.card_code);
@@ -118,35 +118,35 @@ public class Customers extends DbTable<Customer, Integer> {
 		return null;
 	}
 
-	@Deprecated
-	public void startWhitelistDownload(Context ctx, Handler handler) {
-		DLog.D("Start whitelist download..");
-		/*CustomersConnector cn = new CustomersConnector();
-		cn.setLastUpdate(mostRecentTimestamp());
-		HttpsConnector http = new HttpsConnector(ctx);
-		http.SetHandler(handler);
-		http.Execute(cn);*/
-	}
+//	@Deprecated
+//	public void startWhitelistDownload(Context ctx, Handler handler) {
+//		DLog.D("Start whitelist download..");
+//		/*CustomersConnector cn = new CustomersConnector();
+//		cn.setLastUpdate(mostRecentTimestamp());
+//		HttpsConnector http = new HttpsConnector(ctx);
+//		http.SetHandler(handler);
+//		http.Execute(cn);*/
+//	}
 
-	public Observable<Customer> setCustomers(final Collection<Customer> customers) {
-		return Observable.create(emitter -> {
-			if (emitter.isDisposed()) return;
-
-			try {
-				int index = 0;
-				for (Customer customer : customers) {
-					index++;
-					customer.encrypt();
-					int result = createOrUpdate(customer).getNumLinesChanged();
-					if (result >= 0) emitter.onNext(customer);
-				}
-				emitter.onComplete();
-			} catch (Exception e) {
-				DLog.E("Exception setting Customer", e);
-				emitter.onError(e);
-			}
-		});
-	}
+//	public Observable<Customer> setCustomers(final Collection<Customer> customers) {
+//		return Observable.create(emitter -> {
+//			if (emitter.isDisposed()) return;
+//
+//			try {
+//				int index = 0;
+//				for (Customer customer : customers) {
+//					index++;
+//					customer.encrypt();
+//					int result = createOrUpdate(customer).getNumLinesChanged();
+//					if (result >= 0) emitter.onNext(customer);
+//				}
+//				emitter.onComplete();
+//			} catch (Exception e) {
+//				DLog.E("Exception setting Customer", e);
+//				emitter.onError(e);
+//			}
+//		});
+//	}
 
 	@Override
 	public CreateOrUpdateStatus createOrUpdate(Customer data) throws SQLException {

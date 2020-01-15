@@ -12,7 +12,7 @@ import io.reactivex.Observable;
 
 public class DbTable<tableClass, pk> extends BaseDaoImpl<tableClass, pk> {
 
-	public DbTable(ConnectionSource connectionSource, Class dataClass)
+    public DbTable(ConnectionSource connectionSource, Class dataClass)
 			throws SQLException {
 		super(connectionSource, dataClass);
 
@@ -38,7 +38,7 @@ public class DbTable<tableClass, pk> extends BaseDaoImpl<tableClass, pk> {
 						}
 						emitter.onComplete();
 					} catch (Exception e) {
-						DLog.E("Exception updating Many", e);
+						DLog.E("DbTable.createOrUpdateMany().callBatchTasks();Exception updating Many", e);
 						emitter.onError(e);
 					}
 
@@ -46,7 +46,7 @@ public class DbTable<tableClass, pk> extends BaseDaoImpl<tableClass, pk> {
 
 				});
 			} catch (Exception e) {
-				DLog.E("Exception while updating many " + emitter, e);
+				DLog.E("DbTable.createOrUpdateMany();Exception while updating many " + emitter, e);
 				//emitter.onError(e);
 			}
 
@@ -65,19 +65,19 @@ public class DbTable<tableClass, pk> extends BaseDaoImpl<tableClass, pk> {
 							((CustomOp) collection).onDbWrite();
 						}
 
-						DLog.D("UpdateOne " + collection.toString());
+						DLog.D("DbTable.createOrUpdateOne();" + collection.toString());
 						int result = createOrUpdate(collection).getNumLinesChanged();
 						if (result >= 0) emitter.onNext(collection);
 
 						emitter.onComplete();
 					} catch (Exception e) {
-						DLog.E("Exception updating One", e);
+						DLog.E("DbTable.createOrUpdateOne();Exception updating One", e);
 						emitter.onError(e);
 					}
 					return null;
 				});
 			} catch (IllegalStateException e) {
-				DLog.E("Exception updating collection", e);
+				DLog.E("DbTable.createOrUpdateOne();Exception updating collection", e);
 				emitter.onError(e);
 			}
 
