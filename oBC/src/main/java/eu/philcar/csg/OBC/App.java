@@ -1,9 +1,9 @@
 package eu.philcar.csg.OBC;
 
-import android.annotation.SuppressLint;
+//import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
+//import android.app.AlarmManager;
+//import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,23 +21,23 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+//import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
+//import android.os.Handler;
+//import android.os.Message;
 import android.os.SystemClock;
-import android.provider.Settings;
-import android.provider.Settings.SettingNotFoundException;
+//import android.provider.Settings;
+//import android.provider.Settings.SettingNotFoundException;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDexApplication;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
-import android.util.Log;
+//import android.util.Log;
 import android.widget.Toast;
 
 import com.Hik.Mercury.SDK.Manager.CANManager;
@@ -51,7 +51,7 @@ import com.skobbler.ngx.SKPrepareMapTextureListener;
 import com.skobbler.ngx.SKPrepareMapTextureThread;
 import com.skobbler.ngx.map.SKMapViewStyle;
 import com.skobbler.ngx.map.SKPolygon;
-import com.skobbler.ngx.map.SKPolyline;
+//import com.skobbler.ngx.map.SKPolyline;
 import com.skobbler.ngx.navigation.SKAdvisorSettings;
 import com.skobbler.ngx.packages.SKPackage;
 import com.skobbler.ngx.packages.SKPackageManager;
@@ -61,7 +61,7 @@ import com.skobbler.ngx.versioning.SKVersioningManager;
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
-import org.apache.http.conn.util.InetAddressUtils;
+//import org.apache.http.conn.util.InetAddressUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,13 +83,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
+//import java.net.InetAddress;
+//import java.net.NetworkInterface;
+//import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
+//import java.util.Enumeration;
+//import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -97,14 +97,14 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
+//import ch.qos.logback.classic.Level;
+//import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.rolling.RollingFileAppender;
-import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
-import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
+//import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+//import ch.qos.logback.classic.spi.ILoggingEvent;
+//import ch.qos.logback.core.rolling.RollingFileAppender;
+//import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
+//import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 import ch.qos.logback.core.util.StatusPrinter;
 import eu.philcar.csg.OBC.controller.map.util.GeoUtils;
 import eu.philcar.csg.OBC.data.common.ErrorResponse;
@@ -122,8 +122,8 @@ import eu.philcar.csg.OBC.injection.component.ApplicationComponent;
 import eu.philcar.csg.OBC.injection.component.DaggerApplicationComponent;
 import eu.philcar.csg.OBC.injection.module.ApplicationModule;
 import eu.philcar.csg.OBC.server.SslConnection;
-import eu.philcar.csg.OBC.service.AdvertisementService;
-import eu.philcar.csg.OBC.service.ObcService;
+//import eu.philcar.csg.OBC.service.AdvertisementService;
+//import eu.philcar.csg.OBC.service.ObcService;
 import eu.philcar.csg.OBC.service.ParkMode;
 import eu.philcar.csg.OBC.service.Reservation;
 import eu.philcar.csg.OBC.service.ServiceConnector;
@@ -157,7 +157,7 @@ public class App extends MultiDexApplication {
 	private DLog dlog = new DLog(this.getClass());
 
 	public static App Instance;
-	public static Versions versions = new Versions();
+	//public static Versions versions = new Versions();
 	public static long sharengoTime = 0;
 	public static long sharengoTimeFix = 0;
 
@@ -174,7 +174,7 @@ public class App extends MultiDexApplication {
 				if (lastApiError != 0 && SystemClock.elapsedRealtime() - getDiffLastApiError() < 60 * 1000) {//1min
 					if (++networkExceptions > 60) {
 						setNetworkStable(false);
-						DLog.D("Api Failed set network false");
+						DLog.D("App.onFailedApi();Api Failed set network false");
 					}
 				}
 				setLastApiError(SystemClock.elapsedRealtime());
@@ -182,7 +182,6 @@ public class App extends MultiDexApplication {
 			} else {
 				setNetworkStable(false);
 			}
-
 		}
 	}
 
@@ -198,9 +197,9 @@ public class App extends MultiDexApplication {
 		App.networkExceptions = 0;
 	}
 
-	public static long getLastApiError() {
+/*	public static long getLastApiError() {
 		return lastApiError;
-	}
+	}*/
 
 	public static long getDiffLastApiError() {
 		return SystemClock.elapsedRealtime() - lastApiError;
@@ -215,7 +214,7 @@ public class App extends MultiDexApplication {
 	}
 
 	public static void setHasNetworkConnection(boolean hasNetworkConnection) {
-		DLog.CR("Ricevuto cambio di stato del network: " + hasNetworkConnection);
+		DLog.CR("App.setHasNetworkConnection();Ricevuto cambio di stato del network: " + hasNetworkConnection);
 		App.hasNetworkConnection = hasNetworkConnection;
 	}
 
@@ -240,7 +239,7 @@ public class App extends MultiDexApplication {
 	}
 
 	public static void setCharging(boolean charging) {
-		DLog.I("setCharging: old/new value = " + Charging + " / " + charging);
+		DLog.I("App.setCharging();old/new value = " + Charging + " / " + charging);
 		Charging = charging;
 	}
 
@@ -248,19 +247,19 @@ public class App extends MultiDexApplication {
 
 		static {
 			AndroidDevice = Build.DEVICE;
-			AndroidModel = Build.MODEL;
+//			AndroidModel = Build.MODEL;
+//			AndroidRadio = Build.getRadioVersion();
+//			AndroidSDK = Build.VERSION.SDK_INT;
 			AndroidBuild = Build.DISPLAY;
-			AndroidRadio = Build.getRadioVersion();
-			AndroidSDK = Build.VERSION.SDK_INT;
 		}
 
-		public static String AndroidDevice;
-		public static String AndroidBuild;
-		public static String AndroidModel;
-		public static String AndroidRadio;
-		public static int AndroidSDK;
+		private static String AndroidDevice;
+		private static String AndroidBuild;
+//		private static String AndroidModel;
+//		private static String AndroidRadio;
+//		private static int AndroidSDK;
 		public static String AppName;
-		public static int AppCode;
+		private static int AppCode;
 		public static int Service;
 		public static String SDK;
 		public static String MCU;
@@ -315,7 +314,7 @@ public class App extends MultiDexApplication {
 				jo.put("VINCode", VINCode);
 				jo.put("HbVer", HbVer);
 			} catch (JSONException e) {
-				DLog.E("Versions to json", e);
+				DLog.E("App.toJson();Versions to json", e);
 			}
 			return jo.toString();
 
@@ -387,7 +386,7 @@ public class App extends MultiDexApplication {
 
 			Port_UDP_Beacon = 7600;
 
-			APP_DATA_PATH = getString(R.string.app_data_path);;
+			APP_DATA_PATH = getString(R.string.app_data_path);
 
 			/*URL_Area = "http://corecina.sharengo.it/api/zone/json.php?";
 			URL_Beacon = "http://corecina.sharengo.it/api/pushbeacon.php?";
@@ -416,9 +415,8 @@ public class App extends MultiDexApplication {
 
 	}
 
-	public enum Fleets {SHARENGO}
-
-	public static final Fleets FLEET_IDENTITY = Fleets.SHARENGO;
+	//public enum Fleets {SHARENGO}
+	//public static final Fleets FLEET_IDENTITY = Fleets.SHARENGO;
 
 	public static final int AWELCOME_UID = 0x0001;
 	public static final int ASOS_UID = 0x0010;
@@ -451,12 +449,12 @@ public class App extends MultiDexApplication {
 	public static String URL_AdsBuilderCar;
 	public static String URL_AdsBuilderStart;
 	public static String URL_AdsBuilderEnd;
-	public static String URL_UpdateStartImages;
-	public static String URL_UpdateEndImages;
+//	public static String URL_UpdateStartImages;
+//	public static String URL_UpdateEndImages;
 	public static String URL_Configs;
 	public static String URL_Time;
 
-	public static final String TIME_SERVER = "time.google.com"; // change the server here to fit what you need
+//	public static final String TIME_SERVER = "time.google.com"; // change the server here to fit what you need
 
 	public static String URL_NRD;
 	public static String NRD = "0";
@@ -468,7 +466,7 @@ public class App extends MultiDexApplication {
 	@Inject
 	public DbManager dbManager;
 
-	private ServiceConnector serviceConnector;
+//	private ServiceConnector serviceConnector;
 
 	private SharedPreferences preferences;
 
@@ -488,7 +486,7 @@ public class App extends MultiDexApplication {
 	private static final String KEY_pulizia_ext = "pulizia_ext";
 	private static final String KEY_Fuelcard_PIN = "fuelcard_pin";
 	private static final String KEY_ParkMode = "park_mode";
-	private static final String KEY_ChargeControlEnabled = "charge_control_enabled";
+	//private static final String KEY_ChargeControlEnabled = "charge_control_enabled";
 	private static final String KEY_AlarmEnabled = "alarm_enabled";
 	private static final String KEY_AlarmSmsNumber = "alarm_sms_number";
 	private static final String KEY_BatteryAlarmSmsNumbers = "battery_alarm_sms_numbers";
@@ -497,7 +495,7 @@ public class App extends MultiDexApplication {
 	private static final String KEY_RadioSetup = "radio_setup";
 	private static final String KEY_OpenDoorsCards = "open_doors_cards";
 	private static final String KEY_Watchdog = "watchdog";
-	private static final String KEY_BatteryShutdownLevel = "battery_shutdown_level";
+//	private static final String KEY_BatteryShutdownLevel = "battery_shutdown_level";
 	private static final String KEY_FleetId = "fleet_id";
 	private static final String KEY_ServerIP = "server_ip";
 	private static final String KEY_RebootTime = "reboot_time";
@@ -509,7 +507,7 @@ public class App extends MultiDexApplication {
 	private static final String KEY_TimeZone = "time_zone";
 	private static final String KEY_CallCenterNumer = "call_center_numer";
 	private static final String KEY_NewBatteryShutdownLevel = "new_battery_shutdown_level";
-	private static final String KEY_FullNode = "full_node";
+//	private static final String KEY_FullNode = "full_node";
 	private static final String KEY_SpegnimentoEnabled = "spegnimento_enabled";
 	private static final String KEY_SpegnimentoDisabled = "spegnimento_disabled";
 	private static final String Key_VirtualSocEnabled = "virtual_soc_enabled";
@@ -555,7 +553,7 @@ public class App extends MultiDexApplication {
 	}
 
 	public static int km = 0;
-	public static int km2 = 0;
+//	public static int km2 = 0;
 	public static long whiteListSize = 0;
 	public static int tabletBatteryTemperature = 0;
 	public static int tabletBatteryLevel = 0;
@@ -618,20 +616,20 @@ public class App extends MultiDexApplication {
 	public static final String POI_ICON_FOLDER = "PoisIcon/";
 	public static final String POI_POSITION_FOLDER = "PoisPos/";
 	public static final String BANNER_IMAGES_FOLDER = "BannerImages/";
-	public static final String END_IMAGES_FOLDER = "BannerImages/";
+//	public static final String END_IMAGES_FOLDER = "BannerImages/";
 
-	private final String CONFIG_FILE = "config";
-	private final String STOP_FILE = "stop";
+	final String CONFIG_FILE = "config";
+//	private final String STOP_FILE = "stop";
 
-	private final String SPLIT_TRIP_CONFIG_FILE = "splittrip.txt";
-	private final String DEFAULT_CITY_CONFIG_FILE = "default_city.txt";
-	private final String MOCKLOCATION_CONFIG_FILE = "mockgps.txt";
-	private final String ZMQ_DISABLE_CONFIG_FILE = "zmq_disable.txt";
+	final String SPLIT_TRIP_CONFIG_FILE = "splittrip.txt";
+	final String DEFAULT_CITY_CONFIG_FILE = "default_city.txt";
+	final String MOCKLOCATION_CONFIG_FILE = "mockgps.txt";
+	final String ZMQ_DISABLE_CONFIG_FILE = "zmq_disable.txt";
 
 	private static String foregroundActivity = "";
 	private static boolean loaded = false;
-	public static long serverTime = 0;
-	public static long serverTimeElapsed = 0;
+//	public static long serverTime = 0;
+//	public static long serverTimeElapsed = 0;
 
 	private SensorManager sensorManager;
 	private Sensor motionDetector;
@@ -645,10 +643,10 @@ public class App extends MultiDexApplication {
 	public static long lastConnReset = 0;
 	public static Date update_Poi = new Date();
 	public static Date update_StartImages = new Date();
-	public static Date update_EndImages = new Date();
+//	public static Date update_EndImages = new Date();
 	public static boolean first_UP_poi = true; //flag per primo update Start Images
-	public static boolean first_UP_Start = true; //flag per primo update Start Images
-	public static boolean first_UP_End = true; //flag per primo update End Images
+//	public static boolean first_UP_Start = true; //flag per primo update Start Images
+//	public static boolean first_UP_End = true; //flag per primo update End Images
 	public static Bundle BannerName = new Bundle();
 	public static Bundle askClose = new Bundle();
 	public static int CounterCleanlines = 0;
@@ -661,7 +659,7 @@ public class App extends MultiDexApplication {
 	//public static final double[] polygon = new double[]{46.091832, 13.235410, 46.096125, 13.234584, 46.097628, 13.239723, 46.092658, 13.240678};	// Udine
 	//public static final double[] polygon = new double[]{45.402867 , 9.276161, 45.402867 , 9.053406, 45.542358 , 9.053406, 45.542358 , 9.276161};		// Milano
 	//public static final double[] polygon = new double[]{46.090560, 13.067453, 46.090560, 13.174187, 46.123334, 13.174187, 46.123334, 13.067453};		// Fagagna
-	public static final double[] polygonCenter = new double[]{45.464189, 9.191181};    // Duomo di Milano
+//	public static final double[] polygonCenter = new double[]{45.464189, 9.191181};    // Duomo di Milano
 	//public static final double[] polygonCenter = new double[]{46.105813, 13.116209};	// Castello di villalta
 
 	public static String getAppDataPath() {
@@ -672,9 +670,9 @@ public class App extends MultiDexApplication {
 		return Environment.getExternalStorageDirectory().getPath().concat(APP_LOG_PATH);
 	}
 
-	public static String getAppOldLogPath() {
+/*	public static String getAppOldLogPath() {
 		return Environment.getExternalStorageDirectory().getPath().concat(APP_OLD_LOG_PATH);
-	}
+	}*/
 
 	public static String getPoiIconFolder() {
 		return getAppDataPath().concat(POI_ICON_FOLDER);
@@ -688,6 +686,19 @@ public class App extends MultiDexApplication {
 		return getAppDataPath().concat(BANNER_IMAGES_FOLDER);
 	}
 
+	public String getDefaultLang() {
+		return getString(R.string.def_lang);
+	}
+
+	public String getSKMapsDefaultPackage() {
+		switch(getString(R.string.def_lang)) {
+			case "sl":
+				return "si";
+			default:
+				return getString(R.string.def_lang);
+		}
+	}
+
 	public static int getBmsCountTo90() {
 		return bmsCountTo90;
 	}
@@ -698,17 +709,17 @@ public class App extends MultiDexApplication {
 		return (bmsCountTo90 - 1);
 	}
 
-	public static String getEndImagesFolder() {
+/*	public static String getEndImagesFolder() {
 		return getAppDataPath().concat(END_IMAGES_FOLDER);
-	}
+	}*/
 
 	public String getCONFIG_FILE() {
 		return getAppDataPath().concat(CONFIG_FILE);
 	}
 
-	public String getSTOP_FILE() {
-		return getAppDataPath().concat(STOP_FILE);
-	}
+//	public String getSTOP_FILE() {
+//		return getAppDataPath().concat(STOP_FILE);
+//	}
 
 	public String getSPLIT_TRIP_CONFIG_FILE() {
 		return getAppDataPath().concat(SPLIT_TRIP_CONFIG_FILE);
@@ -901,13 +912,13 @@ public class App extends MultiDexApplication {
 		}
 	}
 
-	public void persistFullNode() {
+/*	public void persistFullNode() {
 		if (this.preferences != null) {
 			Editor e = this.preferences.edit();
 			e.putBoolean(KEY_FullNode, fullNode);
 			e.apply();
 		}
-	}
+	}*/
 
 	public void persistVirtualSocEnabled(){
 		if(this.preferences != null){
@@ -996,7 +1007,7 @@ public class App extends MultiDexApplication {
 	public void loadReservation() {
 		if (this.preferences != null) {
 			String r = this.preferences.getString("reservation", "");
-			if (r != null)
+			//if (r != null)
 				App.reservation = Reservation.createFromString(r);
 		} else {
 			App.reservation = null;
@@ -1013,7 +1024,7 @@ public class App extends MultiDexApplication {
 
 	public void loadBatteryAlarmSmsNumbers() {
 
-		BatteryAlarmSmsNumbers = new ArrayList<String>();
+		BatteryAlarmSmsNumbers = new ArrayList<>();
 
 		if (this.preferences != null) {
 			String json = preferences.getString(KEY_BatteryAlarmSmsNumbers, "[]");
@@ -1027,7 +1038,7 @@ public class App extends MultiDexApplication {
 					}
 				}
 			} catch (JSONException e) {
-				dlog.e("Parsing BatteryAlarmSmsNumbers", e);
+				dlog.e("App.loadBatteryAlarmSmsNumbers();Parsing BatteryAlarmSmsNumbers", e);
 			}
 		}
 
@@ -1043,7 +1054,7 @@ public class App extends MultiDexApplication {
 
 		if (this.preferences != null) {
 			String json = preferences.getString(KEY_RadioSetup, "");
-			dlog.i("RadioSetup from preferences : " + json);
+			dlog.i("App.loadRadioSetup();RadioSetup from preferences : " + json);
 			radioSetup = RadioSetup.fromJson(json);
 
 		}
@@ -1057,7 +1068,7 @@ public class App extends MultiDexApplication {
 
 			persistRadioSetup();
 
-			dlog.d("RadioSetup from defaults : " + radioSetup.toJson());
+			dlog.d("App.loadRadioSetup();RadioSetup from defaults : " + radioSetup.toJson());
 		}
 
 	}
@@ -1093,7 +1104,7 @@ public class App extends MultiDexApplication {
 				}
 				br.close();
 			} catch (Exception e) {
-				dlog.e("Loading split trip config : " + getSPLIT_TRIP_CONFIG_FILE(), e);
+				dlog.e("App.loadSplitTripConfig();Loading split trip config : " + getSPLIT_TRIP_CONFIG_FILE(), e);
 			}
 
 		}
@@ -1114,7 +1125,7 @@ public class App extends MultiDexApplication {
 				}
 				br.close();
 			} catch (Exception e) {
-				dlog.e("Loading split trip config : " + getDEFAULT_CITY_CONFIG_FILE(), e);
+				dlog.e("App.loadDefaultCity();Loading split trip config : " + getDEFAULT_CITY_CONFIG_FILE(), e);
 			}
 
 		}
@@ -1128,7 +1139,7 @@ public class App extends MultiDexApplication {
 			max_voltage = preferences.getFloat(KEY_MaxVoltage, 83);
 			max_voltage = (max_voltage > 85f || max_voltage < 80f ? 83f : max_voltage); //controllo bontà maxVoltage
 		} catch (Exception e) {
-			dlog.e("Loading max voltage", e);
+			dlog.e("App.loadMaxVoltage();Loading max voltage", e);
 		}
 
 	}
@@ -1139,7 +1150,7 @@ public class App extends MultiDexApplication {
 			bmsCountTo90 = preferences != null ? preferences.getInt(KEY_BmsCountTo90, 0) : 0;
 
 		} catch (Exception e) {
-			dlog.e("Loading max voltage", e);
+			dlog.e("App.loadBmsCountTo90();Loading max voltage", e);
 		}
 
 	}
@@ -1151,14 +1162,16 @@ public class App extends MultiDexApplication {
 		File f = new File(getDEFAULT_CITY_CONFIG_FILE());
 
 		if (city == null) {
-			f.delete();
+			if(!f.delete()) {
+				dlog.e("App.SaveDefaultCity();delete fail");
+			}
 		} else {
 			try {
 				BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 				bw.write(city);
 				bw.close();
 			} catch (IOException e) {
-				dlog.e("Writing default city", e);
+				dlog.e("App.SaveDefaultCity();Writing default city", e);
 
 			}
 		}
@@ -1179,7 +1192,7 @@ public class App extends MultiDexApplication {
 			}
 
 		} catch (JSONException e) {
-			dlog.e("Setting MockLocation", e);
+			dlog.e("App.setMockLocation();Setting MockLocation", e);
 		}
 
 	}
@@ -1188,7 +1201,9 @@ public class App extends MultiDexApplication {
 		File f = new File(getMOCKLOCATION_CONFIG_FILE());
 
 		if (lat == 0 && lon == 0) {
-			f.delete();
+			if(!f.delete()) {
+				dlog.e("App.setMockLocation();delete fail");
+			}
 		} else {
 			try {
 				BufferedWriter bw = new BufferedWriter(new FileWriter(f));
@@ -1196,7 +1211,7 @@ public class App extends MultiDexApplication {
 				bw.write(line);
 				bw.close();
 			} catch (IOException e) {
-				dlog.e("Writing MOCKLOCATION", e);
+				dlog.e("App.setMockLocation();Writing MOCKLOCATION", e);
 
 			}
 		}
@@ -1212,9 +1227,9 @@ public class App extends MultiDexApplication {
 				BufferedReader br = new BufferedReader(new FileReader(f));
 				String line;
 				if ((line = br.readLine()) != null) {
-					String p[] = line.split(";");
+					String[] p = line.split(";");
 
-					if (p != null && p.length >= 2) {
+					if ( p.length >= 2) {
 						App.mockLocation = new Location(LocationManager.GPS_PROVIDER);
 						App.mockLocation.setLatitude(Double.parseDouble(p[0]));
 						App.mockLocation.setLongitude(Double.parseDouble(p[1]));
@@ -1226,7 +1241,7 @@ public class App extends MultiDexApplication {
 				}
 				br.close();
 			} catch (Exception e) {
-				dlog.e("Loading split trip config : " + getMOCKLOCATION_CONFIG_FILE(), e);
+				dlog.e("App.loadMockLocationConfig();Loading split trip config : " + getMOCKLOCATION_CONFIG_FILE(), e);
 			}
 
 		} else {
@@ -1263,7 +1278,9 @@ public class App extends MultiDexApplication {
 
 			File f = new File("/sdcard/csg/ads/");
 			if (!f.exists()) {
-				f.mkdirs();
+				if(!f.mkdirs()) {
+					dlog.e("App.onCreate();mkdirs fail");
+				}
 			}
 
 			return;
@@ -1271,15 +1288,15 @@ public class App extends MultiDexApplication {
 
 		SslConnection.init(this);
 
-		dlog.d("App starting");
-		dlog.i("MANUFACTURER: " + Build.MANUFACTURER);
-		dlog.i("DEVICE: " + Build.DEVICE);
-		dlog.i("MODEL: " + Build.MODEL);
-		dlog.i("ID: " + Build.DISPLAY);
-		dlog.i("CPU_ABI: " + Build.CPU_ABI);
-		dlog.i("RADIO: " + Build.getRadioVersion());
-		dlog.i("ANDROID VERSION: " + Build.VERSION.SDK_INT);
-		dlog.cr("Avvio applicazione");
+		dlog.d("App.onCreate();starting");
+		dlog.i("App.onCreate();MANUFACTURER: " + Build.MANUFACTURER);
+		dlog.i("App.onCreate();DEVICE: " + Build.DEVICE);
+		dlog.i("App.onCreate();MODEL: " + Build.MODEL);
+		dlog.i("App.onCreate();ID: " + Build.DISPLAY);
+		dlog.i("App.onCreate();CPU_ABI: " + Build.CPU_ABI);
+		dlog.i("App.onCreate();RADIO: " + Build.getRadioVersion());
+		dlog.i("App.onCreate();ANDROID VERSION: " + Build.VERSION.SDK_INT);
+		dlog.cr("App.onCreate();Avvio applicazione");
 
 		/*
 		File skmaps = new File("/sdcard/skmaps.zip");
@@ -1295,7 +1312,6 @@ public class App extends MultiDexApplication {
 			public void onMapTexturesPrepared(boolean arg0) {
 
 				SKMaps.getInstance().setApiKey("c9ad8a7f8cccd97a7cd5dfc09213ed7f7abbd71321be48985014a14909a67c24");
-
 				SKMapsInitSettings initSettings = new SKMapsInitSettings();
 
 				initSettings.setConnectivityMode(SKMaps.CONNECTIVITY_MODE_OFFLINE);
@@ -1320,18 +1336,18 @@ public class App extends MultiDexApplication {
 
 				if (!new File("/sdcard/SKMaps/Maps/v1/20150413/meta/").exists()) {
 					SKVersioningManager manager = SKVersioningManager.getInstance();
-					boolean updated = manager.updateMapsVersion(20150413);
+//					boolean updated = manager.updateMapsVersion(20150413);
 				}
 
 				SKPackage[] packages = SKPackageManager.getInstance().getInstalledPackages();
 				if (packages == null || packages.length == 0) {
 					int i1 = SKPackageManager.getInstance().addOfflinePackage("/sdcard/skpackages/", "ITREG09");
-					int i2 = SKPackageManager.getInstance().addOfflinePackage("/sdcard/skpackages/", "IT");
+					int i2 = SKPackageManager.getInstance().addOfflinePackage("/sdcard/skpackages/", App.Instance.getSKMapsDefaultPackage().toUpperCase()); //"IT"
 					packages = SKPackageManager.getInstance().getInstalledPackages();
 				}
 
 				String xmlurl = SKPackageManager.getInstance().getMapsXMLPathForVersion(1);
-				SKPackageURLInfo skinfo = SKPackageManager.getInstance().getURLInfoForPackageWithCode("IT", false);
+				SKPackageURLInfo skinfo = SKPackageManager.getInstance().getURLInfoForPackageWithCode(App.Instance.getSKMapsDefaultPackage().toUpperCase(), false); //"IT"
 				String mapURL = skinfo.getMapURL();
 				String nameBrowserFilesURL = skinfo.getNameBrowserFilesURL();
 
@@ -1340,13 +1356,11 @@ public class App extends MultiDexApplication {
 		};
 
 		CanManager = CANManager.get(Instance);
-
 		if (new File("/sdcard/SKMaps/").exists()) {
 			skListener.onMapTexturesPrepared(false);
 		} else {
 			final SKPrepareMapTextureThread prepThread = new SKPrepareMapTextureThread(this, "/sdcard/SKMaps", "SKMapsFull_IT.zip", skListener);
 			prepThread.start();
-
 			Toast.makeText(this, "Preparazione mappe in corso", Toast.LENGTH_LONG).show();
 
 			try {
@@ -1355,8 +1369,6 @@ public class App extends MultiDexApplication {
 				e2.printStackTrace();
 			}
 		}
-
-
 
 		/*
 		Beacon b = Beacon.newBuilder()
@@ -1375,22 +1387,22 @@ public class App extends MultiDexApplication {
 		initPhase2();
 	}
 
-	@SuppressLint("HandlerLeak")
-	private final Handler localHandler = new Handler() {
-
-		@Override
-		public void handleMessage(Message msg) {
-
-			DLog.I("Service: received msg id:" + msg.what);
-
-			switch (msg.what) {
-
-				case ObcService.MSG_SERVER_CHANGE_IP:
-
-					break;
-			}
-		}
-	};
+//	@SuppressLint("HandlerLeak")
+//	private final Handler localHandler = new Handler() {
+//
+//		@Override
+//		public void handleMessage(Message msg) {
+//
+//			DLog.I("Service: received msg id:" + msg.what);
+//
+///*			switch (msg.what) {
+//
+//				case ObcService.MSG_SERVER_CHANGE_IP:
+//
+//					break;
+//			}*/
+//		}
+//	};
 	
 		
 /*private Handler searchHandler = new Handler() {
@@ -1440,12 +1452,12 @@ public class App extends MultiDexApplication {
 			App.Versions.AppName = pInfo.versionName;
 			if (pInfo.requestedPermissions != null) {
 				for (String s : pInfo.requestedPermissions) {
-					dlog.d("Uses permission: " + s);
+					dlog.d("App.initPhase2();Uses permission: " + s);
 				}
 			}
 
 		} catch (NameNotFoundException e1) {
-			dlog.e("App package not found", e1);
+			dlog.e("App.initPhase2();package not found", e1);
 
 		}
 		setDNS();
@@ -1454,9 +1466,9 @@ public class App extends MultiDexApplication {
 			WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 			WifiInfo info = manager.getConnectionInfo();
 			MacAddress = info.getMacAddress();
-			dlog.d("Got MAC address: " + MacAddress);
+			dlog.d("App.initPhase2();Got MAC address: " + MacAddress);
 		} catch (Exception e) {
-			dlog.e("Failed reading MAC address", e);
+			dlog.e("App.initPhase2();Failed reading MAC address", e);
 		}
 
 		try {
@@ -1464,11 +1476,11 @@ public class App extends MultiDexApplication {
 			IMEI = telephonyManager.getDeviceId();
 			SimSerialNumber = telephonyManager.getSimSerialNumber();
 			PhoneNumber = telephonyManager.getLine1Number();
-			dlog.d("Got IMEI : " + IMEI);
+			dlog.d("App.initPhase2();Got IMEI : " + IMEI);
 		} catch (SecurityException e) {
-			dlog.e("Failed reading IMEI ", e);
+			dlog.e("App.initPhase2();Failed reading IMEI ", e);
 		} catch (Exception e) {
-			dlog.e("Failed reading IMEI ", e);
+			dlog.e("App.initPhase2();Failed reading IMEI ", e);
 		}
 
 	/*try {
@@ -1479,7 +1491,9 @@ public class App extends MultiDexApplication {
 	}*/
 
 		File DataPath = new File(getAppDataPath());
-		DataPath.mkdirs();
+		if(!DataPath.mkdirs()) {
+			dlog.e("App.initPhase2();mkdirs fail ");
+		}
 
 		preferences = this.getSharedPreferences(COMMON_PREFERENCES, Context.MODE_PRIVATE);
 
@@ -1513,6 +1527,7 @@ public class App extends MultiDexApplication {
 		intentFilter.addAction("android.provider.Telephony.SMS_RECEIVED");
 		registerReceiver(smsReceiver, intentFilter);
 
+		ServiceConnector serviceConnector;
 		serviceConnector = new ServiceConnector(this, null);
 		serviceConnector.startService();
 
@@ -1523,7 +1538,9 @@ public class App extends MultiDexApplication {
 
 		File f = new File("/sdcard/csg/ads/");
 		if (!f.exists()) {
-			f.mkdirs();
+			if(!f.mkdirs()) {
+				dlog.e("App.onSensorChanged();mkdirs fail");
+			}
 		}
 
 		sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
@@ -1552,7 +1569,7 @@ public class App extends MultiDexApplication {
 							float module = (float) Math.sqrt(x * x + y * y + z * z);
 
 							if (module > 1 && App.AlarmEnabled && App.currentTripInfo == null) {
-								dlog.d("Motion alarm. Module=" + module);
+								dlog.d("App.onSensorChanged();Motion alarm. Module=" + module);
 								sendAlarmSms(AlarmSmsNumber);
 							}
 						}
@@ -1619,7 +1636,7 @@ public class App extends MultiDexApplication {
 
 	public void setBatteryLevel(int fuel_level) {
 		Editor editor = preferences.edit();
-		float currVoltage = 0;
+//		float currVoltage = 0;
 
 		if (fuel_level == App.fuel_level || fuel_level == 0) {
 			App.fuel_level = fuel_level;
@@ -1636,7 +1653,7 @@ public class App extends MultiDexApplication {
 		persistBmsCountTo90();
 	}
 
-	public void setChargingAmp(double Amp) {
+/*	public void setChargingAmp(double Amp) {
 		Editor editor = preferences.edit();
 
 		if (Amp == App.chargingAmp || Amp < 0)
@@ -1645,7 +1662,7 @@ public class App extends MultiDexApplication {
 		editor.putLong(KEY_charging_amp, (long) Amp);
 		editor.apply();
 		loadPreferences();
-	}
+	}*/
 
 	public void setCurrentAmp(double Amp) {
 		Editor editor = preferences.edit();
@@ -1735,7 +1752,7 @@ public class App extends MultiDexApplication {
 	}
 
 	public ArrayList<String> getDamagesList() {
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<String> list = new ArrayList<>();
 
 		if (Damages != null && !Damages.isEmpty() && !Damages.equalsIgnoreCase("null")) {
 			JSONArray jsonarray;
@@ -1743,7 +1760,7 @@ public class App extends MultiDexApplication {
 			try {
 				jsonarray = new JSONArray(Damages);
 			} catch (JSONException e) {
-				dlog.e("Parse damages string:", e);
+				dlog.e("App.getDamagesList();Parse damages string:", e);
 				return list;
 			}
 
@@ -1751,7 +1768,7 @@ public class App extends MultiDexApplication {
 				try {
 					list.add(jsonarray.getString(i));
 				} catch (JSONException e) {
-					dlog.e("Parse damage:", e);
+					dlog.e("App.getDamagesList();Parse damage:", e);
 				}
 			}
 		}
@@ -1802,7 +1819,7 @@ public class App extends MultiDexApplication {
 					else
 						openDoorsCards = CardRfidCollection.decodeFromJson(value);
 					persistOpenDoorsCards();
-				} else if (key.equalsIgnoreCase("FullNode")) {
+//				} else if (key.equalsIgnoreCase("FullNode")) {
 //					fullNode = jo.getBoolean(key);
 //					persistFullNode();
 				} else if (key.equalsIgnoreCase("SosNumber")) {
@@ -1818,7 +1835,7 @@ public class App extends MultiDexApplication {
 			}
 			loadPreferences();
 		} catch (JSONException e) {
-			dlog.e("Parsing setConfig :", e);
+			dlog.e("App.setConfig();Parsing setConfig :", e);
 		}
 
 	}
@@ -1859,7 +1876,7 @@ public class App extends MultiDexApplication {
 		loadPreferences();
 	}
 
-	public void setBatteryAlarmSmsNumbers(List<String> numbers) {
+/*	public void setBatteryAlarmSmsNumbers(List<String> numbers) {
 		String str = "[]";
 
 		if (numbers != null) {
@@ -1871,7 +1888,7 @@ public class App extends MultiDexApplication {
 		}
 
 		setBatteryAlarmSmsNumbers(str);
-	}
+	}*/
 
 	public void setBatteryAlarmSmsNumbers(String numbers) {
 		Editor editor = preferences.edit();
@@ -1895,13 +1912,13 @@ public class App extends MultiDexApplication {
 		long value = 0;
 		if (date != null) {
 
-			dlog.d("Set parkmModeStart to : " + date.toString());
+			dlog.d("App.setParkModeStarted();Set parkmModeStart to : " + date.toString());
 			value = date.getTime();
 			App.ParkModeStarted = new Date(value);
 
 		} else {
 
-			dlog.d("Set parkmModeStart to null ");
+			dlog.d("App.setParkModeStarted();Set parkmModeStart to null ");
 			App.ParkModeStarted = null;
 		}
 
@@ -1909,13 +1926,13 @@ public class App extends MultiDexApplication {
 		editor.putInt(KEY_ParkMode, parkMode.toInt());
 		editor.apply();
 
-		dlog.d("Write " + KEY_parkModeStarted + ":" + value);
+		dlog.d("App.setParkModeStarted();Write " + KEY_parkModeStarted + ":" + value);
 	}
 
-	public boolean isStopped() {
-		File f = new File(getSTOP_FILE());
-		return f.exists();
-	}
+//	public boolean isStopped() {
+//		File f = new File(getSTOP_FILE());
+//		return f.exists();
+//	}
 
 	public boolean isConfigMode() {
 		File f = new File(getCONFIG_FILE());
@@ -1926,8 +1943,7 @@ public class App extends MultiDexApplication {
 //		if(BuildConfig.FLAVOR.equalsIgnoreCase("develop"))
 //			return false;
 		if (latitude == 0 || longitude == 0 || AreaPolygons == null) {
-
-			DLog.I("checkParkArea: lat, lon " + latitude + ", " + longitude + " " + true);
+			DLog.I("e;empty;" + latitude + "," + longitude + " " + true);
 			return true;
 		}
 
@@ -1939,7 +1955,7 @@ public class App extends MultiDexApplication {
 
 				if (GeoUtils.contains(latitude, longitude, aPolygon)) {
 
-					DLog.I("checkParkArea: lat, lon " + latitude + ", " + longitude + " " + true);
+					DLog.I("App.checkParkArea();polygon;" + latitude + "," + longitude + " " + true);
 					return true;
 				}
 			}
@@ -1947,11 +1963,11 @@ public class App extends MultiDexApplication {
 
 		if (App.AreaPolygons.size() == 0) {
 			App.Instance.initAreaPolygon();
-			DLog.I("checkParkArea: empty area lat, lon " + latitude + ", " + longitude + " " + true);
+			DLog.I("App.checkParkArea();empty area; " + latitude + "," + longitude + " " + true);
 			return true;
 		}
 
-		DLog.I("checkParkArea: lat, lon " + latitude + ", " + longitude + " " + false);
+		DLog.I("App.checkParkArea();" + latitude + "," + longitude + " " + false);
 		return false;
 	}
 
@@ -1964,7 +1980,7 @@ public class App extends MultiDexApplication {
 			if (loc != null)
 				inside = checkParkArea(loc.getLatitude(), loc.getLongitude());
 		} catch (Exception e) {
-			DLog.E("Exception while checking inside area ", e);
+			DLog.E("App.checkIsInsideParkingArea();", e);
 		}
 		return inside;
 	}
@@ -1984,7 +2000,7 @@ public class App extends MultiDexApplication {
 		CarPlate = preferences.getString(KEY_CarPlate, "NO_PLATE");
 		fw_version = preferences.getString(KEY_fw_version, "nd");
 		fuel_level = preferences.getInt(KEY_fuel_level, 0);
-		dlog.i("loadPreferences: fuel_level is " + fuel_level);
+		dlog.i("App.loadPreferences();fuel_level is " + fuel_level);
 		max_voltage = preferences.getFloat(KEY_MaxVoltage, 83);
 		max_voltage = (max_voltage > 85f || max_voltage < 80f ? 83f : max_voltage); //controllo bontà maxVoltage
 		km = preferences.getInt(KEY_Km, 0);
@@ -2024,7 +2040,7 @@ public class App extends MultiDexApplication {
 
 			SystemControl.rebootInProgress = preferences.getLong(KEY_RebootTime, 0);
 		} catch (Exception e) {
-			dlog.e("loadPreferences: errore in reboot time ", e);
+			dlog.e("App.loadPreferences();errore in reboot time ", e);
 		}
 		if (!loaded)
 			initSharengo();  //non proprio il massimo, da trovare una soluzione
@@ -2051,11 +2067,11 @@ public class App extends MultiDexApplication {
 			rt.exec(new String[]{"/system/xbin/su", "-c", "setprop net.dns2 8.8.8.8"});
 
 		} catch (Exception e) {
-			dlog.e("Impossible to set manually DNS ", e);
+			dlog.e("App.setDNS();Impossible to set manually DNS ", e);
 		}
 	}
 
-	public static String getipAddress() {
+/*	public static String getipAddress() {
 		try {
 			for (Enumeration en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
 				NetworkInterface intf = (NetworkInterface) en.nextElement();
@@ -2071,7 +2087,7 @@ public class App extends MultiDexApplication {
 			DLog.E("Socket exception in GetIP Address of Utilities", ex);
 		}
 		return null;
-	}
+	}*/
 
 	public static int getCpuTemp() {
 
@@ -2090,7 +2106,7 @@ public class App extends MultiDexApplication {
 					ir.close();
 					reader.close();
 				} catch (Exception e) {
-					DLog.E("GetCpuTemp:", e);
+					DLog.E("App.GetCpuTemp();", e);
 				}
 			}
 		}
@@ -2098,12 +2114,12 @@ public class App extends MultiDexApplication {
 		return temp;
 	}
 
-	public static long getAppRunningSeconds() {
+/*	public static long getAppRunningSeconds() {
 		long now = new Date().getTime();
 		long boot = App.AppStartupTime.getTime();
 
 		return (now - boot) / 1000;
-	}
+	}*/
 
 	public void initAreaPolygon() {
 
@@ -2111,9 +2127,11 @@ public class App extends MultiDexApplication {
 
 		if (!areaFile.exists()) {
 			try {
-				areaFile.createNewFile();
+				if(!areaFile.createNewFile()) {
+					dlog.e("App.initAreaPolygon();createNewFile fail");
+				}
 			} catch (IOException e) {
-				dlog.e("Impossibile creare area.json", e);
+				dlog.e("App.initAreaPolygon();Impossibile creare area.json", e);
 			}
 
 			try {
@@ -2133,7 +2151,7 @@ public class App extends MultiDexApplication {
 				oms.close();
 				ims.close();
 			} catch (IOException e) {
-				dlog.e("initAreaPolygon:", e);
+				dlog.e("App.initAreaPolygon();", e);
 			}
 
 		}
@@ -2154,20 +2172,20 @@ public class App extends MultiDexApplication {
 			reader.close();
 
 		} catch (IOException e) {
-			dlog.e("initAreaPolygon:", e);
+			dlog.e("App.initAreaPolygon();", e);
 		}
 	}
 
 	private void decodeAreaPolygon(String json) {
 
-		AreaPolygons = new ArrayList<double[]>();
+		AreaPolygons = new ArrayList<>();
 
 		JSONArray jArray;
 		try {
 
 			jArray = new JSONArray(json);
 		} catch (JSONException e) {
-			dlog.e("decodeAreaPolygon : ", e);
+			dlog.e("App.decodeAreaPolygon();", e);
 			return;
 		}
 
@@ -2191,7 +2209,7 @@ public class App extends MultiDexApplication {
 				AreaPolygons.add(points);
 
 			} catch (Exception e) {
-
+				dlog.e("App.decodeAreaPolygon();", e);
 			}
 		}
 
@@ -2212,8 +2230,8 @@ public class App extends MultiDexApplication {
 	}
 
 	public static void decodeAreaPolygonSkobbler(String json) {
-		nodes = new ArrayList<List<SKCoordinate>>();
-		polyline = new ArrayList<List<SKCoordinate>>();
+		nodes = new ArrayList<>();
+		polyline = new ArrayList<>();
 
 		decodeStringToAreaResponse(json) //Area response out now we have to select the maxLat  min and max
 				.concatMap(Area::initPoints)
@@ -2346,7 +2364,7 @@ public class App extends MultiDexApplication {
 
 	}
 
-	public static List<SKPolygon> getSKPoligon() {
+/*	public static List<SKPolygon> getSKPoligon() {
 		List<SKPolygon> result = new ArrayList<>();
 		for (List<SKCoordinate> node : nodes) {
 
@@ -2362,9 +2380,9 @@ public class App extends MultiDexApplication {
 			result.add(polygon);
 		}
 		return result;
-	}
+	}*/
 
-	public static List<SKPolyline> getSKPolyline() {
+/*	public static List<SKPolyline> getSKPolyline() {
 		List<SKPolyline> result = new ArrayList<>();
 		for (List<SKCoordinate> node : nodes) {
 			SKPolyline polyline = new SKPolyline();
@@ -2375,7 +2393,7 @@ public class App extends MultiDexApplication {
 			result.add(polyline);
 		}
 		return result;
-	}
+	}*/
 
 	public static List<SKPolygon> getSKPolylineEnvelope() {
 		List<SKPolygon> result = new ArrayList<>();
@@ -2438,7 +2456,7 @@ public class App extends MultiDexApplication {
 
 		text = "*ALARM: " + App.CarPlate + "  https://maps.google.com/maps?q=" + lat + "," + lon;
 
-		dlog.d("SEND SMS: " + text);
+		dlog.d("App.sendAlarmSms();SEND SMS: " + text);
 
 		sms.sendTextMessage(AlarmSmsNumber, null, text, null, null);
 
@@ -2464,9 +2482,7 @@ public class App extends MultiDexApplication {
 
 		try {
 
-			final ConnectivityManager conman = (ConnectivityManager)
-
-					getSystemService(Context.CONNECTIVITY_SERVICE);
+			final ConnectivityManager conman = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
 			final Class conmanClass = Class.forName(conman.getClass().getName());
 
@@ -2488,7 +2504,7 @@ public class App extends MultiDexApplication {
 
 	}
 
-	public boolean isAirplaneModeActive() {
+/*	public boolean isAirplaneModeActive() {
 		int mode = 0;
 
 		try {
@@ -2498,8 +2514,9 @@ public class App extends MultiDexApplication {
 		}
 
 		return (mode != 0);
-	}
+	}*/
 
+/*
 	public void ToggleAirplaneMode() {
 		int mode = 0;
 
@@ -2519,13 +2536,15 @@ public class App extends MultiDexApplication {
 
 		dlog.d("Toggled airplane mode. Current state: " + mode);
 	}
+*/
 
-	public boolean isOnline() {
+/*	public boolean isOnline() {
 		ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo netInfo = cm.getActiveNetworkInfo();
 		return netInfo != null && netInfo.isConnected();
-	}
+	}*/
 
+/*
 	public void changeRadioComponentEnabled(Context context, String type, boolean radio_component_enabled, boolean reset) {
 		// now toggle airplane mode from on to off, or vice versa
 		Settings.System.putInt(context.getContentResolver(), Settings.System.AIRPLANE_MODE_ON, radio_component_enabled ? 0 : 1);
@@ -2550,19 +2569,52 @@ public class App extends MultiDexApplication {
 			Settings.System.putString(context.getContentResolver(), Settings.System.AIRPLANE_MODE_RADIOS, "cell");
 		}
 	}
+*/
 
 	private class SMSreceiver extends BroadcastReceiver {
-		private final String TAG = this.getClass().getSimpleName();
+//		private final String TAG = this.getClass().getSimpleName();
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Bundle extras = intent.getExtras();
-
 			String strMessage = "";
 
 			if (extras != null) {
-				Object[] smsextras = (Object[]) extras.get("pdus");
+                Object[] smsextras = (Object[]) extras.get("pdus");
 
+				if(smsextras!=null) {
+                    for(Object obj : smsextras) {
+                        SmsMessage smsmsg = SmsMessage.createFromPdu((byte[]) obj);
+
+                        String strMsgBody = smsmsg.getMessageBody();
+                        String strMsgSrc = smsmsg.getOriginatingAddress();
+
+                        strMessage += "SMS from " + strMsgSrc + " : " + strMsgBody;
+
+                        if (strMsgBody.equals("PodPal14")) {
+                            Intent intentDiag = new Intent(App.this, ServiceTestActivity.class);
+                            intentDiag.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            App.this.startActivity(intentDiag);
+                        } else if (strMsgBody.equals("PodPal14-xy")) {
+                            sendLocationSms(strMsgSrc);
+
+                        } else if (strMsgBody.startsWith("alarm on")) {
+                            setAlarmEnable(true);
+                            setAlarmSmsNumber(strMsgSrc);
+                            lastAlarmSms = 0;
+                            dlog.d("App.onReceive();Alarm enabled for : " + strMsgSrc);
+                        } else if (strMsgBody.startsWith("alarm off")) {
+                            setAlarmEnable(false);
+                            dlog.d("App.onReceive();Alarm disabled by :" + strMsgSrc);
+                        }
+                        dlog.i(strMessage);
+                    }
+
+                } else {
+				    dlog.e("App.SMSreceiver();smsextras is null");
+                }
+
+/*
 				for (int i = 0; i < smsextras.length; i++) {
 					SmsMessage smsmsg = SmsMessage
 							.createFromPdu((byte[]) smsextras[i]);
@@ -2590,6 +2642,7 @@ public class App extends MultiDexApplication {
 					}
 					dlog.i(strMessage);
 				}
+*/
 
 			}
 
@@ -2597,6 +2650,7 @@ public class App extends MultiDexApplication {
 
 	}
 
+/*
 	private void scheduleAdvertisementUpdate() {
 
 		AlarmManager alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
@@ -2634,6 +2688,7 @@ public class App extends MultiDexApplication {
 			Log.e(App.class.getCanonicalName(), "App: no advertisement update required");
 		}
 	}
+*/
 
 	@Deprecated
 	public static boolean startShutdownTimer() {
@@ -2657,15 +2712,15 @@ public class App extends MultiDexApplication {
 		}
 	}
 
-	private static void configureLogbackDirectly(String log_dir, String filePrefix) {
+/*	private static void configureLogbackDirectly(String log_dir, String filePrefix) {
 		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 		context.reset();
 
-		RollingFileAppender<ILoggingEvent> rollingFileAppender = new RollingFileAppender<ILoggingEvent>();
+		RollingFileAppender<ILoggingEvent> rollingFileAppender = new RollingFileAppender<>();
 		rollingFileAppender.setAppend(true);
 		rollingFileAppender.setContext(context);
 
-		TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new TimeBasedRollingPolicy<ILoggingEvent>();
+		TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new TimeBasedRollingPolicy<>();
 		rollingPolicy.setFileNamePattern(log_dir + "/" + filePrefix + "_%d{yyyy-MM-dd_HH}.%i.log.zip");
 		rollingPolicy.setMaxHistory(365);
 		rollingPolicy.setParent(rollingFileAppender);
@@ -2692,7 +2747,7 @@ public class App extends MultiDexApplication {
 		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 		root.setLevel(Level.TRACE);
 		root.addAppender(rollingFileAppender);
-	}
+	}*/
 
 	public static App get(Context context) {
 		return (App) context.getApplicationContext();
@@ -2713,11 +2768,13 @@ public class App extends MultiDexApplication {
 	}
 
 	public long getRebootTimeForLabel(String label){
-		return preferences.getLong(label, 0);
+	    return preferences.getLong(label, 0);
 	}
+
 	public void setRebootTimeForLabel(String label){
 		Editor editor = preferences.edit();
 		editor.putLong(label, System.currentTimeMillis());
-		editor.commit();
+//		editor.commit();
+        editor.apply();
 	}
 }

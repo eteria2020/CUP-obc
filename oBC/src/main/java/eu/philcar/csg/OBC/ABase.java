@@ -199,19 +199,23 @@ public abstract class ABase extends Activity implements ServiceClient {
 		setBaseLanguage("sk");
 	}
 
+	public void setSlovenianLanguage() { setBaseLanguage("sl"); }
+
 	public void setNetherlandsLanguage() {
 		setBaseLanguage("nl");
 	}
+
+    public void setNRBState(String state) { App.NRD = state; }
 
 	private void setBaseLanguage(String lang) {
 		saveLanguage(lang);
 		changeLanguage(lang);
 		SKMapsInitSettings initSettings = new SKMapsInitSettings();
 
+		initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
 		initSettings.setConnectivityMode(SKMaps.CONNECTIVITY_MODE_OFFLINE);
 		initSettings.setMapsPath("/sdcard/SKMaps/");
 		initSettings.setMapResourcesPaths("/sdcard/SKMaps/", new SKMapViewStyle("/sdcard/SKMaps/daystyle/", "daystyle.json"));
-		initSettings.setPreinstalledMapsPath("/sdcard/SKMaps/PreinstalledMaps/");
 
 		initSettings.setMapDetailLevel(SKMapsInitSettings.SK_MAP_DETAIL_LIGHT);
 
@@ -234,8 +238,6 @@ public abstract class ABase extends Activity implements ServiceClient {
 
 		SKRouteManager.getInstance().setAudioAdvisorSettings(advisorSettings);
 	}
-
-
 
 	/**
 	 * Use this method to push (and display) a new fragment (i.e., like [UINavigationController pushViewController:animated]).

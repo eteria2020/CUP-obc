@@ -48,7 +48,7 @@ public class Trips extends DbTable<Trip, Integer> {
 				return null;
 
 		} catch (SQLException e) {
-			dlog.e("getLastOpenTrip fail:", e);
+			dlog.e("Trips().getLastOpenTrip();fail:", e);
 			return null;
 
 		}
@@ -62,7 +62,7 @@ public class Trips extends DbTable<Trip, Integer> {
 			return this.query(query);
 
 		} catch (SQLException e) {
-			dlog.e("getOpenTrips fail:", e);
+			dlog.e("Trips().getOpenTrips();", e);
 			return null;
 
 		}
@@ -76,12 +76,12 @@ public class Trips extends DbTable<Trip, Integer> {
 			updateBuilder.update();
 			updateBuilder.reset();
 		} catch (SQLException e) {
-			dlog.e("ResetFailed error:", e);
+			dlog.e("Trips.ResetFailed();", e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Trip> getTripsToSend() {
+	private List<Trip> getTripsToSend() {
 
 		try {
 			Where<Trip, Integer> where = queryBuilder().orderBy("begin_timestamp", true).where();
@@ -101,12 +101,12 @@ public class Trips extends DbTable<Trip, Integer> {
 
 			PreparedQuery<Trip> query = where.prepare();
 
-			dlog.d("Query : " + query.toString());
+			dlog.d("Trips.getTripsToSend();" + query.toString());
 
 			return this.query(query);
 
 		} catch (Exception e) {
-			dlog.e("getTripsToSend fail:", e);
+			dlog.e("Trips.getTripsToSend();", e);
 			return null;
 
 		}
@@ -126,21 +126,22 @@ public class Trips extends DbTable<Trip, Integer> {
 					)
 			);
 
-			long count = where.countOf();
-			return count;
+//			long count = where.countOf();
+			return where.countOf();
 
 		} catch (Exception e) {
-			dlog.e("getNTripsToSend fail:", e);
+			dlog.e("Trips.getNTripsToSend();", e);
 			return 0;
 		}
 	}
 
 	private Disposable offlineDisposable = null;
 
+
 	public boolean sendOffline(Context context, Handler handler, SharengoApiRepository apiRepository, SharengoPhpRepository phpRepository) {
 		//HttpConnector http;
 		if (RxUtil.isRunning(offlineDisposable)) {
-			dlog.d("offlineDisposable is running");
+			dlog.d("Trips.sendOffline();is running");
 			return false;
 		}
 
@@ -148,16 +149,16 @@ public class Trips extends DbTable<Trip, Integer> {
 
 		if (list == null) {
 
-			dlog.d("Trips to send : null");
+			dlog.d("Trips.sendOffline();null");
 			return false;
 		}
 
-		dlog.d("Trips to send : " + list.size());
+		dlog.d("Trips.sendOffline();to send:" + list.size());
 		if (list.size() == 0)
 			return false;
 
 		if (!App.hasNetworkConnection()) {
-			dlog.w("No connection: aborted");
+			dlog.w("Trips.sendOffline();No connection: aborted");
 			return false;
 		}
 
@@ -177,24 +178,25 @@ public class Trips extends DbTable<Trip, Integer> {
 
 					@Override
 					public void onNext(Trip trip) {
-						dlog.d("Sent offline trip, response is " + trip.toString());
+						dlog.d("Trips.sendOffline();Sent offline trip, response is " + trip.toString());
 
 					}
 
 					@Override
 					public void onError(Throwable e) {
-						dlog.e("Error while communicating offline trip, ", e);
+						dlog.e("Trips.sendOffline();Error while communicating offline trip, ", e);
 						offlineDisposable.dispose();
 					}
 
 					@Override
 					public void onComplete() {
-						dlog.d("Completed sendOfflineTrip successfully");
+						dlog.d("Trips.sendOffline();Completed sendOfflineTrip successfully");
 						offlineDisposable.dispose();
 					}
 				});
 
-		/*for(Trip c : list) {
+
+/*for(Trip c : list) {
 
 			dlog.d("Selected trip to send:" + c.toString());
 			
@@ -208,15 +210,17 @@ public class Trips extends DbTable<Trip, Integer> {
 			return true;
 		}*/
 
+
 		return false;
 	}
 
+
 	public Trip Begin(String targa, Customer cliente, Location location, int carburante, int km) {
-		Trip corsaAperta = null;
+		Trip corsaAperta = new Trip();
 
 		//TODO: gestire eventuale corsa ancora aperta.
 
-		corsaAperta = new Trip();
+//		corsaAperta = new Trip();
 
 		corsaAperta.plate = targa;
 
@@ -232,17 +236,18 @@ public class Trips extends DbTable<Trip, Integer> {
 			corsaAperta.begin_lon = location.getLongitude();
 		}
 
-		int id;
+/*		int id;
 
 		try {
 			id = this.create(corsaAperta);
 		} catch (SQLException e) {
 			dlog.e("Begin corsa", e);
-		}
-		dlog.d("Begin: " + corsaAperta.toString());
+		}*/
+		dlog.d("Trips.Begin();Begin: " + corsaAperta.toString());
 		return corsaAperta;
 	}
 
+/*
 	public boolean End(Trip corsaAperta, Location location, int carburante, int km) {
 
 		//TODO: gestire eventuale corsa NON ancora aperta.
@@ -266,7 +271,9 @@ public class Trips extends DbTable<Trip, Integer> {
 
 		return true;
 	}
+*/
 
+/*
 	public int getRemoteIDfromLocal(int id) {
 		try {
 			Where<Trip, Integer> where = queryBuilder().where();
@@ -281,6 +288,7 @@ public class Trips extends DbTable<Trip, Integer> {
 			return 0;
 		}
 	}
+*/
 
 	public List<Trip> getTripfromTime(long timestamp) {
 
@@ -293,12 +301,12 @@ public class Trips extends DbTable<Trip, Integer> {
 			//where.ge("timestamp",((System.currentTimeMillis()/1000)-60*60*24*7))
 
 			PreparedQuery<Trip> query = where.prepare();
-			dlog.d("Query : " + query.toString());
+			dlog.d("Trips.getTripfromTime();query:" + query.toString());
 
 			return this.query(query);
 
 		} catch (SQLException e) {
-			dlog.e("getEventsToSend fail:", e);
+			dlog.e("Trips.getTripfromTime();", e);
 			return null;
 
 		}
@@ -317,7 +325,7 @@ public class Trips extends DbTable<Trip, Integer> {
 			//where.ge("timestamp",((System.currentTimeMillis()/1000)-60*60*24*7))
 
 			PreparedQuery<Trip> query = where.prepare();
-			dlog.d("Query : " + query.toString());
+			dlog.d("Trips.findTripParentfromTrip();query:" + query.toString());
 			List<Trip> result = this.query(query);
 			if (result.size() > 0) {
 				return Observable.just(this.query(query))
@@ -325,7 +333,7 @@ public class Trips extends DbTable<Trip, Integer> {
 			} else return Observable.just(new Trip());
 
 		} catch (SQLException e) {
-			dlog.e("getEventsToSend fail:", e);
+			dlog.e("Trips.findTripParentfromTrip();", e);
 			return null;
 
 		}

@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -24,11 +25,11 @@ import eu.philcar.csg.OBC.service.DataManager;
 public class Customer extends DbRecord<Customer> implements CustomOp, ServerResponse {
 
 	@ExcludeSerialization
-	public static final int N_ERROR_PIN = 0;
+	private static final int N_ERROR_PIN = 0;
 	@ExcludeSerialization
-	public static final int N_PRIMARY_PIN = 1;
+	private static final int N_PRIMARY_PIN = 1;
 	@ExcludeSerialization
-	public static final int N_SECONDARY_PIN = 2;
+	private static final int N_SECONDARY_PIN = 2;
 	@ExcludeSerialization
 	public static final int N_COMPANY_PIN = 100;
 
@@ -73,7 +74,7 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 	public long update_timestamp;
 
 	@SerializedName("ps")
-	public Pin pins = null;
+	Pin pins = null;
 
 	@ExcludeSerialization
 	private boolean isEnctypted = true;
@@ -104,9 +105,11 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 		}
 	}
 
-	private String subMd5(byte hash[]) {
+	private String subMd5(byte[] hash) {
 		if (hash.length >= 4) {
-			StringBuffer hexString = new StringBuffer();
+
+//			StringBuffer hexString = new StringBuffer();
+			StringBuilder hexString = new StringBuilder();
 			for (int i = 0; i < 4; i++) {
 				hexString.append(Integer.toHexString((0xF0 & hash[i]) >> 4));
 				hexString.append(Integer.toHexString((0x0F & hash[i])));
@@ -119,27 +122,27 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 	public int checkPin(String input) {
 
 		input = input.trim();
-		DLog.D("Cliente checkPin : " + input);
+		DLog.D("Customers.checkPin();" + input);
 
-		String hashStr = "";
+		String hashStr;
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			byte[] bytes = input.getBytes("UTF-8");
 			byte[] hash = md.digest(bytes);
 			hashStr = subMd5(hash);
 			if (hashStr.length() != 8) {
-				DLog.E("Cliente checkPin : hash too short :" + hashStr.length());
+				DLog.E("Customers.checkPin();hash too short :" + hashStr.length());
 				return N_ERROR_PIN;
 			}
 		} catch (NoSuchAlgorithmException e) {
-			DLog.E("Cliente checkPin", e);
+			DLog.E("Customers.checkPin();", e);
 			return N_ERROR_PIN;
 		} catch (UnsupportedEncodingException e) {
-			DLog.E("Cliente checkPin", e);
+			DLog.E("Customers.checkPin();", e);
 			return N_ERROR_PIN;
 		}
 
-		DLog.I("Customer hashed pin : " + hashStr);
+		DLog.I("Customers.checkPin();hashed pin : " + hashStr);
 
 		if (pin == null)
 			return N_ERROR_PIN;
@@ -148,7 +151,7 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 
 		try {
 			JSONObject jobj = new JSONObject(pin);
-			DLog.I("Valid JSON : " + pin);
+			DLog.I("Customers.checkPin();Valid JSON : " + pin);
 
 			if (jobj.has("primary") && jobj.getString("primary").equals(hashStr)) {
 				return N_PRIMARY_PIN;
@@ -163,14 +166,14 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 			}
 
 		} catch (Exception e) {   // If JSON is invalid try to use simpler JSON
-			DLog.D("Invalid JSON, falling to simple JSON");
+			DLog.D("Customers.checkPin();Customers.checkPin();"+e);
 		}
 
 		try {
 
 			JSONArray jarray = new JSONArray(pin);
 
-			DLog.I("Valid JSON : " + pin);
+			DLog.I("Customers.checkPin();Valid JSON : " + pin);
 
 			if (jarray.length() > 0)
 				pin1 = jarray.getString(0);
@@ -178,21 +181,21 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 			if (jarray.length() > 1)
 				pin2 = jarray.getString(1);
 
-			DLog.D("Pin1 : " + pin1 + ",Pin2 :" + pin2);
+			DLog.D("Customers.checkPin();Pin1 : " + pin1 + ",Pin2 :" + pin2);
 
 		} catch (Exception e) {   // Se il json non è valido uso  direttamente il valore di pin
-			DLog.D("Invalid JSON, falling to raw value : " + pin);
+			DLog.D("Customers.checkPin();Invalid JSON, falling to raw value : " + pin);
 			pin1 = pin;
 		}
 
 		if (hashStr.contentEquals(pin1)) {
-			DLog.D("Customer checkPin 1 : hash match " + hashStr + "==" + pin1);
+			DLog.D("Customers.checkPin();checkPin 1 : hash match " + hashStr + "==" + pin1);
 			return N_PRIMARY_PIN;
 		} else if (hashStr.contentEquals(pin2)) {
-			DLog.D("Customer checkPin 2: hash match " + hashStr + "==" + pin2);
+			DLog.D("Customers.checkPin();checkPin 2: hash match " + hashStr + "==" + pin2);
 			return N_SECONDARY_PIN;
 		} else {
-			DLog.D("Customer checkPin : hash mismatch " + hashStr + "!=" + pin);
+			DLog.D("Customers.checkPin();checkPin : hash mismatch " + hashStr + "!=" + pin);
 			return N_ERROR_PIN;
 		}
 	}
@@ -225,14 +228,14 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 			return !pinJson.has("companyPinDisabled") || !pinJson.getBoolean("companyPinDisabled");
 
 		} catch (JSONException e) {
-			DLog.D("Invalid JSON parsing");
+			DLog.D("Customers.isCompanyPinEnabled();Invalid JSON parsing");
 		}
 		return true;
 	}
 
 	public boolean update() {
 		try {
-			DLog.D("Customer update: start updating Customer from DB");
+			DLog.D("Customers.update();start updating Customer from DB");
 			DbManager dbm = App.Instance.dbManager;
 			Customers daoCustomers = dbm.getClientiDao();
 			Customer customer = daoCustomers.queryForId(id);
@@ -242,7 +245,7 @@ public class Customer extends DbRecord<Customer> implements CustomOp, ServerResp
 			return true;
 
 		} catch (Exception e) {
-			DLog.E("Customer update: Exception while updating Customer", e);
+			DLog.E("Customers.update();", e);
 			return false;
 		}
 	}

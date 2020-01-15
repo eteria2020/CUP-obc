@@ -21,18 +21,19 @@ import eu.philcar.csg.OBC.service.MessageFactory;
  */
 
 public class FVideo extends FBase implements View.OnClickListener {
-	private ImageButton backIB;
+//	private ImageButton backIB;
 	private VideoView video;
 	private DLog dlog = new DLog(this.getClass());
 
 	public static FVideo newInstance() {
 
-		FVideo fv = new FVideo();
-		return fv;
+//		FVideo fv = new FVideo();
+		return new FVideo();
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		ImageButton backIB;
 		View view = inflater.inflate(R.layout.f_video, container, false);
 		dlog.d("OnCreareView FVideo");
 		backIB = (ImageButton) view.findViewById(R.id.fmenBackIB);

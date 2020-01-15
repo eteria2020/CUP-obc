@@ -16,17 +16,17 @@ public class UsbReceiverActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		dlog.d("onCreate");
+		dlog.d("UsbReceiverActivity.onCreate();");
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		dlog.d("onResume");
+		dlog.d("UsbReceiverActivity.onResume();");
 
 		Intent intent = getIntent();
 		if (intent != null) {
-			dlog.d("Action: " + intent.getAction());
+			dlog.d("UsbReceiverActivity.onResume();Action: " + intent.getAction());
 			if (intent.getAction().equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)) {
 				Parcelable usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 
@@ -34,10 +34,10 @@ public class UsbReceiverActivity extends Activity {
 				Intent broadcastIntent = new Intent(ACTION_USB_DEVICE_ATTACHED);
 				broadcastIntent.putExtra(UsbManager.EXTRA_DEVICE, usbDevice);
 
-				dlog.d("Extra_device:" + usbDevice.toString());
+				dlog.d("UsbReceiverActivity.onResume();Extra_device:" + usbDevice.toString());
 				// Broadcast this event so we can receive it
 				sendBroadcast(broadcastIntent);
-				dlog.d("Rebroadcasted intent");
+				dlog.d("UsbReceiverActivity.onResume();Rebroadcasted intent");
 			}
 		}
 

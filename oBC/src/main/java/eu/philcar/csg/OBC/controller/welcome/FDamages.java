@@ -146,9 +146,9 @@ public class FDamages extends FBase implements OnClickListener, OnSeekBarChangeL
 		damagesObservedTV.setTypeface(font);
 
 		if (damagesSize == 1) {
-			damagesObservedTV.setText(String.valueOf(damagesSize) + " " + getResources().getString(R.string.damage_observed));
+			damagesObservedTV.setText(damagesSize + " " + getResources().getString(R.string.damage_observed));
 		} else {
-			damagesObservedTV.setText(String.valueOf(damagesSize) + " " + getResources().getString(R.string.damages_observed));
+			damagesObservedTV.setText(damagesSize + " " + getResources().getString(R.string.damages_observed));
 		}
 
 		return view;

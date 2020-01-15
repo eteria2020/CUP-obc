@@ -75,12 +75,12 @@ public class SerialInputOutputManager implements Runnable {
 		void onRunError(Exception e);
 	}
 
-	/**
+	/*
 	 * Creates a new instance with no listener.
 	 */
-	public SerialInputOutputManager(UsbSerialPort driver) {
+/*	public SerialInputOutputManager(UsbSerialPort driver) {
 		this(driver, null);
-	}
+	}*/
 
 	/**
 	 * Creates a new instance with the provided listener.
@@ -98,11 +98,11 @@ public class SerialInputOutputManager implements Runnable {
 		return mListener;
 	}
 
-	public void writeAsync(byte[] data) {
+/*	public void writeAsync(byte[] data) {
 		synchronized (mWriteBuffer) {
 			mWriteBuffer.put(data);
 		}
-	}
+	}*/
 
 	public synchronized void stop() {
 		if (getState() == State.RUNNING) {

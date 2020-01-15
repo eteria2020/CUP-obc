@@ -111,6 +111,7 @@ public class ApiModule {
 	@Provides
 	@Singleton
 	OkHttpClient provideOkHttpClientTrusted(Context context) {
+		DLog.I("ApiModule.provideOkHttpClientTrusted();");
         /*HttpLogger logger = new HttpLogger();
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(logger){
 
@@ -120,27 +121,28 @@ public class ApiModule {
 		LoggerInterceptor logging = new LoggerInterceptor();
 
 		OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+
 		httpClient.addInterceptor(logging);
 
 		try {
 
 			final TrustManager[] trustAllCerts = new TrustManager[]{
-					new X509TrustManager() {
-						@Override
-						public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+				new X509TrustManager() {
+					@Override
+					public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
 
-						}
-
-						@Override
-						public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-
-						}
-
-						@Override
-						public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-							return new java.security.cert.X509Certificate[]{};
-						}
 					}
+
+					@Override
+					public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+
+					}
+
+					@Override
+					public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+						return new java.security.cert.X509Certificate[]{};
+					}
+				}
 			};
 
 			CertificateFactory cf = CertificateFactory.getInstance("X509");
@@ -163,14 +165,14 @@ public class ApiModule {
 				trustStore.setCertificateEntry("ca", caServer);
 				TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
 				tmf.init(trustStore);
-				TrustManager[] trustManagers = tmf.getTrustManagers();
+//				TrustManager[] trustManagers = tmf.getTrustManagers();
 				SSLContext sslContext = SSLContext.getInstance("SSL");
 				sslContext.init(keyManagers, trustAllCerts, null);
 
 				httpClient.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
 			}
 		} catch (Exception e) {
-			DLog.E("Exception while providing OKHTTPCLIENTTrusted", e);
+			DLog.E("ApiModule.provideOkHttpClientTrusted();Exception while providing OKHTTPCLIENTTrusted", e);
 		}
 
         /*httpClient.addInterceptor(new Interceptor() {
@@ -194,11 +196,11 @@ public class ApiModule {
         });*/
 
 		httpClient.hostnameVerifier(new HostnameVerifier() {
-										@Override
-										public boolean verify(String hostname, SSLSession session) {
-											return true;
-										}
-									}
+				@Override
+				public boolean verify(String hostname, SSLSession session) {
+					return true;
+				}
+			}
 		);
 		httpClient.readTimeout(40, TimeUnit.SECONDS);
 		httpClient.connectTimeout(40, TimeUnit.SECONDS);
@@ -211,14 +213,15 @@ public class ApiModule {
 	@Provides
 	@Singleton
 	OkHttpClient provideOkHttpClient() {
+		DLog.I("ApiModule.provideOkHttpClient();");
+
 /*        HttpLogger logger = new HttpLogger();
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(logger);
             logging.setLevel(HttpLoggingInterceptor.Level.BASIC);*/
 		LoggerInterceptor logging = new LoggerInterceptor();
 		OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+
 		httpClient.addInterceptor(logging);
-
-
 
         /*httpClient.addInterceptor(new Interceptor() {
             @Override
@@ -242,6 +245,11 @@ public class ApiModule {
 
 		httpClient.readTimeout(20, TimeUnit.SECONDS);
 		httpClient.connectTimeout(20, TimeUnit.SECONDS);
+
+/*		httpClient.readTimeout(80, TimeUnit.SECONDS);
+		httpClient.connectTimeout(80, TimeUnit.SECONDS);
+		httpClient.writeTimeout(80, TimeUnit.SECONDS);*/
+
 		//httpClient.retryOnConnectionFailure(false);
 
 		return httpClient.build();

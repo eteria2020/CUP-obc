@@ -33,17 +33,18 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 
 	public static FPin newInstance() {
 
-		FPin fp = new FPin();
-		return fp;
+//		FPin fp = new FPin();
+		return new FPin();
 	}
 
 	private DFProgressing progressDF;
 
-	private Button b1, b2, b3, b4, b5, b6, b7, b8, b9, b0, sosB, faqB;
+//	private Button b1, b2, b3, b4, b5, b6, b7, b8, b9, b0, sosB, faqB;
+	private Button b1, b2, b3, b4, b5, b6, b7, b8, b9, b0;
 	private ImageButton deleteIB;
 	private ImageView p1, p2, p3, p4;
 	private TextView messageTV;
-	private FrameLayout fpinRightFrame;
+//	private FrameLayout fpinRightFrame;
 	private Handler localHandler = new Handler();
 	private DLog dlog = new DLog(this.getClass());
 	private final Runnable skipRemoteCheck = new Runnable() {
@@ -51,8 +52,17 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 		public void run() {
 			progressDF.dismiss();
 
+			DLog.I("FPin.run();pin="+pin);
+
+			AWelcome activity = (AWelcome)getActivity();
+			if(activity!=null) {
+				activity.sendMessage(MessageFactory.checkPin(pin));
+			}
+
+/*
 			if (getActivity() != null)
 				((AWelcome) getActivity()).sendMessage(MessageFactory.checkPin(pin));
+*/
 
 			pinChecked(App.currentTripInfo.CheckPin(pin, true));
 		}
@@ -62,7 +72,7 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-
+		DLog.I("FPin.onCreate();");
 		super.onCreate(savedInstanceState);
 
 		this.pin = "";
@@ -70,40 +80,41 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		Button sosB, faqB;
+		FrameLayout fpinRightFrame;
 
+		dlog.d("FPin.OnCreareView();");
 		View view = inflater.inflate(R.layout.f_pin, container, false);
-		dlog.d("OnCreareView FPin");
-
 		progressDF = DFProgressing.newInstance(R.string.checking_pin);
 
-		b1 = (Button) view.findViewById(R.id.fpinOneB);
-		b2 = (Button) view.findViewById(R.id.fpinTwoB);
-		b3 = (Button) view.findViewById(R.id.fpinThreeB);
-		b4 = (Button) view.findViewById(R.id.fpinFourB);
-		b5 = (Button) view.findViewById(R.id.fpinFiveB);
-		b6 = (Button) view.findViewById(R.id.fpinSixB);
-		b7 = (Button) view.findViewById(R.id.fpinSevenB);
-		b8 = (Button) view.findViewById(R.id.fpinEightB);
-		b9 = (Button) view.findViewById(R.id.fpinNineB);
-		b0 = (Button) view.findViewById(R.id.fpinZeroB);
+		b1 = view.findViewById(R.id.fpinOneB);
+		b2 = view.findViewById(R.id.fpinTwoB);
+		b3 = view.findViewById(R.id.fpinThreeB);
+		b4 = view.findViewById(R.id.fpinFourB);
+		b5 = view.findViewById(R.id.fpinFiveB);
+		b6 = view.findViewById(R.id.fpinSixB);
+		b7 = view.findViewById(R.id.fpinSevenB);
+		b8 = view.findViewById(R.id.fpinEightB);
+		b9 = view.findViewById(R.id.fpinNineB);
+		b0 = view.findViewById(R.id.fpinZeroB);
 
-		p1 = (ImageView) view.findViewById(R.id.fpinFirstIV);
-		p2 = (ImageView) view.findViewById(R.id.fpinSecondIV);
-		p3 = (ImageView) view.findViewById(R.id.fpinThirdIV);
-		p4 = (ImageView) view.findViewById(R.id.fpinFourthIV);
+		p1 = view.findViewById(R.id.fpinFirstIV);
+		p2 = view.findViewById(R.id.fpinSecondIV);
+		p3 = view.findViewById(R.id.fpinThirdIV);
+		p4 = view.findViewById(R.id.fpinFourthIV);
 
-		fpinRightFrame = (FrameLayout) view.findViewById(R.id.fpinRightFrame);
+		fpinRightFrame = view.findViewById(R.id.fpinRightFrame);
 
-		messageTV = (TextView) view.findViewById(R.id.fpinMessageTV);
+		messageTV = view.findViewById(R.id.fpinMessageTV);
 
 		Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "interstateregular.ttf");
 		messageTV.setTypeface(font);
 		((TextView) view.findViewById(R.id.fpin_pin_is_TV)).setTypeface(font);
 
-		deleteIB = (ImageButton) view.findViewById(R.id.fpinDeleteIB);
+		deleteIB = view.findViewById(R.id.fpinDeleteIB);
 
-		sosB = (Button) view.findViewById(R.id.fpinSOSB);
-		faqB = (Button) view.findViewById(R.id.fpinFAQB);
+		sosB = view.findViewById(R.id.fpinSOSB);
+		faqB = view.findViewById(R.id.fpinFAQB);
 
 		sosB.setOnClickListener(this);
 		faqB.setOnClickListener(this);
@@ -133,7 +144,7 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 
 	@Override
 	public void onClick(View v) {
-
+//		dlog.d("FPin.onClick();");
 		switch (v.getId()) {
 			case R.id.fpinOneB:
 				addPin("1");
@@ -266,6 +277,7 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 
 	private void pinChecked(boolean valid) {
 
+		dlog.d("FPin.pinChecked();valid " + valid);
 		progressDF.dismiss();
 
 		boolean result;
@@ -346,14 +358,22 @@ public class FPin extends FBase implements OnClickListener, OnTripCallback {
 	}
 
 	void checkTripResult() {
+		dlog.d("FPin.checkTripResult();");
 		if (App.currentTripInfo.trip.offline || App.currentTripInfo.trip.begin_sent) {
 			if (App.currentTripInfo.trip.recharge >= 0) {
 
 				try {
 
 					progressDF.dismiss();
-					if (getActivity() != null)
-						((AWelcome) getActivity()).sendMessage(MessageFactory.checkPin(pin));
+					DLog.I("FPin.checkTripResult();pin="+pin);
+
+					AWelcome activity = (AWelcome)getActivity();
+					if(activity!=null) {
+						activity.sendMessage(MessageFactory.checkPin(pin));
+					}
+
+/*					if (getActivity() != null)
+						((AWelcome) getActivity()).sendMessage(MessageFactory.checkPin(pin));*/
 
 					pinChecked(App.currentTripInfo.CheckPin(pin, true));
 				} catch (Exception e) {

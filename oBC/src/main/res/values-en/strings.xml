@@ -112,7 +112,8 @@
     <string name="push_to_cancel">Tap to\ncancel</string>
 
     <string name="goodbye_instructions">You can exit the car. The doors will automatically close in the seconds shown below</string>
-
+    <string name="goodbye_cancel">Cancel</string>
+    <string name="goodbye_back_to_trip">Click here to return to the trip</string>
 
     <string name="menu_rent_end">End rent</string>
     <string name="menu_rent_end_off">End rent (not available)</string>

@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.support.v4.app.FragmentManager;
+//import android.support.v4.app.FragmentManager;
 
 import com.Hik.Mercury.SDK.Audio.AudioInfo;
 import com.Hik.Mercury.SDK.Audio.AudioObserver;
@@ -96,9 +96,9 @@ public class Hik_io implements LowLevelInterface {
 	private String lastGpsInfo = "";
 
 	private String SDKVersion = "";
-	private int ServiceVersion = -1;
+//	private int ServiceVersion = -1;
 
-	private FragmentManager getSupportFragmentManager;
+//	private FragmentManager getSupportFragmentManager;
 
 	private boolean getMinorGPSDisabled = false;
 
@@ -124,7 +124,7 @@ public class Hik_io implements LowLevelInterface {
 	@Override
 	public void init() {
 
-		dlog.i("init request");
+		dlog.i("Hik_io.init();request");
 
 		mCANManager = CANManager.get(context);
 
@@ -133,7 +133,7 @@ public class Hik_io implements LowLevelInterface {
 			mCANManager.attachVehicleInfoObserver(mVehicleObserver);
 			App.Versions.SDK = mCANManager.getSDKVersion();
 			SDKVersion = App.Versions.SDK;
-			dlog.i("Initial SDK version:" + SDKVersion);
+			dlog.i("Hik_io.init();SDK version:" + SDKVersion);
 		}
 
 		mBTManager = BTManager.get(context);
@@ -153,8 +153,8 @@ public class Hik_io implements LowLevelInterface {
 		mLeaseManager = LeaseManager.get(context);
 		if (mLeaseManager != null) {
 			mLeaseManager.attachLeaseInfoObserver(mLeaseObserver);
-			int status = mLeaseManager.GetLeaseStatus();
-			int memberId = mLeaseManager.GetLeaseMerberID();
+//			int status = mLeaseManager.GetLeaseStatus();
+//			int memberId = mLeaseManager.GetLeaseMerberID();
 			//eventRepository.LeaseInfo(status, memberId);
 		}
 
@@ -176,9 +176,9 @@ public class Hik_io implements LowLevelInterface {
 			}
 		}
 
-		ServiceVersion = getServiceVersion();
+		int ServiceVersion = getServiceVersion();
 		App.Versions.Service = ServiceVersion;
-		dlog.i("Initial SDK SERVICE VERSION: " + ServiceVersion);
+		dlog.i("Hik_io.init();SDK SERVICE VERSION: " + ServiceVersion);
 
 		try {
 			if (App.Versions.getLevel() > 0) {
@@ -195,7 +195,7 @@ public class Hik_io implements LowLevelInterface {
 				App.Versions.VINCode = versionManager.requestVINCode();
 			}
 		} catch (Exception e) {
-			dlog.e("Exception while retrieving version information", e);
+			dlog.e("Hik_io.init();Exception while retrieving version information", e);
 		}
 
 		//mCANManager.getAllVehicleInfo();
@@ -208,7 +208,7 @@ public class Hik_io implements LowLevelInterface {
 		threadKeepAlive = new Thread() {
 			public void run() {
 				int prescaler = 6;
-				dlog.i("threadKeepAlive started");
+				dlog.i("Hik_io.init();threadKeepAlive started");
 				while (!this.isInterrupted()) {
 
 					setDisplayStatus(null, displayStatus);
@@ -219,7 +219,7 @@ public class Hik_io implements LowLevelInterface {
 					}
 
 					if (prescaler-- == 0) {
-						dlog.i("HIK Prescaler fired");
+						dlog.i("Hik_io.init(); Prescaler fired");
 						refreshInfo();
 						prescaler = 6;
 					}
@@ -233,7 +233,7 @@ public class Hik_io implements LowLevelInterface {
 			}
 		};
 
-		threadKeepAlive.setName("HIK KeepAlive");
+		threadKeepAlive.setName("Hik_io.init();KeepAlive");
 		threadKeepAlive.start();
 
 		setSecondaryGPS(10000);
@@ -298,7 +298,7 @@ public class Hik_io implements LowLevelInterface {
 		if (this.forceLedBlinking == status)
 			return;
 
-		dlog.i("forceLedBlinking=" + status);
+		dlog.i("Hik_io.setForcedLedBlink();" + status);
 		this.forceLedBlinking = status;
 	}
 
@@ -321,19 +321,21 @@ public class Hik_io implements LowLevelInterface {
 
 		if (mLeaseManagerItaly != null) {
 
-			if (this.forceLedBlinking && data[1] == LeaseInfoItaly.LED_STATUS_LIGHT_ON)
+			if (this.forceLedBlinking && data[1] == LeaseInfoItaly.LED_STATUS_LIGHT_ON){
 				data[1] = LeaseInfoItaly.LED_STATUS_LIGHT_FLASH;
+			}
 
-			boolean result = mLeaseManagerItaly.SetLEDStatus(data);
+			//boolean result = mLeaseManagerItaly.SetLEDStatus(data);
 			//dlog.i("setLed Led=" + data[0] + ", state="+data[1] + " result=" + result);
+			dlog.i("Hik_io.setLed();Led=" + data[0] + ", state="+data[1] + " result=" + mLeaseManagerItaly.SetLEDStatus(data));
 		}
 
 	}
 
 	@Override
 	public void setDoors(Messenger replyTo, int state, String message) {
-		dlog.i("setDoors :" + state);
-		dlog.cr("Ricevuto messaggio per azione su porte: " + state);
+		dlog.i("Hik_io.setDoors();setDoors :" + state);
+		dlog.cr("Hik_io.setDoors();Ricevuto messaggio per azione su porte: " + state);
 		int ctl = (state == 0 ? LeaseInfoItaly.LEASE_CTL_DOOR_CLOSE : LeaseInfoItaly.LEASE_CTL_DOOR_OPEN);
 		if (mLeaseManagerItaly != null) {
 			mLeaseManagerItaly.SetDoorStatus(ctl);
@@ -342,16 +344,16 @@ public class Hik_io implements LowLevelInterface {
 
 	@Override
 	public void setEngine(Messenger replyTo, int status) {
-		dlog.d("setEngine :" + status);
-		dlog.cr("Ricevuta azione sul motore: " + status);
+		dlog.d("Hik_io.setEngine();" + status);
+		dlog.cr("Hik_io.setEngine();Ricevuta azione sul motore: " + status);
 		int ctl = (status == 0 ? LeaseInfoItaly.LEASE_CTL_DISABLE_POWER : LeaseInfoItaly.LEASE_CTL_ENABLE_POWER);
 		if (mLeaseManagerItaly != null) {
 			if (mLeaseManagerItaly.SetPowerStatus(ctl))
-				DLog.I("setEngine : success ");
+				DLog.I("Hik_io.setEngine();success ");
 			else
-				DLog.I("setEngine : failed ");
+				DLog.I("Hik_io.setEngine();failed ");
 		} else
-			DLog.I("setEngine : failed ");
+			DLog.I("Hik_io.setEngine();failed ");
 	}
 
 	@Override
@@ -403,12 +405,12 @@ public class Hik_io implements LowLevelInterface {
 	@Override
 	public void addAdminCard(List<String> cards) {
 		if (cards == null) {
-			dlog.e("Null admins cards list. Skipping");
+			dlog.e("Hik_io.addAdminCard();Null admins cards list. Skipping");
 			return;
 		}
 
 		if (cards.size() == 0) {
-			dlog.e("Empty admins cards list. Skipping");
+			dlog.e("Hik_io.addAdminCard();Empty admins cards list. Skipping");
 			return;
 		}
 
@@ -420,19 +422,19 @@ public class Hik_io implements LowLevelInterface {
 			addAdminCard(card);
 		}
 
-		dlog.i("Added N." + cards.size() + " cards");
+		dlog.i("Hik_io.addAdminCard();Added N." + cards.size() + " cards");
 
 	}
 
 	@Override
 	public void addAdminCard(String card) {
-		dlog.i("Card:" + card);
-		byte[] data0 = hexStringToByteArray(card);
+		dlog.i("Hik_io.addAdminCard();Card:" + card);
+//		byte[] data0 = hexStringToByteArray(card);
 		byte[] data = Converts.hexStringToByte(card);
 
 		if (mLeaseManagerItaly != null && data != null) {
 			boolean result = mLeaseManagerItaly.AddAdmin(data);
-			dlog.i("Added admin card : " + card + ", result=" + result);
+			dlog.i("Hik_io.addAdminCard();Added admin card : " + card + ", result=" + result);
 		}
 	}
 
@@ -442,7 +444,7 @@ public class Hik_io implements LowLevelInterface {
 
 		if (mLeaseManagerItaly != null && data != null) {
 			boolean result = mLeaseManagerItaly.DeleteAdmin(data);
-			dlog.i("Removed admin card : " + card + ", result=" + result);
+			dlog.i("Hik_io.delAdminCard();Removed admin card : " + card + ", result=" + result);
 		}
 	}
 
@@ -450,7 +452,7 @@ public class Hik_io implements LowLevelInterface {
 	public void resetAdminCards() {
 		if (mLeaseManagerItaly != null) {
 			boolean result = mLeaseManagerItaly.CleanAllAdmin();
-			dlog.i("Removed all admin cards, result=" + result);
+			dlog.i("Hik_io.resetAdminCards();Removed all admin cards, result=" + result);
 		}
 	}
 
@@ -465,7 +467,7 @@ public class Hik_io implements LowLevelInterface {
 
 		threadGpsUpdate = new Thread() {
 			public void run() {
-				dlog.i("threadGpsUpdate started with period: " + period);
+				dlog.i("Hik_io.setSecondaryGPS();threadGpsUpdate started with period: " + period);
 				while (!this.isInterrupted()) {
 
 					String gpsInfo = getGpsInfo();
@@ -480,7 +482,7 @@ public class Hik_io implements LowLevelInterface {
 					try {
 						Thread.sleep(period);
 					} catch (InterruptedException e) {
-						dlog.i("Thread interrupted");
+						dlog.i("Hik_io.setSecondaryGPS();Thread interrupted");
 						break;
 					}
 				}
@@ -506,7 +508,7 @@ public class Hik_io implements LowLevelInterface {
 				mAudioManager.audioSetChannel(AudioInfo.HIK_AUDIO_CHANNEL_RADIO);
 				mAudioManager.audioSetVol(0);
 				mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_OFF);
-				dlog.i("HIK Audio channel : NONE");
+				dlog.i("Hik_io.setAudioChannel();NONE");
 				break;
 
 			case AUDIO_RADIO:
@@ -516,7 +518,7 @@ public class Hik_io implements LowLevelInterface {
 				else
 					mAudioManager.audioSetVol(lastVolumeValue);
 				mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
-				dlog.i("HIK Audio channel : RADIO");
+				dlog.i("Hik_io.setAudioChannel();RADIO");
 				break;
 
 			case AUDIO_SYSTEM:
@@ -526,7 +528,7 @@ public class Hik_io implements LowLevelInterface {
 				else
 					mAudioManager.audioSetVol(lastVolumeValue);
 				mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
-				dlog.i("HIK Audio channel : SYSTEM");
+				dlog.i("Hik_io.setAudioChannel();SYSTEM");
 				break;
 
 			case AUDIO_AUX:
@@ -536,7 +538,7 @@ public class Hik_io implements LowLevelInterface {
 				else
 					mAudioManager.audioSetVol(lastVolumeValue);
 				mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
-				dlog.i("HIK Audio channel : AUX");
+				dlog.i("Hik_io.setAudioChannel();AUX");
 				break;
 
 		}
@@ -546,13 +548,18 @@ public class Hik_io implements LowLevelInterface {
 	public void SetRadioChannel(String band, int freq) {
 		if (mRadioManager != null) {
 			int iBand = RadioInfo.BAND_TYPE_FM;
-			if (band == null || band.isEmpty() || band.equalsIgnoreCase("FM"))
+/*			if (band == null || band.isEmpty() || band.equalsIgnoreCase("FM"))
 				iBand = RadioInfo.BAND_TYPE_FM;
 			else if (band.equalsIgnoreCase("AM"))
+				iBand = RadioInfo.BAND_TYPE_AM;*/
+
+			if (band.equalsIgnoreCase("AM")) {
 				iBand = RadioInfo.BAND_TYPE_AM;
+			}
+
 
 			mRadioManager.radioSetBand(iBand);
-			dlog.i("Radio: set band : " + iBand + " - " + band);
+			dlog.i("Hik_io.SetRadioChannel();Radio: set band : " + iBand + " - " + band);
 
 			if (iBand == RadioInfo.BAND_TYPE_FM) {
 				if (freq > RadioInfo.BAND_FM_FREQ_MAX_VALUE)
@@ -567,7 +574,7 @@ public class Hik_io implements LowLevelInterface {
 			}
 
 			mRadioManager.radioSetFreq(freq);
-			dlog.i("Radio: set freq : " + freq);
+			dlog.i("Hik_io.SetRadioChannel();Radio: set freq : " + freq);
 
 		}
 	}
@@ -578,16 +585,16 @@ public class Hik_io implements LowLevelInterface {
 
 			if (volume < 0) {
 				mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
-				dlog.i("Radio: set AMPLIFIER ON");
+				dlog.i("Hik_io.SetRadioVolume();Radio: set AMPLIFIER ON");
 			} else if (volume == 0) {
 				mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_OFF);
-				dlog.i("Radio: set AMPLIFIER OFF");
+				dlog.i("Hik_io.SetRadioVolume();Radio: set AMPLIFIER OFF");
 			} else {
 				float coeff = AudioInfo.VOLUME_MAX_VALUE / 100f;
 				int vol = Math.min((int) (volume * coeff), AudioInfo.VOLUME_MAX_VALUE);
 				mAudioManager.audioSetVol(vol);
 				mAudioManager.AudioSetAMP(AudioInfo.AUDIO_AMP_STATUS_ON);
-				dlog.i("Radio: set VOLUME : " + volume + " - " + vol);
+				dlog.i("Hik_io.SetRadioVolume();Radio: set VOLUME : " + volume + " - " + vol);
 				mAudioObserver.onVolumeValueChange(AudioInfo.HIK_AUDIO_CHANNEL_RADIO, vol);
 			}
 		}
@@ -596,7 +603,7 @@ public class Hik_io implements LowLevelInterface {
 	@Override
 	public void SetSeek(int direction, boolean auto) {
 		if (mRadioManager != null) {
-			dlog.i("Radio: set seek dir=" + direction + " auto=" + auto);
+			dlog.i("Hik_io.SetSeek();Radio: set seek dir=" + direction + " auto=" + auto);
 			if (direction > 0)
 				mRadioManager.radioSetSeekDirection(RadioInfo.SEEK_DIRECTION_DOWN);
 			else if (direction < 0)
@@ -620,9 +627,9 @@ public class Hik_io implements LowLevelInterface {
 			try {
 				boolean result = mLeaseManagerItaly.configHeartbeatTime(secs);
 				watchdogActive = result;
-				dlog.i("Watchdog timeout set to " + secs + " Result=" + result);
+				dlog.i("Hik_io.enableWatchdog();Watchdog timeout set to " + secs + " Result=" + result);
 			} catch (Exception e) {
-				dlog.e("Watchdog setup failed");
+				dlog.e("Hik_io.enableWatchdog();"+e.getMessage());
 			}
 		}
 	}
@@ -632,9 +639,9 @@ public class Hik_io implements LowLevelInterface {
 		if (mLeaseManagerItaly != null && watchdogActive) {
 			try {
 				mLeaseManagerItaly.cancelHeartbeat();
-				dlog.i("Watchdog remove");
+				dlog.i("Hik_io.disableWatchdog();Watchdog remove");
 			} catch (Exception e) {
-				dlog.e("Watchdog remove failed");
+				dlog.e("Hik_io.disableWatchdog();"+e.getMessage());
 			}
 		}
 	}
@@ -650,7 +657,7 @@ public class Hik_io implements LowLevelInterface {
 
 	@Override
 	public float getCellVoltageValue(int index) {
-		BatteryInfo bi = mCANManager.getBatteryInfoStatus();
+//		BatteryInfo bi = mCANManager.getBatteryInfoStatus();
 		return mCANManager.getCellVoltageValue(index);
 	}
 
@@ -692,7 +699,7 @@ public class Hik_io implements LowLevelInterface {
 		}
 	}
 
-	private String getWorkStatusName(int value) {
+/*	private String getWorkStatusName(int value) {
 		switch (value) {
 			case VehicleInfo.MOTOR_WORK_STATUS_FOREWARD:
 				return "FW";
@@ -704,9 +711,9 @@ public class Hik_io implements LowLevelInterface {
 			default:
 				return "" + value;
 		}
-	}
+	}*/
 
-	private String getReverseStatusName(int value) {
+/*	private String getReverseStatusName(int value) {
 		switch (value) {
 			case VehicleInfo.CAR_REVERSE_IN:
 				return "IN";
@@ -715,9 +722,9 @@ public class Hik_io implements LowLevelInterface {
 			default:
 				return "" + value;
 		}
-	}
+	}*/
 
-	private String getWakeupSourcesName(int value) {
+/*	private String getWakeupSourcesName(int value) {
 		switch (value) {
 			case VehicleInfo.WAKEUP_SOURCE_ACC:
 				return "ACC";
@@ -726,7 +733,7 @@ public class Hik_io implements LowLevelInterface {
 			default:
 				return "" + value;
 		}
-	}
+	}*/
 
 	private String getPackageStatusName(int value) {
 		switch (value) {
@@ -755,7 +762,7 @@ public class Hik_io implements LowLevelInterface {
 			try {
 				parcel = mLeaseManagerItaly.getMinorGPS();
 			} catch (Exception e) {
-				dlog.e("getMinorGPS fail. Permanent disable", e);
+				dlog.e("Hik_io.getMinorGPS();", e);
 				getMinorGPSDisabled = true;
 				return null;
 			}
@@ -771,7 +778,7 @@ public class Hik_io implements LowLevelInterface {
 					jo.put("head", parcel.direction);
 					json = jo.toString();
 				} catch (JSONException e) {
-					dlog.e("Building JSON", e);
+					dlog.e("Hik_io.getMinorGPS();Building JSON", e);
 				}
 
 			}
@@ -782,7 +789,7 @@ public class Hik_io implements LowLevelInterface {
 	private void refreshInfo() {
 
 		if (mCANManager == null) {
-			dlog.e("ALARM: SDK CANManager not instanced");
+			dlog.e("Hik_io.refreshInfo();ALARM: SDK CANManager not instanced");
 			return;
 		}
 
@@ -862,7 +869,7 @@ public class Hik_io implements LowLevelInterface {
 
 			b.putInt("ChStatus", bi.chargerAvaliableStatus);
 		} else {
-			dlog.e("batteryInfo==null");
+			dlog.e("Hik_io.refreshInfo();batteryInfo==null");
 		}
 
 		if (lastGpsInfo != null && !lastGpsInfo.isEmpty())
@@ -870,7 +877,7 @@ public class Hik_io implements LowLevelInterface {
 
 		b.putString("SDKVer", SDKVersion);
 
-		dlog.i("Refresh info:" + b.toString());
+		dlog.i("Hik_io.refreshInfo();" + b.toString());
 
 		obcService.notifyCarInfo(b);
 	}
@@ -899,7 +906,7 @@ public class Hik_io implements LowLevelInterface {
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo("com.Hik.Mercury.SDK.service", PackageManager.GET_META_DATA);
 			version = pInfo.versionCode;
 		} catch (NameNotFoundException e) {
-			dlog.e("Getting service package version :", e);
+			dlog.e("Hik_io.getServiceVersion();Getting service package version :", e);
 		}
 		return version;
 	}
@@ -911,7 +918,7 @@ public class Hik_io implements LowLevelInterface {
 		@Override
 		public void onCleanAdminResult(int result) throws RemoteException {
 			super.onCleanAdminResult(result);
-			dlog.i("onCleanAdminResult : " + result);
+			dlog.i("Hik_io.onCleanAdminResult();" + result);
 		}
 
 		@Override
@@ -919,8 +926,8 @@ public class Hik_io implements LowLevelInterface {
 			super.onLeaseReportCard(cardID);
 
 			String Hex = Integer.toHexString(cardID);
-			dlog.i("onLeaseReportCard : " + cardID + ", hex=" + Hex);
-			dlog.i("perf: onLeaseReportCard");
+			dlog.i("Hik_io.onLeaseReportCard();" + cardID + ", hex=" + Hex);
+			//dlog.i("Hik_io.perf: onLeaseReportCard");
 			obcService.notifyCard(Hex, "OPEN RFID", false);
 
 		}
@@ -953,7 +960,7 @@ public class Hik_io implements LowLevelInterface {
 					if (cData.length > 2)
 						b.putString("fakePin", cData[2]);
 				} catch (Exception e) {
-					dlog.e("Exception handling extra data inside Heartbeat", e);
+					dlog.e("Hik_io.onLeaseReportHeartbeat();Exception handling extra data inside Heartbeat", e);
 				}
 			} else {
 				version = data;
@@ -999,14 +1006,23 @@ public class Hik_io implements LowLevelInterface {
 				vin = vinCode.substring(0, vinCode.indexOf("~"));
 			}
 
+/*
 			if (vin.isEmpty() || vin.equalsIgnoreCase("") || vin.length() < 7)
+				return;
+*/
+			if (vin.isEmpty() || vin.length() < 7)
 				return;
 
 			Bundle b = new Bundle();
 			b.putString("VIN", vin);
 			obcService.notifyCarInfo(b);
-			if (!BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
-				dlog.i("onVinCodeChange(vinCode):" + vinCode);
+
+/*			if (!BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug")){
+				dlog.i("Hik_io.VehicleObr();" + vinCode);
+			}
+			*/
+
+			dlog.i("Hik_io.VehicleObr();" + vinCode);
 		}
 
 		@Override
@@ -1017,7 +1033,7 @@ public class Hik_io implements LowLevelInterface {
 			b.putString("GearStatus", getGearStatusName(gearStatus));
 			obcService.notifyCarInfo(b);
 
-			dlog.i("onGearStatusChange(gearStatus):" + gearStatus);
+			dlog.i("Hik_io.onGearStatusChange();" + gearStatus);
 		}
 
 		@Override
@@ -1028,7 +1044,7 @@ public class Hik_io implements LowLevelInterface {
 			b.putBoolean("keyOn", keyOnStatus == VehicleInfo.KEY_ON_STATUS_FLAG_TRUE);
 			obcService.notifyCarInfo(b);
 
-			dlog.i("onKeyOnStatusFlagChange(keyOnStatus):" + keyOnStatus);
+			dlog.i("Hik_io.onKeyOnStatusFlagChange();" + keyOnStatus);
 		}
 
 		@Override
@@ -1097,7 +1113,7 @@ public class Hik_io implements LowLevelInterface {
 			b.putBoolean("ReadyOn", readySignal == VehicleInfo.READY_SIGNAL_LIGHTEN);
 			obcService.notifyCarInfo(b);
 
-			dlog.i("onReadySignalStatusChange(readySignal):" + readySignal);
+			dlog.i("Hik_io.onReadySignalStatusChange();" + readySignal);
 		}
 
 		private long VehicleSpeedChange_LastLog = 0;
@@ -1110,7 +1126,7 @@ public class Hik_io implements LowLevelInterface {
 			b.putFloat("Speed", vehicleSpeed);
 			obcService.notifyCarInfo(b);
 			if (System.currentTimeMillis() - VehicleSpeedChange_LastLog > 10000) {
-				dlog.i("onVehicleSpeedChange(vehicleSpeed):" + vehicleSpeed);
+				dlog.i("Hik_io.onVehicleSpeedChange();" + vehicleSpeed);
 				VehicleSpeedChange_LastLog = System.currentTimeMillis();
 			}
 		}
@@ -1118,7 +1134,7 @@ public class Hik_io implements LowLevelInterface {
 		@Override
 		public void onVehileOdoMeterValueChange(int vehileOdoMeter) throws RemoteException {
 			super.onVehileOdoMeterValueChange(vehileOdoMeter);
-			dlog.i("onVehileOdoMeterValueChange(vehileOdoMeter):" + vehileOdoMeter);
+			dlog.i("Hik_io.onVehileOdoMeterValueChange();" + vehileOdoMeter);
 
 			Bundle b = new Bundle();
 			b.putInt("Km", vehileOdoMeter);
@@ -1138,7 +1154,7 @@ public class Hik_io implements LowLevelInterface {
 			b.putBoolean("BrakesOn", brakesStatus == VehicleInfo.BRAKES_STATUS_DOWN);
 			obcService.notifyCarInfo(b);
 
-			dlog.i("onBrakesStatusChange:" + brakesStatus);
+			dlog.i("Hik_io.onBrakesStatusChange();" + brakesStatus);
 		}
 
 		@Override
@@ -1149,7 +1165,7 @@ public class Hik_io implements LowLevelInterface {
 			b.putBoolean("AccStatus", accStatus == VehicleInfo.ACC_STATUS_ON);
 			obcService.notifyCarInfo(b);
 
-			dlog.i("onAccStatusChange:" + accStatus);
+			dlog.i("Hik_io.onAccStatusChange();" + accStatus);
 		}
 
 		@Override
@@ -1160,7 +1176,7 @@ public class Hik_io implements LowLevelInterface {
 			//b.putBoolean("ArmPowerDown",status==VehicleInfo.NOTIFY_ARM_POWER_DOWN_ENABLE);
 			obcService.notifyCarInfo(b);
 
-			dlog.i("onMCUNoitfyPowerDownChange:" + status);
+			dlog.i("Hik_io.onMCUNoitfyPowerDownChange();" + status);
 		}
 
 		@Override
@@ -1171,7 +1187,7 @@ public class Hik_io implements LowLevelInterface {
 			//b.putString("ReverseStatus",getReverseStatusName(status));
 			obcService.notifyCarInfo(b);
 
-			dlog.i("onReverseStatusChange:" + status);
+			dlog.i("Hik_io.onReverseStatusChange();" + status);
 		}
 
 	}
@@ -1185,7 +1201,7 @@ public class Hik_io implements LowLevelInterface {
 				throws RemoteException {
 			// TODO Auto-generated method stub
 			super.onBatteryWarningStatusChange(warningIndex, warningStatus);
-			dlog.i("onBatteryWarningStatusChange(warningIndex, warningStatus):("
+			dlog.i("Hik_io.onBatteryWarningStatusChange():("
 					+ warningIndex + "," + warningStatus + ")");
 		}
 
@@ -1216,21 +1232,21 @@ public class Hik_io implements LowLevelInterface {
 			b.putBoolean("ChFault", commStatus == SDKConstants.STATUS_EXCEPTION);
 			obcService.notifyCarInfo(b);
 
-			dlog.i("onChargeCommStatusChange(commStatus):" + commStatus);
+			dlog.i("Hik_io.onChargeCommStatusChange();" + commStatus);
 		}
 
 		@Override
 		public void onChargerAvaliableStatusChange(int status) throws RemoteException {
 			// TODO Auto-generated method stub
 			super.onChargerAvaliableStatusChange(status);
-			dlog.i("onChargerAvaliableStatusChange(status):" + status);
+			dlog.i("Hik_io.onChargerAvaliableStatusChange();" + status);
 		}
 
 		@Override
 		public void onEndBalanceStatusChange(int endBalance) throws RemoteException {
 			// TODO Auto-generated method stub
 			super.onEndBalanceStatusChange(endBalance);
-			dlog.i("onEndBalanceStatusChange(endBalance):" + endBalance);
+			dlog.i("Hik_io.onEndBalanceStatusChange();" + endBalance);
 		}
 
 		@Override
@@ -1242,7 +1258,7 @@ public class Hik_io implements LowLevelInterface {
 			b.putBoolean("KMStatus", kmStatus == BatteryInfo.KM_STATUS_ON);
 			obcService.notifyCarInfo(b);
 
-			dlog.i("onKMStatusChange(kmStatus):" + kmStatus);
+			dlog.i("Hik_io.onKMStatusChange();" + kmStatus);
 		}
 
 		@Override
@@ -1254,7 +1270,7 @@ public class Hik_io implements LowLevelInterface {
 			b.putBoolean("KSStatus", kStatus == BatteryInfo.KS_STATUS_ON);
 			obcService.notifyCarInfo(b);
 
-			dlog.i("onKSStatusChange(kStatus):" + kStatus);
+			dlog.i("Hik_io.onKSStatusChange();" + kStatus);
 		}
 
 		@Override
@@ -1266,10 +1282,10 @@ public class Hik_io implements LowLevelInterface {
 			b.putBoolean("PPStatus", pStatus == BatteryInfo.PP_STATUS_CONNECTED);
 			obcService.notifyCarInfo(b);
 
-			dlog.i("onPPStatusChange(pStatus):" + pStatus);
+			dlog.i("Hik_io.onPPStatusChange();" + pStatus);
 		}
 
-		int currentValue = 0;
+//		int currentValue = 0;
 
 		@Override
 		public void onPackCurrentValueChange(int currentValue) throws RemoteException {
@@ -1312,14 +1328,14 @@ public class Hik_io implements LowLevelInterface {
 			b.putString("PackStatus", getPackageStatusName(packageStatus));
 			obcService.notifyCarInfo(b);
 
-			dlog.i("onPackageStatusChange(packageStatus):" + packageStatus);
+			dlog.i("Hik_io.onPackageStatusChange();" + packageStatus);
 		}
 
 		@Override
 		public void onSOCPercentValueChange(int percentValue) throws RemoteException {
 			// TODO Auto-generated method stub
 			super.onSOCPercentValueChange(percentValue);
-			dlog.i("onSOCPercentValueChange(percentValue):" + percentValue);
+			dlog.i("Hik_io.onSOCPercentValueChange();" + percentValue);
 
 			Bundle b = new Bundle();
 			b.putInt("SOC", percentValue);
@@ -1340,7 +1356,7 @@ public class Hik_io implements LowLevelInterface {
 	}
 
 	private AudioObr mAudioObserver = new AudioObr();
-	public static int lastVolumeValue = 20;
+	private static int lastVolumeValue = 20;
 
 	private class AudioObr extends AudioObserver {
 
@@ -1353,7 +1369,7 @@ public class Hik_io implements LowLevelInterface {
 				b.putString("what", "RadioVolume");
 				b.putInt("volume", (int) ((double) volume * coeff));
 				obcService.notifyRadioInfo(b);
-				dlog.i("Radio: Volume change = " + volume);
+				dlog.i("Hik_io.AudioObr();Radio: Volume change = " + volume);
 
 			}
 			if (ProTTS.ignoreVolume || AudioPlayer.ignoreVolume) {

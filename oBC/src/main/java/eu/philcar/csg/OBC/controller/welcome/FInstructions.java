@@ -34,7 +34,7 @@ public class FInstructions extends FBase {
 	private DLog dlog = new DLog(this.getClass());
 	private RelativeLayout fins_right_FL;
 	private final static int MSG_CLOSE_FRAGMENT = 1;
-	private SharedPreferences preferences;
+//	private SharedPreferences preferences;
 
 	public static FInstructions newInstance(boolean login) {
 
@@ -49,9 +49,8 @@ public class FInstructions extends FBase {
 
 		@Override
 		public void handleMessage(Message msg) {
-
+/*
 			switch (msg.what) {
-
 				case MSG_CLOSE_FRAGMENT:
 					try {
 						dlog.d("FInstruction timeout ");
@@ -68,6 +67,22 @@ public class FInstructions extends FBase {
 					}
 					break;
 			}
+*/
+			try {
+				if(msg.what==MSG_CLOSE_FRAGMENT) {
+					dlog.d("FInstruction.handleMessage();timeout ");
+					if (App.BannerName.getBundle("START") == null) {
+						Intent i = new Intent(getActivity(), AMainOBC.class);
+						i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(i);
+						getActivity().finish();
+					} else {
+						((ABase) getActivity()).pushFragment(FDriveMessage_new.newInstance(true), FDriveMessage_new.class.getName(), true);
+					}
+				}
+			} catch(Exception e) {
+				dlog.e("FInstruction.handleMessage();MSG_CLOSE_FRAGMENT Exception", e);
+			}
 		}
 	};
 
@@ -77,12 +92,12 @@ public class FInstructions extends FBase {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		final View view = inflater.inflate(R.layout.f_instructions, container, false);
-		dlog.d("OnCreareView FInstruction");
+		dlog.d("FInstruction.onCreateView();");
 		// no red button init
-		preferences = this.getActivity().getSharedPreferences(App.COMMON_PREFERENCES, Context.MODE_PRIVATE);
+		SharedPreferences preferences = this.getActivity().getSharedPreferences(App.COMMON_PREFERENCES, Context.MODE_PRIVATE);
 
 		App.NRD = preferences.getString("NRD", "-1");
-		if (App.NRD == "-1" || App.NRD == "") {
+		if (App.NRD.equals("-1") || App.NRD.equals("")) {
 			NoRedButton rd = new NoRedButton(this.getActivity());
 			HttpsConnector http = new HttpsConnector(this.getActivity());
 			http.Execute(rd);
@@ -93,7 +108,7 @@ public class FInstructions extends FBase {
 		view.findViewById(R.id.finsNextIB).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				dlog.d("FInstructions finsNextIB click : " + login);
+				dlog.d("FInstruction.onCreateView();finsNextIB click : " + login);
 				if (login) {
 					if (App.BannerName.getBundle("START") == null) {
 						Intent i = new Intent(getActivity(), AMainOBC.class);
@@ -132,6 +147,16 @@ public class FInstructions extends FBase {
 
 			((AWelcome) getActivity()).sendMessage(MessageFactory.setEngine(true));
 			((AWelcome) getActivity()).sendMessage(MessageFactory.setEngine(true));
+
+			//Set the NRB state for all the car in the fleet//
+			switch (getString(R.string.def_lang)){
+				case "nl":
+					((ABase) getActivity()).setNRBState("1");
+					break;
+				default:
+					((ABase) getActivity()).setNRBState("0");
+					break;
+			}
 
 			((TextView) view.findViewById(R.id.fins_message_TV)).setText(R.string.instruction_title);
 			try {
@@ -206,7 +231,7 @@ public class FInstructions extends FBase {
 
 				view.findViewById(R.id.fins_message_bottom_TV).setVisibility(View.VISIBLE);
 			} catch (Exception e) {
-				dlog.e("Exception in FInstruction wtf login is: " + login, e);
+				dlog.e("FInstruction.onCreateView();Exception wtf login is: " + login, e);
 			}
 		}
 

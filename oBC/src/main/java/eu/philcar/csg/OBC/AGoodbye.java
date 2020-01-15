@@ -26,7 +26,7 @@ public class AGoodbye extends ABase {
 	public final boolean SKIP_DAMAGES = true;
 	private DLog dlog = new DLog(this.getClass());
 	private ServiceConnector serviceConnector;
-	private GoodbyServiceHandler serviceHandler = new GoodbyServiceHandler(new WeakReference<AGoodbye>(this));
+	private GoodbyServiceHandler serviceHandler = new GoodbyServiceHandler(new WeakReference<>(this));
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +40,7 @@ public class AGoodbye extends ABase {
 		}
 
 		//System.gc();
-		dlog.d("AGoodbye: onCreate extra: " + getIntent().getBooleanExtra(EUTHANASIA, true));
+		dlog.d("AGoodbye.onCreate();extra: " + getIntent().getBooleanExtra(EUTHANASIA, true));
 
 		setContentView(R.layout.a_base);
 
@@ -112,7 +112,7 @@ public class AGoodbye extends ABase {
 
 		final WeakReference<AGoodbye> goodbyeWeakReference;
 
-		public GoodbyServiceHandler(WeakReference<AGoodbye> goodbyeWeakReference) {
+		GoodbyServiceHandler(WeakReference<AGoodbye> goodbyeWeakReference) {
 			this.goodbyeWeakReference = goodbyeWeakReference;
 		}
 
@@ -123,9 +123,9 @@ public class AGoodbye extends ABase {
 				if (msg.what != ObcService.MSG_TRIP_END) {
 
 					if (!App.isForegroundActivity(goodbyeWeakReference.get())) {
-						DLog.W(AGoodbye.class.getName() + " MSG to non foreground activity. ignoring");
+						DLog.W("AGoodbye.handleMessage();MSG to non foreground activity. ignoring");
 						if (App.currentTripInfo == null) {
-							DLog.W(AGoodbye.class.getName() + " no trip found wrong foreground activity restarting AWelcome");
+							DLog.W("AGoodbye.handleMessage();no trip found wrong foreground activity restarting AWelcome");
 							if (!App.isForegroundActivity(AWelcome.class.getName())) {
 								Intent i = new Intent(goodbyeWeakReference.get(), AWelcome.class);
 								i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -149,7 +149,7 @@ public class AGoodbye extends ABase {
 				switch (msg.what) {
 
 					case ObcService.MSG_CLIENT_REGISTER:
-						DLog.I(": MSG_CLIENT_REGISTER");
+						DLog.I("AGoodbye.handleMessage();MSG_CLIENT_REGISTER");
 
 						// Since this is the first fragment, we need to use the "add" method to show it to the user, and not the "replace"
 						FragmentTransaction transaction = goodbyeWeakReference.get().getFragmentManager().beginTransaction();
@@ -159,7 +159,7 @@ public class AGoodbye extends ABase {
 							transaction.add(R.id.awelPlaceholderFL, FDamages.newInstance(false), FDamages.class.getName());
 							transaction.addToBackStack(FDamages.class.getName());
 						} else if (goodbyeWeakReference.get().SKIP_DAMAGES || (goodbyeWeakReference.get().getIntent() != null && goodbyeWeakReference.get().getIntent().getBooleanExtra(AGoodbye.JUMP_TO_END, false))) {
-							DLog.D("Agoodbye JUMP_TO_END");//Create fragment and add bundle to indicate the explicit request to close trip
+							DLog.D("AGoodbye.handleMessage();JUMP_TO_END");//Create fragment and add bundle to indicate the explicit request to close trip
 
 							Fragment f = FGoodbye.newInstance();
 							Bundle b = new Bundle();
@@ -177,16 +177,16 @@ public class AGoodbye extends ABase {
 						break;
 
 					case ObcService.MSG_CMD_TIMEOUT:
-						DLog.D(": MSG_CMD_TIMEOUT");
+						DLog.D("AGoodbye.handleMessage();MSG_CMD_TIMEOUT");
 						break;
 
 					case ObcService.MSG_PING:
-						DLog.D(": MSG_PING");
+						DLog.D("AGoodbye.handleMessage();MSG_PING");
 						break;
 
 					case ObcService.MSG_IO_RFID:
 
-						DLog.D(": MSG_IO_RFID");
+						DLog.D("AGoodbye.handleMessage();MSG_IO_RFID");
 						break;
 
 					case ObcService.MSG_TRIP_END:
@@ -203,7 +203,7 @@ public class AGoodbye extends ABase {
 
 					case ObcService.MSG_TRIP_BEGIN:
 
-						//NON PRENDERE COME VALIDOP QUESTO EVENTO VIENE GENERATO ANCHE A CORSA GIà APERTA
+						//NON PRENDERE COME VALIDO QUESTO EVENTO VIENE GENERATO ANCHE A CORSA GIà APERTA
 
 						break;
 
@@ -231,7 +231,7 @@ public class AGoodbye extends ABase {
 						super.handleMessage(msg);
 				}
 			} catch (Exception e) {
-				DLog.E("Exception while handling message", e);
+				DLog.E("AGoodbye.handleMessage();Exception while handling message", e);
 			}
 		}
 	}

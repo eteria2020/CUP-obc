@@ -27,13 +27,13 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
 	protected Boolean doInBackground(Void... params) {
 
 		try {
-			dlog.i("CheckOldLogSize ~ Start cleaning log");
+			dlog.i("OldLogCleamup.doInBackground();");
 			File logRoot = new File(App.getAppLogPath());
 			long logsize = FileTools.getFileSize(logRoot);
 
-			dlog.i("CheckOldLogSize ~ Log directory weight: " + logsize);
+			dlog.i("OldLogCleamup.doInBackground();Log directory weight: " + logsize);
 			if (logsize > 2147483648L) {
-				dlog.i("CheckOldLogSize ~ Folder too big deleting last 30 record");
+				dlog.i("OldLogCleamup.doInBackground();Folder too big deleting last 30 record");
 
 				retreiveAllLogs(logRoot);
 				logs.removeFromBottom(30);
@@ -42,7 +42,7 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
 
 				retreiveAllLogs(logRoot);
 
-				dlog.i("CheckOldLogSize ~ Let's delete some trash");
+				dlog.i("OldLogCleamup.doInBackground();Let's delete some trash");
 
 				Date date = new Date();
 				Calendar calendar = Calendar.getInstance();
@@ -56,7 +56,7 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
 				return true;
 			}
 		} catch (Exception e) {
-			dlog.e("CheckOldLogSize ~ An Exception occurs", e);
+			dlog.e("OldLogCleamup.doInBackground();An Exception occurs", e);
 			return false;
 		} finally {
 			logs = null;
@@ -68,12 +68,16 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
 		try {
 			if (!logRoot.isDirectory())
 				return;
-			File logsFile[] = logRoot.listFiles();
+			File[] logsFile = logRoot.listFiles();
 			if (logsFile.length == 0) {
-				dlog.i("CheckOldLogSize ~ Root folder Empty");
+				dlog.i("OldLogCleamup.retreiveAllLogs();Root folder Empty");
 				if (!logRoot.getName().equalsIgnoreCase("log")) {
-					logRoot.delete();
-					dlog.i("CheckOldLogSize ~ deleting empty folder" + logRoot.getPath());
+					if(logRoot.delete()) {
+						dlog.i("OldLogCleamup.retreiveAllLogs();deleting empty folder" + logRoot.getPath());
+					} else {
+						dlog.e("OldLogCleamup.retreiveAllLogs();deleting empty folder" + logRoot.getPath());
+					}
+
 				}
 				return;
 			}
@@ -87,7 +91,7 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
 							String fileType = name.substring(name.lastIndexOf(".") + 1);
 							if (fileType.equalsIgnoreCase("tmp")) {
 								boolean succes = logFile.delete();
-								dlog.i("CheckOldLogSize ~ Found .tmp file, deleting" + succes);
+								dlog.i("OldLogCleamup.retreiveAllLogs(); Found .tmp file, deleting" + succes);
 								continue;
 							}
 							Log log = new Log();
@@ -96,21 +100,21 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
 							log.setFile(logFile);
 							log.setIndex(0);
 							logs.addLog(log);
-							log = null;
+//							log = null;
 						} catch (Exception e) {
-							dlog.w("CheckOldLogSize ~ Found a file that should not be here, what to do?" + logFile.getName());
+							dlog.w("OldLogCleamup.retreiveAllLogs();Found a file that should not be here, what to do?" + logFile.getName());
 							String fileType = name.substring(name.lastIndexOf(".") + 1);
 							if (fileType.equalsIgnoreCase("tmp")) {
 								boolean succes = logFile.delete();
 
-								dlog.i("CheckOldLogSize ~ Found .tmp file, deleting" + succes);
+								dlog.i("OldLogCleamup.retreiveAllLogs();Found .tmp file, deleting" + succes);
 							}
 						}
 					}
 				}
 			}
 		} catch (Exception e) {
-			dlog.e("CheckOldLogSize ~ Exception while retreiving oldLog", e);
+			dlog.e("OldLogCleamup.retreiveAllLogs();", e);
 		}
 	}
 
@@ -123,7 +127,7 @@ public class OldLogCleamup extends AsyncTask<Void, Void, Boolean> {
 	protected void onPostExecute(Boolean aBoolean) {
 		super.onPostExecute(aBoolean);
 		logs = null;
-		dlog.i("LogCleanup ~ finished with result: " + aBoolean);
+		dlog.i("OldLogCleamup.onPostExecute();finished with result: " + aBoolean);
 	}
 
 	@Override

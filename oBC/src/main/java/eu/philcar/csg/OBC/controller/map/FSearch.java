@@ -79,7 +79,7 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.f_search, container, false);
-		dlog.d("OnCreareView FSerch");
+		dlog.d("FSearch.OnCreareView()");
 		//System.gc();
 
 		setupUI(view);
@@ -229,7 +229,7 @@ public class FSearch extends FBase implements OnClickListener, ALVSearchResultsD
 
 	@Override
 	public void onReceivedSearchResults(List<SKSearchResult> list) {
-
+		dlog.d("FSearch.onReceivedSearchResults(): search result " + list.toString());
 	}
 
 	private void prepareAndStartResearch() {

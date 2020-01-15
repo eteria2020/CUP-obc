@@ -141,6 +141,8 @@
     <string name="push_to_cancel">点击 取消</string>
 
     <string name="goodbye_instructions">您可以离开了，车门将在右侧指示的时间后自动关闭；如果您改变主意让车门关闭，之后可以进行新的租赁。</string>
+    <string name="goodbye_cancel">取消</string>
+    <string name="goodbye_back_to_trip">点击此处返回旅程</string>
 
     <string name="milan">米兰</string>
     <string name="minutes_saved">保存的分钟数；</string>

@@ -47,7 +47,7 @@ import com.skobbler.ngx.SKCoordinate;
 import com.skobbler.ngx.map.SKAnimationSettings;
 import com.skobbler.ngx.map.SKAnnotation;
 import com.skobbler.ngx.map.SKAnnotationView;
-import com.skobbler.ngx.map.SKBoundingBox;
+//import com.skobbler.ngx.map.SKBoundingBox;
 import com.skobbler.ngx.map.SKCalloutView;
 import com.skobbler.ngx.map.SKCoordinateRegion;
 import com.skobbler.ngx.map.SKMapCustomPOI;
@@ -62,7 +62,7 @@ import com.skobbler.ngx.map.SKMapViewHolder;
 import com.skobbler.ngx.map.SKPOICluster;
 import com.skobbler.ngx.map.SKPolygon;
 import com.skobbler.ngx.map.SKScreenPoint;
-import com.skobbler.ngx.map.realreach.SKRealReachSettings;
+//import com.skobbler.ngx.map.realreach.SKRealReachSettings;
 import com.skobbler.ngx.navigation.SKNavigationListener;
 import com.skobbler.ngx.navigation.SKNavigationManager;
 import com.skobbler.ngx.navigation.SKNavigationSettings;
@@ -81,7 +81,7 @@ import com.skobbler.ngx.routing.SKRouteManager;
 import com.skobbler.ngx.routing.SKRouteSettings;
 import com.skobbler.ngx.routing.SKRouteSettings.SKRouteConnectionMode;
 import com.skobbler.ngx.routing.SKRouteSettings.SKRouteMode;
-import com.skobbler.ngx.sdktools.navigationui.SKToolsNavigationListener;
+//import com.skobbler.ngx.sdktools.navigationui.SKToolsNavigationListener;
 import com.skobbler.ngx.search.SKSearchResult;
 
 import org.apache.http.HttpEntity;
@@ -114,6 +114,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -141,22 +142,22 @@ import eu.philcar.csg.OBC.service.MessageFactory;
 public class FMap extends FBase implements OnClickListener {
 
 	public static FMap newInstance() {
-		FMap fm = new FMap();
-		return fm;
+//		FMap fm = new FMap();
+		return new FMap();
 	}
 
 	@Inject
 	EventRepository eventRepository;
 	private DLog dlog = new DLog(this.getClass());
 
-	public final static int BASE_TOLLERANCE = 50;                    // Circle radius in meters (for fuel station on-map-tap)
-	public final static byte BASE_ZOOM_LEVEL = 17;                // Maps-forge level
-	public final static byte BASE_TOLLERANCE_INCREMENT = 50;    // meters
+//	public final static int BASE_TOLLERANCE = 50;                    // Circle radius in meters (for fuel station on-map-tap)
+//	public final static byte BASE_ZOOM_LEVEL = 17;                // Maps-forge level
+//	public final static byte BASE_TOLLERANCE_INCREMENT = 50;    // meters
 
 	private final static int MSG_SHOW_REAL_REACH = 1;
 	private final static int MSG_ZOOM_REAL_REACH = 2;
 	private final static int MSG_HIDE_REAL_REACH = 3;
-	private final static int MSG_START_NAVIGATION = 4;
+//	private final static int MSG_START_NAVIGATION = 4;
 	private final static int MSG_STOP_NAVIGATION = 5;
 	private final static int MSG_CENTER_MAP = 6;
 	private final static int MSG_CLOSE_CALLOUT = 7;
@@ -177,9 +178,9 @@ public class FMap extends FBase implements OnClickListener {
 	//anim
 	private Animation alertAnimation;
 	private static boolean animToggle = true, animFull = false;
-	private int playing = 0;//0:no anim 1:anim3g 2:animArea 3:alertAnimation
-	private List<String> animQueue = new ArrayList<String>();
-	private long updateArea = 0;
+//	private int playing = 0;//0:no anim 1:anim3g 2:animArea 3:alertAnimation
+	private List<String> animQueue = new ArrayList<>();
+//	private long updateArea = 0;
 	private CarInfo localCarInfo;
 
 	private static SKCoordinate calloutCoordinate = null;
@@ -188,9 +189,9 @@ public class FMap extends FBase implements OnClickListener {
 
 	private TextView no3gtxt, txtCurrentStreet;
 	private TextView txtNextStreet, titleAnnotation, descriptionAnnotation;
-	private ArrayList<SKAnnotation> annotationList = new ArrayList<SKAnnotation>();
+	private ArrayList<SKAnnotation> annotationList = new ArrayList<>();
 
-	public static CountDownTimer timer_2min, timer_5sec;
+//	public static CountDownTimer timer_2min, timer_5sec;
 
 	private static List<View> panels = new ArrayList<View>();
 
@@ -200,7 +201,7 @@ public class FMap extends FBase implements OnClickListener {
 
 	private SKCurrentPositionProvider currentPositionProvider;
 	private static SKPosition currentPosition = new SKPosition();
-	private int range = 0;
+//	private int range = 0;
 	private static boolean navigationActive = false;
 	private static boolean firstLaunch = true;
 	private static String jsonmd5 = "";
@@ -209,14 +210,14 @@ public class FMap extends FBase implements OnClickListener {
 
 	private ProTTS tts;
 	private AudioPlayer player;
-	private UtteranceProgressListener utteranceListener;
+//	private UtteranceProgressListener utteranceListener;
 
 	private boolean navigatorAT;
 
-	private Uri uri;
+//	private Uri uri;
 	public FMap Instance;
 
-	private boolean mapLoaded = false;
+//	private boolean mapLoaded = false;
 	private boolean showingFuelStations = false;
 	private RelativeLayout fmap_top_LL;
 	private static Boolean RequestBanner = false;
@@ -227,13 +228,13 @@ public class FMap extends FBase implements OnClickListener {
 
 	private static Bundle calloutPoi = null;
 
-	public static Boolean getIsSecondCallout() {
+/*	public static Boolean getIsSecondCallout() {
 		return isSecondCallout;
-	}
+	}*/
 
-	public static void setIsSecondCallout(Boolean isSecondCallout) {
+/*	public static void setIsSecondCallout(Boolean isSecondCallout) {
 		FMap.isSecondCallout = isSecondCallout;
-	}
+	}*/
 
 	private static View calloutView = null;
 
@@ -265,7 +266,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		View view = inflater.inflate(R.layout.f_map, container, false);
 
-		dlog.d("OnCreareView FMap");
+		dlog.d("FMap.onCreareView();FMap");
 		rootView = view;
 		if (App.BannerName.getBundle("CAR") == null && !RequestBanner) {          //App.Instance.BannerName.getBundle("CAR")==null&&
 			//controllo se ho il banner e se non ho già iniziato a scaricarlo.
@@ -274,7 +275,7 @@ public class FMap extends FBase implements OnClickListener {
 				@Override
 				public void run() {
 
-					loadBanner(App.URL_AdsBuilderCar, "CAR", false);        //scarico banner
+					loadBanner(App.URL_AdsBuilderCar, "CAR", false);   //scarico banner
 					getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -286,7 +287,7 @@ public class FMap extends FBase implements OnClickListener {
 									//RequestBanner = false;
 								}
 							} catch (Exception e) {
-								dlog.e("updateBanner: eccezione in chiamata", e);
+								dlog.e("FMap.onCreareView.updateBanner();eccezione in chiamata", e);
 							}
 						}
 					});
@@ -438,7 +439,7 @@ public class FMap extends FBase implements OnClickListener {
 
 			@Override
 			public void onAnimationEnd(Animation animation) {
-				dlog.d(FMap.class.toString() + "EndAnimation: alertAnimation");
+				dlog.d("FMap.onAnimationEnd();alertAnimation");
 
 			}
 
@@ -482,12 +483,12 @@ public class FMap extends FBase implements OnClickListener {
 							no3gwarning.setBackgroundResource(R.drawable.sha_whiteroundedorangebox);
 							animToggle = !animToggle;
 							break;
-
 					}
 
-					animFull = !animFull;
-				} else
-					animFull = !animFull;
+//					animFull = !animFull;
+				}
+
+				animFull = !animFull;
 			}
 
 		});
@@ -518,7 +519,7 @@ public class FMap extends FBase implements OnClickListener {
 		if (App.first_UP_poi && App.hasNetworkConnection()) {
 			new Thread(new Runnable() {
 				public void run() {
-					dlog.d(FMap.class.toString() + " onCreateView: Primo aggiornamento Poi");
+					dlog.d("FMap.onCreateView();Primo aggiornamento Poi");
 					updatePoiIcon(App.URL_PoisIcons);
 					updatePoiPos(App.URL_PoisBanner);
 				}
@@ -679,7 +680,7 @@ public class FMap extends FBase implements OnClickListener {
 		try {
 			getActivity().registerReceiver(this.ConnectivityChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
 		} catch (Exception e) {
-			dlog.e("onResume: eccezione nella registrazione del broadcast receiver ", e);
+			dlog.e("FMap.onResume();eccezione nella registrazione del broadcast receiver ", e);
 		}
 
 		updateUI();
@@ -715,7 +716,7 @@ public class FMap extends FBase implements OnClickListener {
 		try {
 			getActivity().unregisterReceiver(this.ConnectivityChangeReceiver);
 		} catch (Exception e) {
-			dlog.e("onPause: Exception while unresisting receiver ", e);
+			dlog.e("FMap.onPause();Exception while unresisting receiver ", e);
 		}
 
 	}
@@ -744,7 +745,7 @@ public class FMap extends FBase implements OnClickListener {
 				tts = null;
 			}
 		} catch (Exception e) {
-			dlog.e("Exception while detaching FMap", e);
+			dlog.e("FMap.onDetach();", e);
 		}
 
 	}
@@ -822,7 +823,7 @@ public class FMap extends FBase implements OnClickListener {
 			lastInside = 0;
 
 		} else {
-			updateArea = 0;
+//			updateArea = 0;
 			if (!animQueue.contains("area")) {
 				animQueue.add("area");
 			}
@@ -874,7 +875,7 @@ public class FMap extends FBase implements OnClickListener {
 				if (SOC < 15) {
 
 					if (statusAlertSOC <= 1) {
-						dlog.d("Display popup 5km");
+						dlog.d("FMap.updateCarInfo();Display popup 5km");
 						statusAlertSOC = 2;
 						eventRepository.eventSoc(SOC, "Popup 5km");
 						rootView.findViewById(R.id.fmapAlertSOCFL).setVisibility(View.VISIBLE);
@@ -892,7 +893,7 @@ public class FMap extends FBase implements OnClickListener {
 				} else if (SOC <= 30) {
 
 					if (statusAlertSOC <= 0) {
-						dlog.d("Display popup 20km");
+						dlog.d("FMap.updateCarInfo();Display popup 20km");
 
 						statusAlertSOC = 1;
 						eventRepository.eventSoc(SOC, "Popup 20km");
@@ -930,11 +931,11 @@ public class FMap extends FBase implements OnClickListener {
 				tvRange.setText((SOC >= 50 ? SOC : SOC - 10) + " Km");
 			}
 
-			range = carInfo.rangeKm;
+//			range = carInfo.rangeKm;
 			//ShowRealReachTimed(carInfo.rangeKm,10000);
 
 		} catch (Exception e) {
-			dlog.e("Exception while handling carInfo", e);
+			dlog.e("FMap.updateCarInfo();", e);
 		}
 	}
 
@@ -1030,7 +1031,7 @@ public class FMap extends FBase implements OnClickListener {
 			case R.id.fmapAlertCloseBTN:
 
 				localHandler.sendEmptyMessage(MSG_CLOSE_SOC_ALERT);
-				dlog.cr("Chiusura alert SOC");
+				dlog.cr("FMap.onClick();Chiusura alert SOC");
 				break;
 
 		/*case R.id.fmapPOIIB:
@@ -1089,7 +1090,7 @@ public class FMap extends FBase implements OnClickListener {
 							adIV.setColorFilter(R.color.overlay_click);
 							FHome.timer_2min.cancel();
 							handleClick = true;
-							dlog.d(FMap.class.toString() + " Banner: Click su banner ");
+							dlog.d("FMap.onClick();Click su banner ");
 							new Thread(new Runnable() {
 								@Override
 								public void run() {
@@ -1132,7 +1133,7 @@ public class FMap extends FBase implements OnClickListener {
 	private boolean drawPOIS() {
 //TODO visualizzare solo un 30% dei poi
 		if (mapView == null || getActivity() == null) {
-			dlog.d(" drawPois: mapViw null or contemporary called, or activity null");
+			dlog.d("FMap.drawPois();mapViw null or contemporary called, or activity null");
 			return false;
 		}
 
@@ -1167,7 +1168,7 @@ public class FMap extends FBase implements OnClickListener {
 
 				if (customView.findViewById(R.id.customView_poi) != null) {
 					File imgFile = new File(App.getPoiIconFolder().concat(poi.getString("id_icon")).concat(".png"));
-					if (imgFile == null || !imgFile.exists())
+					if (!imgFile.exists())
 						continue;
 					myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 					((ImageView) (customView.findViewById(R.id.customView_poi))).setImageBitmap(myBitmap);
@@ -1188,7 +1189,7 @@ public class FMap extends FBase implements OnClickListener {
 
 			customView.removeAllViews();
 		} catch (Exception e) {
-			DLog.E("error handling bitmap", e);
+			DLog.E("FMap.drawPOIS();error handling bitmap", e);
 
 			return false;
 		}
@@ -1339,7 +1340,7 @@ public class FMap extends FBase implements OnClickListener {
 		calloutCoordinate = position;
 
 		if (getActivity() == null) {
-			dlog.e("eventCallout: Activity null");
+			dlog.e("FMap.eventCallout();Activity null");
 			return;
 		}
 		customView = (RelativeLayout) ((LayoutInflater) (getActivity()).getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.layout_custom_view, null, false);
@@ -1389,7 +1390,7 @@ public class FMap extends FBase implements OnClickListener {
 				navigationCallout.setVerticalOffset(topOffset);
 
 			} catch (Exception e) {
-				dlog.e("Exception during creation of custom layout", e);
+				dlog.e("FMap.eventCallout();Exception during creation of custom layout", e);
 			}
 
 		}
@@ -1404,7 +1405,7 @@ public class FMap extends FBase implements OnClickListener {
 		SKCoordinate destination = new SKCoordinate();
 		destination.setLatitude(location.getLatitude());
 		destination.setLongitude(location.getLongitude());
-		dlog.d("NavigateTo: set destination to " + location.getLatitude() + " " + location.getLongitude());
+		dlog.d("FMap.NavigateTo();set destination to " + location.getLatitude() + " " + location.getLongitude());
 		startRoute(destination);
 	}
 
@@ -1566,14 +1567,14 @@ public class FMap extends FBase implements OnClickListener {
 			txtNextStreet.setVisibility(View.VISIBLE);
 			rootView.findViewById(R.id.btnCloseNav).setVisibility(View.VISIBLE);
 
-			dlog.d("startRouteNavigation: Imposto Audio a AUDIO_SYSTEM");
+			dlog.d("FMap.startRouteNavigation();Imposto Audio a AUDIO_SYSTEM");
 			if (getActivity() != null)
 				((AMainOBC) getActivity()).sendMessage(MessageFactory.AudioChannel(LowLevelInterface.AUDIO_SYSTEM, 15));
 			else
-				dlog.w("startRouteNavigation: getActivity null!!!");
+				dlog.w("FMap.startRouteNavigation();getActivity null!!!");
 
 		} catch (Exception e) {
-			dlog.e("startRouteNavigation: Exception while starting navigation ", e);
+			dlog.e("FMap.startRouteNavigation();", e);
 		}
 
 	}
@@ -1596,14 +1597,14 @@ public class FMap extends FBase implements OnClickListener {
 
 			initMapSettings();
 		} catch (Exception e) {
-			dlog.e("stopRouteNavigation: Unexpected Exception", e);
+			dlog.e("FMap.stopRouteNavigation();", e);
 		}
 
 	}
 
-	private boolean realReachShown = false;
+//	private boolean realReachShown = false;
 
-	private void ShowRealReachTimed(int km, long time) {
+/*	private void ShowRealReachTimed(int km, long time) {
 
 		if (realReachShown || km == 0 || km > 150)
 			return;
@@ -1613,8 +1614,9 @@ public class FMap extends FBase implements OnClickListener {
 		localHandler.sendEmptyMessage(MSG_SHOW_REAL_REACH);
 		localHandler.sendEmptyMessageDelayed(MSG_ZOOM_REAL_REACH, 1000);
 		localHandler.sendEmptyMessageDelayed(MSG_HIDE_REAL_REACH, time);
-	}
+	}*/
 
+/*
 	private void ShowRealReach(int km) {
 
 		if (mapView == null) {
@@ -1630,7 +1632,8 @@ public class FMap extends FBase implements OnClickListener {
 		realReachSettings.setConnectionMode(SKRouteConnectionMode.OFFLINE);
 		mapView.displayRealReachWithSettings(realReachSettings);
 
-    	/*
+    	*/
+/*
     	localHandler.postDelayed(new Runnable() {
 
 			@Override
@@ -1640,11 +1643,13 @@ public class FMap extends FBase implements OnClickListener {
 			}
 
     	}, 2000);
-    	*/
+    	*//*
+
 
 	}
+*/
 
-	private void ZoomRealReach() {
+/*	private void ZoomRealReach() {
 
 		if (mapView == null)
 			return;
@@ -1652,7 +1657,7 @@ public class FMap extends FBase implements OnClickListener {
 		SKBoundingBox bb = mapView.getRealReachBoundingBox();
 		mapView.fitRealReachInView(bb, true, 1000);
 
-	}
+	}*/
 
 	private void HideRealReach() {
 
@@ -1672,7 +1677,8 @@ public class FMap extends FBase implements OnClickListener {
 	}
 
 	public static Bitmap decodeFileToBitmap(String pathToFile) {
-		Bitmap decodedFile = null;
+		Bitmap decodedFile;
+
 		try {
 			decodedFile = BitmapFactory.decodeFile(pathToFile);
 		} catch (OutOfMemoryError ofmerr) {
@@ -1682,7 +1688,7 @@ public class FMap extends FBase implements OnClickListener {
 	}
 
 	private String formatTime(int s) {
-		String str = "";
+		String str;
 		int h = 0, m = 0;
 
 		if (s > 3600) {
@@ -1692,14 +1698,14 @@ public class FMap extends FBase implements OnClickListener {
 
 		if (s > 60) {
 			m = s / 60;
-			str += m + ":";
+//			str += m + ":";
 			s %= 60;
 		}
 
 		if (h > 0)
-			str = String.format("%d:%02d:%02d", h, m, s);
+			str = String.format(Locale.getDefault(), "%d:%02d:%02d", h, m, s);
 		else
-			str = String.format("%d:%02d", m, s);
+			str = String.format(Locale.getDefault(), "%d:%02d", m, s);
 
 		return str;
 
@@ -1707,7 +1713,7 @@ public class FMap extends FBase implements OnClickListener {
 
 	private Spanned distanceToHtml(String s, boolean twoRows) {
 
-		String p[] = s.split(" ");
+		String[] p = s.split(" ");
 		if (p.length < 2) {
 			return Html.fromHtml(s);
 		} else {
@@ -1721,8 +1727,8 @@ public class FMap extends FBase implements OnClickListener {
 	/**
 	 * Handles the navigation state update.
 	 *
-	 * @param skNavigationState
-	 * @param mapStyle
+	 * @param skNavigationState navigator state
+	 * @param mapStyle map style
 	 */
 	private void handleNavigationState(final SKNavigationState skNavigationState,
 									   final int mapStyle, final ViewGroup view) {
@@ -1842,28 +1848,56 @@ public class FMap extends FBase implements OnClickListener {
 	};
 
 	private View inflateNavigationLayout(ViewGroup parent, OnClickListener listener) {
+        View view=null;
+
 		LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View view = inflater.inflate(R.layout.la_navigation, null);
+
+        if(inflater!=null) {
+            view = inflater.inflate(R.layout.la_navigation, null);
+        } else {
+            DLog.E("FMap.inflateNavigationLayout();inflater null");
+        }
+//		View view = inflater.inflate(R.layout.la_navigation, null);
 
 		return view;
 	}
 
 	private View inflateRealReachLayout(ViewGroup parent, OnClickListener listener) {
+	    View view=null;
 		LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View view = inflater.inflate(R.layout.la_realreach, null);
 
-		view.findViewById(R.id.btnCloseRealReach).setOnClickListener(listener);
+		if(inflater!=null) {
+            view = inflater.inflate(R.layout.la_realreach, null);
+            view.findViewById(R.id.btnCloseRealReach).setOnClickListener(listener);
+
+        } else {
+		    DLog.E("FMap.inflateRealReachLayout();inflater null");
+        }
+
+/*		View view = inflater.inflate(R.layout.la_realreach, null);
+		view.findViewById(R.id.btnCloseRealReach).setOnClickListener(listener);*/
 
 		return view;
 	}
 
 	private View inflateNavMenuLayout(ViewGroup parent, OnClickListener listener) {
-		LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View view = inflater.inflate(R.layout.la_navmenu, null);
+        View view = null;
+        LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        if(inflater!=null) {
+            view = inflater.inflate(R.layout.la_navmenu, null);
+            view.findViewById(R.id.btnClose).setOnClickListener(listener);
+            view.findViewById(R.id.btnSearch).setOnClickListener(listener);
+            view.findViewById(R.id.btnFavorites).setOnClickListener(listener);
+        } else {
+            DLog.E("FMap.inflateNavMenuLayout();inflater is null");
+        }
+
+
+/*		View view = inflater.inflate(R.layout.la_navmenu, null);
 		view.findViewById(R.id.btnClose).setOnClickListener(listener);
 		view.findViewById(R.id.btnSearch).setOnClickListener(listener);
-		view.findViewById(R.id.btnFavorites).setOnClickListener(listener);
+		view.findViewById(R.id.btnFavorites).setOnClickListener(listener);*/
 
 		return view;
 	}
@@ -1874,7 +1908,7 @@ public class FMap extends FBase implements OnClickListener {
 			try {
 				parent.removeAllViews();
 			} catch (Exception e) {
-				dlog.e(" eccezione rimuovendo le view da panels", e);
+				dlog.e("FMap.buildLeftPanels();eccezione rimuovendo le view da panels", e);
 			}
 
 			panelRealReach = inflateRealReachLayout(parent, panelsClickListener);
@@ -1892,7 +1926,7 @@ public class FMap extends FBase implements OnClickListener {
 			parent.addView(panelNavMenu);
 			panels.add(panelNavMenu);
 		} catch (Exception e) {
-			dlog.e("Exception while building left panel", e);
+			dlog.e("FMap.buildLeftPanels();Exception while building left panel", e);
 		}
 
 	}
@@ -1960,13 +1994,13 @@ public class FMap extends FBase implements OnClickListener {
 			panel.animate().alpha(1.0f);
 			//panel.animate().translationX(0);
 			//panel.invalidate();
-			dlog.d(FMap.class.toString() + " showLeftPanel: panel " + String.valueOf(which) + " visibile");
+			dlog.d("FMap.showLeftPanel();panel " + which + " visibile");
 
 		} catch (Exception e) {
 
 			homeB.setVisibility(View.VISIBLE);
 			findDestinationB.setVisibility(View.VISIBLE);
-			dlog.e("Exception while building left panel, restoring home button", e);
+			dlog.e("FMap.showLeftPanel();Exception while building left panel, restoring home button", e);
 		}
 
 	}
@@ -1981,13 +2015,13 @@ public class FMap extends FBase implements OnClickListener {
 			//rootView.findViewById(R.id.fmapLeftBorderIV).setVisibility(View.VISIBLE);
 			//rootView.findViewById(R.id.fmapLeftBorderIV).animate().translationX(0);
 		} catch (Exception e) {
-			dlog.e("Exception while hiding left panels", e);
+			dlog.e("FMap.hideLeftPanel();Exception while hiding left panels", e);
 		}
 	}
 
-	private void centerMap(Location position) {
+/*	private void centerMap(Location position) {
 
-	}
+	}*/
 
 	public void onActivityLocationChanged(Location location) {
 
@@ -2082,7 +2116,7 @@ public class FMap extends FBase implements OnClickListener {
 						break;
 				}
 			} catch (Exception e) {
-				dlog.e("Exception while handling message", e);
+				dlog.e("FMap.handleMessage();Exception while handling message", e);
 			}
 		}
 	};
@@ -2096,7 +2130,7 @@ public class FMap extends FBase implements OnClickListener {
 				localHandler.sendEmptyMessageDelayed(MSG_CENTER_MAP, 13000);
 				mapView.getMapSettings().setFollowerMode(SKMapFollowerMode.NONE);
 			} else {
-				DLog.W("Click su mapView ancora non inizializzato");
+				DLog.W("FMap.onActionPan();mapView ancora non inizializzato");
 			}
 		}
 
@@ -2116,7 +2150,7 @@ public class FMap extends FBase implements OnClickListener {
 				localHandler.sendEmptyMessageDelayed(MSG_CENTER_MAP, 20000); //evito il reset della vista prima del tempo
 				localHandler.sendEmptyMessageDelayed(MSG_CLOSE_CALLOUT, 20000);
 			} catch (Exception e) {
-				dlog.e("onAnnotationSelected: Exception on callout creation", e);
+				dlog.e("FMap.onAnnotationSelected();Exception on callout creation", e);
 			}
 		}
 
@@ -2196,7 +2230,7 @@ public class FMap extends FBase implements OnClickListener {
 				}
 
 			} else {
-				DLog.W("mapView null");
+				DLog.W("FMap.onSingleTap();mapView null");
 			}
 		}
 
@@ -2260,14 +2294,13 @@ public class FMap extends FBase implements OnClickListener {
 
 				//}
 			} else {
-				DLog.W("Mapview null");
+				DLog.W("FMap.onLongPress();Mapview null");
 			}
 		}
 
 		@Override
 		public void onMapActionDown(SKScreenPoint arg0) {
 			// TODO Auto-generated method stub
-
 		}
 
 		@Override
@@ -2310,7 +2343,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		@Override
 		public void onSurfaceCreated(SKMapViewHolder holder) {
-			Boolean test = false;
+//			Boolean test = false;
 
 			mapView = holder.getMapSurfaceView();
 			mapView.deleteAnnotation(9);
@@ -2325,9 +2358,9 @@ public class FMap extends FBase implements OnClickListener {
 					drawChargingStation();
 					drawPolyline();
 				} catch (OutOfMemoryError e) {
-					dlog.e("drawPois: out of memory ", e);
+					dlog.e("FMap.onSurfaceCreated();out of memory ", e);
 				} catch (Exception e) {
-					dlog.e("drawPois: Generic Exception ", e);
+					dlog.e("FMap.onSurfaceCreated();Generic Exception ", e);
 				}
 				return;
 
@@ -2338,7 +2371,7 @@ public class FMap extends FBase implements OnClickListener {
 				} else
 					resetMapSettings();
 			} catch (Exception e) {
-				dlog.e("exception startRouteNavigation() ", e);
+				dlog.e("FMap.onSurfaceCreated();startRouteNavigation() ", e);
 			}
 
 		}
@@ -2370,16 +2403,21 @@ public class FMap extends FBase implements OnClickListener {
 		@Override
 		public void onSignalNewAdviceWithAudioFiles(String[] arg0, boolean arg1) {
 			if (arg0 != null && arg0.length > 0) {
-				for (int i = 0; i < arg0.length; i++) {
-					dlog.d("ADVICE: " + arg0[i]);
+
+				for(String a: arg0) {
+					dlog.d("FMap.onSignalNewAdviceWithAudioFiles();ADVICE: " + a);
 				}
+
+/*				for (int i = 0; i < arg0.length; i++) {
+					dlog.d("ADVICE: " + arg0[i]);
+				}*/
 			}
 
 		}
 
 		@Override
 		public void onSignalNewAdviceWithInstruction(String arg0) {
-			dlog.d("ADVICE STRING:" + arg0);
+			dlog.d("FMap.onSignalNewAdviceWithInstruction();ADVICE STRING:" + arg0);
 			//tts.postpone();
 			tts.speak(arg0, TextToSpeech.QUEUE_FLUSH);
 
@@ -2410,7 +2448,7 @@ public class FMap extends FBase implements OnClickListener {
 				if (state != null)
 					handleNavigationState(state, 0, (ViewGroup) rootView.findViewById(R.id.fmapLeftFrame));
 			} catch (Exception e) {
-				dlog.e("Exception handling navigation state", e);
+				dlog.e("FMap.onUpdateNavigationState();Exception handling navigation state", e);
 			}
 
 		}
@@ -2418,25 +2456,23 @@ public class FMap extends FBase implements OnClickListener {
 		@Override
 		public void onViaPointReached(int arg0) {
 			// TODO Auto-generated method stub
-
 		}
 
 		@Override
-		public void onVisualAdviceChanged(boolean arg0, boolean arg1,
-										  SKNavigationState arg2) {
+		public void onVisualAdviceChanged(boolean arg0, boolean arg1, SKNavigationState arg2) {
 			// TODO Auto-generated method stub
 
 		}
 
 		@Override
-		public void onFreeDriveUpdated(String arg0, String arg1, String arg2,
-									   SKStreetType arg3, double arg4, double arg5) {
+		public void onFreeDriveUpdated(String arg0, String arg1, String arg2, SKStreetType arg3, double arg4, double arg5) {
 			// TODO Auto-generated method stub
 
 		}
 
 	};
 
+/*
 	private SKToolsNavigationListener toolsNavigationListener = new SKToolsNavigationListener() {
 
 		@Override
@@ -2473,6 +2509,7 @@ public class FMap extends FBase implements OnClickListener {
 
 	};
 
+*/
 	public SKRouteListener routeListener = new SKRouteListener() {
 
 		@Override
@@ -2511,7 +2548,7 @@ public class FMap extends FBase implements OnClickListener {
 
 		try {
 			File f = new File(folder);
-			File file[] = f.listFiles();
+			File[] file = f.listFiles();
 			Log.d("Files", "Size: " + file.length);
 			if (file.length == 0)
 				return "0";
@@ -2545,7 +2582,7 @@ public class FMap extends FBase implements OnClickListener {
 	private void updatePoiIcon(String Url) {
 		try {
 
-			String jsonStr = "";
+			String jsonStr;
 			if (Icons != null)
 				Icons.clear();
 
@@ -2555,7 +2592,7 @@ public class FMap extends FBase implements OnClickListener {
 			}
 
 			Url = Url.concat("?ID=").concat(maxIconID(App.getPoiIconFolder()));
-			dlog.d("updatePoiIcon: load url" + Url);
+			dlog.d("FMap.updatePoiIcon();load url" + Url);
 			StringBuilder builder = new StringBuilder();
 			HttpClient client = new DefaultHttpClient();
 			HttpGet httpGet = new HttpGet(Url);
@@ -2577,7 +2614,7 @@ public class FMap extends FBase implements OnClickListener {
 					content.close();
 				} else {
 
-					dlog.e(FMap.class.toString() + "Failed to download file");
+					dlog.e( "FMap.updatePoiIcon();Failed to download file");
 				}
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
@@ -2590,7 +2627,7 @@ public class FMap extends FBase implements OnClickListener {
 			}
 			jsonStr = builder.toString();
 			builder.delete(0, builder.length());
-			dlog.d("updatePoiIcon got Response: " + jsonStr);
+			dlog.d("FMap.updatePoiIcon();got Response: " + jsonStr);
 			parseJsonIcon(jsonStr);
 			String filename = "";
 			FileOutputStream fileOutput = null;
@@ -2601,7 +2638,7 @@ public class FMap extends FBase implements OnClickListener {
 					URL url = new URL(Icon.getString("URL"));
 					String extension = url.getFile().substring(url.getFile().lastIndexOf('.') + 1);
 					filename = Icon.getString("ID").concat(".").concat(extension);
-					dlog.d("Local filename:" + filename);
+					dlog.d("FMap.updatePoiIcon();Local filename:" + filename);
 					File file = new File(outDir, filename);
 
 					if (file.exists())
@@ -2624,7 +2661,7 @@ public class FMap extends FBase implements OnClickListener {
 
 					urlConnection.disconnect();
 				} catch (Exception e) {
-					dlog.e("Exception while downloading image");
+					dlog.e("FMap.updatePoiIcon();Exception while downloading image", e);
 					File file = new File(outDir, filename);
 					if (file.exists())
 						file.delete();
@@ -2640,15 +2677,13 @@ public class FMap extends FBase implements OnClickListener {
 			e.printStackTrace();
 		}
 
-		return;
-
 	}
 
 	private void parseJsonIcon(String jsonStr) {
 
 		try {
 			JSONObject json = new JSONObject(jsonStr);
-			Log.i(FMap.class.getName(), "creazione oggetto Json");
+			Log.i(FMap.class.getName(), "FMap.parseJsonIcon();creazione oggetto Json");
 			//Get the instance of JSONArray that contains JSONObjects
 			JSONArray jsonArray = json.optJSONArray("Icons");
 
@@ -2683,14 +2718,14 @@ public class FMap extends FBase implements OnClickListener {
 			StringBuilder builder = new StringBuilder();
 			Writer writer;
 			HttpClient client = new DefaultHttpClient();
-			List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
+			List<NameValuePair> paramsList = new ArrayList<>();
 			if (!jsonmd5.equals("")) {
 				paramsList.add(new BasicNameValuePair("md5", jsonmd5));//Url = Url.concat("?md5=").concat(jsonmd5);
 			}
 			paramsList.add(new BasicNameValuePair("versione", "2")); //corrisponde al type massimo di poi che gestisce
 			paramsList.add(new BasicNameValuePair("carplate", App.CarPlate));
 			Url = UrlTools.buildQuery(Url.concat("?"), paramsList).toString();
-			dlog.d(FMap.class.toString() + " updatePoiPos: Richiesta url " + Url);
+			dlog.d("FMap.updatePoiPos();Richiesta url " + Url);
 			HttpGet httpGet = new HttpGet(Url);
 			try {
 				HttpResponse response = client.execute(httpGet);
@@ -2710,7 +2745,7 @@ public class FMap extends FBase implements OnClickListener {
 					content.close();
 				} else {
 
-					dlog.e(FMap.class.toString() + "updatePoiPos: Failed to download file: " + statusLine.toString());
+					dlog.e("FMap.updatePoiPos();Failed to download file: " + statusLine.toString());
 				}
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
@@ -2722,7 +2757,7 @@ public class FMap extends FBase implements OnClickListener {
 				client.getConnectionManager().shutdown();
 			}
 			jsonStr = builder.toString();
-			dlog.d(FMap.class.toString() + " updatePoiPos: Risposta a url " + jsonStr);
+			dlog.d( "FMap.updatePoiPos();Risposta a url " + jsonStr);
 			if (jsonStr.equals(""))
 				return;
 			parseJsonPos(jsonStr);
@@ -2743,17 +2778,15 @@ public class FMap extends FBase implements OnClickListener {
 					drawChargingStation();
 				}
 
-				dlog.d(FMap.class.toString() + " updatePoiPos: Poi aggiornati");
+				dlog.d("FMap.updatePoiPos();Poi aggiornati");
 			} catch (IOException e) {
-				dlog.e(FMap.class.toString() + " updatePoiPos: eccezione nel salvataggio del json o crazione Poi ", e);
+				dlog.e("FMap.updatePoiPos(); eccezione nel salvataggio del json o crazione Poi ", e);
 
 			}
 		} catch (Exception e) {
-			dlog.e(FMap.class.toString() + " updatePoiPos: eccezione nel reperimento e salvataggio del json ", e);
+			dlog.e("FMap.updatePoiPos();eccezione nel reperimento e salvataggio del json ", e);
 			e.printStackTrace();
 		}
-
-		return;
 
 	}
 
@@ -2771,7 +2804,7 @@ public class FMap extends FBase implements OnClickListener {
 			JSONArray jsonArray = json.optJSONArray("Position");
 
 			//Iterate the jsonArray and print the info of JSONObjects
-			ArrayList<Bundle> PoisTemp = new ArrayList<Bundle>();
+			ArrayList<Bundle> PoisTemp = new ArrayList<>();
 
 			int k;
 			for (k = 0; k < jsonArray.length(); k++) {
@@ -2798,8 +2831,7 @@ public class FMap extends FBase implements OnClickListener {
 					if (jsonObject.has("code"))
 						Poi.putString("code", jsonObject.getString("code"));
 				} catch (Exception e) {
-
-					dlog.e(FMap.class.getName() + " parseJsonPos: eccezione durante  parse JsonObject", e);
+					dlog.e("FMap.parseJsonPos();eccezione durante  parse JsonObject", e);
 				}
 				PoisTemp.add(Poi);
 
@@ -2821,8 +2853,7 @@ public class FMap extends FBase implements OnClickListener {
 					Poi.putString("description", singlePoi.type);
 					Poi.putString("code", singlePoi.code);
 				} catch (Exception e) {
-
-					dlog.e(FMap.class.getName() + " parseJsonPos: eccezione durante  parse JsonObject", e);
+					dlog.e("FMap.parseJsonPos();eccezione durante  parse JsonObject", e);
 				}
 				PoisTemp.add(Poi);
 				k++;
@@ -2838,18 +2869,21 @@ public class FMap extends FBase implements OnClickListener {
 
 	public String md5(String encTarget) {
 		MessageDigest mdEnc = null;
+		String md5="";
+
 		try {
 			mdEnc = MessageDigest.getInstance("MD5");
+			// Encryption algorithm
+			mdEnc.update(encTarget.getBytes(), 0, encTarget.length());
+			md5 = new BigInteger(1, mdEnc.digest()).toString(16);
+			while (md5.length() < 32) {
+				md5 = "0" + md5;
+			}
+			mdEnc.reset();
 		} catch (NoSuchAlgorithmException e) {
-			dlog.e(FMap.class.toString() + " md5: Exception while encrypting to md5", e);
+			dlog.e("FMap.md5();Exception while encrypting to md5", e);
 			e.printStackTrace();
-		} // Encryption algorithm
-		mdEnc.update(encTarget.getBytes(), 0, encTarget.length());
-		String md5 = new BigInteger(1, mdEnc.digest()).toString(16);
-		while (md5.length() < 32) {
-			md5 = "0" + md5;
 		}
-		mdEnc.reset();
 		return md5;
 	}
 
@@ -2902,6 +2936,13 @@ public class FMap extends FBase implements OnClickListener {
 
 	public void loadBanner(String Url, String type, Boolean isClick) {
 
+		//for countries outside Italy use local banners
+		if (!App.Instance.getDefaultLang().equals("it")) {
+			dlog.e(" loadBanner: get LOCAL banner");
+			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
+			return;
+		}
+
 		File outDir = new File(App.getBannerImagesFolder());
 		if (!outDir.isDirectory()) {
 			outDir.mkdir();
@@ -2909,12 +2950,12 @@ public class FMap extends FBase implements OnClickListener {
 
 		if (App.parkMode.isOn()) {
 
-			dlog.i("loadBanner: Park mode ON");
+			dlog.i("FMap.loadBanner();Park mode ON");
 			return;
 		}
 
 		if (!App.hasNetworkConnection()) {
-			dlog.e(FMap.class.toString() + " loadBanner: nessuna connessione");
+			dlog.e("FMap.loadBanner();nessuna connessione");
 			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 		}
@@ -2943,7 +2984,7 @@ public class FMap extends FBase implements OnClickListener {
 			Url = UrlTools.buildQuery(Url.concat("?"), paramsList).toString();
 			//connessione per scaricare id immagine
 
-			DLog.I(FMap.class.toString() + " loadBanner: Url richiesta " + Url);
+			DLog.I("FMap.loadBanner(); Url richiesta " + Url);
 			HttpClient client = new DefaultHttpClient();
 			HttpGet httpGet = new HttpGet(Url);
 
@@ -2964,25 +3005,25 @@ public class FMap extends FBase implements OnClickListener {
 				reader.close();
 			} else {
 
-				dlog.e(FMap.class.toString() + " loadBanner: Failed to connect " + String.valueOf(statusCode));
+				dlog.e("FMap.loadBanner();Failed to connect " + String.valueOf(statusCode));
 				App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
 				return;
 			}
 			client.getConnectionManager().shutdown();
 		} catch (Exception e) {
-			dlog.e(FMap.class.toString() + " loadBanner: eccezione in connessione ", e);
+			dlog.e("FMap.loadBanner();eccezione in connessione ", e);
 			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 		}
 		String jsonStr = builder.toString();
 		builder.delete(0, builder.length());
 		if (jsonStr.compareTo("") == 0) {
-			dlog.e(FMap.class.toString() + " loadBanner: nessuna connessione");
+			dlog.e("FMap.loadBanner();nessuna connessione");
 			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
 			return;
 		}
 
-		DLog.I(FMap.class.toString() + " loadBanner: risposta " + jsonStr);
+		DLog.I("FMap.loadBanner(); risposta " + jsonStr);
 		File file = new File(outDir, "placeholder.lol");
 
 		try {
@@ -3017,11 +3058,11 @@ public class FMap extends FBase implements OnClickListener {
 			if (file.exists()) {
 				Image.putString(("FILENAME"), filename);
 				App.BannerName.putBundle(type, Image);
-				dlog.i(FMap.class.toString() + " loadBanner: file già esistente: " + filename);
+				dlog.i("FMap.loadBanner();file già esistente: " + filename);
 				return;
 			}
 
-			dlog.i(FMap.class.toString() + " loadBanner: file mancante inizio download a url: " + urlImg.toString());
+			dlog.i("FMap.loadBanner();file mancante inizio download a url: " + urlImg.toString());
 			HttpURLConnection urlConnection = (HttpURLConnection) urlImg.openConnection();
 			urlConnection.setRequestMethod("GET");
 			urlConnection.setDoOutput(true);
@@ -3045,12 +3086,14 @@ public class FMap extends FBase implements OnClickListener {
 			inputStream.close();
 			Image.putString(("FILENAME"), filename);
 			App.BannerName.putBundle(type, Image);
-			DLog.I(FMap.class.toString() + " loadBanner: File scaricato e creato " + filename);
+			DLog.I("FMap.loadBanner();File scaricato e creato " + filename);
 
 		} catch (Exception e) {
-			if (file.exists()) file.delete();
+			if (file.exists()) {
+				file.delete();
+			}
 			App.BannerName.putBundle(type, null);//null per identificare nessuna connessione, caricare immagine offline
-			dlog.e(FMap.class.toString() + " loadBanner: eccezione in creazione e download file ", e);
+			dlog.e("FMap.loadBanner();eccezione in creazione e download file ", e);
 
 			e.printStackTrace();
 		}
@@ -3065,19 +3108,19 @@ public class FMap extends FBase implements OnClickListener {
 			ImageV = new File(App.getBannerImagesFolder(), Banner.getString("FILENAME", "nope"));
 
 			try {
-				if (ImageV != null && ImageV.exists()) {
-					dlog.d(FMap.class.toString() + " updateBanner: file trovato imposto immagine " + ImageV.getName());
+				if (ImageV.exists()) {
+					dlog.d("FMap.loadBanner();file trovato imposto immagine " + ImageV.getName());
 					Bitmap myBitmap = BitmapFactory.decodeFile(ImageV.getAbsolutePath());
 					if (myBitmap == null) {
 
-						dlog.e(FMap.class.toString() + " updateBanner: file corrotto, elimino e visualizzo offline ");
+						dlog.e("FMap.loadBanner();file corrotto, elimino e visualizzo offline ");
 						ImageV.delete();
 						//initWebBanner(Banner.getString("URL",null));
 						//webViewBanner.setVisibility(View.INVISIBLE);
 						adIV.setImageResource(R.drawable.car_banner_offline);
 						adIV.setVisibility(View.VISIBLE);
 						if (!FHome.started) {
-							FHome.started = !FHome.started;
+							FHome.started = true;
 							FHome.timer_2min.cancel();
 							FHome.timer_2min.start();
 						}
@@ -3090,7 +3133,7 @@ public class FMap extends FBase implements OnClickListener {
 
 				}
 			} catch (Exception e) {
-				dlog.e(FMap.class.toString() + " updateBanner: eccezione in caricamento file visualizzo offline ", e);
+				dlog.e("FMap.loadBanner();eccezione in caricamento file visualizzo offline ", e);
 				e.printStackTrace();
 				//initWebBanner(Banner.getString("URL",null));
 				//webViewBanner.setVisibility(View.INVISIBLE);
@@ -3099,7 +3142,7 @@ public class FMap extends FBase implements OnClickListener {
 
 			}
 		} else {
-			dlog.e(FMap.class.toString() + " updateBanner: Bundle null, visualizzo offline");
+			dlog.e("FMap.loadBanner();Bundle null, visualizzo offline");
 			//initWebBanner(Banner.getString("URL",null));
 			//webViewBanner.setVisibility(View.INVISIBLE);
 			adIV.setImageResource(R.drawable.car_banner_offline);
@@ -3108,7 +3151,7 @@ public class FMap extends FBase implements OnClickListener {
 		}
 
 		if (!FHome.started) {
-			FHome.started = !FHome.started;
+			FHome.started = true;
 			FHome.timer_2min.cancel();
 			FHome.timer_2min.start();
 		}
@@ -3116,7 +3159,7 @@ public class FMap extends FBase implements OnClickListener {
 
 	private void updateFleet(int fleet) {
 
-		dlog.d("updateFleet: ricevuto fleet id " + fleet);
+		dlog.d("FMap.updateFleet();ricevuto fleet id " + fleet);
 		if (App.FleetId != fleet && fleet != 0) {
 			App.FleetId = fleet;
 			App.Instance.persistFleetId();
@@ -3151,10 +3194,10 @@ public class FMap extends FBase implements OnClickListener {
 		/*if (!firstUpReceived) {
 			return false;
 		}*/
-		dlog.d("drawChargingStation: " + firstUpReceived);
+		dlog.d("FMap.drawChargingStation();" + firstUpReceived);
 
 		if (mapView == null || getActivity() == null) {
-			dlog.d(" drawPois: mapViw null or contemporary called, or activity null");
+			dlog.d(" FMap.drawChargingStation(); mapViw null or contemporary called, or activity null");
 			return false;
 		}
 
@@ -3164,31 +3207,39 @@ public class FMap extends FBase implements OnClickListener {
 					R.layout.layout_custom_view_poi, null, false);
 			List<SKAnnotation> MapAnnotations = mapView.getAllAnnotations();
 			List<Poi> PoiList = retriveChargingList();
+
+
 			ArrayList<Bundle> PoisTemp = new ArrayList<>();
 
 			int k =0;
-			if(Pois.size()>0)
+			if(Pois.size()>0){
 				k=Pois.get(Pois.size()-1).getInt("INDEX",0);
-			for (Poi singlePoi : PoiList) {
-				Bundle Poi = new Bundle();
-				try {
-					Poi.putInt("ID", singlePoi.id);
-					Poi.putDouble("LAT", singlePoi.lat);
-					Poi.putDouble("LON", singlePoi.lon);
-					Poi.putString("id_icon", "map_poi_icon");
-					Poi.putString("address", singlePoi.town);
-					Poi.putString("nome", singlePoi.name);
-					Poi.putInt("INDEX", k + 10);
-					Poi.putInt("type", 3);
-					Poi.putString("description", singlePoi.type);
-					Poi.putString("code", singlePoi.code);
-				} catch (Exception e) {
-
-					dlog.e(FMap.class.getName() + " parseJsonPos: eccezione durante  parse JsonObject", e);
-				}
-				PoisTemp.add(Poi);
-				k++;
 			}
+
+			if(PoiList!=null) {
+				for (Poi singlePoi : PoiList) {
+					Bundle Poi = new Bundle();
+					try {
+						Poi.putInt("ID", singlePoi.id);
+						Poi.putDouble("LAT", singlePoi.lat);
+						Poi.putDouble("LON", singlePoi.lon);
+						Poi.putString("id_icon", "map_poi_icon");
+						Poi.putString("address", singlePoi.town);
+						Poi.putString("nome", singlePoi.name);
+						Poi.putInt("INDEX", k + 10);
+						Poi.putInt("type", 3);
+						Poi.putString("description", singlePoi.type);
+						Poi.putString("code", singlePoi.code);
+					} catch (Exception e) {
+						dlog.e("FMap.drawChargingStation();eccezione durante  parse JsonObject", e);
+					}
+					PoisTemp.add(Poi);
+					k++;
+				}
+			} else {
+				dlog.w("FMap.drawChargingStation();PoiList null");
+			}
+
 			Pois.addAll(PoisTemp);
 
 			//annotationList.clear();
@@ -3228,19 +3279,16 @@ public class FMap extends FBase implements OnClickListener {
 
 			customView.removeAllViews();
 		} catch (Exception e) {
-			DLog.E("error handling bitmap", e);
-
+			DLog.E("FMap.drawChargingStation();", e);
 			return false;
 		}
 
 		return true;
 	}
 
-	private Drawable makeFreeMarker(Drawable backgroundImage, String text,
-									int width, int height) {
+	private Drawable makeFreeMarker(Drawable backgroundImage, String text, int width, int height) {
 
-		Bitmap canvasBitmap = Bitmap.createBitmap(width, height,
-				Bitmap.Config.ARGB_8888);
+		Bitmap canvasBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		// Create a canvas, that will draw on to canvasBitmap.
 		Canvas imageCanvas = new Canvas(canvasBitmap);
 
@@ -3266,13 +3314,12 @@ public class FMap extends FBase implements OnClickListener {
 		backgroundImage.draw(imageCanvas);
 
 		// Draw the text on top of our image
-		imageCanvas.drawText(text, width / 2, height-40, imagePaint);
-		imageCanvas.drawText(text, width / 2, height-40, imagePaintBorder);
+		imageCanvas.drawText(text, (float) width / 2, height-40, imagePaint);
+		imageCanvas.drawText(text, (float) width / 2, height-40, imagePaintBorder);
 
 		// Combine background and text to a LayerDrawable
-		LayerDrawable layerDrawable = new LayerDrawable(
-				new Drawable[]{backgroundImage, new BitmapDrawable(canvasBitmap)});
-		return layerDrawable;
+//		LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{backgroundImage, new BitmapDrawable(canvasBitmap)});
+		return new LayerDrawable(new Drawable[]{backgroundImage, new BitmapDrawable(canvasBitmap)});
 	}
 
 
@@ -3286,20 +3333,19 @@ public class FMap extends FBase implements OnClickListener {
 			drawCharging = false;
 			firstUpReceived = true;
 			drawChargingStation();
-			dlog.d("Displayed bonus poi");
+			dlog.d("FMap.updatePoiInfo();Displayed bonus poi");
 
 		}
 		if (status > 0) {
 			if (!animQueue.contains("bonus")) {
 				animQueue.add("bonus");
 				drawChargingStation();
-				dlog.d("Stating bonus anim");
+				dlog.d("FMap.updatePoiInfo();Stating bonus anim");
 
 			}
 			if (no3gwarning.getAnimation() == null)
 				no3gwarning.startAnimation(alertAnimation);
 		} else {
-
 			if (animQueue.contains("bonus")) {
 				animQueue.remove("bonus");
 			}
@@ -3313,10 +3359,10 @@ public class FMap extends FBase implements OnClickListener {
 				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM, LowLevelInterface.AUDIO_LEVEL_ALERT);
 			}
 			tts.speak(text);
-			dlog.d("queueTTS: leggo " + text);
+			dlog.d("FMap.queueTTS();leggo " + text);
 
 		} catch (Exception e) {
-			dlog.e("queueTTS exception while start speak", e);
+			dlog.e("FMap.queueTTS();exception while start speak", e);
 		}
 
 	}
@@ -3328,11 +3374,11 @@ public class FMap extends FBase implements OnClickListener {
 				((AMainOBC) getActivity()).setAudioSystem(LowLevelInterface.AUDIO_SYSTEM, LowLevelInterface.AUDIO_LEVEL_ALERT);
 			}
 			player.waitToPlayFile(Uri.parse("android.resource://eu.philcar.csg.OBC/" + resID));
-			dlog.d("playAlertAdvice: play " + name);
-			dlog.cr("Riproduco avviso vocale: play " + name);
+			dlog.d("FMap.playAlertAdvice();play " + name);
+			dlog.cr("FMap.playAlertAdvice();Riproduco avviso vocale: play " + name);
 
 		} catch (Exception e) {
-			dlog.e("playAlertAdvice exception while start speak", e);
+			dlog.e("FMap.playAlertAdvice();exception while start speak", e);
 		}
 
 	}

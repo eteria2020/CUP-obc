@@ -25,7 +25,7 @@ public class ServiceConnector {
 		this(ctx, handler, null);
 	}
 
-	public ServiceConnector(Context ctx, Handler handler, String name) {
+	private ServiceConnector(Context ctx, Handler handler, String name) {
 		this.context = ctx;
 
 		if (handler != null)
@@ -41,18 +41,18 @@ public class ServiceConnector {
 	public void startService() {
 		if (context != null) {
 			context.startService(new Intent(context, ObcService.class));
-			DLog.I("Requested service start");
+			DLog.I("ServiceConnector.startService();Requested service start");
 		} else {
-			DLog.E("Requested service start failed. Context null ");
+			DLog.E("ServiceConnector.startService();Requested service start failed. Context null ");
 		}
 	}
 
 	public void connect() {
 		if (context != null) {
 			context.bindService(new Intent(context, ObcService.class), mConnection, Context.BIND_AUTO_CREATE);
-			DLog.I("Requested service connection");
+			DLog.I("ServiceConnector.connect();Requested service connection");
 		} else {
-			DLog.E("Requested service connection failed. Context null ");
+			DLog.E("ServiceConnector.connect();Requested service connection failed. Context null ");
 		}
 	}
 
@@ -60,9 +60,9 @@ public class ServiceConnector {
 		if (context != null) {
 			context.bindService(new Intent(context, ObcService.class), mConnection, Context.BIND_AUTO_CREATE);
 			this.type = type;
-			DLog.I("Requested service connection");
+			DLog.I("ServiceConnector.connect();Requested service connection");
 		} else {
-			DLog.E("Requested service connection failed. Context null ");
+			DLog.E("ServiceConnector.connect();Requested service connection failed. Context null ");
 		}
 	}
 
@@ -73,9 +73,9 @@ public class ServiceConnector {
 				msg.replyTo = localMessenger;
 				msg.arg1 = type;
 				serviceMessenger.send(msg);
-				DLog.I("Requested service unregistration");
+				DLog.I("ServiceConnector.unregister();Requested service unregistration");
 			} catch (RemoteException e) {
-				DLog.E("Unregistration failed", e);
+				DLog.E("ServiceConnector.unregister();Unregistration failed", e);
 			}
 		}
 
@@ -91,13 +91,13 @@ public class ServiceConnector {
 				serviceMessenger.send(msg);
 
 				context.unbindService(mConnection);
-				DLog.I("Requested unbinding");
+				DLog.I("ServiceConnector.disconnect();Requested unbinding");
 			} catch (Exception e) {
-				DLog.E("Error diconnecting service", e);
+				DLog.E("ServiceConnector.disconnect();Error diconnecting service", e);
 			}
 			mIsBound = false;
 		} else {
-			DLog.E("Unbinding failed");
+			DLog.E("ServiceConnector.disconnect();Unbinding failed");
 		}
 
 	}
@@ -107,11 +107,11 @@ public class ServiceConnector {
 			msg.replyTo = localMessenger;
 			try {
 				serviceMessenger.send(msg);
-				DLog.I("Sent message : " + msg.what);
+				DLog.I("ServiceConnector.send();Sent message : " + msg.what);
 
 				return true;
 			} catch (RemoteException e) {
-				DLog.E("Error sending message", e);
+				DLog.E("ServiceConnector.send();Error sending message", e);
 			}
 
 		}
@@ -123,7 +123,7 @@ public class ServiceConnector {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 
 			mIsBound = true;
-			DLog.I("Service connected");
+			DLog.I("ServiceConnector.onServiceConnected();Service connected");
 
 			serviceMessenger = new Messenger(service);
 
@@ -138,18 +138,19 @@ public class ServiceConnector {
 				localMessenger.send(Message.obtain(null, ObcService.MSG_CLIENT_REGISTER));
 
 			} catch (RemoteException e) {
-				DLog.E("Client registration failed", e);
+				DLog.E("ServiceConnector.onServiceConnected();Client registration failed", e);
 			}
 
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
-			DLog.E("Service disconnected");
+			DLog.E("ServiceConnector.onServiceConnected();Service disconnected");
 			// This is called when the connection with the service has been
 			// unexpectedly disconnected - process crashed.
 			try {
 				localMessenger.send(Message.obtain(null, ObcService.MSG_CLIENT_UNREGISTER));
 			} catch (RemoteException e) {
+				DLog.E("ServiceConnector.onServiceConnected();",e);
 			}
 			serviceMessenger = null;
 			//context.stopService(new Intent(context, ObcService.class));

@@ -24,7 +24,7 @@ public class Pois extends DbTable<Poi, Integer> {
 		return Poi.class;
 	}
 
-	public void deleteAll() {
+/*	public void deleteAll() {
 		try {
 			this.executeRawNoArgs("DELETE  FROM poi");
 
@@ -32,9 +32,9 @@ public class Pois extends DbTable<Poi, Integer> {
 			DLog.E("deleteAll failed:", e);
 
 		}
-	}
+	}*/
 
-	public boolean isPresent(int id, long update) {
+/*	public boolean isPresent(int id, long update) {
 
 		try {
 
@@ -49,7 +49,7 @@ public class Pois extends DbTable<Poi, Integer> {
 		}
 
 		return false;
-	}
+	}*/
 
 	public List<Poi> getPois(String typeGroup) {
 

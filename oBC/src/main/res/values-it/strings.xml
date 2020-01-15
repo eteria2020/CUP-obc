@@ -135,6 +135,8 @@
     <string name="push_to_cancel">Premi per\nannullare</string>
 
     <string name="goodbye_instructions">Hai chiuso la corsa, ora puoi scendere, le porte si chiuderanno automaticamente in:</string>
+    <string name="goodbye_cancel">Annulla</string>
+    <string name="goodbye_back_to_trip">Clicca qui per tornare alla corsa</string>
 
     <string name="milan">Milano</string>
     <string name="minutes_saved">Minuti guadagnati&#58;</string>

@@ -49,7 +49,7 @@ import eu.philcar.csg.OBC.task.OptimizeDistanceCalc;
 public class CarInfo {
 
 	private DLog dlog = new DLog(this.getClass());
-	public static CarInfo Shared ;
+//	public static CarInfo Shared ;
 
 	@Inject
 	EventRepository eventRepository;
@@ -61,7 +61,7 @@ public class CarInfo {
 
 	private String id = "";
 
-	public String VIN = "";
+//	public String VIN = "";
 
 	private int speed = 0;
 
@@ -81,13 +81,13 @@ public class CarInfo {
 	private Date lastBatterySafetyTx = new Date();
 	private int outAmp = 0;
 	private Long timestampCurrent = null;
-	public Long lastForceReady = System.currentTimeMillis();
+	private Long lastForceReady = System.currentTimeMillis();
 
 	public float[] cellVoltageValue = new float[24];
-	public float minVoltage = 2.6f;
+	float minVoltage = 2.6f;
 	public String batteryType = "", lowCells = "";
 	public Boolean isCellLowVoltage = false;
-	public Boolean Charging = false;
+//	public Boolean Charging = false;
 	public float currVoltage = App.max_voltage;
 
 	private static boolean ready = false;
@@ -99,13 +99,14 @@ public class CarInfo {
 
 	private String fw_version = "";
 	private String sdk_version = "";
-	public String versions = "";
+	private String versions = "";
 	private static Boolean sent = false;
 
 	public Location location = new Location("");
 
 	public Location intGpsLocation = new Location(LocationManager.GPS_PROVIDER);
-	public Location extGpsLocation = new Location(LocationManager.GPS_PROVIDER) {
+
+	Location extGpsLocation = new Location(LocationManager.GPS_PROVIDER) {
 		@Override
 		public void setLatitude(double latitude) {
 			super.setLatitude(latitude);
@@ -124,25 +125,25 @@ public class CarInfo {
 			beacon.setExt_time(time);
 		}
 	};
-	public Location ntwkLocation = new Location(LocationManager.NETWORK_PROVIDER);
+//	public Location ntwkLocation = new Location(LocationManager.NETWORK_PROVIDER);
 
 	private double longitude = 0;
 	private double latitude = 0;
-	public double accuracy = 0;
+//	private double accuracy = 0;
 
-	public long lastLocationChange = 0;
-	public long lastUpdate = 0;
+	private long lastLocationChange = 0;
+	private long lastUpdate = 0;
 
-	public long tripsOpened = 0;
-	public long tripsToSend = 0;
+	private long tripsOpened = 0;
+	private long tripsToSend = 0;
 
-	public int rangeKm = (App.fuel_level <= 50 ? Math.max(App.fuel_level - 10, 0) : App.fuel_level);
+	private int rangeKm = (App.fuel_level <= 50 ? Math.max(App.fuel_level - 10, 0) : App.fuel_level);
 
-	public final Bundle allData;
+	private final Bundle allData;
 
 	private Beacon beacon;
 
-	public ServiceLocationListener serviceLocationListener;
+	ServiceLocationListener serviceLocationListener;
 
 	private SimpleDateFormat log_sdf = new SimpleDateFormat("dd/MM/yyyy HH.mm.ss", Locale.ITALY);
 
@@ -157,27 +158,27 @@ public class CarInfo {
 
 	public CarInfo(Handler handler) {
 		App.Instance.getComponent().inject(this);
-		Shared = this;
+//		Shared = this;
 		serviceHandler = handler;
 		serviceLocationListener = new ServiceLocationListener();
 		allData = new Bundle();
 		beacon = new Beacon();
 	}
 
-	public String getFakePin() {
+	private String getFakePin() {
 		return fakePin;
 	}
 
-	public boolean setFakePin(String fakePin) {
+	private boolean setFakePin(String fakePin) {
 		this.fakePin = fakePin;
 		return !this.fakePin.equalsIgnoreCase("0000");
 	}
 
-	public String getFakeCard() {
+	private String getFakeCard() {
 		return fakeCard;
 	}
 
-	public boolean setFakeCard(String fakeCard) {
+	private boolean setFakeCard(String fakeCard) {
 		this.fakeCard = fakeCard;
 		return !this.fakeCard.equalsIgnoreCase("00000000");
 	}
@@ -187,15 +188,15 @@ public class CarInfo {
 		return batterySafety;
 	}
 
-	public void setBatterySafety(boolean newBatterySafety) {
+	private void setBatterySafety(boolean newBatterySafety) {
 		if (newBatterySafety != batterySafety) {
 			if (newBatterySafety == lastBatterySafety) {
 				if (checkLastBatterySafety(newBatterySafety)) {
-					dlog.d("setBatterySafety: set new BS to" + newBatterySafety);
+					dlog.d("CarInfo.setBatterySafety();set new BS to" + newBatterySafety);
 					batterySafety = newBatterySafety;
 					beacon.setBatterySafety(batterySafety);
 				} else {
-					dlog.d("setBatterySafety: wait to set new battery safety lastBStime" + lastBatterySafetyTx.toString());
+					dlog.d("CarInfo.setBatterySafety();wait to set new battery safety lastBStime" + lastBatterySafetyTx.toString());
 				}
 			} else {
 				setLastBatterySafety(newBatterySafety);
@@ -206,7 +207,7 @@ public class CarInfo {
 		beacon.setBatterySafety(batterySafety);
 	}
 
-	public void setBatteryLevel(int batteryLevel) {
+	void setBatteryLevel(int batteryLevel) {
 
         /*if(this.batteryLevel<0){
 			this.batteryLevel=batteryLevel;
@@ -214,29 +215,30 @@ public class CarInfo {
         }*/
 		if (batteryLevel > 100)
 			batteryLevel = 100;
-		dlog.i("setBatteryLevel: first " + this.batteryLevel + " target: " + batteryLevel);
+		dlog.i("CarInfo.setBatteryLevel();first " + this.batteryLevel + " target: " + batteryLevel);
 
 		if (this.batteryLevel - batteryLevel >= 5) {
 			this.batteryLevel = (this.batteryLevel > batteryLevel ? this.batteryLevel - 5 : this.batteryLevel + 5);
 		} else
 			this.batteryLevel = (batteryLevel);
 
-		if (BuildConfig.BUILD_TYPE.equals("debug"))
+		if (BuildConfig.BUILD_TYPE.equals("debug")){
 			this.batteryLevel = 99;//FOR DEVELOP PURPOSE
+		}
 
 		App.Instance.setBatteryLevel(this.batteryLevel);
 		beacon.setSOC(this.batteryLevel);
-		dlog.i("setBatteryLevel: result " + this.batteryLevel);
+		dlog.i("CarInfo.setBatteryLevel();result " + this.batteryLevel);
 	}
 
 	private void setLocation(Location loc) {
 
 		if (App.mockLocation != null) {
 			location = App.mockLocation;
-			long a = loc.getTime();
+//			long a = loc.getTime();
 			setLongitude(App.mockLocation.getLongitude());
 			setLatitude(App.mockLocation.getLatitude());
-			accuracy = App.mockLocation.getAccuracy();
+//			accuracy = App.mockLocation.getAccuracy();
 			App.setLastLocation(App.mockLocation);
 			return;
 		}
@@ -244,13 +246,13 @@ public class CarInfo {
 		if (loc != null) {
 
 			location.set(loc);
-			long a = loc.getTime();
-			String time = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS").format(location.getTime());
+//			long a = loc.getTime();
+//			String time = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS").format(location.getTime());
 			if (getLongitude() != loc.getLongitude() || getLatitude() != loc.getLatitude()) {
 				lastLocationChange = System.nanoTime();
 				setLongitude(loc.getLongitude());
 				setLatitude(loc.getLatitude());
-				accuracy = loc.getAccuracy();
+//				accuracy = loc.getAccuracy();
 			}
 
 			if (serviceHandler != null)
@@ -266,7 +268,7 @@ public class CarInfo {
 	public boolean handleUpdate(Bundle b) {
 		int i;
 		boolean forceBeacon = false;
-		List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
+//		List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
 
 		//Update all data in local bundle
         /*if(b.containsKey("SOC"))
@@ -300,7 +302,7 @@ public class CarInfo {
 			} else if (key.equalsIgnoreCase("SOC")) {
 				//batteryLevel = b.getInt(key);
 				bmsSOC_GPRS = b.getInt(key);
-				dlog.d("UpdateBmsSoc: " + b.get(key));
+				dlog.d("CarInfo.handleUpdate();" + b.get(key));
 				if (batteryLevel > 20)
 					sent = false;
 				if (batteryLevel <= 15 && batteryLevel > 0 && !sent && sendMail("http://manage.sharengo.it/mailObcLowBattery.php")) {
@@ -363,7 +365,7 @@ public class CarInfo {
 
 			} else if (key.equalsIgnoreCase("ReadyOn")) {
 				boolean v = b.getBoolean(key);
-				if (v != this.isReady()) {
+				if (v != isReady()) {
 					this.setReady(v);
 					eventRepository.eventReady(v ? 1 : 0);
 				}
@@ -392,27 +394,31 @@ public class CarInfo {
 						}
 
 					} catch (JSONException e) {
-						DLog.E("Parsing GPSBOX:", e);
+						DLog.E("CarInfo.handleUpdate();Parsing GPSBOX:", e);
 					}
 				} else {
-					DLog.W("Empty GPSBOX json");
+					DLog.W("CarInfo.handleUpdate();Empty GPSBOX json");
 				}
 
-			} else if (key.equalsIgnoreCase("CellInfo")) {
-				Bundle c = b.getBundle(key);
+			}
+/*
+			else if (key.equalsIgnoreCase("CellInfo")) {
+//				Bundle c = b.getBundle(key);
 				//this.cellVoltageValue[c.getInt("CellIndex")]=c.getFloat("CellVoltage");
+			}
+*/
 
-			} else if (key.equalsIgnoreCase("CellsInfo")) {
+			/*else if (key.equalsIgnoreCase("CellsInfo")) {
 
 				//this.cellVoltageValue=b.getFloatArray(key);
 
-			}
+			}*/
 		}
 
 		return forceBeacon;
 	}
 
-	public Bundle betterHandleUpdate(Bundle b, ObcService service) {
+	Bundle betterHandleUpdate(Bundle b, ObcService service) {
 		int i;
 		float f;
 		Long l;
@@ -467,7 +473,7 @@ public class CarInfo {
 				if (s != null && !s.equalsIgnoreCase(getFakeCard())) {
 					hasChanged = true;
 					if (setFakeCard(s) && App.currentTripInfo == null) {
-						dlog.d("received fakeCard code" + s);
+						dlog.d("CarInfo.betterHandleUpdate();received fakeCard code" + s);
 						service.notifyCard(s, "OPEN", false, false);
 					}
 				}
@@ -488,7 +494,7 @@ public class CarInfo {
 
 			} else if (key.equalsIgnoreCase("timestampAmp")) {
 				l = b.getLong(key);
-				if (l != getTimestampCurrent()) {
+				if (!l.equals(getTimestampCurrent()) ) {
 					hasChanged = true;
 					setTimestampCurrent(l);
 				}
@@ -500,7 +506,7 @@ public class CarInfo {
 					hasChanged = true;
 					//batteryLevel = b.getInt(key);
 					bmsSOC_GPRS = i;
-					dlog.d("UpdateBmsSoc_GPRS: " + i);
+					dlog.d("CarInfo.betterHandleUpdate();UpdateBmsSoc_GPRS: " + i);
                     /*if (batteryLevel > 20)
                         sent = false;
                     if (batteryLevel <= 15 && batteryLevel > 0 && !sent && sendMail("http://manage.sharengo.it/mailObcLowBattery.php")) {
@@ -545,7 +551,7 @@ public class CarInfo {
 				}
 			} else if (key.equalsIgnoreCase("VIN")) {
 				s = b.getString(key);
-				if (!s.equals(App.CarPlate)) {
+				if (s!=null && !s.equals(App.CarPlate)) {
 					hasChanged = true;
 					setId(s);
 					eventRepository.CarPlateChange(App.CarPlate, getId());
@@ -553,19 +559,19 @@ public class CarInfo {
 					if (App.canRestartZMQ) {
 						App.canRestartZMQ = false;
 						serviceHandler.sendMessage(MessageFactory.zmqRestart());
-						dlog.d("new vin restarting ZMQ");
+						dlog.d("CarInfo.betterHandleUpdate();new vin restarting ZMQ");
 					}
 				}
 			} else if (key.equalsIgnoreCase("VER")) {
 				s = b.getString(key);
-				if (!s.equals(App.fw_version)) {
+				if (s!=null && !s.equals(App.fw_version)) {
 					hasChanged = true;
 					setFw_version(s);
 					App.Instance.setFwVersion(s);
 				}
 			} else if (key.equalsIgnoreCase("keyStatus")) {
 				s = b.getString(key);
-				if (!s.equals(getKeyStatus())) {
+				if (s!=null && !s.equals(getKeyStatus())) {
 					hasChanged = true;
 					setKeyStatus(b.getString(key));
 				}
@@ -594,26 +600,27 @@ public class CarInfo {
 
 			} else if (key.equalsIgnoreCase("ReadyOn")) {
 				bo = b.getBoolean(key);
-				if (bo != this.isReady()) {
+
+				if (bo != ready) {
 					hasChanged = true;
 					this.setReady(bo);
 					eventRepository.eventReady(bo ? 1 : 0);
 				}
 			} else if (key.equalsIgnoreCase("BrakesOn")) {
 				bo = b.getBoolean(key);
-				if (bo != this.isReady()) {
+				if (bo != ready) {
 					hasChanged = true;
 					this.setBrakes(bo);
 				}
 			} else if (key.equalsIgnoreCase("SDKVer")) {
 				s = b.getString(key);
-				if (!s.equals(this.getSdk_version())) {
+				if (s!=null && !s.equals(this.getSdk_version())) {
 					hasChanged = true;
 					this.setSdk_version(s);
 				}
 			} else if (key.equalsIgnoreCase("Versions")) {
 				s = b.getString(key);
-				if (!s.equals(this.versions)) {
+				if (s!=null && !s.equals(this.versions)) {
 					hasChanged = true;
 					this.versions = s;
 				}
@@ -637,21 +644,23 @@ public class CarInfo {
 						}
 
 					} catch (JSONException e) {
-						DLog.E("Parsing GPSBOX:", e);
+						DLog.E("CarInfo.betterHandleUpdate();Parsing GPSBOX:", e);
 					}
 				} else {
-					DLog.W("Empty GPSBOX json");
+					DLog.W("CarInfo.betterHandleUpdate();Empty GPSBOX json");
 				}
 
-			} else if (key.equalsIgnoreCase("CellInfo")) {
+			}
+
+/*
+			else if (key.equalsIgnoreCase("CellInfo")) {
 				//Bundle c=b.getBundle(key);
 				//this.cellVoltageValue[c.getInt("CellIndex")]=c.getFloat("CellVoltage");
 
 			} else if (key.equalsIgnoreCase("CellsInfo")) {
-
 				//this.cellVoltageValue=b.getFloatArray(key);
-
 			}
+*/
 		}
 		if (System.currentTimeMillis() - lastUpdate > 12000) {
 			lastUpdate = System.currentTimeMillis();
@@ -663,14 +672,14 @@ public class CarInfo {
 		return res;
 	}
 
-	public Boolean sendMail(String Url) {
+	private Boolean sendMail(String Url) {
 
 		if (!App.hasNetworkConnection()) {
-			dlog.e(" sendMail: nessuna connessione");
+			dlog.e("CarInfo.sendMail();no network connection");
 			return false;
 		}
 		StringBuilder builder = new StringBuilder();
-		List<NameValuePair> paramsList = new ArrayList<NameValuePair>();
+		List<NameValuePair> paramsList = new ArrayList<>();
 		HttpResponse response = null;
 
 		HttpClient client = new DefaultHttpClient();
@@ -688,7 +697,7 @@ public class CarInfo {
 			HttpGet httpGet = new HttpGet(Url);
 
 			response = client.execute(httpGet);
-			DLog.D(" sendMail: Url richiesta " + Url);
+			DLog.D("CarInfo.sendMail();url: " + Url);
 			StatusLine statusLine = response.getStatusLine();
 			int statusCode = statusLine.getStatusCode();
 			if (statusCode == 200) {
@@ -705,11 +714,11 @@ public class CarInfo {
 				content.close();
 			} else {
 
-				dlog.e(" sendMail: Failed to connect " + String.valueOf(statusCode));
+				dlog.e("CarInfo.sendMail();Failed to connect " + statusCode);
 				return false;
 			}
 		} catch (Exception e) {
-			dlog.e(" sendMail: eccezione in connessione ", e);
+			dlog.e("CarInfo.sendMail();connection exception ", e);
 			return false;
 		} finally {
 			client.getConnectionManager().shutdown();
@@ -717,32 +726,32 @@ public class CarInfo {
 
 		String jsonStr = builder.toString();
 		if (jsonStr.compareTo("0") == 0) {
-			dlog.e(" sendMail: invio mail fallito");
+			dlog.e("CarInfo.sendMail();send fail");
 
 			return false;
 		} else if (jsonStr.compareTo("1") == 0) {
-			dlog.d(" sendMail: invio mail riuscito");
+			dlog.d("CarInfo.sendMail();send successful");
 
 			return true;
 		}
 
-		DLog.D(" sendMail: risposta " + jsonStr);
+		DLog.D("CarInfo.sendMail();response:" + jsonStr);
 		return false;
 	}
 
-	public void updateTrips() {
-		Trips corse = App.Instance.getDbManager().getTripDao();
-		if (corse != null) {
-			tripsToSend = corse.getNTripsToSend();
+	void updateTrips() {
+		Trips trips = App.Instance.getDbManager().getTripDao();
+		if (trips != null) {
+			tripsToSend = trips.getNTripsToSend();
 
-			List<Trip> list = corse.getOpenTrips();
+			List<Trip> list = trips.getOpenTrips();
 			if (list != null) {
 				tripsOpened = list.size();
 			}
 		}
 	}
 
-	public String getGpsJson() {
+	private String getGpsJson() {
 
 		if (location == null)
 			return "";
@@ -774,7 +783,7 @@ public class CarInfo {
 			jw.endObject();
 			jw.close();
 		} catch (IOException e) {
-			DLog.E("Error creating  gps json:", e);
+			DLog.E("CarInfo.getGpsJson();Error creating  gps json:", e);
 		}
 
 		return sw.toString();
@@ -794,12 +803,12 @@ public class CarInfo {
 			}
 
 		} catch (IOException e) {
-			dlog.e("Exception while append json", e);
+			dlog.e("CarInfo.appendJson();Exception while append json", e);
 		}
 
 	}
 
-	private void appendJsonGson(com.google.gson.stream.JsonWriter jw, String key, Object value) {
+/*	private void appendJsonGson(com.google.gson.stream.JsonWriter jw, String key, Object value) {
 		try {
 
 			if (value instanceof Boolean) {
@@ -813,16 +822,16 @@ public class CarInfo {
 			}
 
 		} catch (IOException e) {
-			dlog.e("Exception while append json", e);
+			dlog.e("CarInfo.appendJson();Exception while append json", e);
 		}
 
-	}
+	}*/
 
 	private double gpsRound(double value) {
 		return Math.round(value * 100000D) / 100000D;
 	}
 
-	public String getJson(boolean longVersion) {
+	String getJson(boolean longVersion) {
 		StringWriter sw = new StringWriter();
 		JsonWriter jw = new JsonWriter(sw);
 		//Per chiudere da remoto una corsa (da app utente finale) dobbiamo essere nell'ultima schermata, essere in area accettabile e non in sosta.
@@ -832,8 +841,8 @@ public class CarInfo {
 			jw.beginObject();
 
 			for (String key : allData.keySet()) {
-				if (key != "GPSBOX") {
-					if (key == "SOC") {
+				if (!key.equals("GPSBOX") ) {
+					if (key.equals("SOC")) {
 						appendJson(jw, key, batteryLevel);
 					} else
 						appendJson(jw, key, allData.get(key));
@@ -914,14 +923,14 @@ public class CarInfo {
 
 			jw.close();
 		} catch (IOException e) {
-			DLog.E("Error creating json:", e);
+			DLog.E("CarInfo.getJson();Error creating json:", e);
 		}
 
-		String jsonStr = sw.toString();
-		return jsonStr;
+//		String jsonStr = sw.toString();
+		return sw.toString();
 	}
 
-	public String getJsonGson(boolean longVersion) {
+	String getJsonGson(boolean longVersion) {
 		Gson gson = new Gson();
 		try {
 
@@ -1004,8 +1013,7 @@ public class CarInfo {
 			jw.beginObject();
 
 			for (String key : allData.keySet()) {
-				if (key != "GPSBOX") {
-
+				if (!key.equals("GPSBOX")) {
 					appendJson(jw, key, allData.get(key));
 				}
 			}
@@ -1080,11 +1088,11 @@ public class CarInfo {
 
 			jw.close();
 		} catch (IOException e) {
-			DLog.E("Error creating json:", e);
+			DLog.E("CarInfo.getJson_GPRS();Error creating json:", e);
 		}
 
-		String jsonStr = sw.toString();
-		return jsonStr;
+//		String jsonStr = sw.toString();
+		return sw.toString();
 	}
 
 	public Bundle getBundle() {
@@ -1094,7 +1102,7 @@ public class CarInfo {
 				b.putAll(allData);
 			}
 		} catch (Exception e) {
-			dlog.e("Exception while retrieving all data ", e);
+			dlog.e("CarInfo.getBundle();Exception while retrieving all data ", e);
 		}
 
 		return b;
@@ -1104,7 +1112,7 @@ public class CarInfo {
 		return isKeyOn;
 	}
 
-	public void setIsKeyOn(int isKeyOn) {
+	private void setIsKeyOn(int isKeyOn) {
 		this.isKeyOn = isKeyOn;
 		beacon.setKeyOn(this.isKeyOn);
 	}
@@ -1113,16 +1121,16 @@ public class CarInfo {
 		return outAmp;
 	}
 
-	public void setOutAmp(int outAmp) {
+	void setOutAmp(int outAmp) {
 		this.outAmp = outAmp;
 		beacon.setPackAmp(this.outAmp);
 	}
 
-	public Long getTimestampCurrent() {
+	private Long getTimestampCurrent() {
 		return timestampCurrent;
 	}
 
-	public void setTimestampCurrent(Long timestampCurrent) {
+	private void setTimestampCurrent(Long timestampCurrent) {
 		this.timestampCurrent = timestampCurrent;
 		beacon.setTimestampAmp(this.timestampCurrent);
 	}
@@ -1131,7 +1139,7 @@ public class CarInfo {
 		return speed;
 	}
 
-	public void setSpeed(int speed) {
+	private void setSpeed(int speed) {
 		this.speed = speed;
 		beacon.setSpeed(this.speed);
 	}
@@ -1149,7 +1157,7 @@ public class CarInfo {
 		return voltage;
 	}
 
-	public void setVoltage(float voltage) {
+	private void setVoltage(float voltage) {
 		this.voltage = voltage;
 		beacon.setMotV(this.voltage);
 	}
@@ -1167,7 +1175,7 @@ public class CarInfo {
 		return fw_version;
 	}
 
-	public void setFw_version(String fw_version) {
+	private void setFw_version(String fw_version) {
 		this.fw_version = fw_version;
 		beacon.setFwVer(this.fw_version);
 	}
@@ -1185,11 +1193,11 @@ public class CarInfo {
 		beacon.setKeyStatus(CarInfo.keyStatus);
 	}
 
-	public String getGear() {
+	private String getGear() {
 		return gear;
 	}
 
-	public void setGear(String gear) {
+	private void setGear(String gear) {
 		this.gear = gear;
 		beacon.setGearStatus(this.gear);
 	}
@@ -1198,7 +1206,7 @@ public class CarInfo {
 		return chargingPlug;
 	}
 
-	public void setChargingPlug(boolean chargingPlug) {
+	private void setChargingPlug(boolean chargingPlug) {
 		this.chargingPlug = chargingPlug;
 		beacon.setPPStatus(this.chargingPlug);
 	}
@@ -1207,25 +1215,25 @@ public class CarInfo {
 		return ready;
 	}
 
-	public void setReady(boolean ready) {
-		this.ready = ready;
-		beacon.setReadyOn(this.ready);
+	public void setReady(boolean newReady) {
+		ready = newReady;
+		beacon.setReadyOn(ready);
 	}
 
-	public boolean isBrakes() {
-		return brakes;
-	}
+//	public boolean isBrakes() {
+//		return brakes;
+//	}
 
-	public void setBrakes(boolean brakes) {
+	private void setBrakes(boolean brakes) {
 		this.brakes = brakes;
 		beacon.setBrakesOn(this.brakes);
 	}
 
-	public String getSdk_version() {
+	private String getSdk_version() {
 		return sdk_version;
 	}
 
-	public void setSdk_version(String sdk_version) {
+	private void setSdk_version(String sdk_version) {
 		this.sdk_version = sdk_version;
 		beacon.setSdkVer(this.sdk_version);
 	}
@@ -1234,7 +1242,7 @@ public class CarInfo {
 		return longitude;
 	}
 
-	public void setLongitude(double longitude) {
+	private void setLongitude(double longitude) {
 		this.longitude = longitude;
 		beacon.setLon(this.longitude);
 	}
@@ -1303,8 +1311,8 @@ public class CarInfo {
 		}
 	}
 
-	public void RecordToLog() {
+/*	public void RecordToLog() {
 		//TODO: implement
-	}
+	}*/
 
 }

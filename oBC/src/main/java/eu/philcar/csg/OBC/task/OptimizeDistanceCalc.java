@@ -303,20 +303,22 @@ public class OptimizeDistanceCalc extends FBase implements View.OnClickListener 
 
 	}
 
-	public final void Savetofile() {
+	private void Savetofile() {
 		try {
 			Writer output = null;
 
 			File file = new File(Environment.getExternalStorageDirectory() + "/prova/" + "pr.txt");
-			file.getParentFile().mkdirs();
-			file.createNewFile();
-			output = new BufferedWriter(new FileWriter(file));
+			if(file.getParentFile().mkdirs()){
+				if(file.createNewFile()) {
+					output = new BufferedWriter(new FileWriter(file));
 
-			output.write("distanza totale-var:" + totalDistance);
-			sp = context.getSharedPreferences(App.COMMON_PREFERENCES, Context.MODE_PRIVATE);
-			output.write(sp.getAll().toString());
-			output.close();
-			// Toast.makeText(getApplicationContext(), "Composition saved", Toast.LENGTH_LONG).show();
+					output.write("distanza totale-var:" + totalDistance);
+					sp = context.getSharedPreferences(App.COMMON_PREFERENCES, Context.MODE_PRIVATE);
+					output.write(sp.getAll().toString());
+					output.close();
+					// Toast.makeText(getApplicationContext(), "Composition saved", Toast.LENGTH_LONG).show();
+				}
+			}
 
 		} catch (Exception e) {
 			// Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();

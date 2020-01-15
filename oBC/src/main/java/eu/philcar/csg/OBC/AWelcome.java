@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.util.Log;
 
 import java.lang.ref.WeakReference;
 
@@ -33,10 +34,10 @@ public class AWelcome extends ABase {
 	private DLog dlog = new DLog(this.getClass());
 	private ServiceConnector serviceConnector;
 	private CarInfo localCarInfo = null;
-	private WelcomeServiceHandler serviceHandler = new WelcomeServiceHandler(new WeakReference<AWelcome>(this));
+	private WelcomeServiceHandler serviceHandler = new WelcomeServiceHandler(new WeakReference<>(this));
 
 	protected void setEngine(boolean status) {
-		DLog.D("Request enable engine");
+		DLog.D("AWelcome.setEngine();Request enable engine");
 		sendMessage(MessageFactory.setEngine(status));
 		sendMessage(MessageFactory.setEngine(status));
 	}
@@ -46,7 +47,7 @@ public class AWelcome extends ABase {
 
 		super.onCreate(savedInstanceState);
 		//System.gc();
-		dlog.d("AWelcome onCreate");
+		dlog.d("AWelcome.onCreate()");
 		setContentView(R.layout.a_base);
 
 		if (getIntent().getBooleanExtra("EXIT", false)) {
@@ -62,7 +63,9 @@ public class AWelcome extends ABase {
 		serviceConnector = new ServiceConnector(this, serviceHandler);
 
 		screenLock = ((PowerManager) getSystemService(POWER_SERVICE)).newWakeLock(
-				PowerManager.ON_AFTER_RELEASE | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, this.getClass().getSimpleName());
+				PowerManager.ON_AFTER_RELEASE |
+						PowerManager.ACQUIRE_CAUSES_WAKEUP |
+						PowerManager.SCREEN_BRIGHT_WAKE_LOCK, this.getClass().getSimpleName());
 
 		if (savedInstanceState == null) {
 
@@ -105,8 +108,9 @@ public class AWelcome extends ABase {
 
 		App.setForegroundActivity(this);
 
-		if (!serviceConnector.isConnected())
+		if (!serviceConnector.isConnected()){
 			serviceConnector.connect(Clients.Welcome);
+		}
 
 	}
 
@@ -128,7 +132,7 @@ public class AWelcome extends ABase {
 
 		final WeakReference<AWelcome> welcomeWeakReference;
 
-		public WelcomeServiceHandler(WeakReference<AWelcome> welcomeWeakReference) {
+		private WelcomeServiceHandler(WeakReference<AWelcome> welcomeWeakReference) {
 			this.welcomeWeakReference = welcomeWeakReference;
 		}
 
@@ -137,7 +141,7 @@ public class AWelcome extends ABase {
 			try {
 
 				if (!App.isForegroundActivity(welcomeWeakReference.get()) && !App.isForegroundActivity(ServiceTestActivity.class.getName())) {
-					DLog.W(AWelcome.class.getName() + " MSG to non foreground activity. ");
+					DLog.W("AWelcome.WelcomeServiceHandler();MSG to non foreground activity. ");
 					//AWelcome.this.finish();
 					return;
 				}
@@ -145,7 +149,7 @@ public class AWelcome extends ABase {
 				switch (msg.what) {
 
 					case ObcService.MSG_CLIENT_REGISTER:
-						DLog.D(AWelcome.class.getName() + ": MSG_CLIENT_REGISTER");
+						DLog.D("AWelcome.WelcomeServiceHandler();MSG_CLIENT_REGISTER");
 						break;
 
 					case ObcService.MSG_IO_RFID:
@@ -157,31 +161,31 @@ public class AWelcome extends ABase {
 
 					case ObcService.MSG_API_TRIP_CALLBACK:
 						Fragment frag = welcomeWeakReference.get().getActiveFragment();// getFragmentManager().findFragmentById(R.id.awelPlaceholderFL);
-						if (frag != null && frag instanceof OnTripCallback && msg.obj instanceof TripInfo) {
-
+						//if (frag != null && frag instanceof OnTripCallback && msg.obj instanceof TripInfo) {
+						if (frag instanceof OnTripCallback && msg.obj instanceof TripInfo) {
 							((OnTripCallback) frag).onTripResult((TripInfo) msg.obj);
-
 						} else {
-							DLog.I(AWelcome.class.getName() + " Impossible cast a OnTripCallback  :" + frag);
+							DLog.I("AWelcome.WelcomeServiceHandler();Impossible cast a OnTripCallback  :" + frag);
 						}
 						break;
 
 					case ObcService.MSG_TRIP_BEGIN:
-						DLog.D("perf: received MSG_TRIP_BEGIN");
+						DLog.D("AWelcome.WelcomeServiceHandler();received MSG_TRIP_BEGIN");
 						TripInfo ti = (TripInfo) msg.obj;
 						if (msg.arg1 == 0) {
 							if (ti != null && ti.customer != null) {
 								Fragment fb = welcomeWeakReference.get().getActiveFragment();// getFragmentManager().findFragmentById(R.id.awelPlaceholderFL);
-								if (fb != null && fb instanceof FWelcome) {
+//								if (fb != null && fb instanceof FWelcome) {
+								if (fb instanceof FWelcome) {
 									welcomeWeakReference.get().runOnUiThread(() -> {
 										FWelcome f = (FWelcome) fb;
 										f.setName(ti.customer.name + " " + ti.customer.surname);
 										f.setMaintenance(ti.isMaintenance);
-										DLog.D("perf: show flag");
+										DLog.D("AWelcome.WelcomeServiceHandler();show flag");
 									});
 
 								} else {
-									DLog.E(AWelcome.class.getName() + "Impossibile cast a FWelcome  :");
+									DLog.E("AWelcome.WelcomeServiceHandler();Impossibile cast a FWelcome  :");
 								}
 							}
 						} else {
@@ -196,21 +200,21 @@ public class AWelcome extends ABase {
 								if (fWelcome != null) {
 									fWelcome.setName(ti.customer.name + " " + ti.customer.surname);
 									fWelcome.setMaintenance(ti.isMaintenance);
-									DLog.D(AWelcome.class.getName() + "AWelcome: visualizzazione bandiere e nome corsa già aperta");
+									DLog.D("AWelcome.WelcomeServiceHandler();visualizzazione bandiere e nome corsa già aperta");
 								}
 							}
 						}
 						break;
 
 					case ObcService.MSG_TRIP_END:
-						DLog.D("perf: received MSG_TRIP_END");
+						DLog.D("AWelcome.WelcomeServiceHandler();received MSG_TRIP_END");
 						try {
 							welcomeWeakReference.get().popTillFragment(FWelcome.class.getName());
 						} catch (PopTillException ex) {
-							DLog.E("AWelcome: Exception during popTillFragment refreshing activity ", ex);
+							DLog.E("AWelcome.WelcomeServiceHandler();Exception during popTillFragment refreshing activity ", ex);
 							welcomeWeakReference.get().finish();
 						} catch (Exception e) {
-							DLog.E(AWelcome.class.getName() + "AWelcome: Exception during popTillFragment", e);
+							DLog.E(AWelcome.class.getName() + "AWelcome.WelcomeServiceHandler();Exception during popTillFragment", e);
 						}
 
 						final FWelcome welcome = (FWelcome) welcomeWeakReference.get().getFragmentManager().findFragmentByTag(FWelcome.class.getName());
@@ -218,7 +222,7 @@ public class AWelcome extends ABase {
 							welcomeWeakReference.get().runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									DLog.D("perf: reset ui");
+									DLog.D("AWelcome.WelcomeServiceHandler();reset ui");
 									welcome.resetUI();
 								}
 							});
@@ -228,14 +232,17 @@ public class AWelcome extends ABase {
 
 					case ObcService.MSG_CUSTOMER_CHECKPIN:
 
-						String pin = (String) msg.obj;
+						DLog.I("AWelcome.handleMessage();pin;"+msg.toString());
+//TODO:Enrico codice commentato in quanto genera errore, da verificare
+/*						String pin = (String) msg.obj;
 						if(App.currentTripInfo.CheckPin(pin, false)){
 							welcomeWeakReference.get().startActivity(new Intent(welcomeWeakReference.get(), AMainOBC.class));
 							welcomeWeakReference.get().finish();
-						}
+						}*/
 						break;
 					case ObcService.MSG_CAR_INFO:
-						if (msg.obj != null && msg.obj instanceof CarInfo) {
+//						if (msg.obj != null && msg.obj instanceof CarInfo) {
+						if (msg.obj instanceof CarInfo) {
 							welcomeWeakReference.get().localCarInfo = (CarInfo) msg.obj;
 						}
 						FWelcome fWelcome = (FWelcome) welcomeWeakReference.get().getFragmentManager().findFragmentByTag(FWelcome.class.getName());
@@ -246,10 +253,10 @@ public class AWelcome extends ABase {
 						FMaintenance fmaintenance = (FMaintenance) welcomeWeakReference.get().getFragmentManager().findFragmentByTag(FMaintenance.class.getName());
 						if (fmaintenance != null) {
 
-							if (msg.obj != null && msg.obj instanceof CarInfo) {
+//							if (msg.obj != null && msg.obj instanceof CarInfo) {
+							if (msg.obj instanceof CarInfo) {
 								fmaintenance.handleCarInfo((CarInfo) msg.obj);
 							}
-
 						}
 
 					case AWelcome.MSG_RELEASE_SCREEN:
@@ -262,7 +269,7 @@ public class AWelcome extends ABase {
 						super.handleMessage(msg);
 				}
 			} catch (Exception e) {
-				DLog.E("Excepton handling aWelcome Message", e);
+				DLog.E("AWelcome.WelcomeServiceHandler();Excepton handling aWelcome Message", e);
 			}
 		}
 	}

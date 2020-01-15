@@ -21,7 +21,7 @@ import static eu.philcar.csg.OBC.db.Events.EVT_CLEANLINESS;
 import static eu.philcar.csg.OBC.db.Events.EVT_CMD;
 import static eu.philcar.csg.OBC.db.Events.EVT_DEVICEINFO;
 import static eu.philcar.csg.OBC.db.Events.EVT_DIAG;
-import static eu.philcar.csg.OBC.db.Events.EVT_ENGINE;
+//import static eu.philcar.csg.OBC.db.Events.EVT_ENGINE;
 import static eu.philcar.csg.OBC.db.Events.EVT_GEAR;
 import static eu.philcar.csg.OBC.db.Events.EVT_KEY;
 import static eu.philcar.csg.OBC.db.Events.EVT_LEASE;
@@ -93,9 +93,9 @@ public class EventRepository {
 		labels.put(EVT_REMOTE_PIN, "REMOTE PIN ENTERED");
 	}
 
-	public void eventEngine(int state) {
+/*	public void eventEngine(int state) {
 		generateEvent(EVT_ENGINE, state, null);
-	}
+	}*/
 
 	public void eventSwBoot(String version) {
 		generateEvent(EVT_SWBOOT, 0, version);
@@ -105,9 +105,9 @@ public class EventRepository {
 		generateEvent(EVT_RFID, result, card);
 	}
 
-	public void eventBattery(int value) {
+/*	public void eventBattery(int value) {
 		generateEvent(EVT_BATTERY, value, null);
-	}
+	}*/
 
 	public void eventParkBegin() {
 		generateEvent(EVT_PARK, 1, null);
@@ -117,12 +117,12 @@ public class EventRepository {
 		generateEvent(EVT_PARK, 2, null);
 	}
 
-	public void eventSos(String number) {
+/*	public void eventSos(String number) {
 		generateEvent(EVT_SOS, 1, number);
-	}
+	}*/
 
 	public void eventSos(String number, ObcService service) {
-		DLog.CR("Prenotata chiamata asistenza: " + number);
+		DLog.CR("EventRepository.eventSos();Prenotata chiamata asistenza: " + number);
 		generateEvent(EVT_SOS, 1, number, service);
 	}
 
@@ -167,7 +167,7 @@ public class EventRepository {
 	}
 
 	public void eventObcFail(long delay) {
-		int idelay = 0;
+		int idelay;
 		if (delay > Integer.MAX_VALUE)
 			idelay = Integer.MAX_VALUE;
 		else
@@ -234,13 +234,13 @@ public class EventRepository {
 		generateEvent(EVT_SHUTDOWN, -1, "Shut Down Aborted");
 	}
 
-	public void StartShutdown() {
+/*	public void StartShutdown() {
 		generateEvent(EVT_SHUTDOWN, 0, "Start Shutdown timer");
-	}
+	}*/
 
-	public void StopShutdown() {
+/*	public void StopShutdown() {
 		generateEvent(EVT_SHUTDOWN, 0, "Stop Shutdown timer");
-	}
+	}*/
 
 	public void Reboot(String text) {
 		generateEvent(EVT_REBOOT, 0, text + " " + App.sw_Version);
@@ -253,16 +253,16 @@ public class EventRepository {
 		}
 	}
 
-	public void LeaseInfo(int status, int card) {
+/*	public void LeaseInfo(int status, int card) {
 		String Hex = Integer.toHexString(card);
 		generateEvent(EVT_LEASE, status, Hex);
-	}
+	}*/
 
-	public void generateEvent(int eventId, int intValue, String strValue) {
+	private void generateEvent(int eventId, int intValue, String strValue) {
 		generateEvent(eventId, intValue, strValue, null);
 	}
 
-	public void generateEvent(int eventId, int intValue, String strValue, ObcService service) {
+	private void generateEvent(int eventId, int intValue, String strValue, ObcService service) {
 		Event event = new Event();
 		event.timestamp = System.currentTimeMillis();
 
@@ -287,7 +287,7 @@ public class EventRepository {
 			event.lon = App.getLastLocation().getLongitude();
 			event.lat = App.getLastLocation().getLatitude();
 		}
-		DLog.CR("Invio evento " + event.toStringOneLine());
+		DLog.CR("EventRepository.generateEvent();Invio evento " + event.toStringOneLine());
 		if (App.fullNode)
 			apiRepository.sendEvent(event, service);
 		else

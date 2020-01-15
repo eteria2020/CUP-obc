@@ -77,7 +77,7 @@ public class FPdfViewer extends FBase {
 	protected boolean openFile = false;
 	protected boolean download = false;
 	protected int fileSize = 0;
-	private int mega = 1024 * 1024; // per il buffer
+	int mega = 1024 * 1024; // per il buffer
 	private String downloadUrl;
 	private TextView tv1;
 	private Button b;
@@ -535,7 +535,7 @@ public class FPdfViewer extends FBase {
 
 		}
 
-		protected boolean DownloadPdf() throws JSONException {
+		boolean DownloadPdf() throws JSONException {
 
 			String fileUrl = Json.getString(fileType).replace(subDelete, "");
 			if (fileUrl == null)

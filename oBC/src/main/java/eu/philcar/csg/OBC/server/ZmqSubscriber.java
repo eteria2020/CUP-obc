@@ -31,18 +31,18 @@ public class ZmqSubscriber {
 	public void Start(Handler serviceHandler) {
 		try {
 
-			dlog.i("Starting ZMQ thread");
+			dlog.i("ZmqSubscriber.start();ZMQ thread");
 			//handler = serviceHandler;
 			zmqRunnable = new ZmqRunnable();
 			zmqThread = new Thread(zmqRunnable);
 			zmqThread.start();
 		} catch (Exception e) {
-			dlog.e("Exception while starting thread ", e);
+			dlog.e("ZmqSubscriber.start();Exception while starting thread ", e);
 		}
 	}
 
 	public void Restart(Handler serviceHandler) {
-		dlog.i("Restarting ZMQ thread");
+		dlog.i("ZmqSubscriber.Restart();ZMQ thread");
 		if (zmqThread != null && zmqRunnable != null) {
 
 			if (zmqRunnable.isStarting)
@@ -52,7 +52,7 @@ public class ZmqSubscriber {
 			try {
 				zmqThread.join(5000);
 			} catch (InterruptedException e) {
-				dlog.e("ZMQException ", e);
+				dlog.e("ZmqSubscriber.start();ZMQException ", e);
 
 			}
 
@@ -70,7 +70,7 @@ public class ZmqSubscriber {
 	}
 
 	private void handleZmqMessage(String channel, String payload) {
-		dlog.d("Received ZMQ message from channel '" + channel + "' with payload : '" + payload + "'");
+		dlog.d("ZmqSubscriber.handleZmqMessage();Received ZMQ message from channel '" + channel + "' with payload : '" + payload + "'");
 
 		Message msg = handler.obtainMessage(ObcService.MSG_SERVER_NOTIFY);
 		msg.arg1 = ObcService.SERVER_NOTIFY_RAW;
@@ -84,7 +84,7 @@ public class ZmqSubscriber {
 		private ZMQ.Context context;
 		private ZMQ.Socket socket;
 
-		public void zmqStop(final Thread th) {
+		private void zmqStop(final Thread th) {
 
 			if (th == null)
 				return;
@@ -94,11 +94,11 @@ public class ZmqSubscriber {
 					try {
 
 						context.term();
-						dlog.i("ZMQ context terminated");
+						dlog.i("ZmqSubscriber.zmqStop();ZMQ context terminated");
 						th.interrupt();
-						dlog.i("Thread interrupted");
+						dlog.i("ZmqSubscriber.zmqStop();Thread interrupted");
 					} catch (Exception e) {
-						dlog.e("Exception in zmqStop", e);
+						dlog.e("ZmqSubscriber.zmqStop();Exception in zmqStop", e);
 					}
 				}
 
@@ -108,7 +108,7 @@ public class ZmqSubscriber {
 
 		}
 
-		public boolean isStarting = false;
+		private boolean isStarting = false;
 
 		@Override
 		public void run() {
@@ -128,58 +128,61 @@ public class ZmqSubscriber {
 				socket.setTCPKeepAliveInterval(60);
 				socket.setReconnectIVL(1000);  //TODO: Add random  component
 
-				dlog.i("ZMQ Connecting to:" + App.Instance.getString(R.string.endpointSharengoZMQ));
+				dlog.i("ZmqSubscriber.run();Connecting to:" + App.Instance.getString(R.string.endpointSharengoZMQ));
 				socket.connect(App.Instance.getString(R.string.endpointSharengoZMQ));
 				//socket.subscribe(ZMQ.SUBSCRIPTION_ALL);
-				dlog.i("ZMQ Subscribing to channels: COMMON," + App.CarPlate);
+				dlog.i("ZmqSubscriber.run();Subscribing to channels: COMMON," + App.CarPlate);
 				socket.subscribe(App.CarPlate.getBytes());
 				socket.subscribe("COMMON".getBytes());
 
-				String channel = "";
-				dlog.i("ZMQ thread started");
+				String channel;
+				dlog.i("ZmqSubscriber.run();thread started");
 				isStarting = false;
 				while (!Thread.currentThread().isInterrupted()) {
 					try {
 						channel = socket.recvStr();
 					} catch (ZMQException e) {
-						if (e != null && e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
-							dlog.w("ZMQ recvStr terminated");
+						if (e.getErrorCode() == ZMQ.Error.ETERM.getCode()) {
+							dlog.w("ZmqSubscriber.run();recvStr terminated");
 							break;
 						} else {
-							dlog.e("ZMQ recvStr", e);
+							dlog.e("ZmqSubscriber.run();recvStr", e);
 							break;
 						}
 					}
 					if (socket.hasReceiveMore()) {
 
-						byte[] zmsg = socket.recv(0);
-
 						String str = "";
 						try {
-							String strRaw = new String(zmsg, "UTF-8");
-							str = Encryption.decryptAes(strRaw);
-							handleZmqMessage(channel, str);
+							byte[] zmsg = socket.recv(0);
+							if(zmsg!=null) {
+								String strRaw = new String(zmsg, "UTF-8");
+								str = Encryption.decryptAes(strRaw);
+								handleZmqMessage(channel, str);
+							}else {
+								dlog.e("ZmqSubscriber.run();zmsg is null");
+							}
+
 						} catch (UnsupportedEncodingException e) {
-							dlog.e("ZMQ message exception", e);
+							dlog.e("ZmqSubscriber.run();message exception", e);
 						}
 						Log.d("ZMQ", str);
-
 					}
 				}
 
-				dlog.i("ZMQ thread exited");
+				dlog.i("ZmqSubscriber.run();thread exited");
 				socket.close();
-				dlog.i("ZMQ socket closed");
+				dlog.i("ZmqSubscriber.run();socket closed");
 
 			} catch (ZError.IOException e) {
 
 				isStarting = false;
-				dlog.e("ZMQException Maybe A problem of too many file opened restarting OBC", e);
+				dlog.e("ZmqSubscriber.run();Maybe A problem of too many file opened restarting OBC", e);
 				throw e;
 			} catch (Exception e) {
 
 				isStarting = false;
-				dlog.e("ZMQException ", e);
+				dlog.e("ZmqSubscriber.run();", e);
 				if (App.hasNetworkConnection())
 					handler.sendMessageDelayed(MessageFactory.zmqRestart(), 5000);
 			}

@@ -6,6 +6,8 @@ import android.os.Message;
 import com.skobbler.ngx.SKCategories.SKPOICategory;
 import com.skobbler.ngx.SKMaps.SKLanguage;
 import com.skobbler.ngx.packages.SKPackage;
+import com.skobbler.ngx.packages.SKPackageManager;
+import com.skobbler.ngx.packages.SKPackageURLInfo;
 import com.skobbler.ngx.search.SKMultiStepSearchSettings;
 import com.skobbler.ngx.search.SKSearchListener;
 import com.skobbler.ngx.search.SKSearchManager;
@@ -18,9 +20,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import eu.philcar.csg.OBC.App;
+
 public class SkobblerSearch implements SKSearchListener {
 
-	private final String DefaultPackage = "IT";
+	private final String DefaultPackage = App.Instance.getSKMapsDefaultPackage().toUpperCase(); //"IT";
 	private List<SKPackage> packages;
 	private Map<Short, List<SKSearchResult>> resultsPerLevel = new HashMap<Short, List<SKSearchResult>>();
 	private SKSearchManager searchManager;
@@ -35,6 +39,8 @@ public class SkobblerSearch implements SKSearchListener {
 	public final static int MSG_FOUND_STREET = 2;
 	public final static int MSG_FOUND_HOUSENUMBER = 3;
 	public final static int MSG_RAW = 4;
+
+	private DLog dlog = new DLog(this.getClass());
 
 	public SkobblerSearch() {
 		searchManager = new SKSearchManager(this);
@@ -107,13 +113,26 @@ public class SkobblerSearch implements SKSearchListener {
 	}
 
 	private SKMultiStepSearchSettings getSearchSettings() {
+
+		SKPackage[] packages = SKPackageManager.getInstance().getInstalledPackages();
+
+        //dlog.d("SkobblerSearch.getSearchSettings(): " + DefaultPackage);
+        //dlog.d("SkobblerSearch.SKPackageManager()" + packages.length);
+		//String xmlurl = SKPackageManager.getInstance().getMapsXMLPathForVersion(1);
+		//dlog.d("SkobblerSearch.getMapsXMLPathForVersion: " + xmlurl);
+		//SKPackageURLInfo skinfo = SKPackageManager.getInstance().getURLInfoForPackageWithCode(App.Instance.getSKMapsDefaultPackage().toUpperCase(), false); //"IT"
+		//dlog.d("SkobblerSearch.getURLInfoForPackageWithCode: " + skinfo.toString());
+		//String mapURL = skinfo.getMapURL();
+		//dlog.d("SkobblerSearch.skinfo.getMapURL: " + mapURL);
+		//String nameBrowserFilesURL = skinfo.getNameBrowserFilesURL();
+		//dlog.d("SkobblerSearch.skinfo.getNameBrowserFilesURL: " + nameBrowserFilesURL);
+
 		SKMultiStepSearchSettings searchObject = new SKMultiStepSearchSettings();
 		// set the maximum number of results to be returned
 		searchObject.setMaxSearchResultsNumber(25);
 		// set the country code
 		searchObject.setOfflinePackageCode(DefaultPackage);
-		searchObject.setSearchLanguage(SKLanguage.LANGUAGE_IT);
-
+		searchObject.setSearchLanguage(SKLanguage.LANGUAGE_LOCAL);
 		return searchObject;
 	}
 
@@ -126,7 +145,6 @@ public class SkobblerSearch implements SKSearchListener {
 		searchObj.setListLevel(SKListLevel.SK_LIST_LEVEL_CITY);
 		searchObj.setParentIndex(-1);
 		searchObj.setSearchTerm(city);
-
 		searchManager.multistepSearch(searchObj);
 	}
 
@@ -149,12 +167,9 @@ public class SkobblerSearch implements SKSearchListener {
 	}
 
 	public boolean applyCategoryFilter(SKSearchResult result) {
-
 		if (categoryFilterList == null || categoryFilterList.isEmpty())
 			return true;
-
 		return categoryFilterList.contains(result.getCategory());
-
 	}
 
 	@Override
