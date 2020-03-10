@@ -21,6 +21,7 @@
     <string name="button_park">PAUSE RENT</string>
     <string name="button_end">END RENT</string>
 
+    <string name="call_help">Attention: to request assistance, please use the dedicated function on the Sharengo app on your mobile phone</string>
     <string name="call_book">Book call or insert a new number</string>
     <string name="call_dealt_old">Call to customer assistance forwarded</string>
     <string name="call_dealt">Support call sent to customer service, you\'ll be called back</string>
