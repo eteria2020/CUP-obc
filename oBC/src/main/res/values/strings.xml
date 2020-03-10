@@ -21,6 +21,7 @@
     <string name="button_park">SOSTA</string>
     <string name="button_end">TERMINA</string>
 
+    <string name="call_help">Attenzione: per richiedere assistenza siete pregati di utilizzare la funzione dedicata sull'app Sharengo del vostro cellulare</string>
     <string name="call_book">Prenota la chiamata o inserisci nuovo numero</string>
     <string name="call_dealt_old">Chiamata al centro assistenza inoltrata</string>
     <string name="call_dealt">Richiesta inoltrata al centro assistenza,verrete richiamati sul numero specificato</string>
