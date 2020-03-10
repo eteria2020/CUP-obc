@@ -106,8 +106,16 @@ public class FSOS extends FBase implements OnClickListener {
 			}
 		});
 
-		dialCallB.setOnClickListener(this);
-		changeNumberB.setOnClickListener(this);
+		if (App.Instance.getDefaultLang().equals("it")) {
+			dialCallB.setText(R.string.call_help);
+			changeNumberB.setVisibility(View.GONE);
+			messageTV.setVisibility(View.INVISIBLE);
+			numberTV.setVisibility(View.INVISIBLE);
+		} else {
+			dialCallB.setOnClickListener(this);
+			changeNumberB.setOnClickListener(this);
+		}
+
 		cancelIB.setOnClickListener(this);
 
 		if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {

@@ -2,17 +2,20 @@
 
 Tutte le modifiche rilevanti a questo progetto saranno documentate in questo file.
 
+## [0.112.4] - 2020-03-09
+### VersionCode=194
+### Changes
+- removed SOS management (Italy)
+
 ## [0.112.4] - 2019-12-09
 ### VersionCode=194
 ### Changes
 - changed translations (Slovenia)
 
-
 ## [0.112.3] - 2019-11-22
 ### VersionCode=193
 ### Changes
 - added internationalized strings to GoodBye forms (f_goodbye.xml)
-
 
 ## [0.112.2] - 2019-10-24
 ### VersionCode=192
@@ -20,13 +23,11 @@ Tutte le modifiche rilevanti a questo progetto saranno documentate in questo fil
 - implemented navigator function using localized maps based on the release
 - implemented navigator function using localized voices based on the release
 
-
 ## [0.112.1] - 2019-09-25
 ### VersionCode=191
 ### Changes
 - update app with new release (Slovenia)
 - added use of local banners for non-Italian releases
-
 
 ## [0.112.0] - 2019-07-08
 ### VersionCode=190
