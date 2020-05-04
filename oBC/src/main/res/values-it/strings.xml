@@ -19,10 +19,10 @@
     <string name="button_recharge">PUNTO RICARICA</string>
     <string name="button_search">CERCA</string>
     <string name="button_home">MENU</string>
-    <string name="button_park">SOSTA</string>
+    <string name="button_park">CHIUSURA PORTIERE</string>
     <string name="button_end">TERMINA</string>
 
-    <string name="call_help">Attenzione: per richiedere assistenza siete pregati di utilizzare la funzione dedicata sull\'app Sharengo del vostro cellulare</string>
+    <string name="call_help"><b>HAI BISOGNO DI ASSISTENZA?</b>\n\nIl Servizio Clienti è attivo\ndal lunedì al venerdì dalle 9 alle 17\nall’indirizzo mail mysharengo@sharengo.eu\noppure al numero 0586 1863183</string>
     <string name="call_book">Prenota la chiamata o inserisci nuovo numero</string>
     <string name="call_dealt_old">Chiamata al centro assistenza inoltrata</string>
     <string name="call_dealt">Richiesta inoltrata al centro assistenza,verrete richiamati sul numero specificato</string>
@@ -75,10 +75,10 @@
 
     <string name="instruction_title">Per iniziare ad utilizzare l\'auto</string>
 
-    <string name="instruction_start_1">Controlla che il grande pulsante rosso posto fra i sedili sia alzato</string>
+    <string name="instruction_start_1">Controlla che il pulsante rosso davanti al freno a mano sia alzato  (ove presente secondo il modello dell’auto)</string>
     <string name="instruction_start_2">Gira la chiave</string>
-    <string name="instruction_start_3">Attendi la scritta Ready sul cruscotto</string>
-    <string name="instruction_start_4">Schiaccia il bottone D o R</string>
+    <string name="instruction_start_3">Attendi la scritta READY sul cruscotto</string>
+    <string name="instruction_start_4">Cambia con i pulsanti\n<b>D</b>=Avanti, <b>R</b>=Retro, <b>N</b>=Folle</string>
 
     <string name="instruction_damages">Vedi danni sull\'auto?</string>
     <string name="instruction_dirty"> E\' sporca?</string>
@@ -122,16 +122,16 @@
     <string name="menu_refuel">Fai rifornimento</string>
     <string name="menu_refuel_off">Fai rifornimento (disabilitato)</string>
     <string name="menu_refuel_shutdown_engine">Fai rifornimento (spegni prima il motore)</string>
-    <string name="menu_park_mode_started">Per riprendere il noleggio usa il comando APRI PORTE sul telefono o passa la tua Card per abilitare il motore</string>
-    <string name="menu_park_mode_resume">Riprendi il noleggio</string>
-    <string name="menu_park_mode_resume_shutdown_engine">Riprendi il noleggio (spegni prima il motore)</string>
+    <string name="menu_park_mode_started">Per tornare a guidare usa il comando APRI PORTE sul telefono o passa la tua Card sul lettore RFID posto sul vetro per accedere al veicolo</string>
+    <string name="menu_park_mode_resume">[1] <b>PREMI</b> il pulsante\n\n[2] <b>GIRA</b> la chiave\n\n[3] <b>ATTENDI</b> il READY</string>
+    <string name="menu_park_mode_resume_shutdown_engine">Torna a guidare (spegni prima il motore)</string>
 
     <string name="menu_park_mode_suspend"><b>INIZIA LA SOSTA</b> - <u>Prima</u> controlla di non lasciare cose a bordo , togli le cose che ti servono dal bagagliaio , chiudi luci e finestrini</string>
     <string name="menu_park_mode_suspend_off"><b>INIZIA LA SOSTA</b> - <u>Prima</u> controlla di non lasciare cose a bordo, togli le cose che ti servono dal bagagliaio , chiudi luci e finestrini (disabilitato)</string>
 
     <string name="menu_park_mode_suspend_shutdown_engine"><b>INIZIA LA SOSTA</b> - <u>Prima</u> controlla di non lasciare cose a bordo, togli le cose che ti servono dal bagagliaio , chiudi luci e finestrini  (spegni prima il motore)</string>
 
-    <string name="menu_park_mode_suspend_instructions">SEI IN SOSTA - Ora puoi scendere. Le porte si chiuderanno automaticamente nel tempo indicato a destra.\n\nAl termine della sosta usa il comando APRI PORTE sul telefono o la tua Card per rientrare in macchina</string>
+    <string name="menu_park_mode_suspend_instructions">Le porte si chiuderanno in automatico nel tempo indicato a destra.\n\nAnticipa la chiusura passando la tua card sul lettore RFID posto sul vetro.\n\n<b>PORTA SEMPRE CON TE LA CARD!</b></string>
 
     <string name="push_to_cancel">Premi per\nannullare</string>
 

@@ -180,25 +180,31 @@ public class FInstructions extends FBase {
 
 			}
 			view.findViewById(R.id.fins_message_bottom_TV).setVisibility(View.GONE);
-
-			view.findViewById(R.id.ivDamages).setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					((ABase) getActivity()).pushFragment(FDamages.newInstance(true), FDamages.class.getName(), true);
-				}
-
-			});
-
-			view.findViewById(R.id.ivDirty).setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					((ABase) getActivity()).pushFragment(FCleanliness.newInstance(), FCleanliness.class.getName(), true);
-				}
-
-			});
-
+            // MySharengo version //
+			if (App.Instance.getDefaultLang().equals("it")) {
+				view.findViewById(R.id.ivDamages).setVisibility(View.GONE);
+				view.findViewById(R.id.tvDamages).setVisibility(View.GONE);
+				view.findViewById(R.id.ivDirty).setVisibility(View.GONE);
+				view.findViewById(R.id.tvDirty).setVisibility(View.GONE);
+				ViewGroup.LayoutParams layoutParams = fins_right_FL.getLayoutParams();
+				layoutParams.width = 200;
+				fins_right_FL.setLayoutParams(layoutParams);
+			}
+			else {
+				view.findViewById(R.id.ivDamages).setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						((ABase) getActivity()).pushFragment(FDamages.newInstance(true), FDamages.class.getName(), true);
+					}
+				});
+				view.findViewById(R.id.ivDirty).setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						((ABase) getActivity()).pushFragment(FCleanliness.newInstance(), FCleanliness.class.getName(), true);
+					}
+				});
+			}
+            // end MySharengo version //
 		} else {
 			try {
 				App.setIsCloseable(true);

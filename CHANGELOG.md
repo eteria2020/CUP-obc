@@ -2,10 +2,15 @@
 
 Tutte le modifiche rilevanti a questo progetto saranno documentate in questo file.
 
-## [0.112.4] - 2020-03-09
-### VersionCode=194
+## [0.112.5p] - 2020-03-11
+### VersionCode=196
 ### Changes
-- removed SOS management (Italy)
+- removed close trip button for Italian realease
+
+## [0.112.5] - 2020-03-09
+### VersionCode=195
+### Changes
+- removed SOS management for Italian realease
 
 ## [0.112.4] - 2019-12-09
 ### VersionCode=194

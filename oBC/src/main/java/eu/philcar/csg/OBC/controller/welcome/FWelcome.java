@@ -16,6 +16,7 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -155,6 +156,12 @@ public class FWelcome extends FBase {
 				nextPage();
 			}
 		});
+
+		// MySharengo version //
+		if (App.Instance.getDefaultLang().equals("it")) {
+			((ImageView) view.findViewById(R.id.fwelLogoIV)).setImageResource(R.drawable.mysng_logo_welcome);
+		}
+		// end MySharengo version //
 
 		// Count  taps for service login dialog
 		view.findViewById(R.id.fwelLogoIV).setOnClickListener(new OnClickListener() {

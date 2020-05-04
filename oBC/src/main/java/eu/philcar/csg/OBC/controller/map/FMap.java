@@ -3117,7 +3117,13 @@ public class FMap extends FBase implements OnClickListener {
 						ImageV.delete();
 						//initWebBanner(Banner.getString("URL",null));
 						//webViewBanner.setVisibility(View.INVISIBLE);
-						adIV.setImageResource(R.drawable.car_banner_offline);
+						// MySharengo version //
+						if (App.Instance.getDefaultLang().equals("it")) {
+							adIV.setImageResource(R.drawable.mysng_car_banner_offline);
+						} else {
+							adIV.setImageResource(R.drawable.car_banner_offline);
+						}
+						// end MySharengo version //
 						adIV.setVisibility(View.VISIBLE);
 						if (!FHome.started) {
 							FHome.started = true;
@@ -3137,7 +3143,13 @@ public class FMap extends FBase implements OnClickListener {
 				e.printStackTrace();
 				//initWebBanner(Banner.getString("URL",null));
 				//webViewBanner.setVisibility(View.INVISIBLE);
-				adIV.setImageResource(R.drawable.car_banner_offline);
+				// MySharengo version //
+				if (App.Instance.getDefaultLang().equals("it")) {
+					adIV.setImageResource(R.drawable.mysng_car_banner_offline);
+				} else {
+					adIV.setImageResource(R.drawable.car_banner_offline);
+				}
+				// end MySharengo version //
 				adIV.setVisibility(View.VISIBLE);
 
 			}
@@ -3145,9 +3157,14 @@ public class FMap extends FBase implements OnClickListener {
 			dlog.e("FMap.loadBanner();Bundle null, visualizzo offline");
 			//initWebBanner(Banner.getString("URL",null));
 			//webViewBanner.setVisibility(View.INVISIBLE);
-			adIV.setImageResource(R.drawable.car_banner_offline);
+			// MySharengo version //
+			if (App.Instance.getDefaultLang().equals("it")) {
+				adIV.setImageResource(R.drawable.mysng_car_banner_offline);
+			} else {
+				adIV.setImageResource(R.drawable.car_banner_offline);
+			}
+			// end MySharengo version //
 			adIV.setVisibility(View.VISIBLE);
-
 		}
 
 		if (!FHome.started) {

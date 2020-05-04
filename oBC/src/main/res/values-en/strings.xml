@@ -18,10 +18,10 @@
     <string name="button_recharge">RECHARGE POINTS</string>
     <string name="button_search">FIND</string>
     <string name="button_home">MENU</string>
-    <string name="button_park">PAUSE RENT</string>
+    <string name="button_park">DOOR CLOSING</string>
     <string name="button_end">END RENT</string>
 
-    <string name="call_help">Attention: to request assistance, please use the dedicated function on the Sharengo app on your mobile phone</string>
+    <string name="call_help"><b>DO YOU NEED ASSISTANCE?</b>\n\nCustomer Service is available\nfrom Monday to Friday from 9 to 17\nat the email address mysharengo@sharengo.eu\nor at 0586 1863183</string>
     <string name="call_book">Book call or insert a new number</string>
     <string name="call_dealt_old">Call to customer assistance forwarded</string>
     <string name="call_dealt">Support call sent to customer service, you\'ll be called back</string>
@@ -74,10 +74,10 @@
 
     <string name="instruction_title">Preparing to drive the vehicle</string>
     <string name="instruction_title_close">How to leave the vehicle</string>
-    <string name="instruction_start_1">Check that the big red button between the seats is lifted</string>
-    <string name="instruction_start_2">Turn the key clockwise</string>
-    <string name="instruction_start_3">Wait for the Ready sign on the instrument panel</string>
-    <string name="instruction_start_4">Press the D or R button</string>
+    <string name="instruction_start_1">Check that the red button in front of the handbrake is raised (if present according to the car model)</string>
+    <string name="instruction_start_2">Turn the key</string>
+    <string name="instruction_start_3">Wait for READY on the dashboard</string>
+    <string name="instruction_start_4">Change with the buttons\n<b>D</b>=Forward, <b>R</b>=Back, <b>N</b>=Neutral</string>
 
     <string name="instruction_damages">Are there any damages?</string>
     <string name="instruction_dirty">Is it dirty?</string>
@@ -127,12 +127,12 @@
     <string name="menu_refuel">Refuel</string>
     <string name="menu_refuel_off">Refuel (not available)</string>
     <string name="menu_refuel_shutdown_engine">Refuel (switch off engine first)</string>
-    <string name="menu_park_mode_started">To resume rent please use command OPEN DOORS on your phone or your card to get back in the car</string>
-    <string name="menu_park_mode_resume">Resume rent</string>
-    <string name="menu_park_mode_resume_shutdown_engine">Resume rent (switch off engine first)</string>
+    <string name="menu_park_mode_started">To go back to driving click on the buttom OPEN DOORS on the phone or pass your Card on the RFID reader on the glass to access the vehicle</string>
+    <string name="menu_park_mode_resume">[1] <b>CLICK</b> the button\n\n[2] <b>TURN</b> the key\n\n[3] <b>WAIT</b> for READY on the dashboard</string>
+    <string name="menu_park_mode_resume_shutdown_engine">Go back to driving (turn off the engine first)</string>
     <string name="menu_park_mode_suspend">Pause Rent</string>
     <string name="menu_park_mode_suspend_off">Suspend rent (not available)</string>
-    <string name="menu_park_mode_suspend_instructions">Your rent session is now paused. You can exit the car, the doors will automatically close in the seconds shown on the right. To open the doors and start driving again, please either use the "OPEN DOORS" command on the Application or use your Share\'ngo card.</string>
+    <string name="menu_park_mode_suspend_instructions">The doors will close automatically in the time indicated on the right.\n\nAnticipate the closing by passing your card on the RFID reader placed on the glass.</string>
     <string name="menu_park_mode_suspend_shutdown_engine">Suspend rent (switch off engine first)</string>
     <string name="milan">Milano</string>
     <string name="minutes_saved">Minutes saved&#58;</string>
@@ -239,7 +239,7 @@
     <string name="menu_park_mode_suspend_key_on">Please turn off the car before pausing the rent</string>
     <string name="button_video_tutorial">TUTORIAL</string>
     <string name="button_assicurazione">INSURANCE</string>
-    <string name="button_libretto">REGISTRATIONCARD</string>
+    <string name="button_libretto">REGISTRATION CARD</string>
     <!--<string name="endpointSharengo">https://api.sharengo.it:8123/</string>
     <string name="endpointSharengoBeacon">http://core.sharengo.it:7600/</string>
     <string name="endpointSharengoPhp">http://core.sharengo.it/api/</string>-->

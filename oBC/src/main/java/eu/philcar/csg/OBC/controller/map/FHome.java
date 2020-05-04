@@ -181,13 +181,23 @@ public class FHome extends FBase implements OnClickListener {
 		}
 		tts = new ProTTS(getActivity());
 
-		view.findViewById(R.id.fmapVideo).setOnClickListener(this);
+
 		view.findViewById(R.id.fmapSOSB).setOnClickListener(this);
 		view.findViewById(R.id.fmapSearchB).setOnClickListener(this);
 		view.findViewById(R.id.fmapRadioB).setOnClickListener(this);
-		view.findViewById(R.id.fmapDamagesIB).setOnClickListener(this); // momo debug
 		//((Button) view.findViewById(R.id.fmapFuelStationsB)).setOnClickListener(this); rimosso su richiesta mkt
-		view.findViewById(R.id.fmapCloseTriplB).setOnClickListener(this);
+        // MySharengo version //
+		if (App.Instance.getDefaultLang().equals("it")) {
+			view.findViewById(R.id.fmapVideo).setVisibility(View.GONE);
+			view.findViewById(R.id.fmapDamagesIB).setVisibility(View.GONE);
+			view.findViewById(R.id.fmapCloseTriplB).setVisibility(View.GONE);
+			view.findViewById(R.id.fmapParkB).setBackgroundResource(R.drawable.sel_button_lock);
+		} else {
+			view.findViewById(R.id.fmapVideo).setOnClickListener(this);
+			view.findViewById(R.id.fmapDamagesIB).setOnClickListener(this); // momo debug
+			view.findViewById(R.id.fmapCloseTriplB).setOnClickListener(this);
+		}
+        // end MySharengo version //
 		view.findViewById(R.id.fmapParkB).setOnClickListener(this);
 		view.findViewById(R.id.fmapAssicurazione).setOnClickListener(this);
 		view.findViewById(R.id.fmapLibretto).setOnClickListener(this);
@@ -1250,7 +1260,13 @@ public class FHome extends FBase implements OnClickListener {
 							ImageV.delete();
 							//initWebBanner(Banner.getString("URL",null));
 							// webViewBanner.setVisibility(View.INVISIBLE);
-							adIV.setImageResource(R.drawable.car_banner_offline);
+							// MySharengo version //
+							if (App.Instance.getDefaultLang().equals("it")) {
+								adIV.setImageResource(R.drawable.mysng_car_banner_offline);
+							} else {
+								adIV.setImageResource(R.drawable.car_banner_offline);
+							}
+							// end MySharengo version //
 							adIV.setVisibility(View.VISIBLE);
 							if (!started) {
 								started = true;
@@ -1270,14 +1286,26 @@ public class FHome extends FBase implements OnClickListener {
 					e.printStackTrace();
 					//initWebBanner(Banner.getString("URL",null));
 					// webViewBanner.setVisibility(View.INVISIBLE);
-					adIV.setImageResource(R.drawable.car_banner_offline);
+					// MySharengo version //
+					if (App.Instance.getDefaultLang().equals("it")) {
+						adIV.setImageResource(R.drawable.mysng_car_banner_offline);
+					} else {
+						adIV.setImageResource(R.drawable.car_banner_offline);
+					}
+					// end MySharengo version //
 					adIV.setVisibility(View.VISIBLE);
 				}
 			} else {
 				dlog.e("FHome.updateBanner();Bundle null, visualizzo offline");
 				//initWebBanner(Banner.getString("URL",null));
 				//webViewBanner.setVisibility(View.INVISIBLE);
-				adIV.setImageResource(R.drawable.car_banner_offline);
+				// MySharengo version //
+				if (App.Instance.getDefaultLang().equals("it")) {
+					adIV.setImageResource(R.drawable.mysng_car_banner_offline);
+				} else {
+					adIV.setImageResource(R.drawable.car_banner_offline);
+				}
+				// end MySharengo version //
 				adIV.setVisibility(View.VISIBLE);
 			}
 

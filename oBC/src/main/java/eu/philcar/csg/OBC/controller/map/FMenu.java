@@ -132,10 +132,17 @@ public class FMenu extends FBase implements OnClickListener {
 //		cancelTV.setTypeface(font);
 //		sosB.setTypeface(font);
 
-
 		sosB.setOnClickListener(this);
-		ivDamages.setOnClickListener(this);
-		ivDamages.setVisibility(View.VISIBLE);
+
+		// MySharengo version //
+		if (App.Instance.getDefaultLang().equals("it")) {
+			((TextView) view.findViewById(R.id.fmen_title_TV)).setText("MYSHARENGO");
+			ivDamages.setVisibility(View.GONE);
+		} else {
+			ivDamages.setOnClickListener(this);
+			ivDamages.setVisibility(View.VISIBLE);
+		}
+		// end MySharengo version //
 
 		if (App.currentTripInfo != null && App.currentTripInfo.isMaintenance) {
 			fmen_right_FL.setBackgroundColor(getResources().getColor(R.color.background_red));
@@ -390,25 +397,52 @@ public class FMenu extends FBase implements OnClickListener {
 
 				switch (App.parkMode) {
 					case PARK_OFF:        // (FALSE, DATE, OFF) //
-						UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_off, null,
-								R.drawable.ic_letter_p, R.string.menu_park_mode_suspend_instructions, null,
-								R.drawable.ic_arrow_left, R.string.menu_cancel_action, this,
-								R.drawable.ic_arrow_left, this);
+						// MySharengo version //
+						if (App.Instance.getDefaultLang().equals("it")) {
+							UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_off, null,
+									R.drawable.ic_lock, R.string.menu_park_mode_suspend_instructions, null,
+									R.drawable.ic_arrow_left, R.string.menu_cancel_action, this,
+									R.drawable.ic_arrow_left, this);
+						} else {
+							UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_off, null,
+									R.drawable.ic_letter_p, R.string.menu_park_mode_suspend_instructions, null,
+									R.drawable.ic_arrow_left, R.string.menu_cancel_action, this,
+									R.drawable.ic_arrow_left, this);
+						}
+						// end MySharengo version //
 						break;
 					case PARK_STARTED:    // (FALSE, DATE, STARTED)
-						UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_off, null,
-								R.drawable.ic_letter_p, R.string.menu_park_mode_started, null,
-								R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
-								R.drawable.ic_arrow_left, null);
+						// MySharengo version //
+						if (App.Instance.getDefaultLang().equals("it")) {
+							UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_off, null,
+									R.drawable.ic_key_green, R.string.menu_park_mode_started, null,
+									R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+									R.drawable.ic_arrow_left, null);
+						} else {
+							UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_off, null,
+									R.drawable.ic_letter_p, R.string.menu_park_mode_started, null,
+									R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+									R.drawable.ic_arrow_left, null);
+						}
+						// end MySharengo version //
 						stopSelfClose(rootView);
 						if (endRentLL != null)
 							endRentLL.setVisibility(View.GONE);
 						break;
 					case PARK_ENDED:    // (FALSE, DATE, ENDED)
-						UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_off, null,
-								R.drawable.ic_letter_p, R.string.menu_park_mode_resume, this,
-								R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
-								R.drawable.ic_arrow_left, null);
+						// MySharengo version //
+						if (App.Instance.getDefaultLang().equals("it")) {
+							UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_off, null,
+									R.drawable.ic_key_green, R.string.menu_park_mode_resume, this,
+									R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+									R.drawable.ic_arrow_left, null);
+						} else {
+							UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_off, null,
+									R.drawable.ic_letter_p, R.string.menu_park_mode_resume, this,
+									R.drawable.ic_arrow_left, R.string.menu_cancel_action, null,
+									R.drawable.ic_arrow_left, null);
+						}
+						// end MySharengo version //
 						if (endRentLL != null)
 							endRentLL.setVisibility(View.GONE);
 						break;
@@ -448,7 +482,7 @@ public class FMenu extends FBase implements OnClickListener {
 								} else {
 									if (clickedButton.equalsIgnoreCase(REQUEST_END_RENT))
 										UIHelper(R.drawable.ic_letter_x_red, R.string.menu_rent_end_instruction, null,
-												R.drawable.ic_letter_p, R.string.menu_park_mode_resume, null,
+												R.drawable.ic_key_green, R.string.menu_park_mode_resume, null,
 												R.drawable.ic_arrow_left, R.string.menu_cancel_action, this,
 												R.drawable.ic_arrow_left, this);
 								}
