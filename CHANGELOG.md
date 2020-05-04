@@ -2,6 +2,11 @@
 
 Tutte le modifiche rilevanti a questo progetto saranno documentate in questo file.
 
+## [0.112.5p] - 2020-04-02
+### VersionCode=196
+### Changes
+- new release for MySharengo project (#950)
+
 ## [0.112.5p] - 2020-03-11
 ### VersionCode=196
 ### Changes
